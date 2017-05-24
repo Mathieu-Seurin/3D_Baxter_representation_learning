@@ -53,7 +53,7 @@ IM_HEIGHT = 200
 --===========================================================
 -- CUDA CONSTANTS
 --===========================================================
-USE_CUDA = true --false
+USE_CUDA = false
 USE_SECOND_GPU = true
 
 if USE_CUDA and USE_SECOND_GPU then
@@ -100,24 +100,22 @@ elseif DATA_FOLDER == 'mobileRobot' then
 
    SUB_DIR_IMAGE = 'recorded_camera_top'
 
-elseif DATA_FOLDER == 'realBaxterPushingObjects' then
+elseif DATA_FOLDER == 'realBaxterPushingObjects' then  --TODO upload to data_baxter repo
   -- Leni's real Baxter data on  ISIR dataserver. It is named "data_archive_sim_1".
   DEFAULT_PRECISION = 0.1
   -- CLAMP_CAUSALITY = false
-  --
   -- MIN_TABLE = {-10000,-10000} -- for x,y
   -- MAX_TABLE = {10000,10000} -- for x,y
   --
-  -- DIMENSION_IN = 2
-  --
-  -- REWARD_INDICE = 1
+  DIMENSION_IN = 3
+  REWARD_INDICE = 2
   -- INDICE_TABLE = {1,2} --column indice for coordinate in state file (respectively x,y)
   --
-  -- FILENAME_FOR_ACTION = "action"
-  -- FILENAME_FOR_STATE = "state"
-  -- FILENAME_FOR_REWARD = "reward"
+  FILENAME_FOR_ACTION = "action_pushing_object.txt" -- equiv to recorded_button1_is_pressed.txt right now in 3D simulated learning representations
+  FILENAME_FOR_STATE = "state_pushing_object"
+  FILENAME_FOR_REWARD = "reward_pushing_object"
   --
-  -- SUB_DIR_IMAGE = 'recorded_camera_top'
+  SUB_DIR_IMAGE = 'baxter_pushing_objects'
 
 else
   print("No supported data folder provided, please add either of simpleData3D, mobileRobot or Leni's realBaxterPushingObjects")
