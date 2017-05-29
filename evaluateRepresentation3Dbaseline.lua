@@ -55,12 +55,10 @@ end
 --MODEL_NAME, name = 'Save97Win/reprLearner1d.t7', '97'
 --MODEL_NAME,name = 'reprLearner1dWORKS.t7', 'works'
 MODEL_NAME, representationsName = 'reprLearner3d.t7', 'default'  --TODO create
--- if this doesn't exist, it means you didn't run 'train.lua'
+-- if this doesn't exist, it means you didn't run 'script.lua'
 MODEL_FULL_PATH = MODEL_PATH..MODEL_NAME
 DATA = PRELOAD_FOLDER..'imgsCv1.t7'  --TODO 'preloaded_simpleData3D_Seq1_normalized.t7'
 PLOT = true
-LOADING = false --true
-
 
 print('Running main script with USE_CUDA flag: '..tostring(USE_CUDA))
 print('DIMENSION_OUT: '..DIMENSION_OUT.." LearningRate: "..LR.." BATCH_SIZE: "..BATCH_SIZE..". Using data folder: "..DATA_FOLDER.." Model file Torch: "..MODEL_ARCHITECTURE_FILE..'Preloaded DATA: '..DATA)
@@ -316,8 +314,7 @@ function createPreloadedDataFolder(list_folders_images,list_txt,LOG_FOLDER,use_s
    local coef_list={coef_Temp,coef_Prop,coef_Rep,coef_Caus}
    local list_corr={}
 
-  --  local plot = false
-   local loading = true
+  --  local plot = false    local loading = true
 
    NB_SEQUENCES = #list_folders_images
 	 print('createPreloadedDataFolder for NB_SEQUENCES: '..NB_SEQUENCES)
@@ -328,7 +325,7 @@ function createPreloadedDataFolder(list_folders_images,list_txt,LOG_FOLDER,use_s
       currentLogFolder=LOG_FOLDER..'CrossVal'..crossValStep..'/' --*
       current_preload_file = PRELOAD_FOLDER..'imgsCv'..crossValStep..'.t7'
 
-      if file_exists(current_preload_file) and loading then
+      if file_exists(current_preload_file) and RELOAD_MODEL then
          print("Preloaded Data Already Exists, Loading from file: "..current_preload_file.."...")
          imgs = load_seq_by_id(crossValStep)--imgs = torch.load(current_preload_file)
          local imgs_test = imgs[#imgs]
@@ -391,16 +388,16 @@ function createPreloadedDataFolder(list_folders_images,list_txt,LOG_FOLDER,use_s
 						-- local data1 = load_seq_by_id(indice1)
 						-- local data2 = load_seq_by_id(indice2)
 
-            batch=getRandomBatchFromSeparateListContinuous(imgs1,imgs2,BATCH_SIZE,"Temp")--batch(imgs1,imgs2,txt1,txt2,BATCH_SIZE,"Temp")
+            batch=getRandomBatchFromSeparateList(imgs1,imgs2,BATCH_SIZE,"Temp", USE_CONTINUOUS)--batch(imgs1,imgs2,txt1,txt2,BATCH_SIZE,"Temp")
             lossTemp = lossTemp + Rico_Training_evaluation(models,'Temp',batch, coef_Temp,LR)
 
-            batch=getRandomBatchFromSeparateListContinuous(imgs1,imgs2,BATCH_SIZE,"Caus")
+            batch=getRandomBatchFromSeparateList(imgs1,imgs2,BATCH_SIZE,"Caus", USE_CONTINUOUS)
             lossCaus = lossCaus + Rico_Training_evaluation(models, 'Caus',batch, 1,LR)
 
-            batch=getRandomBatchFromSeparateListContinuous(imgs1,imgs2,BATCH_SIZE,"Prop")
+            batch=getRandomBatchFromSeparateList(imgs1,imgs2,BATCH_SIZE,"Prop", USE_CONTINUOUS)
             lossProp = lossProp + Rico_Training_evaluation(models, 'Prop',batch, coef_Prop,LR)
 
-            batch=getRandomBatchFromSeparateListContinuous(imgs1,imgs2,BATCH_SIZE,"Rep")
+            batch=getRandomBatchFromSeparateList(imgs1,imgs2,BATCH_SIZE,"Rep", USE_CONTINUOUS)
             lossRep = lossRep + Rico_Training_evaluation(models,'Rep',batch, coef_Rep,LR)
 
             xlua.progress(numBatch, NB_BATCHES)
@@ -426,7 +423,7 @@ end
 
 --from functions 1D
 function createModels(MODEL_FULL_PATH)
-   if LOADING then
+   if RELOAD_MODEL then
       print("Loading Model..."..MODEL_FULL_PATH)
       if file_exists(MODEL_FULL_PATH) then
          model = torch.load(MODEL_FULL_PATH)  --LOG_FOLDER..'20e.t7'
@@ -441,6 +438,8 @@ function createModels(MODEL_FULL_PATH)
 
    if USE_CUDA then
 		 model=model:cuda()
+	 else
+		 model=model:double()
 	 end
    parameters,gradParameters = model:getParameters()
    model2=model:clone('weight','bias','gradWeight','gradBias','running_mean','running_std')
@@ -539,6 +538,9 @@ local function getRewardsFromTxts(txt_joint, nb_parts, part)
    return torch.Tensor(y)
 end
 
+
+
+
 ------------------------------------
 -- Our representation learnt should be coordinate independent, as it is not aware of
 -- what is x,y,z and thus, we should be able to reconstruct the state by switching
@@ -551,9 +553,9 @@ local dataAugmentation=true
 -- if not file_exists(PRELOAD_FOLDER) then   --TODO  needed? Remove and leave in const only once
 --    lfs.mkdir(PRELOAD_FOLDER)
 -- end
-if not file_exists(LOG_FOLDER) then
-   lfs.mkdir(LOG_FOLDER)
-end
+-- if not file_exists(LOG_FOLDER) then
+--    lfs.mkdir(LOG_FOLDER)
+-- end
 ---
 list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(DATA_FOLDER)
 NB_SEQUENCES = #list_folders_images
