@@ -35,10 +35,11 @@ end
 
 outStr = ''
 
-for seqStr in lfs.dir(imagesFolder) do
-   if string.find(seqStr,'record') then
-      print("Sequence : ",seqStr)
-      local imagesPath = imagesFolder..'/'..seqStr..'/'..SUB_DIR_IMAGE
+tempSeq = {}
+for dir_seq_str in lfs.dir(imagesFolder) do
+   if string.find(dir_seq_str,'record') then
+      print("Sequence : ",dir_seq_str)
+      local imagesPath = imagesFolder..'/'..dir_seq_str..'/'..SUB_DIR_IMAGE
       for imageStr in lfs.dir(imagesPath) do
          if string.find(imageStr,'jpg') then
             local fullImagesPath = imagesPath..'/'..imageStr
@@ -47,19 +48,27 @@ for seqStr in lfs.dir(imagesFolder) do
             if USE_CUDA then
               img = getImageFormated(fullImagesPath):cuda():reshape(1,3,200,200)
             else
-              img = getImageFormated(fullImagesPath):double():reshape(1,3,200,200)  --TODO IF NOT USING CUDA, THIS DOES NOT WORK either way, with :cuda() nor without: In 1 module of nn.Sequential: /home/natalia/torch/install/share/lua/5.1/nn/THNN.lua:110: bad argument #3 to 'v' (cannot convert 'struct THDoubleTensor *' to 'struct THFloatTensor *')
+              img = getImageFormated(fullImagesPath):float():reshape(1,3,200,200)
+              --TODO IF NOT USING CUDA, THIS DOES NOT WORK either way =========== working now ?
             end
             repr = model:forward(img)
             for i=1,repr:size(2) do
                reprStr = reprStr..repr[{1,i}]..' '
             end
-            outStr = outStr..fullImagesPath..' '..reprStr..'\n'
-
+            tempSeq[#tempSeq+1] = {fullImagesPath, fullImagesPath..' '..reprStr}
          end
       end
    end
+
+
+end
+
+table.sort(tempSeq, function (a,b) return a[1] < b[1] end)
+tempSeqStr = ''
+for key in pairs(tempSeq) do
+   tempSeqStr = tempSeqStr..tempSeq[key][2]..'\n'
 end
 
 file = io.open(path..'/saveImagesAndRepr.txt', 'w')
-file:write(outStr)
+file:write(tempSeqStr)
 file:close()

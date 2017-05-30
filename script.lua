@@ -19,20 +19,19 @@ require 'definition_priors'
 require 'const'
 -- try to avoid global variable as much as possible
 
-function Rico_Training(Models,Mode,data1,data2,criterion,coef,LR,BATCH_SIZE, USE_CONTINUOUS)
-   local mom=0.9
-   local coefL2=0,0
+function Rico_Training(Models,data1,data2)
 
-   if USE_CONTINUOUS then
-     batch, action1, action2 = getRandomBatchFromSeparateListContinuous(data1,data2,BATCH_SIZE,Mode)
-   else
-     batch = getRandomBatchFromSeparateList(data1,data2,BATCH_SIZE,Mode)
-   end
+   local rep_criterion=get_Rep_criterion()
+   local prop_criterion=get_Prop_criterion()
+   local caus_criterion=get_Caus_criterion()
+   local temp_criterion=nn.MSDCriterion()
+
    -- create closure to evaluate f(X) and df/dX
    local feval = function(x)
       -- just in case:
       collectgarbage()
 
+      local action1, action2 --,lossTemp,lossProp,lossCaus,lossRep
       -- get new parameters
       if x ~= parameters then
          parameters:copy(x)
@@ -40,30 +39,47 @@ function Rico_Training(Models,Mode,data1,data2,criterion,coef,LR,BATCH_SIZE, USE
 
       -- reset gradients
       gradParameters:zero()
-      if Mode=='Simpl' then print("Simpl")
-      elseif Mode=='Temp' then loss,grad=doStuff_temp(Models,criterion, batch,coef)
-      elseif Mode=='Prop' then
-        if USE_CONTINUOUS then
-           loss,grad=doStuff_Prop_continuous(Models,criterion,batch,coef, action1, action2)
-        else
-           loss,grad=doStuff_Prop(Models,criterion,batch,coef)
-        end
-      elseif Mode=='Caus' then
-         if USE_CONTINUOUS then
-            loss,grad=doStuff_Caus_continuous(Models,criterion,batch,coef, action1, action2)
-         else
-            loss,grad=doStuff_Caus(Models,criterion,batch,coef)
-         end
-      elseif Mode=='Rep' then
-        if USE_CONTINUOUS then
-           loss,grad=doStuff_Rep_continuous(Models,criterion,batch,coef, action1, action2)
-        else
-           loss,grad=doStuff_Rep(Models,criterion,batch,coef)
-        end
-      else print("Wrong Mode")
+
+      --===========
+      local mode='Temp' --Same for continuous or not
+      local batch=getRandomBatchFromSeparateList(data1,data2,BATCH_SIZE,mode)
+      LOSS_TEMP,grad=doStuff_temp(Models,temp_criterion, batch,COEF_TEMP)
+
+      if USE_CONTINUOUS then
+         --==========
+         mode='Prop'
+         batch, action1, action2 = getRandomBatchFromSeparateListContinuous(data1,data2,BATCH_SIZE,mode)
+         LOSS_PROP,gradProp=doStuff_Prop_continuous(Models,prop_criterion,batch,COEF_PROP, action1, action2)
+
+         --==========
+         mode='Caus'
+         batch, action1, action2 = getRandomBatchFromSeparateListContinuous(data1,data2,BATCH_SIZE,mode)
+         LOSS_CAUS,gradCaus=doStuff_Caus_continuous(Models,caus_criterion,batch,COEF_CAUS, action1, action2)
+
+         --==========
+         mode='Rep'
+         batch, action1, action2 = getRandomBatchFromSeparateListContinuous(data1,data2,BATCH_SIZE,mode)
+         LOSS_REP,gradRep=doStuff_Rep_continuous(Models,rep_criterion,batch,COEF_REP, action1, action2)
+      else
+         --==========
+         mode='Prop'
+         batch = getRandomBatchFromSeparateList(data1,data2,BATCH_SIZE,mode)
+         LOSS_PROP,gradProp=doStuff_Prop(Models,prop_criterion,batch,COEF_PROP)
+
+         --==========
+         mode='Caus'
+         batch = getRandomBatchFromSeparateList(data1,data2,BATCH_SIZE,mode)
+         LOSS_CAUS,gradCaus=doStuff_Caus(Models,caus_criterion,batch,COEF_CAUS)
+
+         --==========
+         mode='Rep'
+         batch=getRandomBatchFromSeparateList(data1,data2,BATCH_SIZE,mode)
+         LOSS_REP,gradRep=doStuff_Rep(Models,rep_criterion,batch,COEF_REP)
       end
-      return loss,gradParameters
+
+      return LOSS_REP+LOSS_CAUS+LOSS_PROP+LOSS_TEMP ,gradParameters
    end
+
    --sgdState = sgdState or { learningRate = LR, momentum = mom,learningRateDecay = 5e-7,weightDecay=coefL2 }
    --parameters, loss=optim.sgd(feval, parameters, sgdState)
    optimState={learningRate=LR}
@@ -80,97 +96,59 @@ function Rico_Training(Models,Mode,data1,data2,criterion,coef,LR,BATCH_SIZE, USE
 end
 
 function train_Epoch(Models,Prior_Used,LOG_FOLDER,LR, USE_CONTINUOUS)
-    local NB_BATCHES= math.ceil(NB_SEQUENCES*90/BATCH_SIZE/(4+4+2+2))
-    --90 is the average number of images per sequences, div by 12 because the network sees 12 images per iteration
-    -- (4*2 for rep and prop, 2*2 for temp and caus)
+   local NB_BATCHES= math.ceil(NB_SEQUENCES*90/BATCH_SIZE/(4+4+2+2))
+   --90 is the average number of images per sequences, div by 12 because the network sees 12 images per iteration
+   -- (4*2 for rep and prop, 2*2 for temp and caus)
 
-    local REP_criterion=get_Rep_criterion()
-    local PROP_criterion=get_Prop_criterion()
-    local CAUS_criterion=get_Caus_criterion()
-    local TEMP_criterion=nn.MSDCriterion()
+   print(NB_SEQUENCES..' : sequences. '..NB_BATCHES..' batches')
 
-    local Temp_loss_list, Prop_loss_list, Rep_loss_list, Caus_loss_list = {},{},{},{}
-    local Temp_loss_list_test,Prop_loss_list_test,Rep_loss_list_test,Caus_loss_list_test = {},{},{},{}
-    local Sum_loss_train, Sum_loss_test = {},{}
-    local Temp_grad_list,Prop_grad_list,Rep_grad_list,Caus_grad_list = {},{},{},{}
-    local list_errors,list_MI, list_corr={},{},{}
+   for epoch=1, NB_EPOCHS do
+      print('--------------Epoch : '..epoch..' ---------------')
+      local total_temp_loss,total_prop_loss,total_rep_loss,total_caus_loss=0,0,0,0
 
-    local Prop=Have_Todo(Prior_Used,'Prop') --rename applies_prior()
-    local Temp=Have_Todo(Prior_Used,'Temp')
-    local Rep=Have_Todo(Prior_Used,'Rep')
-    local Caus=Have_Todo(Prior_Used,'Caus')
-    print(Prop)
-    print(Temp)
-    print(Rep)
-    print(Caus)
+      xlua.progress(0, NB_BATCHES)
 
-    local coef_Temp=1
-    local coef_Prop=1
-    local coef_Rep=1
-    local coef_Caus=1
-    local coef_list={coef_Temp,coef_Prop,coef_Rep,coef_Caus}
+      for numBatch=1, NB_BATCHES do
+         indice1=torch.random(1,NB_SEQUENCES-1)
+         indice2=torch.random(1,NB_SEQUENCES-1)
 
-    print(NB_SEQUENCES..' : sequences. '..NB_BATCHES..' batches')
+         ------------- only one list used----------
+         -- print([[====================================================
+         -- WARNING TESTING PRIOR, THIS IS NOT RANDOM AT ALL
+         -- ====================================================]])
+         -- local indice1=8
+         -- local indice2=3
 
-    for epoch=1, NB_EPOCHS do
-       print('--------------Epoch : '..epoch..' ---------------')
-       local Temp_loss,Prop_loss,Rep_loss,Caus_loss=0,0,0,0
-       local Grad_Temp,Grad_Prop,Grad_Rep,Grad_Caus=0,0,0,0
+         local data1 = load_seq_by_id(indice1)
+         local data2 = load_seq_by_id(indice2)
 
-       xlua.progress(0, NB_BATCHES)
-       for numBatch=1, NB_BATCHES do
-          indice1=torch.random(1,NB_SEQUENCES-1)
-          indice2=torch.random(1,NB_SEQUENCES-1)
-          ------------- only one list used----------
-          --       print([[====================================================
-          -- WARNING TESTING PRIOR, THIS IS NOT RANDOM AT ALL
-          -- ====================================================]])
-          --       local indice1=8
-          --       local indice2=3
+         assert(data1, "Something went wrong while loading data1")
+         assert(data2, "Something went wrong while loading data2")
 
-          local data1 = load_seq_by_id(indice1)
-          local data2 = load_seq_by_id(indice2)
+         Loss,Grad=Rico_Training(Models,data1,data2,LR,BATCH_SIZE, USE_CONTINUOUS)
 
-          assert(data1, "Something went wrong while loading data1")
-          assert(data2, "Something went wrong while loading data2")
+         total_temp_loss = total_temp_loss + LOSS_TEMP --Ugly, this variable is located in Rico_Training in eval
+         total_caus_loss = total_caus_loss + LOSS_CAUS --Ugly, this variable is located in Rico_Training in eval
+         total_rep_loss = total_rep_loss + LOSS_REP --Ugly, this variable is located in Rico_Training in eval
+         total_prop_loss = total_prop_loss + LOSS_PROP --Ugly, this variable is located in Rico_Training in eval
+         
+         xlua.progress(numBatch, NB_BATCHES)
+      end
 
-          if Temp then
-             Loss,Grad=Rico_Training(Models,'Temp',data1,data2,TEMP_criterion, coef_Temp,LR,BATCH_SIZE, USE_CONTINUOUS)
-             Grad_Temp=Grad_Temp+Grad
-             Temp_loss=Temp_loss+Loss
-          end
-          if Prop then
-             Loss,Grad=Rico_Training(Models,'Prop',data1,data2, PROP_criterion, coef_Prop,LR,BATCH_SIZE, USE_CONTINUOUS)
-             Grad_Prop=Grad_Prop+Grad
-             Prop_loss=Prop_loss+Loss
-          end
-          if Rep then
-             Loss,Grad=Rico_Training(Models,'Rep',data1,data2,REP_criterion, coef_Rep,LR,BATCH_SIZE, USE_CONTINUOUS)
-             Grad_Rep=Grad_Rep+Grad
-             Rep_loss=Rep_loss+Loss
-          end
-          if Caus then
-             Loss,Grad=Rico_Training(Models,'Caus',data1,data2,CAUS_criterion,coef_Caus,LR,BATCH_SIZE, USE_CONTINUOUS)
-             Grad_Caus=Grad_Caus+Grad
-             Caus_loss=Caus_loss+Loss
-          end
-          xlua.progress(numBatch, NB_BATCHES)
-       end
+      local id=name..epoch -- variable used to not mix several log files
 
-       local id=name..epoch -- variable used to not mix several log files
+      print("Loss Temp", total_temp_loss/NB_BATCHES/BATCH_SIZE)
+      print("Loss Prop", total_prop_loss/NB_BATCHES/BATCH_SIZE)
+      print("Loss Caus", total_caus_loss/NB_BATCHES/BATCH_SIZE)
+      print("Loss Rep", total_rep_loss/NB_BATCHES/BATCH_SIZE)
 
-       print("Loss Temp", Temp_loss/NB_BATCHES/BATCH_SIZE)
-       print("Loss Prop", Prop_loss/NB_BATCHES/BATCH_SIZE)
-       print("Loss Caus", Caus_loss/NB_BATCHES/BATCH_SIZE)
-       print("Loss Rep", Rep_loss/NB_BATCHES/BATCH_SIZE)
-       print("Saving continuous model in ".. NAME_SAVE..'Continuous')
-       if USE_CONTINUOUS then
+      if USE_CONTINUOUS then
          model_name = NAME_SAVE..'Continuous'
-       else
+      else
          model_name = NAME_SAVE
-       end
-       save_model(Models.Model1, model_name)
-    end
+      end
+      save_model(Models.Model1, model_name)
+   end
 end
 
 Tests_Todo={
@@ -213,6 +191,7 @@ for nb_test=1, #Tests_Todo do
    end
 
    parameters,gradParameters = Model:getParameters()
+
    Model2=Model:clone('weight','bias','gradWeight','gradBias','running_mean','running_std')
    Model3=Model:clone('weight','bias','gradWeight','gradBias','running_mean','running_std')
    Model4=Model:clone('weight','bias','gradWeight','gradBias','running_mean','running_std')

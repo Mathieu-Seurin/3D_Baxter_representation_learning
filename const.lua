@@ -53,7 +53,7 @@ IM_HEIGHT = 200
 --===========================================================
 -- CUDA CONSTANTS
 --===========================================================
-USE_CUDA = false
+USE_CUDA = true
 USE_SECOND_GPU = true
 
 if USE_CUDA and USE_SECOND_GPU then
