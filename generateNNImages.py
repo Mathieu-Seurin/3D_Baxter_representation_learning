@@ -81,4 +81,4 @@ for img_name,id,dist,state in data:
 	output_file = path_to_neighbour + seq_name + "_" + base_name + "_" + 'Neigbors.png'
 	print('Saved nearest neighbor image to '+output_file)
 	plt.savefig(output_file,bbox_inches='tight')
-    plt.close() # efficiency: avoids keeping all images into RAM
+	plt.close() # efficiency: avoids keeping all images into RAM
