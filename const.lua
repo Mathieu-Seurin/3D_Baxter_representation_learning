@@ -63,6 +63,7 @@ end
 --================================================
 -- dataFolder specific constants : filename, dim_in, indices in state file etc...
 --===============================================
+
 if DATA_FOLDER == 'simpleData3D' then
    CLAMP_CAUSALITY = true
 
@@ -80,6 +81,7 @@ if DATA_FOLDER == 'simpleData3D' then
    FILENAME_FOR_STATE = "endpoint_state"
 
    SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
+   AVG_FRAMES_PER_RECORD = 1000
 
 elseif DATA_FOLDER == 'mobileRobot' then
 
@@ -94,32 +96,41 @@ elseif DATA_FOLDER == 'mobileRobot' then
    INDICE_TABLE = {1,2} --column indice for coordinate in state file (respectively x,y)
 
    DEFAULT_PRECISION = 0.1
-   FILENAME_FOR_ACTION = "action"
+   FILENAME_FOR_ACTION = "action" --not used at all, we use state file, and compute the action with it (contains dx, dy)
    FILENAME_FOR_STATE = "state"
    FILENAME_FOR_REWARD = "reward"
 
    SUB_DIR_IMAGE = 'recorded_camera_top'
+   AVG_FRAMES_PER_RECORD = 90
 
-elseif DATA_FOLDER == 'realBaxterPushingObjects' then  --TODO upload to data_baxter repo
+
+elseif DATA_FOLDER == 'babbling_converted' then
   -- Leni's real Baxter data on  ISIR dataserver. It is named "data_archive_sim_1".
+  --(real Baxter Pushing Objects).  If data is not converted into action, state
+  -- and reward files with images in subfolder, run first the conversion tool from
+  -- yml format to rgb based data in https://github.com/LeniLeGoff/DB_action_discretization
   DEFAULT_PRECISION = 0.1
-  -- CLAMP_CAUSALITY = false
-  -- MIN_TABLE = {-10000,-10000} -- for x,y
-  -- MAX_TABLE = {10000,10000} -- for x,y
+  CLAMP_CAUSALITY = false
+  MIN_TABLE = {-10000,-10000} -- for x,y
+  MAX_TABLE = {10000,10000} -- for x,y
   --
   DIMENSION_IN = 3
   REWARD_INDICE = 2
-  -- INDICE_TABLE = {1,2} --column indice for coordinate in state file (respectively x,y)
+  INDICE_TABLE = {2,3,4} --column indexes for coordinate in state file (respectively x,y)
   --
-  FILENAME_FOR_ACTION = "action_pushing_object.txt" -- equiv to recorded_button1_is_pressed.txt right now in 3D simulated learning representations
-  FILENAME_FOR_STATE = "state_pushing_object"
-  FILENAME_FOR_REWARD = "reward_pushing_object"
-  --
+  FILENAME_FOR_REWARD = "reward_pushing_object.txt"  -- 1 if the object being pushed actually moved
+  FILENAME_FOR_STATE = "state_pushing_object.txt" --computed while training based on action
+  FILENAME_FOR_ACTION = "action_pushing_object.txt"
+  --FILENAME_FOR_ACTION_DELTAS = "action_pushing_object_deltas.txt"
+
   SUB_DIR_IMAGE = 'baxter_pushing_objects'
+  AVG_FRAMES_PER_RECORD = 60
 
 else
-  print("No supported data folder provided, please add either of simpleData3D, mobileRobot or Leni's realBaxterPushingObjects")
+  print("No supported data folder provided, please add either of simpleData3D, mobileRobot or Leni's babbling")
   os.exit()
 end
 
+
+FILE_PATTERN_TO_EXCLUDE = 'deltas'
 print("\nUSE_CUDA ",USE_CUDA," \nUSE_CONTINUOUS ACTIONS: ",USE_CONTINUOUS)

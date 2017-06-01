@@ -27,7 +27,7 @@ else:
                 if line[0]!='#':
                         words=line.split(' ')
                         states_l.append((words[0],list(map(float,words[1:-1]))))
-                        
+
         states_l.sort(key= lambda x : x[0])
 
         states = np.zeros((len(states_l), len(states_l[0][1])))
@@ -35,13 +35,13 @@ else:
                 #print states_l[i][1]
                 states[i] = np.array(states_l[i][1])
 
-                
+
 
 for line in reward_file:
 	if line[0]!='#':
 		words=line.split(' ')
 		rewards_l.append(float(words[0]))
-        
+
 rewards=np.asarray(rewards_l)
 toplot=states
 

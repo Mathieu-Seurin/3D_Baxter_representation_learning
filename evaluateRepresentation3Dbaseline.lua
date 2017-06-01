@@ -336,14 +336,14 @@ function createPreloadedDataFolder(list_folders_images,list_txt,LOG_FOLDER,use_s
          print("Preloaded Data Does Not Exists. Loading Training and Test from "..DATA.." and saving to "..current_preload_file)
 
 				 local imgs = torch.load(DATA) --local imgs, imgs_test = loadTrainTest(list_folders_images,crossValStep, PRELOAD_FOLDER)
-				 if crossValStep ==NB_SEQUENCES then
-					 test_sequence_index = crossValStep +1
-				 else
-					 test_sequence_index = 1
-				 end
-				 local imgs_test = load_seq_by_id(test_sequence_index)
+				--  if crossValStep ==NB_SEQUENCES then
+				-- 	 test_sequence_index = crossValStep +1
+				--  else
+				-- 	 test_sequence_index = 1
+				--  end
+				 local imgs_test = load_seq_by_id(crossValStep)
 				 print ("imgs "..#imgs)
-				 print ("load_seq_by_id #imgs_test"..#imgs_test)
+				 print ("load_seq_by_id #imgs_test: "..#imgs_test)
 
 				 imgs[1], imgs[#imgs] = imgs[#imgs], imgs[1] -- Because during database creation we swapped those values
 

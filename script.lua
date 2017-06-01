@@ -79,9 +79,9 @@ function Rico_Training(Models,Mode,data1,data2,criterion,coef,LR,BATCH_SIZE, USE
    return loss[1], grad
 end
 
-function train_Epoch(Models,Prior_Used,LOG_FOLDER,LR, USE_CONTINUOUS)
-    local NB_BATCHES= math.ceil(NB_SEQUENCES*90/BATCH_SIZE/(4+4+2+2))
-    --90 is the average number of images per sequences, div by 12 because the network sees 12 images per iteration
+function train_Epoch(Models,Prior_Used,LOG_FOLDER,LR, USE_CONTINUOUS)  -- TODO: LOG_FOLDER IS NOT USED, REMOVE
+    local NB_BATCHES= math.ceil(NB_SEQUENCES*AVG_FRAMES_PER_RECORD/BATCH_SIZE/(4+4+2+2))
+    --90 is the FRAMES_PER_RECORD (average number of images per sequences for mobileRobot data), div by 12 because the network sees 12 images per iteration (i.e. record)
     -- (4*2 for rep and prop, 2*2 for temp and caus)
 
     local REP_criterion=get_Rep_criterion()
@@ -193,16 +193,24 @@ Tests_Todo={
    --]]
 }
 
-
-
-local list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(DATA_FOLDER)
-NB_SEQUENCES= #list_folders_images
+local records_paths = Get_Folders(DATA_FOLDER, 'record') --local list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(DATA_FOLDER)
+NB_SEQUENCES= #records_paths
+if NB_SEQUENCES ==0  then --or not folder_exists(DATA_FOLDER) then
+    error('Error: data was not found in input directory INPUT_DIR= '.. DATA_FOLDER)
+end
+--
+-- print('Get_HeadCamera_View_Files returned: ',#list_folders_images)
+-- print(#list_txt_action) -- action files
+--print(#list_txt_button) -- nil
+--print(#list_txt_state)
 
 for nb_test=1, #Tests_Todo do
 
    if RELOAD_MODEL then
+      print("Reloading model in "..MODEL_FILE_STRING)
       Model = torch.load(MODEL_FILE_STRING):double()
    else
+      print("Getting model in : "..MODEL_ARCHITECTURE_FILE)
       require(MODEL_ARCHITECTURE_FILE)
       Model=getModel(DIMENSION_OUT)
       --graph.dot(Model.fg, 'Our Model')
@@ -220,8 +228,8 @@ for nb_test=1, #Tests_Todo do
    Models={Model1=Model,Model2=Model2,Model3=Model3,Model4=Model4}
 
    local Priors=Tests_Todo[nb_test]
-   local Log_Folder=Get_Folder_Name(LOG_FOLDER,Priors)
-   print("Current test : "..LOG_FOLDER)
+   local Log_Folder=Get_Folder_Name(LOG_FOLDER, Priors)
+   print("Training epoch : "..nb_test ..' using Log_Folder: '..Log_Folder)
    train_Epoch(Models,Priors,Log_Folder,LR, USE_CONTINUOUS)
 end
 
