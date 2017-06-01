@@ -7,18 +7,24 @@ import shutil
 import random
 import sys
 
+nbr_images = -1
+
+if len(sys.argv) <= 1:
+        sys.exit("Give number of neighbors (and number of images and model dir if you don't want to use the last model created")
+        
 # Some parameters
-nbr_neighbors=4
+nbr_neighbors= int(sys.argv[1])
 
-lastModelFile = open('lastModel.txt')
+if len(sys.argv) >= 3:
+        nbr_images=int(sys.argv[2])
 
-path_to_model = lastModelFile.readline()[:-1]
+if len(sys.argv) == 4:
+        path_to_model = sys.argv[3]
+else:
+        lastModelFile = open('lastModel.txt')
+        path_to_model = lastModelFile.readline()[:-1]
 
 data_file=path_to_model+"/saveImagesAndRepr.txt"
-
-nbr_images = -1
-if len(sys.argv) ==2:
-	nbr_images=int(sys.argv[1])
 
 #reading data
 file  = open(data_file, "r")
@@ -26,9 +32,10 @@ file  = open(data_file, "r")
 images=[]
 states=[]
 for line in file:
-	words = line.split()
-	images.append(words[0])
-	states.append(words[1:])
+        if line[0]!='#':
+                words = line.split()
+                images.append(words[0])
+                states.append(words[1:])
 
 dim_state= len(states[0])
 
@@ -79,6 +86,6 @@ for img_name,id,dist,state in data:
 
 	plt.tight_layout()
 	output_file = path_to_neighbour + seq_name + "_" + base_name + "_" + 'Neigbors.png'
-	print('Saved nearest neighbor image to '+output_file)
+	#print('Saved nearest neighbor image to '+output_file)
 	plt.savefig(output_file,bbox_inches='tight')
 	plt.close() # efficiency: avoids keeping all images into RAM

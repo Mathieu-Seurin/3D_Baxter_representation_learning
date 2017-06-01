@@ -12,7 +12,7 @@ function save_model(model)
    lfs.mkdir(path)
    file_string = path..'/'..NAME_SAVE..'.t7'
 
-   os.execute("cp const.lua "..path)
+   os.execute("cp hyperparams.lua "..path)
 
    print("Saved at : "..path)
    torch.save(file_string,model)
@@ -23,68 +23,55 @@ function save_model(model)
 end
 
 ---------------------------------------------------------------------------------------
--- Function :getBatch(imgs, list, indice, length, width, height, Type)
--- Input ():
--- Output ():
----------------------------------------------------------------------------------------
--- this function search the indice of associated images and take the corresponding images in imgs which are the loaded images of the folder
-function getBatch(imgs, list, indice, length, width, height, Type)
-
-   if (indice+1)*length<#list.im1 then
-      start=indice*length
-   else
-      start=#list.im1-length
-   end
-   if Type=="Prop" then
-      Batch=torch.Tensor(4, length,1, width, height)
-   else
-      Batch=torch.Tensor(2, length,1, width, height)
-   end
-
-   for i=1, length do
-      Batch[1][i]=imgs[list.im1[start+i]]
-      Batch[2][i]=imgs[list.im2[start+i]]
-      if Type=="Prop" then
-         Batch[3][i]=imgs[list.im3[start+i]]
-         Batch[4][i]=imgs[list.im4[start+i]]
-      end
-   end
-   return Batch
-end
----------------------------------------------------------------------------------------
 -- Function :getRandomBatchFromSeparateList(imgs1, imgs2, txt1, txt2, length, image_width, image_height, Mode, use_simulate_images)
 -- Input ():
 -- Output ():
 ---------------------------------------------------------------------------------------
-function getRandomBatchFromSeparateList(Data1,Data2, length, Mode)
+function getRandomBatchFromSeparateList(batch_size, mode)
 
-   local Dim=Data1.images[1]:size()
-   if Mode=="Prop" or Mode=="Rep" then
-      Batch=torch.Tensor(4, length,Dim[1], Dim[2], Dim[3])
+   if mode=="Prop" or mode=="Rep" then
+      Batch=torch.Tensor(4, batch_size, IM_CHANNEL, IM_LENGTH, IM_HEIGHT)
    else
-      Batch=torch.Tensor(2, length,Dim[1], Dim[2], Dim[3])
+      Batch=torch.Tensor(2, batch_size, IM_CHANNEL, IM_LENGTH, IM_HEIGHT)
    end
 
    local im1,im2,im3,im4
 
-   for i=1, length do
-      if Mode=="Prop" or Mode=="Rep" then
-         Set=get_two_Prop_Pair(Data1.Infos, Data2.Infos)
-         im1,im2 = Data1.images[Set.im1], Data1.images[Set.im2]
-         im3,im4 = Data2.images[Set.im3], Data2.images[Set.im4]
+   for i=1, batch_size do
+
+      INDICE1=torch.random(1,NB_SEQUENCES) -- Global only for visualisation purpose
+      INDICE2=torch.random(1,NB_SEQUENCES) -- Global only for visualisation purpose
+
+      local data1,data2
+      
+      if CAN_HOLD_ALL_SEQ_IN_RAM then
+         data1 = ALL_SEQ[INDICE1]
+         data2 = ALL_SEQ[INDICE2]
+      else
+         data1 = load_seq_by_id(INDICE1)
+         data2 = load_seq_by_id(INDICE2)
+      end
+
+      assert(data1, "Something went wrong while loading data1")
+      assert(data2, "Something went wrong while loading data2")
+         
+      if mode=="Prop" or mode=="Rep" then
+         Set=get_two_Prop_Pair(data1.Infos, data2.Infos)
+         im1,im2 = data1.images[Set.im1], data1.images[Set.im2]
+         im3,im4 = data2.images[Set.im3], data2.images[Set.im4]
          Batch[1][i]= im1
          Batch[2][i]= im2
          Batch[3][i]= im3
          Batch[4][i]= im4
-      elseif Mode=="Temp" then
-         Set=get_one_random_Temp_Set(#Data1.images)
-         im1,im2 = Data1.images[Set.im1], Data1.images[Set.im2]
+      elseif mode=="Temp" then
+         Set=get_one_random_Temp_Set(#data1.images)
+         im1,im2 = data1.images[Set.im1], data1.images[Set.im2]
          Batch[1][i]=im1
          Batch[2][i]=im2
-      elseif Mode=="Caus" then
-         Set=get_one_random_Caus_Set(Data1.Infos, Data2.Infos)
+      elseif mode=="Caus" then
+         Set=get_one_random_Caus_Set(data1.Infos, data2.Infos)
 
-         im1,im2,im3,im4 = Data1.images[Set.im1], Data2.images[Set.im2], Data1.images[Set.im3], Data2.images[Set.im4]
+         im1,im2,im3,im4 = data1.images[Set.im1], data2.images[Set.im2], data1.images[Set.im3], data2.images[Set.im4]
          --The last two are for viz purpose only
 
          Batch[1][i]=im1
@@ -99,7 +86,7 @@ function getRandomBatchFromSeparateList(Data1,Data2, length, Mode)
 
    --Very useful tool to check if prior are coherent
    if VISUALIZE_IMAGES_TAKEN then
-      print("MODE :",Mode)
+      print("MODE :",mode)
       visualize_set(im1,im2,im3,im4)
    end
 
@@ -107,34 +94,51 @@ function getRandomBatchFromSeparateList(Data1,Data2, length, Mode)
 
 end
 
-function getRandomBatchFromSeparateListContinuous(Data1,Data2, batchSize, Mode)
-   local Dim=Data1.images[1]:size()
-   if Mode=="Prop" or Mode=="Rep" then
-      Batch=torch.Tensor(4, batchSize,Dim[1], Dim[2], Dim[3])
+function getRandomBatchFromSeparateListContinuous(batch_size, mode)
+
+   if mode=="Prop" or mode=="Rep" then
+      Batch=torch.Tensor(4, batch_size, IM_CHANNEL, IM_LENGTH, IM_HEIGHT)
    else
-      Batch=torch.Tensor(2, batchSize,Dim[1], Dim[2], Dim[3])
+      Batch=torch.Tensor(2, batch_size, IM_CHANNEL, IM_LENGTH, IM_HEIGHT)
    end
 
    local im1,im2,im3,im4
 
-   for i=1, batchSize do
-      if Mode=="Prop" or Mode=="Rep" then
-         Set =get_two_Prop_Pair_and_actions(Data1.Infos, Data2.Infos)
-         im1,im2 = Data1.images[Set.im1], Data1.images[Set.im2]
-         im3,im4 = Data2.images[Set.im3], Data2.images[Set.im4]
+   for i=1, batch_size do
+
+      INDICE1=torch.random(1,NB_SEQUENCES) -- Global only for visualisation purpose
+      INDICE2=torch.random(1,NB_SEQUENCES) -- Global only for visualisation purpose
+
+      local data1,data2
+      
+      if CAN_HOLD_ALL_SEQ_IN_RAM then
+         data1 = ALL_SEQ[INDICE1]
+         data2 = ALL_SEQ[INDICE2]
+      else
+         data1 = load_seq_by_id(INDICE1)
+         data2 = load_seq_by_id(INDICE2)
+      end
+
+      assert(data1, "Something went wrong while loading data1")
+      assert(data2, "Something went wrong while loading data2")
+      
+      if mode=="Prop" or mode=="Rep" then
+         Set =get_two_Prop_Pair_and_actions(data1.Infos, data2.Infos)
+         im1,im2 = data1.images[Set.im1], data1.images[Set.im2]
+         im3,im4 = data2.images[Set.im3], data2.images[Set.im4]
          Batch[1][i]= im1
          Batch[2][i]= im2
          Batch[3][i]= im3
          Batch[4][i]= im4
-      elseif Mode=="Temp" then
-         Set=get_one_random_Temp_Set(#Data1.images)
-         im1,im2 = Data1.images[Set.im1], Data1.images[Set.im2]
+      elseif mode=="Temp" then
+         Set=get_one_random_Temp_Set(#data1.images)
+         im1,im2 = data1.images[Set.im1], data1.images[Set.im2]
          Batch[1][i]=im1
          Batch[2][i]=im2
-      elseif Mode=="Caus" then
-         Set =get_one_random_Caus_Set_and_actions(Data1.Infos, Data2.Infos)
+      elseif mode=="Caus" then
+         Set =get_one_random_Caus_Set_and_actions(data1.Infos, data2.Infos)
 
-         im1,im2,im3,im4 = Data1.images[Set.im1], Data2.images[Set.im2], Data1.images[Set.im3], Data2.images[Set.im4]
+         im1,im2,im3,im4 = data1.images[Set.im1], data2.images[Set.im2], data1.images[Set.im3], data2.images[Set.im4]
          --The last two are for viz purpose only
 
          Batch[1][i]=im1
@@ -146,7 +150,7 @@ function getRandomBatchFromSeparateListContinuous(Data1,Data2, batchSize, Mode)
 
    --Very useful tool to check if prior are coherent
    if VISUALIZE_IMAGES_TAKEN then
-      print("MODE :",Mode)
+      print("MODE :",mode)
       visualize_set(im1,im2,im3,im4)
    end
    return Batch, Set.act1, Set.act2
@@ -317,6 +321,9 @@ function load_Part_list(list,txt,txt_reward,txt_state)
    local im={}
    local Infos=getInfos(txt,txt_reward,txt_state)
 
+   assert(#Infos[1]==#list)
+   assert(#(Infos.reward)==#list)
+   
    for i=1, #(Infos[1]) do
       table.insert(im,getImageFormated(list[i]))
    end
