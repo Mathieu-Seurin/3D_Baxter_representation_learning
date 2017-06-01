@@ -34,10 +34,11 @@ end
 
 outStr = ''
 
-for seqStr in lfs.dir(imagesFolder) do
-   if string.find(seqStr,'record') then
-      print("Sequence : ",seqStr)
-      local imagesPath = imagesFolder..'/'..seqStr..'/'..SUB_DIR_IMAGE
+tempSeq = {}
+for dir_seq_str in lfs.dir(imagesFolder) do
+   if string.find(dir_seq_str,'record') then
+      print("Sequence : ",dir_seq_str)
+      local imagesPath = imagesFolder..'/'..dir_seq_str..'/'..SUB_DIR_IMAGE
       for imageStr in lfs.dir(imagesPath) do
          if string.find(imageStr,'jpg') then
             local fullImagesPath = imagesPath..'/'..imageStr
@@ -55,13 +56,20 @@ for seqStr in lfs.dir(imagesFolder) do
             for i=1,repr:size(2) do
                reprStr = reprStr..repr[{1,i}]..' '
             end
-            outStr = outStr..fullImagesPath..' '..reprStr..'\n'
-
+            tempSeq[#tempSeq+1] = {fullImagesPath, fullImagesPath..' '..reprStr}
          end
       end
    end
+
+
+end
+
+table.sort(tempSeq, function (a,b) return a[1] < b[1] end)
+tempSeqStr = ''
+for key in pairs(tempSeq) do
+   tempSeqStr = tempSeqStr..tempSeq[key][2]..'\n'
 end
 
 file = io.open(path..'/saveImagesAndRepr.txt', 'w')
-file:write(outStr)
+file:write(tempSeqStr)
 file:close()

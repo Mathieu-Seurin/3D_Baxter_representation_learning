@@ -261,7 +261,7 @@ function get_two_Prop_Pair(Infos1, Infos2)
             id_second_action_end=id_second_action_begin+1
             action2 = action_amplitude(Infos2, id_second_action_begin, id_second_action_end)
             if is_same_action(action1, action2) then
-               -- print("indices", indice1, indice2)
+               -- print("indices", INDICE1, INDICE2)
                -- print("id_ref_action_begin,id_ref_action_end,id_second_action_begin,id_second_action_end",id_ref_action_begin,id_ref_action_end,id_second_action_begin,id_second_action_end)
                -- print("action1",action1[1],action1[2],action1[3])
                -- print("action2",action2[1],action2[2],action2[3])
@@ -297,7 +297,6 @@ function get_one_random_Caus_Set(Infos1,Infos2)
          id_ref_action_end  = id_ref_action_begin+1
       end
 
-
       reward1 = Infos2.reward[id_ref_action_end]
       action1 = action_amplitude(Infos2, id_ref_action_begin, id_ref_action_end)
 
@@ -313,7 +312,7 @@ function get_one_random_Caus_Set(Infos1,Infos2)
          print("id1",id_ref_action_begin)
          print("id2",id_ref_action_end)
          print("action1",action1[1],action1[2])--,action[3])
-         visualize_image_from_seq_id(indice2,id_ref_action_begin,id_ref_action_end,true)
+         visualize_image_from_seq_id(INDICE2,id_ref_action_begin,id_ref_action_end,true)
          io.read()
       end
 
@@ -334,7 +333,7 @@ function get_one_random_Caus_Set(Infos1,Infos2)
             --Visualize images taken if you want
             if VISUALIZE_CAUS_IMAGE then
                print("action2",action2[1],action2[2])--,action[3])
-               visualize_image_from_seq_id(indice1,id_second_action_begin,id_second_action_end)
+               visualize_image_from_seq_id(INDICE1,id_second_action_begin,id_second_action_end)
                print(is_same_action(action1, action2))
                io.read()
             end
@@ -508,7 +507,7 @@ function get_one_random_Caus_Set_and_actions(Infos1, Infos2)
       reward1 = Infos2.reward[id_ref_action_end]
 
       if VISUALIZE_CAUS_IMAGE then
-         visualize_image_from_seq_id(indice2,id_ref_action_begin,id_ref_action_end)
+         visualize_image_from_seq_id(INDICE2,id_ref_action_begin,id_ref_action_end)
       end
 
       action1 = action_amplitude(Infos2, id_ref_action_begin, id_ref_action_end)

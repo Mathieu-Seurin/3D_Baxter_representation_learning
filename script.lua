@@ -5,8 +5,16 @@ require 'torch'
 require 'xlua'
 require 'math'
 require 'string'
-require 'cunn'
 require 'nngraph'
+
+-- THIS IS WHERE ALL THE CONSTANTS SHOULD COME FROM
+-- See const.lua file for more details
+require 'const'
+-- try to avoid global variable as much as possible
+
+if USE_CUDA then
+   require 'cunn'
+end
 
 require 'MSDC'
 require 'functions'
@@ -14,25 +22,20 @@ require 'printing'
 require "Get_Images_Set"
 require 'optim_priors'
 require 'definition_priors'
--- THIS IS WHERE ALL THE CONSTANTS SHOULD COME FROM
--- See const.lua file for more details
-require 'const'
--- try to avoid global variable as much as possible
 
-function Rico_Training(Models,Mode,data1,data2,criterion,coef,LR,BATCH_SIZE, USE_CONTINUOUS)
-   local mom=0.9
-   local coefL2=0,0
+function Rico_Training(Models)
 
-   if USE_CONTINUOUS then
-     batch, action1, action2 = getRandomBatchFromSeparateListContinuous(data1,data2,BATCH_SIZE,Mode)
-   else
-     batch = getRandomBatchFromSeparateList(data1,data2,BATCH_SIZE,Mode)
-   end
+   local rep_criterion=get_Rep_criterion()
+   local prop_criterion=get_Prop_criterion()
+   local caus_criterion=get_Caus_criterion()
+   local temp_criterion=nn.MSDCriterion()
+
    -- create closure to evaluate f(X) and df/dX
    local feval = function(x)
       -- just in case:
       collectgarbage()
 
+      local action1, action2 --,lossTemp,lossProp,lossCaus,lossRep
       -- get new parameters
       if x ~= parameters then
          parameters:copy(x)
@@ -40,33 +43,50 @@ function Rico_Training(Models,Mode,data1,data2,criterion,coef,LR,BATCH_SIZE, USE
 
       -- reset gradients
       gradParameters:zero()
-      if Mode=='Simpl' then print("Simpl")
-      elseif Mode=='Temp' then loss,grad=doStuff_temp(Models,criterion, batch,coef)
-      elseif Mode=='Prop' then
-        if USE_CONTINUOUS then
-           loss,grad=doStuff_Prop_continuous(Models,criterion,batch,coef, action1, action2)
-        else
-           loss,grad=doStuff_Prop(Models,criterion,batch,coef)
-        end
-      elseif Mode=='Caus' then
-         if USE_CONTINUOUS then
-            loss,grad=doStuff_Caus_continuous(Models,criterion,batch,coef, action1, action2)
-         else
-            loss,grad=doStuff_Caus(Models,criterion,batch,coef)
-         end
-      elseif Mode=='Rep' then
-        if USE_CONTINUOUS then
-           loss,grad=doStuff_Rep_continuous(Models,criterion,batch,coef, action1, action2)
-        else
-           loss,grad=doStuff_Rep(Models,criterion,batch,coef)
-        end
-      else print("Wrong Mode")
+
+      --===========
+      local mode='Temp' --Same for continuous or not
+      local batch=getRandomBatchFromSeparateList(BATCH_SIZE,mode)
+      LOSS_TEMP,grad=doStuff_temp(Models,temp_criterion, batch,COEF_TEMP)
+
+      if USE_CONTINUOUS then
+         --==========
+         mode='Prop'
+         batch, action1, action2 = getRandomBatchFromSeparateListContinuous(BATCH_SIZE,mode)
+         LOSS_PROP,gradProp=doStuff_Prop_continuous(Models,prop_criterion,batch,COEF_PROP, action1, action2)
+
+         --==========
+         mode='Caus'
+         batch, action1, action2 = getRandomBatchFromSeparateListContinuous(BATCH_SIZE,mode)
+         LOSS_CAUS,gradCaus=doStuff_Caus_continuous(Models,caus_criterion,batch,COEF_CAUS, action1, action2)
+
+         --==========
+         mode='Rep'
+         batch, action1, action2 = getRandomBatchFromSeparateListContinuous(BATCH_SIZE,mode)
+         LOSS_REP,gradRep=doStuff_Rep_continuous(Models,rep_criterion,batch,COEF_REP, action1, action2)
+      else
+         --==========
+         mode='Prop'
+         batch = getRandomBatchFromSeparateList(BATCH_SIZE,mode)
+         LOSS_PROP,gradProp=doStuff_Prop(Models,prop_criterion,batch,COEF_PROP)
+
+         --==========
+         mode='Caus'
+         batch = getRandomBatchFromSeparateList(BATCH_SIZE,mode)
+         LOSS_CAUS,gradCaus=doStuff_Caus(Models,caus_criterion,batch,COEF_CAUS)
+
+         --==========
+         mode='Rep'
+         batch=getRandomBatchFromSeparateList(BATCH_SIZE,mode)
+         LOSS_REP,gradRep=doStuff_Rep(Models,rep_criterion,batch,COEF_REP)
       end
-      return loss,gradParameters
+
+      return LOSS_REP+LOSS_CAUS+LOSS_PROP+LOSS_TEMP ,gradParameters
    end
+
    --sgdState = sgdState or { learningRate = LR, momentum = mom,learningRateDecay = 5e-7,weightDecay=coefL2 }
    --parameters, loss=optim.sgd(feval, parameters, sgdState)
-   optimState={learningRate=LR}
+   optimState={learningRate=LR, learningRateDecay=LR_DECAY}
 
    if SGD_METHOD == 'adagrad' then
       parameters,loss=optim.adagrad(feval,parameters,optimState)
@@ -95,7 +115,7 @@ function train_Epoch(Models,Prior_Used,LOG_FOLDER,LR, USE_CONTINUOUS)  -- TODO: 
     local Temp_grad_list,Prop_grad_list,Rep_grad_list,Caus_grad_list = {},{},{},{}
     local list_errors,list_MI, list_corr={},{},{}
 
-    local Prop=Have_Todo(Prior_Used,'Prop') --rename applies_prior()
+    local Prop=Have_Todo(Prior_Used,'Prop') --TODOrename applies_prior()
     local Temp=Have_Todo(Prior_Used,'Temp')
     local Rep=Have_Todo(Prior_Used,'Rep')
     local Caus=Have_Todo(Prior_Used,'Caus')
@@ -166,11 +186,11 @@ function train_Epoch(Models,Prior_Used,LOG_FOLDER,LR, USE_CONTINUOUS)  -- TODO: 
        print("Saving continuous model in ".. NAME_SAVE..'Continuous')
        if USE_CONTINUOUS then
          model_name = NAME_SAVE..'Continuous'
-       else
+      else
          model_name = NAME_SAVE
-       end
-       save_model(Models.Model1, model_name)
-    end
+      end
+      save_model(Models.Model1, model_name)
+   end
 end
 
 Tests_Todo={
@@ -198,11 +218,15 @@ NB_SEQUENCES= #records_paths
 if NB_SEQUENCES ==0  then --or not folder_exists(DATA_FOLDER) then
     error('Error: data was not found in input directory INPUT_DIR= '.. DATA_FOLDER)
 end
---
--- print('Get_HeadCamera_View_Files returned: ',#list_folders_images)
--- print(#list_txt_action) -- action files
---print(#list_txt_button) -- nil
---print(#list_txt_state)
+
+if CAN_HOLD_ALL_SEQ_IN_RAM then
+   print("Preloading all sequences in memory, that way, to accelerate batch selection")
+   ALL_SEQ = {} -- Preload all the sequences instead of loading specific sequences during batch selection
+   for id=1,NB_SEQUENCES do
+      ALL_SEQ[#ALL_SEQ+1] = load_seq_by_id(id)
+   end
+end
+
 
 for nb_test=1, #Tests_Todo do
 
@@ -221,6 +245,7 @@ for nb_test=1, #Tests_Todo do
    end
 
    parameters,gradParameters = Model:getParameters()
+
    Model2=Model:clone('weight','bias','gradWeight','gradBias','running_mean','running_std')
    Model3=Model:clone('weight','bias','gradWeight','gradBias','running_mean','running_std')
    Model4=Model:clone('weight','bias','gradWeight','gradBias','running_mean','running_std')

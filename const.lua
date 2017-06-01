@@ -11,7 +11,6 @@
 -- Hyperparameters are located in a different file (hyperparameters.lua)
 --=============================================================
 require 'lfs'
-require 'cutorch'
 require 'hyperparams'
 --torch.manualSeed(100)
 
@@ -33,6 +32,9 @@ DAY = now.year..'_'..now.yday..'__'..now.hour..'_'..now.min..'_'..now.sec
 NAME_SAVE= 'model'..DAY
 RELOAD_MODEL = false
 
+CAN_HOLD_ALL_SEQ_IN_RAM = true
+-- indicates of you can hold all images sequences in your RAM or not, that way, you can compute much faster.
+
 --===========================================================
 -- VISUALIZATION TOOL
 -- if you want to visualize images, use 'qlua' instead of 'th'
@@ -47,16 +49,18 @@ if VISUALIZE_IMAGES_TAKEN or VISUALIZE_CAUS_IMAGE or VISUALIZE_IMAGE_CROP or VIS
    WINDOW = image.display(image.lena())
 end
 
+IM_CHANNEL = 3
 IM_LENGTH = 200
 IM_HEIGHT = 200
 
 --===========================================================
 -- CUDA CONSTANTS
 --===========================================================
-USE_CUDA = false
+USE_CUDA = true
 USE_SECOND_GPU = true
 
 if USE_CUDA and USE_SECOND_GPU then
+   require 'cutorch'
    cutorch.setDevice(2)
 end
 

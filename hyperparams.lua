@@ -21,19 +21,20 @@ print("============ DATA USED =========\n",
 EXTRAPOLATE_ACTION = false
 
 LR=0.001
+LR_DECAY = 1e-6
 
 SGD_METHOD = 'adam' -- Can be adam or adagrad
-BATCH_SIZE = 2 -- TRYING TO HAVE BIGGER BATCH
-NB_EPOCHS=3
+BATCH_SIZE = 2
+NB_EPOCHS=15
 
 DATA_AUGMENTATION = 0.01
 NORMALIZE_IMAGE = true
 
-COEF_TEMP=0.3
-COEF_PROP=0.3
-COEF_REP=0.3
+COEF_TEMP=1
+COEF_PROP=1
+COEF_REP=1
 COEF_CAUS=1
-DIMENSION_OUT= 4
+DIMENSION_OUT=2
 
 
 --======================================================
