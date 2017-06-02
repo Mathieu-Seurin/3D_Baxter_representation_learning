@@ -193,26 +193,6 @@ function train_Epoch(Models,Prior_Used,LR, USE_CONTINUOUS)
    end
 end
 
-Tests_Todo={
-   {"Prop","Temp","Caus","Rep"}
-   --[[
-      {"Rep","Caus","Prop"},
-      {"Rep","Caus","Temp"},
-      {"Rep","Prop","Temp"},
-      {"Prop","Caus","Temp"},
-      {"Rep","Caus"},
-      {"Prop","Caus"},
-      {"Temp","Caus"},
-      {"Temp","Prop"},
-      {"Rep","Prop"},
-      {"Rep","Temp"},
-      {"Rep"},
-      {"Temp"},
-      {"Caus"},
-      {"Prop"}
-   --]]
-}
-
 local records_paths = Get_Folders(DATA_FOLDER, 'record') --local list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(DATA_FOLDER)
 NB_SEQUENCES= #records_paths
 if NB_SEQUENCES ==0  then --or not folder_exists(DATA_FOLDER) then
@@ -228,7 +208,7 @@ if CAN_HOLD_ALL_SEQ_IN_RAM then
 end
 
 
-for nb_test=1, #Tests_Todo do
+for nb_test=1, #PRIORS_TO_APPLY do
 
    if RELOAD_MODEL then
       print("Reloading model in "..MODEL_FILE_STRING)
@@ -252,7 +232,7 @@ for nb_test=1, #Tests_Todo do
 
    Models={Model1=Model,Model2=Model2,Model3=Model3,Model4=Model4}
 
-   local Priors=Tests_Todo[nb_test]
+   local Priors= PRIORS_TO_APPLY[nb_test]
    local Log_Folder=Get_Folder_Name(LOG_FOLDER, Priors)
    print("Training epoch : "..nb_test ..' using Log_Folder: '..Log_Folder)
    train_Epoch(Models,Priors, LR, USE_CONTINUOUS)

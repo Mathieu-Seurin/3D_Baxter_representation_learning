@@ -19,7 +19,7 @@ require 'hyperparams'
 --===========================================================
 -- CUDA CONSTANTS
 --===========================================================
-USE_CUDA = true
+USE_CUDA = false
 USE_SECOND_GPU = true
 
 if USE_CUDA and USE_SECOND_GPU then
@@ -41,7 +41,11 @@ STRING_MEAN_AND_STD_FILE = PRELOAD_FOLDER..'meanStdImages_'..DATA_FOLDER..'.t7'
 LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
 
 now = os.date("*t")
-DAY = now.year..'_'..now.yday..'__'..now.hour..'_'..now.min..'_'..now.sec
+if USE_CONTINUOUS then
+    DAY = now.year..'_'..now.yday..'_'..now.hour..'_'..now.min..'_'..now.sec..'_'..DATA_FOLDER..' cont'
+else
+    DAY = now.year..'_'..now.yday..'_'..now.hour..'_'..now.min..'_'..now.sec..'_'..DATA_FOLDER
+end
 NAME_SAVE= 'model'..DAY
 RELOAD_MODEL = false
 
@@ -73,6 +77,7 @@ if DATA_FOLDER == SIMPLEDATA3D then
    MAX_TABLE = {0.8,0.7,10} -- for x,y,z
 
    DIMENSION_IN = 3
+   DIMENSION_OUT = 3 --TODO better specify here than leave it up to the model?
 
    REWARD_INDEX = 2
    INDEX_TABLE = {2,3,4} --column index for coordinates in state file, respectively (x,y,z)
@@ -93,7 +98,7 @@ elseif DATA_FOLDER == MOBILE_ROBOT then
    MAX_TABLE = {10000,10000} -- for x,y
 
    DIMENSION_IN = 2
-
+   DIMENSION_OUT = 2
    REWARD_INDEX = 1
    INDEX_TABLE = {1,2} --column index for coordinate in state file (respectively x,y)
 
@@ -117,6 +122,7 @@ elseif DATA_FOLDER == BABBLING then
   MAX_TABLE = {10000, 10000, 10000} -- for x,y, z
   --
   DIMENSION_IN = 3
+  DIMENSION_OUT = 3
   REWARD_INDEX = 2
   INDEX_TABLE = {2,3,4} --column indexes for coordinate in state file (respectively x,y)
   --
