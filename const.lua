@@ -15,6 +15,17 @@ require 'cutorch'
 require 'hyperparams'
 --torch.manualSeed(100)
 
+
+--===========================================================
+-- CUDA CONSTANTS
+--===========================================================
+USE_CUDA = true
+USE_SECOND_GPU = true
+
+if USE_CUDA and USE_SECOND_GPU then
+   cutorch.setDevice(2)
+end
+
 --=====================================
 --DATA AND LOG FOLDER NAME etc..
 --====================================
@@ -27,6 +38,7 @@ MODEL_PATH = LOG_FOLDER
 MODEL_ARCHITECTURE_FILE = './models/topUniqueSimplerWOTanh'
 
 STRING_MEAN_AND_STD_FILE = PRELOAD_FOLDER..'meanStdImages_'..DATA_FOLDER..'.t7'
+LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
 
 now = os.date("*t")
 DAY = now.year..'_'..now.yday..'__'..now.hour..'_'..now.min..'_'..now.sec
@@ -50,16 +62,6 @@ end
 IM_LENGTH = 200
 IM_HEIGHT = 200
 IM_CHANNEL = 3 --image channels (RGB)
-
---===========================================================
--- CUDA CONSTANTS
---===========================================================
-USE_CUDA = false
-USE_SECOND_GPU = true
-
-if USE_CUDA and USE_SECOND_GPU then
-   cutorch.setDevice(2)
-end
 
 --================================================
 -- dataFolder specific constants : filename, dim_in, indexes in state file etc...

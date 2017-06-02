@@ -35,7 +35,7 @@ outStr = ''
 tempSeq = {}
 for dir_seq_str in lfs.dir(imagesFolder) do
    if string.find(dir_seq_str,'record') then
-      print("Sequence : ",dir_seq_str)
+      print("Sequence (data record id): ",dir_seq_str)
       local imagesPath = imagesFolder..'/'..dir_seq_str..'/'..SUB_DIR_IMAGE
       for imageStr in lfs.dir(imagesPath) do
          if string.find(imageStr,'jpg') then
@@ -48,9 +48,9 @@ for dir_seq_str in lfs.dir(imagesFolder) do
               img = getImageFormated(fullImagesPath):double():reshape(1,3,200,200)
             end
             repr = model:forward(img)
-            print ('img and repr')
-            print (#img)
-            print(repr)
+            -- print ('img and repr')
+            -- print (#img)
+            -- print(repr)
             for i=1,repr:size(2) do
                reprStr = reprStr..repr[{1,i}]..' '
             end
@@ -68,6 +68,6 @@ for key in pairs(tempSeq) do
    tempSeqStr = tempSeqStr..tempSeq[key][2]..'\n'
 end
 
-file = io.open(path..'/saveImagesAndRepr.txt', 'w') --TODO Add modelString to state representations for comparison
+file = io.open(path..LEARNED_REPRESENTATIONS_FILE, 'w')
 file:write(tempSeqStr)
 file:close()
