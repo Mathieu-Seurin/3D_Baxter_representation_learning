@@ -53,6 +53,7 @@ for dir_seq_str in lfs.dir(imagesFolder) do
             -- print(repr)
             for i=1,repr:size(2) do
                reprStr = reprStr..repr[{1,i}]..' '
+               --print (reprStr)
             end
             tempSeq[#tempSeq+1] = {fullImagesPath, fullImagesPath..' '..reprStr}
          end
@@ -67,7 +68,9 @@ tempSeqStr = ''
 for key in pairs(tempSeq) do
    tempSeqStr = tempSeqStr..tempSeq[key][2]..'\n'
 end
+path_to_output_file = path..'/'..LEARNED_REPRESENTATIONS_FILE
 
-file = io.open(path..LEARNED_REPRESENTATIONS_FILE, 'w')
+print('Saving images and their learnt representations to file '..path_to_output_file)
+file = io.open(path_to_output_file, 'w')
 file:write(tempSeqStr)
 file:close()
