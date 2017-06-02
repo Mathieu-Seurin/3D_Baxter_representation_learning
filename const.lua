@@ -49,7 +49,7 @@ end
 
 IM_LENGTH = 200
 IM_HEIGHT = 200
-IM_CHANNEL = 3
+IM_CHANNEL = 3 --image channels (RGB)
 
 --===========================================================
 -- CUDA CONSTANTS
@@ -62,9 +62,9 @@ if USE_CUDA and USE_SECOND_GPU then
 end
 
 --================================================
--- dataFolder specific constants : filename, dim_in, indices in state file etc...
+-- dataFolder specific constants : filename, dim_in, indexes in state file etc...
 --===============================================
-if DATA_FOLDER == 'simpleData3D' then
+if DATA_FOLDER == SIMPLEDATA3D then
    CLAMP_CAUSALITY = true
 
    MIN_TABLE = {0.42,-0.2,-10} -- for x,y,z
@@ -72,18 +72,18 @@ if DATA_FOLDER == 'simpleData3D' then
 
    DIMENSION_IN = 3
 
-   REWARD_INDICE = 2
-   INDICE_TABLE = {2,3,4} --column indice for coordinate in state file (respectively x,y,z)
+   REWARD_INDEX = 2
+   INDEX_TABLE = {2,3,4} --column index for coordinates in state file, respectively (x,y,z)
 
    DEFAULT_PRECISION = 0.05 -- for 'arrondit' function
-   FILENAME_FOR_REWARD = "is_pressed"
-   FILENAME_FOR_ACTION = "endpoint_action"
-   FILENAME_FOR_STATE = "endpoint_state"
+   FILENAME_FOR_REWARD = "recorded_button1_is_pressed.txt"--"is_pressed"
+   FILENAME_FOR_ACTION = "recorded_robot_limb_left_endpoint_action.txt"--endpoint_action"
+   FILENAME_FOR_STATE = "recorded_robot_limb_left_endpoint_state.txt"--endpoint_state"
 
    SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
    AVG_FRAMES_PER_RECORD = 1000
 
-elseif DATA_FOLDER == 'mobileRobot' then
+elseif DATA_FOLDER == MOBILE_ROBOT then
 
    CLAMP_CAUSALITY = false
 
@@ -92,42 +92,43 @@ elseif DATA_FOLDER == 'mobileRobot' then
 
    DIMENSION_IN = 2
 
-   REWARD_INDICE = 1
-   INDICE_TABLE = {1,2} --column indice for coordinate in state file (respectively x,y)
+   REWARD_INDEX = 1
+   INDEX_TABLE = {1,2} --column index for coordinate in state file (respectively x,y)
 
    DEFAULT_PRECISION = 0.1
-   FILENAME_FOR_ACTION = "action" --not used at all, we use state file, and compute the action with it (contains dx, dy)
-   FILENAME_FOR_STATE = "state"
-   FILENAME_FOR_REWARD = "reward"
+   FILENAME_FOR_ACTION = "recorded_robot_action.txt" --not used at all, we use state file, and compute the action with it (contains dx, dy)
+   FILENAME_FOR_STATE = "recorded_robot_state.txt"
+   FILENAME_FOR_REWARD = "recorded_robot_reward.txt"
 
    SUB_DIR_IMAGE = 'recorded_camera_top'
    AVG_FRAMES_PER_RECORD = 90
 
 
-elseif DATA_FOLDER == 'babbling_converted' then
+elseif DATA_FOLDER == BABBLING then
   -- Leni's real Baxter data on  ISIR dataserver. It is named "data_archive_sim_1".
   --(real Baxter Pushing Objects).  If data is not converted into action, state
   -- and reward files with images in subfolder, run first the conversion tool from
   -- yml format to rgb based data in https://github.com/LeniLeGoff/DB_action_discretization
   DEFAULT_PRECISION = 0.1
   CLAMP_CAUSALITY = false
-  MIN_TABLE = {-10000,-10000} -- for x,y
-  MAX_TABLE = {10000,10000} -- for x,y
+  MIN_TABLE = {-10000, -10000, -10000} -- for x,y,z
+  MAX_TABLE = {10000, 10000, 10000} -- for x,y, z
   --
   DIMENSION_IN = 3
-  REWARD_INDICE = 2
-  INDICE_TABLE = {2,3,4} --column indexes for coordinate in state file (respectively x,y)
+  REWARD_INDEX = 2
+  INDEX_TABLE = {2,3,4} --column indexes for coordinate in state file (respectively x,y)
   --
   FILENAME_FOR_REWARD = "reward_pushing_object.txt"  -- 1 if the object being pushed actually moved
   FILENAME_FOR_STATE = "state_pushing_object.txt" --computed while training based on action
-  FILENAME_FOR_ACTION = "action_pushing_object.txt"
-  --FILENAME_FOR_ACTION_DELTAS = "action_pushing_object_deltas.txt"
+  FILENAME_FOR_ACTION_DELTAS = "state_pushing_object_deltas.txt"
+  FILENAME_FOR_ACTION = FILENAME_FOR_ACTION_DELTAS --""action_pushing_object.txt"
+
 
   SUB_DIR_IMAGE = 'baxter_pushing_objects'
   AVG_FRAMES_PER_RECORD = 60
 
 else
-  print("No supported data folder provided, please add either of simpleData3D, mobileRobot or Leni's babbling")
+  print("No supported data folder provided, please add either of the data folders defined in hyperparams: "..BABBLING..", "..MOBILE_ROBOT.." "..SIMPLEDATA3D )
   os.exit()
 end
 

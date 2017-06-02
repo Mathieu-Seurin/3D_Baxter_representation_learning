@@ -604,7 +604,7 @@ if #list_folders_images >0 then
 	-- predict:
 	X = getReprFromImgs(imgs, PATH_PRELOAD_DATA,representationsName, MODEL_FULL_PATH)
 
-	train(X,y,reconstructingTask)
+	train(X,y, reconstructingTask, NB_SEQUENCES)
 else
 	print("Input image files not found, check your DATA_FOLDER global variable (should be named 'simpleData3D')")
 	os.exit()

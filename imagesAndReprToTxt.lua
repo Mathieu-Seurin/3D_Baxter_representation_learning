@@ -9,8 +9,6 @@ require 'const'
 require 'functions'
 
 local imagesFolder = DATA_FOLDER
-local modelString
-
 local path, modelString
 -- Last model is a file where the name of the last model computed is saved
 -- this way, you just have to launch the programm without specifying anything,
@@ -70,6 +68,6 @@ for key in pairs(tempSeq) do
    tempSeqStr = tempSeqStr..tempSeq[key][2]..'\n'
 end
 
-file = io.open(path..'/saveImagesAndRepr.txt', 'w')
+file = io.open(path..'/saveImagesAndRepr.txt', 'w') --TODO Add modelString to state representations for comparison
 file:write(tempSeqStr)
 file:close()

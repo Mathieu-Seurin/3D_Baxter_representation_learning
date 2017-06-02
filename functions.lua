@@ -38,17 +38,17 @@ function getRandomBatchFromSeparateList(batch_size, mode)
 
    for i=1, batch_size do
 
-      INDICE1=torch.random(1,NB_SEQUENCES) -- Global only for visualisation purposes
-      INDICE2=torch.random(1,NB_SEQUENCES) -- Global only for visualisation purposes
+      INDEX1=torch.random(1,NB_SEQUENCES) -- Global only for visualisation purposes
+      INDEX2=torch.random(1,NB_SEQUENCES) -- Global only for visualisation purposes
 
       local data1,data2
 
       if CAN_HOLD_ALL_SEQ_IN_RAM then
-         data1 = ALL_SEQ[INDICE1] --TODO CAPITAL LETTERS SHOULD BE USED ONLY FOR CONSTANT NAMES?
-         data2 = ALL_SEQ[INDICE2]
+         data1 = ALL_SEQ[INDEX1] --TODO CAPITAL LETTERS SHOULD BE USED ONLY FOR CONSTANT NAMES?
+         data2 = ALL_SEQ[INDEX2]
       else
-         data1 = load_seq_by_id(INDICE1)
-         data2 = load_seq_by_id(INDICE2)
+         data1 = load_seq_by_id(INDEX1)
+         data2 = load_seq_by_id(INDEX2)
       end
 
       assert(data1, "Something went wrong while loading data1")
@@ -105,17 +105,17 @@ function getRandomBatchFromSeparateListContinuous(batch_size, mode)
 
    for i=1, batch_size do
 
-      INDICE1=torch.random(1,NB_SEQUENCES) -- Global only for visualisation purpose
-      INDICE2=torch.random(1,NB_SEQUENCES) -- Global only for visualisation purpose
+      INDEX1=torch.random(1,NB_SEQUENCES) -- Global only for visualisation purpose
+      INDEX2=torch.random(1,NB_SEQUENCES) -- Global only for visualisation purpose
 
       local data1,data2
 
       if CAN_HOLD_ALL_SEQ_IN_RAM then
-         data1 = ALL_SEQ[INDICE1]
-         data2 = ALL_SEQ[INDICE2]
+         data1 = ALL_SEQ[INDEX1]
+         data2 = ALL_SEQ[INDEX2]
       else
-         data1 = load_seq_by_id(INDICE1)
-         data2 = load_seq_by_id(INDICE2)
+         data1 = load_seq_by_id(INDEX1)
+         data2 = load_seq_by_id(INDEX2)
       end
 
       assert(data1, "Something went wrong while loading data1")
@@ -209,23 +209,19 @@ function load_seq_by_id(id)
       --print("load_seq_by_id Data and Normalization exist ",id,string_preloaded_and_normalized_data )--      print(data)
    else   -- DATA DOESN'T EXIST AT ALL
       print("load_seq_by_id input file DOES NOT exists (input id "..id..") Getting files and saving them to "..string_preloaded_and_normalized_data..' from DATA_FOLDER '..DATA_FOLDER)
-      local list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(DATA_FOLDER)
-      print('Get_HeadCamera_View_Files returned #folders: '..#list_folders_images)
-      print(list_folders_images)
-      print('type')
-      print(torch.typename(list_folders_images))
+      local list_folders_images, list_txt_action,list_txt_button, list_txt_state = Get_HeadCamera_View_Files(DATA_FOLDER)
+      print('Get_HeadCamera_View_Files returned #folders: '..#list_folders_images) --print(list_folders_images)
       if #list_folders_images == 0 then
           error("load_seq_by_id: list_folders_images returned by Get_HeadCamera_View_Files is empty! ",#list_folders_images)
       end
-      print("list_txt_action",list_txt_action)
-      print("list_txt_button",list_txt_button)--nil
-      print("list_txt_state",list_txt_state) --nil
+      --print("list_txt_action",list_txt_action)
+    --   print("list_txt_button",list_txt_button)--nil
+    --   print("list_txt_state",list_txt_state) --nil
       assert(list_folders_images[id], 'The frame with order id '..id..'  within the record '..string_preloaded_and_normalized_data..' does not correspond to any existing frame. Check the NB_BATCHES parameter for this dataset and adjust it accounting for the average nr of frames per record')
       local list= images_Paths(list_folders_images[id])
-
-      local txt=list_txt_action[id]
-      local txt_reward=list_txt_button[id] --nil
-      local txt_state=list_txt_state[id]--nil
+      local txt = list_txt_action[id]
+      local txt_reward = list_txt_button[id] --nil
+      local txt_state = list_txt_state[id]--nil
 
       data = load_Part_list(list, txt, txt_reward, txt_state)
       print("load_Part_list ",#data)
@@ -268,10 +264,10 @@ function load_Part_list(list, txt, txt_reward, txt_state)
 
    local im={}
    local Infos = getInfos(txt,txt_reward,txt_state)
-   print('list size: '..#list)  -- 11, 99  2  99
-   print('Infos[1] size: '..#Infos[1])
-   print ('Infos size: '..#Infos)
-   print ('#(Infos.reward): '..#(Infos.reward))
+   -- print('list size: '..#list)
+   -- print('Infos[1] size: '..#Infos[1])
+   -- print ('Infos size: '..#Infos)
+   -- print ('#(Infos.reward): '..#(Infos.reward))-- 11, 99  2  99
    assert(#Infos[1]==#list)
    -- assert(#(Infos.reward)==#list)
    assert(#(Infos.reward)== #Infos[1])
@@ -290,7 +286,7 @@ function getInfos(txt,txt_reward,txt_state)
    end
    Infos.reward = {}
 
-   local reward_indice=REWARD_INDICE
+   local reward_index= REWARD_INDEX
 
    local tensor_state, label=tensorFromTxt(txt_state)
 
@@ -301,28 +297,26 @@ function getInfos(txt,txt_reward,txt_state)
    for i=1,tensor_reward:size(1) do
 
       local last_pos = {}
-
-      for dim=1,#INDICE_TABLE do
-         id_of_dim_in_tensor = INDICE_TABLE[dim]
+      for dim=1,#INDEX_TABLE do
+         id_of_dim_in_tensor = INDEX_TABLE[dim]
          local value = tensor_state[i][id_of_dim_in_tensor]
          table.insert(Infos[dim],value)
          table.insert(last_pos, value) -- For out_of_bound func
       end
 
-      local reward = tensor_reward[i][reward_indice]
-
-      if reward~=0 then
+      local reward = tensor_reward[i][reward_index]
+      if reward ~=0 then
          there_is_reward=true
-         table.insert(Infos.reward,reward)
+         table.insert(Infos.reward, reward)
       elseif is_out_of_bound(last_pos) then
          there_is_reward=true
          table.insert(Infos.reward,-1)
       else
          table.insert(Infos.reward,0)
       end
-      --print(tensor_reward[i][reward_indice])
+      --print(tensor_reward[i][reward_index])
    end
-   assert(there_is_reward,"Reward is needed in a sequence...")
+   assert(Infos.reward,"Reward is needed in a sequence...") --TODO IS THIS ALWAYS THE CASE IF WE WANT TO USE OUR PRIORS? if so, return to previous assert(there_is_reward)
    return Infos
 end
 
@@ -361,12 +355,12 @@ function scaleAndCrop(img)
    return imgAfter
 end
 
-function is_out_of_bound(list_pos)
-
+--list_positions is a table with (DIM, normally 3) coordinate positions
+function is_out_of_bound(list_positions)
    -- For each dimension you check if the value is inside
    -- barrier fix by MIN_TABLE and MAX_TABLE
-   for dim=1,#list_pos do
-      if list_pos[dim] < MIN_TABLE[dim] or list_pos[dim] > MAX_TABLE[dim] then
+   for dim=1,#list_positions do
+      if list_positions[dim] < MIN_TABLE[dim] or list_positions[dim] > MAX_TABLE[dim] then
          return true
       end
    end
