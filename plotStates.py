@@ -1,15 +1,14 @@
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 from matplotlib import colors
-
 import sys
-
 import numpy as np
+LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
 
 if len(sys.argv) != 3:
         lastModelFile = open('lastModel.txt')
         path = lastModelFile.readline()[:-1]+'/'
-        state_file_str = path+"saveImagesAndRepr.txt"
+        state_file_str = path+ LEARNED_REPRESENTATIONS_FILE
         lastModelFile.close()
         reward_file_str = 'allRewards.txt'
 else:

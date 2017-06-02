@@ -4,8 +4,8 @@ MOBILE_ROBOT = 'mobileRobot'
 SIMPLEDATA3D = 'simpleData3D'
 --================================================
 
-DATA_FOLDER = BABBLING
---DATA_FOLDER = MOBILE_ROBOT
+--DATA_FOLDER = BABBLING
+DATA_FOLDER = MOBILE_ROBOT
 
 print("============ DATA USED =========\n",
       DATA_FOLDER,
@@ -34,7 +34,7 @@ COEF_TEMP=1
 COEF_PROP=1
 COEF_REP=1
 COEF_CAUS=1
-DIMENSION_OUT=2
+DIMENSION_OUT=2 --TODO only for mobile data? move to const.lua?
 
 
 --======================================================

@@ -206,26 +206,20 @@ function load_seq_by_id(id)
    -- DATA + NORMALIZATION EXISTS
    if file_exists(string_preloaded_and_normalized_data) then
       data = torch.load(string_preloaded_and_normalized_data)
-      --print("load_seq_by_id Data and Normalization exist ",id,string_preloaded_and_normalized_data )--      print(data)
    else   -- DATA DOESN'T EXIST AT ALL
       print("load_seq_by_id input file DOES NOT exists (input id "..id..") Getting files and saving them to "..string_preloaded_and_normalized_data..' from DATA_FOLDER '..DATA_FOLDER)
       local list_folders_images, list_txt_action,list_txt_button, list_txt_state = Get_HeadCamera_View_Files(DATA_FOLDER)
-      print('Get_HeadCamera_View_Files returned #folders: '..#list_folders_images) --print(list_folders_images)
+      --print('Get_HeadCamera_View_Files returned #folders: '..#list_folders_images) --print(list_folders_images)
       if #list_folders_images == 0 then
           error("load_seq_by_id: list_folders_images returned by Get_HeadCamera_View_Files is empty! ",#list_folders_images)
       end
-      --print("list_txt_action",list_txt_action)
-    --   print("list_txt_button",list_txt_button)--nil
-    --   print("list_txt_state",list_txt_state) --nil
       assert(list_folders_images[id], 'The frame with order id '..id..'  within the record '..string_preloaded_and_normalized_data..' does not correspond to any existing frame. Check the NB_BATCHES parameter for this dataset and adjust it accounting for the average nr of frames per record')
       local list= images_Paths(list_folders_images[id])
       local txt = list_txt_action[id]
       local txt_reward = list_txt_button[id] --nil
       local txt_state = list_txt_state[id]--nil
 
-      data = load_Part_list(list, txt, txt_reward, txt_state)
-      print("load_Part_list ",#data)
-      --print (data)
+      data = load_Part_list(list, txt, txt_reward, txt_state)--      print("load_Part_list: ",#data) --for tables, #table returns 0 despite not being empty table.       print (data)
       torch.save(string_preloaded_and_normalized_data, data)
    end
    assert(data, 'Failure in load_seq_by_id: data to be saved is nil')
