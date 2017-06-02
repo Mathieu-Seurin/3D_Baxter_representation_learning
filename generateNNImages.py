@@ -11,7 +11,7 @@ nbr_images = -1
 
 if len(sys.argv) <= 1:
         sys.exit("Give number of neighbors (and number of images and model dir if you don't want to use the last model created")
-        
+
 # Some parameters
 nbr_neighbors= int(sys.argv[1])
 
@@ -41,7 +41,7 @@ dim_state= len(states[0])
 
 #Compute nearest neighbors
 nbrs = NearestNeighbors(n_neighbors=(nbr_neighbors+1), algorithm='ball_tree').fit(states)
-distances, indices = nbrs.kneighbors(states)
+distances, indexes = nbrs.kneighbors(states)
 
 #Generate mosaics
 path_to_neighbour = path_to_model + '/NearestNeighbors/'
@@ -51,9 +51,9 @@ if not os.path.exists(path_to_neighbour):
 	os.mkdir(path_to_neighbour)
 
 if nbr_images == -1:
-	data= zip(images,indices,distances,states)
+	data= zip(images,indexes,distances,states)
 else:
-	data= random.sample(zip(images,indices,distances,states),nbr_images)
+	data= random.sample(zip(images,indexes,distances,states),nbr_images)
 
 
 for img_name,id,dist,state in data:

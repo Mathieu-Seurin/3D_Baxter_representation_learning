@@ -99,7 +99,7 @@ function Rico_Training(Models)
    return loss[1], grad
 end
 
-function train_Epoch(Models,Prior_Used,LOG_FOLDER,LR, USE_CONTINUOUS)  -- TODO: LOG_FOLDER IS NOT USED, REMOVE
+function train_Epoch(Models,Prior_Used,LR, USE_CONTINUOUS)
     local NB_BATCHES= math.ceil(NB_SEQUENCES*AVG_FRAMES_PER_RECORD/BATCH_SIZE/(4+4+2+2))
     --90 is the FRAMES_PER_RECORD (average number of images per sequences for mobileRobot data), div by 12 because the network sees 12 images per iteration (i.e. record)
     -- (4*2 for rep and prop, 2*2 for temp and caus)
@@ -139,17 +139,17 @@ function train_Epoch(Models,Prior_Used,LOG_FOLDER,LR, USE_CONTINUOUS)  -- TODO: 
 
        xlua.progress(0, NB_BATCHES)
        for numBatch=1, NB_BATCHES do
-          indice1=torch.random(1,NB_SEQUENCES-1)
-          indice2=torch.random(1,NB_SEQUENCES-1)
+          index1=torch.random(1,NB_SEQUENCES-1)
+          index2=torch.random(1,NB_SEQUENCES-1)
           ------------- only one list used----------
           --       print([[====================================================
           -- WARNING TESTING PRIOR, THIS IS NOT RANDOM AT ALL
           -- ====================================================]])
-          --       local indice1=8
-          --       local indice2=3
+          --       local index1=8
+          --       local index2=3
 
-          local data1 = load_seq_by_id(indice1)
-          local data2 = load_seq_by_id(indice2)
+          local data1 = load_seq_by_id(index1)
+          local data2 = load_seq_by_id(index2)
 
           assert(data1, "Something went wrong while loading data1")
           assert(data2, "Something went wrong while loading data2")
@@ -255,7 +255,7 @@ for nb_test=1, #Tests_Todo do
    local Priors=Tests_Todo[nb_test]
    local Log_Folder=Get_Folder_Name(LOG_FOLDER, Priors)
    print("Training epoch : "..nb_test ..' using Log_Folder: '..Log_Folder)
-   train_Epoch(Models,Priors,Log_Folder,LR, USE_CONTINUOUS)
+   train_Epoch(Models,Priors, LR, USE_CONTINUOUS)
 end
 
 imgs={} --memory is free!!!!!

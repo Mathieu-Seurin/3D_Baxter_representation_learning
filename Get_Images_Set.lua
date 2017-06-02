@@ -114,9 +114,8 @@ function Get_HeadCamera_View_Files(Path)
    list_txt_button={}
    list_txt_action={}
    list_txt_state={}
-
    for i=1, #Paths do
-      list_folder=Get_Folders(Paths[i],SUB_DIR_IMAGE,'txt',list_folder)
+      list_folder = Get_Folders(Paths[i],SUB_DIR_IMAGE,'txt',list_folder)
       table.insert(list_txt_button, get_path_to_text_files(Paths[i],FILENAME_FOR_REWARD))
       table.insert(list_txt_action, get_path_to_text_files(Paths[i],FILENAME_FOR_ACTION))
       table.insert(list_txt_state, get_path_to_text_files(Paths[i],FILENAME_FOR_STATE))
@@ -133,18 +132,17 @@ end
 -- Input ():
 -- Output ():
 ---------------------------------------------------------------------------------------
-function get_path_to_text_files(Path, including)--TODO add, excluding)
+function get_path_to_text_files(Path, including, excluding)
    local incl=including or ""
    local excl=excluding or "uyfouhjbhytfoughl" -- random motif
    local txt=nil
    --print('get_path_to_text_files Path: ')
    --print (Path)
    for file in paths.files(Path) do
-      --print(file)
       -- We only load files that match the 'including' pattern because we know that there are the folder we are interested in
-      if file:find(incl..'.txt' .. '$') and (not file:find(excl)) then
+      if file:find(incl.. '$') and (not file:find(excl)) then --file:find(incl..'.txt' .. '$') then
          --print('found path...'..paths.concat(Path,file))
-         txt=paths.concat(Path,file) ---TODO: return as soon as we find one, ore return a list of all files that match the search criteria
+         txt=paths.concat(Path,file) ---TODO: return as soon as we find one, or return a list of all files that match the search criteria
       end
    end
    return txt
@@ -312,7 +310,7 @@ function get_one_random_Caus_Set(Infos1,Infos2)
          print("id1",id_ref_action_begin)
          print("id2",id_ref_action_end)
          print("action1",action1[1],action1[2])--,action[3])
-         visualize_image_from_seq_id(INDICE2,id_ref_action_begin,id_ref_action_end,true)
+         visualize_image_from_seq_id(INDEX2,id_ref_action_begin,id_ref_action_end,true)
          io.read()
       end
 
@@ -333,7 +331,7 @@ function get_one_random_Caus_Set(Infos1,Infos2)
             --Visualize images taken if you want
             if VISUALIZE_CAUS_IMAGE then
                print("action2",action2[1],action2[2])--,action[3])
-               visualize_image_from_seq_id(INDICE1,id_second_action_begin,id_second_action_end)
+               visualize_image_from_seq_id(INDEX1,id_second_action_begin,id_second_action_end)
                print(is_same_action(action1, action2))
                io.read()
             end
@@ -351,7 +349,7 @@ end
 ---------------------------------------------------------------------------------------
 -- Function : arrondit(value)
 -- Input (tensor) :
--- Input (head_pan_indice) :
+-- Input (head_pan_index) :
 -- Output (tensor):
 ---------------------------------------------------------------------------------------
 function arrondit(value, prec)
@@ -416,7 +414,7 @@ end
 -- Input (txt1) : path of the file of the first list of joint
 -- Input (txt2) : path of the file of the second list of joint
 -- Input (use_simulate_images) : boolean variable which say if we use or not simulate images (we need this information because the data is not formated exactly the same in the txt file depending on the origin of images)
--- Output : structure with 4 indices which represente a quadruplet (2 Pair of images from 2 different list) for Traininng with prop prior.
+-- Output : structure with 4 s which represente a quadruplet (2 Pair of images from 2 different list) for Traininng with prop prior.
 -- Returns a Lua table with 4 images and the 2 actions derived from the states
 -- {
 --   im3 : 19
@@ -507,7 +505,7 @@ function get_one_random_Caus_Set_and_actions(Infos1, Infos2)
       reward1 = Infos2.reward[id_ref_action_end]
 
       if VISUALIZE_CAUS_IMAGE then
-         visualize_image_from_seq_id(INDICE2,id_ref_action_begin,id_ref_action_end)
+         visualize_image_from_seq_id(INDEX2,id_ref_action_begin,id_ref_action_end)
       end
 
       action1 = action_amplitude(Infos2, id_ref_action_begin, id_ref_action_end)
