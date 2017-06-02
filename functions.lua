@@ -28,7 +28,6 @@ end
 -- Output ():
 ---------------------------------------------------------------------------------------
 function getRandomBatchFromSeparateList(batch_size, mode)
-
    if mode=="Prop" or mode=="Rep" then
       Batch=torch.Tensor(4, batch_size, IM_CHANNEL, IM_LENGTH, IM_HEIGHT)
    else
@@ -39,13 +38,13 @@ function getRandomBatchFromSeparateList(batch_size, mode)
 
    for i=1, batch_size do
 
-      INDICE1=torch.random(1,NB_SEQUENCES) -- Global only for visualisation purpose
-      INDICE2=torch.random(1,NB_SEQUENCES) -- Global only for visualisation purpose
+      INDICE1=torch.random(1,NB_SEQUENCES) -- Global only for visualisation purposes
+      INDICE2=torch.random(1,NB_SEQUENCES) -- Global only for visualisation purposes
 
       local data1,data2
 
       if CAN_HOLD_ALL_SEQ_IN_RAM then
-         data1 = ALL_SEQ[INDICE1]
+         data1 = ALL_SEQ[INDICE1] --TODO CAPITAL LETTERS SHOULD BE USED ONLY FOR CONSTANT NAMES?
          data2 = ALL_SEQ[INDICE2]
       else
          data1 = load_seq_by_id(INDICE1)
@@ -212,7 +211,7 @@ function load_seq_by_id(id)
       print("load_seq_by_id input file DOES NOT exists (input id "..id..") Getting files and saving them to "..string_preloaded_and_normalized_data..' from DATA_FOLDER '..DATA_FOLDER)
       local list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(DATA_FOLDER)
       print('Get_HeadCamera_View_Files returned #folders: '..#list_folders_images)
-      print(list_folder_images)
+      print(list_folders_images)
       print('type')
       print(torch.typename(list_folders_images))
       if #list_folders_images == 0 then
@@ -228,7 +227,7 @@ function load_seq_by_id(id)
       local txt_reward=list_txt_button[id] --nil
       local txt_state=list_txt_state[id]--nil
 
-      data = load_Part_list(list_folders_images, txt, txt_reward, txt_state)
+      data = load_Part_list(list, txt, txt_reward, txt_state)
       print("load_Part_list ",#data)
       --print (data)
       torch.save(string_preloaded_and_normalized_data, data)
@@ -260,7 +259,7 @@ end
 --    return {images=im,Infos=Infos}
 -- end
 
-function load_Part_list(list,txt,txt_reward,txt_state)
+function load_Part_list(list, txt, txt_reward, txt_state)
 
    assert(list, "list not found")
    assert(txt, "Txt not found")
@@ -268,15 +267,19 @@ function load_Part_list(list,txt,txt_reward,txt_state)
    assert(txt_reward, "Txt reward not found")
 
    local im={}
-   local Infos=getInfos(txt,txt_reward,txt_state)
-
+   local Infos = getInfos(txt,txt_reward,txt_state)
+   print('list size: '..#list)  -- 11, 99  2  99
+   print('Infos[1] size: '..#Infos[1])
+   print ('Infos size: '..#Infos)
+   print ('#(Infos.reward): '..#(Infos.reward))
    assert(#Infos[1]==#list)
-   assert(#(Infos.reward)==#list)
+   -- assert(#(Infos.reward)==#list)
+   assert(#(Infos.reward)== #Infos[1])
    for i=1, #(Infos[1]) do
-      table.insert(im,getImageFormated(list[i]))
+      table.insert(im, getImageFormated(list[i]))
    end
 
-   return {images=im,Infos=Infos}
+   return {images=im, Infos=Infos}
 end
 
 function getInfos(txt,txt_reward,txt_state)

@@ -388,16 +388,16 @@ function createPreloadedDataFolder(list_folders_images,list_txt,LOG_FOLDER,use_s
 						-- local data1 = load_seq_by_id(indice1)
 						-- local data2 = load_seq_by_id(indice2)
 
-            batch=getRandomBatchFromSeparateList(imgs1,imgs2,BATCH_SIZE,"Temp", USE_CONTINUOUS)--batch(imgs1,imgs2,txt1,txt2,BATCH_SIZE,"Temp")
+            batch=getRandomBatchFromSeparateList(BATCH_SIZE,'Temp')--imgs1,imgs2,BATCH_SIZE,"Temp", USE_CONTINUOUS)--batch(imgs1,imgs2,txt1,txt2,BATCH_SIZE,"Temp")
             lossTemp = lossTemp + Rico_Training_evaluation(models,'Temp',batch, coef_Temp,LR)
 
-            batch=getRandomBatchFromSeparateList(imgs1,imgs2,BATCH_SIZE,"Caus", USE_CONTINUOUS)
+            batch=getRandomBatchFromSeparateList(BATCH_SIZE,'Caus')--imgs1,imgs2,BATCH_SIZE,"Caus", USE_CONTINUOUS)
             lossCaus = lossCaus + Rico_Training_evaluation(models, 'Caus',batch, 1,LR)
 
-            batch=getRandomBatchFromSeparateList(imgs1,imgs2,BATCH_SIZE,"Prop", USE_CONTINUOUS)
+            batch=getRandomBatchFromSeparateList(BATCH_SIZE,'Prop')--imgs1,imgs2,BATCH_SIZE,"Prop", USE_CONTINUOUS)
             lossProp = lossProp + Rico_Training_evaluation(models, 'Prop',batch, coef_Prop,LR)
 
-            batch=getRandomBatchFromSeparateList(imgs1,imgs2,BATCH_SIZE,"Rep", USE_CONTINUOUS)
+            batch=getRandomBatchFromSeparateList(BATCH_SIZE,'Rep')--imgs1,imgs2,BATCH_SIZE,"Rep", USE_CONTINUOUS)
             lossRep = lossRep + Rico_Training_evaluation(models,'Rep',batch, coef_Rep,LR)
 
             xlua.progress(numBatch, NB_BATCHES)
@@ -567,12 +567,12 @@ avg_error = 0
 seq_id = 1 --TODO provide for each sequence and give final avg reconstruction error  local indice_test = torch.random(1,NB_SEQUENCES-1)
 
 if #list_folders_images >0 then
-	local list_image_paths= images_Paths(list_folders_images[indice_test])
+	local images_in_path= images_Paths(list_folders_images[indice_test])
 	print('images_paths (First test:)'..list_folders_images[indice_test])
 	txt_test=list_txt_state[indice_test]
 	txt_reward_test=list_txt_button[indice_test]
 	--part_test=1
-	--Data_test=load_Part_list(list_image_paths,txt_test,txt_reward_test,image_width,image_height,nb_part,part_test,0,txt_test) --avoid, call only  load_seq_by_id(seq_id)
+	--Data_test=load_Part_list(images_in_path,txt_test,txt_reward_test,image_width,image_height,nb_part,part_test,0,txt_test) --avoid, call only  load_seq_by_id(seq_id)
 	--Data_test=load_Part_list(list,txt,txt_reward,IM_LENGTH,IM_HEIGHT,DATA_AUGMENTATION,txt_state)
 	data_test=load_seq_by_id(seq_id)
 	print ('data_test: '..#data_test)
