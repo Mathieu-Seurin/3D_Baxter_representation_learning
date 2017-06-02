@@ -79,7 +79,7 @@ if DATA_FOLDER == SIMPLEDATA3D then
    DIMENSION_IN = 3
    DIMENSION_OUT = 3 --TODO better specify here than leave it up to the model?
 
-   REWARD_INDEX = 2
+   REWARD_INDEX = 2 --2 reward values: -0, 1
    INDEX_TABLE = {2,3,4} --column index for coordinates in state file, respectively (x,y,z)
 
    DEFAULT_PRECISION = 0.05 -- for 'arrondit' function
@@ -99,7 +99,7 @@ elseif DATA_FOLDER == MOBILE_ROBOT then
 
    DIMENSION_IN = 2
    DIMENSION_OUT = 2
-   REWARD_INDEX = 1
+   REWARD_INDEX = 1  --3 reward values: -1, 0, 10
    INDEX_TABLE = {1,2} --column index for coordinate in state file (respectively x,y)
 
    DEFAULT_PRECISION = 0.1
@@ -116,6 +116,7 @@ elseif DATA_FOLDER == BABBLING then
   --(real Baxter Pushing Objects).  If data is not converted into action, state
   -- and reward files with images in subfolder, run first the conversion tool from
   -- yml format to rgb based data in https://github.com/LeniLeGoff/DB_action_discretization
+  --For the version 1 of the dataset, rewards are very sparse and not always there is 2 values for the reward (required to apply Causality prior)
   DEFAULT_PRECISION = 0.1
   CLAMP_CAUSALITY = false
   MIN_TABLE = {-10000, -10000, -10000} -- for x,y,z
@@ -123,7 +124,7 @@ elseif DATA_FOLDER == BABBLING then
   --
   DIMENSION_IN = 3
   DIMENSION_OUT = 3
-  REWARD_INDEX = 2
+  REWARD_INDEX = 2 -- 2 reward values: 0, 1
   INDEX_TABLE = {2,3,4} --column indexes for coordinate in state file (respectively x,y)
   --
   FILENAME_FOR_REWARD = "reward_pushing_object.txt"  -- 1 if the object being pushed actually moved

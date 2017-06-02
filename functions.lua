@@ -311,7 +311,8 @@ function getInfos(txt,txt_reward,txt_state)
       end
       --print(tensor_reward[i][reward_index])
    end
-   assert(Infos.reward,"Reward is needed in a sequence...") --TODO IS THIS ALWAYS THE CASE IF WE WANT TO USE OUR PRIORS? if so, return to previous assert(there_is_reward)
+   --THIS IS ALWAYS THE CASE IF WE WANT TO USE CAUSALITY PRIORS. TODO: create synthetic second value reward or do notn apply causality prior (see PRIORS_TO_APPLY in const.lua)
+   assert(there_is_reward,"Reward different than 0 (i.e. min 2 different values of reward) are needed in a sequence...")
    return Infos
 end
 
