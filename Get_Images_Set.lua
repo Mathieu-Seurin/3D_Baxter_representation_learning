@@ -6,10 +6,11 @@ require 'const'
 -- Output : list of the jpg files path
 ---------------------------------------------------------------------------------------
 function images_Paths(folder_containing_jpgs)
-
+   assert(folder_containing_jpgs, 'images_Paths got input folder name nil')
    local listImage={}
    --print('images_Paths: ', folder_containing_jpgs)
    --folder_containing_jpgs="./data_baxter" -- TODO: make it work by passing it as a parameter
+   --print (folder_containing_jpgs)
    for file in paths.files(folder_containing_jpgs) do
       --print('getting image path:  '..file)
       -- We only load files that match the extension
@@ -25,50 +26,28 @@ function images_Paths(folder_containing_jpgs)
 end
 
 ---------------------------------------------------------------------------------------
--- Function : images_Paths(path)
--- Input (Path): path of a Folder which contains jpg images
--- Output : list of the jpg files path
+-- Function :
+-- Input ():
+-- Output ():
 ---------------------------------------------------------------------------------------
--- function get_images_paths(folder_containing_jpgs)
---    local listImage={}
---    print('get_images_paths: ', folder_containing_jpgs)
---    --folder_containing_jpgs="./data_baxter" -- TODO: make it work by passing it as a parameter
+-- function Get_Folders(Path, including, excluding)
+--    local folders={}
+--    local incl=including or ""
+--    local excl=excluding or "uyfouhjbhytfoughl" -- random motif
 --
---    for file in paths.files(folder_containing_jpgs) do
---       --print('getting image path:  '..file)
---       -- We only load files that match the extension
---       if file:find('jpg' .. '$') then
+--    for file in paths.files(Path) do
+--       -- We only load files that match the 'including' pattern because we know that there are the folder we are interested in
+--       if file:find(incl) and (not file:find(excl)) then
 --          -- and insert the ones we care about in our table
---          table.insert(listImage, paths.concat(folder_containing_jpgs,file))
---          --print('Inserted image :  '..paths.concat(folder_containing_jpgs,file))
+--          --print('Get_Folders '..Path..' found search pattern: '..incl..' in filename: '..paths.concat(Path,file))
+--          --table.insert(folders, paths.concat(Path, file))
+--          folders[#folders +1] = paths.concat(Path, file)
+--          --  else
+--          -- 	 print('Get_Folders '..Path..' did not find pattern: '..incl..' Check the structure of your data folders')
 --       end
 --    end
---    table.sort(listImage) --print('got_images_paths from Path: '..folder_containing_jpgs)
---    print(listImage)
---    return listImage
+--    return folders
 -- end
-
----------------------------------------------------------------------------------------
--- Function :
--- Input ():
--- Output ():
----------------------------------------------------------------------------------------
-function txt_path(Path, including)
-   local including=including or ""
-   local txt=nil
-   for file in paths.files(Path) do
-      if file:find(including..'.txt' .. '$') then
-         txt=paths.concat(Path,file)
-      end
-   end
-   return txt
-end
-
----------------------------------------------------------------------------------------
--- Function :
--- Input ():
--- Output ():
----------------------------------------------------------------------------------------
 function Get_Folders(Path, including, excluding,list)
    local list=list or {}
    local incl=including or ""
@@ -86,16 +65,51 @@ function Get_Folders(Path, including, excluding,list)
    end
    return list
 end
-
 ---------------------------------------------------------------------------------------
--- Function : Get_HeadCamera_HeadMvt(use_simulate_images) --TODO: Get_HeadCamera_HeadMvt?
+-- Function : Get_HeadCamera_View_Files(Path)
 -- Input (use_simulate_images) : boolean variable which say if we use or not simulate images
 -- Output (list_head_left): list of the images directories path
 -- Output (list_txt):  txt list associated to each directories (this txt file contains the grundtruth of the robot position)
 ---------------------------------------------------------------------------------------
+-- function Get_HeadCamera_View_Files(Path)
+--    assert(Path, 'Get_HeadCamera_View_Files got nil as input Path: '..Path)
+--    local use_simulate_images=use_simulate_images or false
+--    local Paths=Get_Folders(Path,'record') --TODO add Global for records subfolder pattern name
+--    if #Paths == 0 then
+--        error('Get_HeadCamera_View_Files returned nil when getting folders with pattern "record"')
+--    end
+--    list_of_records_paths={}
+--    list_txt_button={}
+--    list_txt_action={}
+--    list_txt_state={}
+--
+--    for i=1, #Paths do
+--     --list_folder=Get_Folders(Paths[i],SUB_DIR_IMAGE,'txt',list_folder)--      print (list_folder)
+--     --   table.insert(list_txt_button, get_path_to_text_files(Paths[i],FILENAME_FOR_REWARD))
+--     --   table.insert(list_txt_action, get_path_to_text_files(Paths[i],FILENAME_FOR_ACTION))
+--     --   table.insert(list_txt_state, get_path_to_text_files(Paths[i],FILENAME_FOR_STATE))
+--     folders = Get_Folders(Paths[i],SUB_DIR_IMAGE,'txt')--
+--     for p=1, #folders do
+--         list_of_records_paths[#list_of_records_paths+1] = folders[p]
+--     end
+--     --TODO add flag and if dataset only
+--     list_txt_button[#list_txt_button+1] = get_path_to_text_files(Paths[i],FILENAME_FOR_REWARD, FILE_PATTERN_TO_EXCLUDE)
+--     list_txt_action[#list_txt_action+1] = get_path_to_text_files(Paths[i],FILENAME_FOR_ACTION, FILE_PATTERN_TO_EXCLUDE)
+--     list_txt_state[#list_txt_state+1] = get_path_to_text_files(Paths[i],FILENAME_FOR_STATE, FILE_PATTERN_TO_EXCLUDE)
+--    end
+--    table.sort(list_txt_button) -- file recorded_button_is_pressed.txt
+--    table.sort(list_txt_action) --file recorded_robot_limb_left_endpoint_action.txt
+--    table.sort(list_txt_state)--recroded_robot_libm_left_endpoint_state  -- for the hand position
+--    table.sort(list_of_records_paths) --recorded_cameras_head_camera_2_image_compressed
+--    print(list_of_records_paths)--   print(#Paths)
+--    print(list_txt_action)
+--    print(list_txt_button)
+--    print(list_txt_state)
+--    return list_of_records_paths, list_txt_action,list_txt_button, list_txt_state
+-- end
 function Get_HeadCamera_View_Files(Path)
    local use_simulate_images=use_simulate_images or false
-   local Paths=Get_Folders(Path,'record')  --TODO? formerly, for 1D, 'record' param was not needed
+   local Paths=Get_Folders(Path,'record')
    list_folder={}
    list_txt_button={}
    list_txt_action={}
@@ -103,15 +117,37 @@ function Get_HeadCamera_View_Files(Path)
 
    for i=1, #Paths do
       list_folder=Get_Folders(Paths[i],SUB_DIR_IMAGE,'txt',list_folder)
-      table.insert(list_txt_button, txt_path(Paths[i],FILENAME_FOR_REWARD))
-      table.insert(list_txt_action, txt_path(Paths[i],FILENAME_FOR_ACTION))
-      table.insert(list_txt_state, txt_path(Paths[i],FILENAME_FOR_STATE))
+      table.insert(list_txt_button, get_path_to_text_files(Paths[i],FILENAME_FOR_REWARD))
+      table.insert(list_txt_action, get_path_to_text_files(Paths[i],FILENAME_FOR_ACTION))
+      table.insert(list_txt_state, get_path_to_text_files(Paths[i],FILENAME_FOR_STATE))
    end
    table.sort(list_txt_button) -- file recorded_button_is_pressed.txt
    table.sort(list_txt_action) --file recorded_robot_limb_left_endpoint_action.txt
    table.sort(list_txt_state)--recroded_robot_libm_left_endpoint_state  -- for the hand position
    table.sort(list_folder) --recorded_cameras_head_camera_2_image_compressed
    return list_folder, list_txt_action,list_txt_button, list_txt_state
+end
+
+---------------------------------------------------------------------------------------
+-- Function :
+-- Input ():
+-- Output ():
+---------------------------------------------------------------------------------------
+function get_path_to_text_files(Path, including)--TODO add, excluding)
+   local incl=including or ""
+   local excl=excluding or "uyfouhjbhytfoughl" -- random motif
+   local txt=nil
+   --print('get_path_to_text_files Path: ')
+   --print (Path)
+   for file in paths.files(Path) do
+      --print(file)
+      -- We only load files that match the 'including' pattern because we know that there are the folder we are interested in
+      if file:find(incl..'.txt' .. '$') and (not file:find(excl)) then
+         --print('found path...'..paths.concat(Path,file))
+         txt=paths.concat(Path,file) ---TODO: return as soon as we find one, ore return a list of all files that match the search criteria
+      end
+   end
+   return txt
 end
 
 ---------------------------------------------------------------------------------------

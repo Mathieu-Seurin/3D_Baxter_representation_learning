@@ -25,7 +25,6 @@ else
    error("lastModel.txt should exist")
 end
 
---local  model = torch.load(path..'/'..modelString)
 local  model = torch.load(path..'/'..modelString)
 if USE_CUDA then
   model = model:cuda()
@@ -48,10 +47,12 @@ for dir_seq_str in lfs.dir(imagesFolder) do
             if USE_CUDA then
               img = getImageFormated(fullImagesPath):cuda():reshape(1,3,200,200)
             else
-              img = getImageFormated(fullImagesPath):float():reshape(1,3,200,200)
-              --TODO IF NOT USING CUDA, THIS DOES NOT WORK either way =========== working now ?
+              img = getImageFormated(fullImagesPath):double():reshape(1,3,200,200)
             end
             repr = model:forward(img)
+            print ('img and repr')
+            print (#img)
+            print(repr)
             for i=1,repr:size(2) do
                reprStr = reprStr..repr[{1,i}]..' '
             end

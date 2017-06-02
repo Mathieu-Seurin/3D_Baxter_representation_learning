@@ -18,7 +18,7 @@ else:
 
 state_file=open(state_file_str)
 reward_file=open(reward_file_str)
-        
+
 states_l=[]
 rewards_l=[]
 
@@ -34,17 +34,21 @@ else:
         for line in state_file:
                 if line[0]!='#':
                         words=line.split(' ')
-                        print "words", words
-                        state = [float(words[i]) for i in range(1,len(words)-1)]
-                        print "state",state 
-                        states_l.append(state)
-        states=np.asarray(states_l)
-        toplot=states
+                        states_l.append((words[0],list(map(float,words[1:-1]))))
 
+        states_l.sort(key= lambda x : x[0])
+
+        states = np.zeros((len(states_l), len(states_l[0][1])))
+        for i in range(len(states_l)):
+                #print states_l[i][1]
+                states[i] = np.array(states_l[i][1])
 for line in reward_file:
 	if line[0]!='#':
 		words=line.split(' ')
 		rewards_l.append(float(words[0]))
+
+rewards=np.asarray(rewards_l)
+toplot=states
 
 rewards=np.asarray(rewards_l)
 

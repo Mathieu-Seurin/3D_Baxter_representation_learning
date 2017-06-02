@@ -28,7 +28,6 @@ end
 -- Output ():
 ---------------------------------------------------------------------------------------
 function getRandomBatchFromSeparateList(batch_size, mode)
-
    if mode=="Prop" or mode=="Rep" then
       Batch=torch.Tensor(4, batch_size, IM_CHANNEL, IM_LENGTH, IM_HEIGHT)
    else
@@ -39,13 +38,13 @@ function getRandomBatchFromSeparateList(batch_size, mode)
 
    for i=1, batch_size do
 
-      INDICE1=torch.random(1,NB_SEQUENCES) -- Global only for visualisation purpose
-      INDICE2=torch.random(1,NB_SEQUENCES) -- Global only for visualisation purpose
+      INDICE1=torch.random(1,NB_SEQUENCES) -- Global only for visualisation purposes
+      INDICE2=torch.random(1,NB_SEQUENCES) -- Global only for visualisation purposes
 
       local data1,data2
-      
+
       if CAN_HOLD_ALL_SEQ_IN_RAM then
-         data1 = ALL_SEQ[INDICE1]
+         data1 = ALL_SEQ[INDICE1] --TODO CAPITAL LETTERS SHOULD BE USED ONLY FOR CONSTANT NAMES?
          data2 = ALL_SEQ[INDICE2]
       else
          data1 = load_seq_by_id(INDICE1)
@@ -54,7 +53,7 @@ function getRandomBatchFromSeparateList(batch_size, mode)
 
       assert(data1, "Something went wrong while loading data1")
       assert(data2, "Something went wrong while loading data2")
-         
+
       if mode=="Prop" or mode=="Rep" then
          Set=get_two_Prop_Pair(data1.Infos, data2.Infos)
          im1,im2 = data1.images[Set.im1], data1.images[Set.im2]
@@ -110,7 +109,7 @@ function getRandomBatchFromSeparateListContinuous(batch_size, mode)
       INDICE2=torch.random(1,NB_SEQUENCES) -- Global only for visualisation purpose
 
       local data1,data2
-      
+
       if CAN_HOLD_ALL_SEQ_IN_RAM then
          data1 = ALL_SEQ[INDICE1]
          data2 = ALL_SEQ[INDICE2]
@@ -121,7 +120,7 @@ function getRandomBatchFromSeparateListContinuous(batch_size, mode)
 
       assert(data1, "Something went wrong while loading data1")
       assert(data2, "Something went wrong while loading data2")
-      
+
       if mode=="Prop" or mode=="Rep" then
          Set =get_two_Prop_Pair_and_actions(data1.Infos, data2.Infos)
          im1,im2 = data1.images[Set.im1], data1.images[Set.im2]
@@ -159,7 +158,7 @@ end
 ---------------------------------------------------------------------------------------
 -- Function :	Have_Todo(list_prior,prior)
 -- Input ():
--- Output ():
+-- Output ():  TODO: rename list_contains_element()
 ---------------------------------------------------------------------------------------
 function Have_Todo(list_prior,prior)
    local answer=false
@@ -193,125 +192,74 @@ function Get_Folder_Name(Log_Folder,list_prior)
    return Log_Folder..name..'/'
 end
 
-
 ---------------------------------------------------------------------------------------
--- Function :
--- Input ():
--- Output (): TODO: REMOVE
+-- Function :	load_seq_by_id(id)
+-- Input (): id of the record file. Loads data of that sequence id, and if it does not exists, it creates the preprocessed data and saves into the PRELOAD_FOLDER
+-- Output ():  Returns a Lua Table with the fields:
+-- images (e.g., array of 100 float Tensors of 200x200)
+-- Infos: 2 indexed arrays, e.g. in mobileData: of 100 values
+-- reward (array of 100 indexed rewards)
 ---------------------------------------------------------------------------------------
--- function real_loss(txt,use_simulate_images)
---    local REP_criterion=get_Rep_criterion()
---    local PROP_criterion=get_Prop_criterion()
---    local CAUS_criterion=get_Caus_criterion()
---    local TEMP_criterion=nn.MSDCriterion()
---
---    local truth=getTruth(txt,use_simulate_images)
---
---    local temp_loss=0
---    local prop_loss=0
---    local rep_loss=0
---    local caus_loss=0
---
---    local nb_sample=100
---
---    for i=0, nb_sample do
---       Set_prop=get_one_random_Prop_Set(txt ,use_simulate_images)
---       Set_temp=get_one_random_Temp_Set(#truth)
---       Caus_temp=get_one_random_Caus_Set(txt, txt, use_simulate_images)
---
---       joint1=torch.Tensor(1)
---       joint2=torch.Tensor(1)
---       joint3=torch.Tensor(1)
---       joint4=torch.Tensor(1)
---
---       joint1[1]=truth[Caus_temp.im1]
---       joint2[1]=truth[Caus_temp.im2]
---       caus_loss=caus_loss+CAUS_criterion:updateOutput({joint1, joint2})
---
---       joint1[1]=truth[Set_temp.im1]
---       joint2[1]=truth[Set_temp.im2]
---       temp_loss=temp_loss+TEMP_criterion:updateOutput({joint1, joint2})
---
---       joint1[1]=truth[Set_prop.im1]
---       joint2[1]=truth[Set_prop.im2]
---       joint3[1]=truth[Set_prop.im3]
---       joint4[1]=truth[Set_prop.im4]
---       prop_loss=prop_loss+PROP_criterion:updateOutput({joint1, joint2, joint3, joint4})
---       rep_loss=rep_loss+REP_criterion:updateOutput({joint1, joint2, joint3, joint4})
---    end
---
---    return temp_loss/nb_sample, prop_loss/nb_sample, rep_loss/nb_sample, caus_loss/nb_sample
--- end
-
-
 function load_seq_by_id(id)
    local string_preloaded_and_normalized_data = PRELOAD_FOLDER..'preloaded_'..DATA_FOLDER..'_Seq'..id..'_normalized.t7'
 
    -- DATA + NORMALIZATION EXISTS
    if file_exists(string_preloaded_and_normalized_data) then
       data = torch.load(string_preloaded_and_normalized_data)
+      --print("load_seq_by_id Data and Normalization exist ",id,string_preloaded_and_normalized_data )--      print(data)
    else   -- DATA DOESN'T EXIST AT ALL
-      list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(DATA_FOLDER)
+      print("load_seq_by_id input file DOES NOT exists (input id "..id..") Getting files and saving them to "..string_preloaded_and_normalized_data..' from DATA_FOLDER '..DATA_FOLDER)
+      local list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(DATA_FOLDER)
+      print('Get_HeadCamera_View_Files returned #folders: '..#list_folders_images)
+      print(list_folders_images)
+      print('type')
+      print(torch.typename(list_folders_images))
+      if #list_folders_images == 0 then
+          error("load_seq_by_id: list_folders_images returned by Get_HeadCamera_View_Files is empty! ",#list_folders_images)
+      end
+      print("list_txt_action",list_txt_action)
+      print("list_txt_button",list_txt_button)--nil
+      print("list_txt_state",list_txt_state) --nil
+      assert(list_folders_images[id], 'The frame with order id '..id..'  within the record '..string_preloaded_and_normalized_data..' does not correspond to any existing frame. Check the NB_BATCHES parameter for this dataset and adjust it accounting for the average nr of frames per record')
+      local list= images_Paths(list_folders_images[id])
 
-      -- print("list_folders_images",list_folders_images)
-      -- print("list_folders_images",list_txt_action)
-      -- print("list_txt_button",list_txt_button)
-      -- print("list_txt_state",list_txt_state)
-
-
-      local list=images_Paths(list_folders_images[id])
       local txt=list_txt_action[id]
-      local txt_reward=list_txt_button[id]
-      local txt_state=list_txt_state[id]
+      local txt_reward=list_txt_button[id] --nil
+      local txt_state=list_txt_state[id]--nil
 
-      data = load_Part_list(list,txt,txt_reward,txt_state)
-      torch.save(string_preloaded_and_normalized_data,data)
+      data = load_Part_list(list, txt, txt_reward, txt_state)
+      print("load_Part_list ",#data)
+      --print (data)
+      torch.save(string_preloaded_and_normalized_data, data)
    end
+   assert(data, 'Failure in load_seq_by_id: data to be saved is nil')
    return data
-end
-
-function scaleAndCrop(img)
-   -- Why do i scale and crop after ? Because this is the way it's done under python,
-   -- so we need to do the same conversion
-
-   -- local lengthBeforeCrop = 320 --Tuned by hand, that way, when you scale then crop, the image is 200x200
-
-   -- local lengthAfterCrop = IM_LENGTH
-   -- local height = IM_HEIGHT
-   -- local formatBefore=lengthBeforeCrop.."x"..height
-
-   local format=IM_LENGTH.."x"..IM_HEIGHT
-   local imgAfter=image.scale(img,format)
-
-   if VISUALIZE_IMAGE_CROP then
-      dim1_before = img:size(1)
-      dim2_before = img:size(2)
-      dim3_before = img:size(3)
-
-      dim1_after = imgAfter:size(1)
-      dim2_after = imgAfter:size(2)
-      dim3_after = imgAfter:size(3)
-
-      imgAfterPadded =torch.zeros(dim1_before,dim2_before, dim3_before)
-      imgAfterPadded[{{1,dim1_after},{1,dim2_after},{1,dim3_after}}] =
-         imgAfter
-
-      local imgMerge = image.toDisplayTensor({img,imgAfterPadded})
-      print("Before and After scale")
-      image.display{image=imgMerge,win=WINDOW}
-      io.read()
-   end
-
-   return imgAfter
 end
 
 ---------------------------------------------------------------------------------------
 -- Function : load_list(list,length,height)
--- This method is used by load_data and shouldn't be called on its own
+-- --TODO: since load_data does not exist any longer, can we rename this method?
 -- Input ():
 -- Output ():
 ---------------------------------------------------------------------------------------
-function load_Part_list(list,txt,txt_reward,txt_state)
+-- function load_Part_list(list,txt,txt_reward,txt_state)
+--
+--    assert(list, "list not found")
+--    assert(txt, "Txt not found")
+--    assert(txt_state, "Txt state not found")
+--    assert(txt_reward, "Txt reward not found")
+--
+--    local im={}
+--    local Infos=getInfos(txt,txt_reward,txt_state)
+--    assert(Infos, "getInfos returned nil")
+--    for i=1, #(Infos[1]) do
+--        print(list[i])
+--       table.insert(im, getImageFormated(list[i]))
+--    end
+--    return {images=im,Infos=Infos}
+-- end
+
+function load_Part_list(list, txt, txt_reward, txt_state)
 
    assert(list, "list not found")
    assert(txt, "Txt not found")
@@ -319,28 +267,19 @@ function load_Part_list(list,txt,txt_reward,txt_state)
    assert(txt_reward, "Txt reward not found")
 
    local im={}
-   local Infos=getInfos(txt,txt_reward,txt_state)
-
+   local Infos = getInfos(txt,txt_reward,txt_state)
+   print('list size: '..#list)  -- 11, 99  2  99
+   print('Infos[1] size: '..#Infos[1])
+   print ('Infos size: '..#Infos)
+   print ('#(Infos.reward): '..#(Infos.reward))
    assert(#Infos[1]==#list)
-   assert(#(Infos.reward)==#list)
-   
+   -- assert(#(Infos.reward)==#list)
+   assert(#(Infos.reward)== #Infos[1])
    for i=1, #(Infos[1]) do
-      table.insert(im,getImageFormated(list[i]))
+      table.insert(im, getImageFormated(list[i]))
    end
 
-   return {images=im,Infos=Infos}
-end
-
-function is_out_of_bound(list_pos)
-
-   -- For each dimension you check if the value is inside
-   -- barrier fix by MIN_TABLE and MAX_TABLE
-   for dim=1,#list_pos do
-      if list_pos[dim] < MIN_TABLE[dim] or list_pos[dim] > MAX_TABLE[dim] then
-         return true
-      end
-   end
-   return false
+   return {images=im, Infos=Infos}
 end
 
 function getInfos(txt,txt_reward,txt_state)
@@ -385,6 +324,53 @@ function getInfos(txt,txt_reward,txt_state)
    end
    assert(there_is_reward,"Reward is needed in a sequence...")
    return Infos
+end
+
+function scaleAndCrop(img)
+   -- Why do i scale and crop after ? Because this is the way it's done under python,
+   -- so we need to do the same conversion
+
+   -- local lengthBeforeCrop = 320 --Tuned by hand, that way, when you scale then crop, the image is 200x200
+
+   -- local lengthAfterCrop = IM_LENGTH
+   -- local height = IM_HEIGHT
+   -- local formatBefore=lengthBeforeCrop.."x"..height
+
+   local format=IM_LENGTH.."x"..IM_HEIGHT
+   local imgAfter=image.scale(img,format)
+
+   if VISUALIZE_IMAGE_CROP then
+      dim1_before = img:size(1)
+      dim2_before = img:size(2)
+      dim3_before = img:size(3)
+
+      dim1_after = imgAfter:size(1)
+      dim2_after = imgAfter:size(2)
+      dim3_after = imgAfter:size(3)
+
+      imgAfterPadded =torch.zeros(dim1_before,dim2_before, dim3_before)
+      imgAfterPadded[{{1,dim1_after},{1,dim2_after},{1,dim3_after}}] =
+         imgAfter
+
+      local imgMerge = image.toDisplayTensor({img,imgAfterPadded})
+      print("Before and After scale")
+      image.display{image=imgMerge,win=WINDOW}
+      io.read()
+   end
+
+   return imgAfter
+end
+
+function is_out_of_bound(list_pos)
+
+   -- For each dimension you check if the value is inside
+   -- barrier fix by MIN_TABLE and MAX_TABLE
+   for dim=1,#list_pos do
+      if list_pos[dim] < MIN_TABLE[dim] or list_pos[dim] > MAX_TABLE[dim] then
+         return true
+      end
+   end
+   return false
 end
 
 function calculate_mean_and_std()
@@ -514,6 +500,19 @@ function file_exists(name)
    if f~=nil then io.close(f) return true else return false end
 end
 
+function folder_exists(strFolderName)
+	local fileHandle, strError = io.open(strFolderName.."\\*.*","r")
+	if fileHandle ~= nil then
+		io.close(fileHandle)
+		return true
+	else
+		if string.match(strError,"No such file or directory") then
+			return false
+		else
+			return true
+		end
+	end
+end
 
 function visualize_image_from_seq_id(seq_id,image_id1,image_id2, another_window)
    local data = load_seq_by_id(seq_id).images
