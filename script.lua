@@ -183,13 +183,8 @@ function train_Epoch(Models,Prior_Used,LR, USE_CONTINUOUS)
        print("Loss Prop", Prop_loss/NB_BATCHES/BATCH_SIZE)
        print("Loss Caus", Caus_loss/NB_BATCHES/BATCH_SIZE)
        print("Loss Rep", Rep_loss/NB_BATCHES/BATCH_SIZE)
-       print("Saving continuous model in ".. NAME_SAVE..'Continuous')
-       if USE_CONTINUOUS then
-         model_name = NAME_SAVE..'Continuous'
-      else
-         model_name = NAME_SAVE
-      end
-      save_model(Models.Model1, model_name)
+       print("Saving model in ".. NAME_SAVE)
+       save_model(Models.Model1, NAME_SAVE)
    end
 end
 
@@ -209,9 +204,8 @@ end
 
 
 for nb_test=1, #PRIORS_TO_APPLY do
-
    if RELOAD_MODEL then
-      print("Reloading model in "..MODEL_FILE_STRING)
+      print("Reloading model in "..MODEL_FILE_STRING)  --TODO: undefined constants, rename NAME_SAVE to MODEL_FILE_STRING and get latest Log folder where to find it
       Model = torch.load(MODEL_FILE_STRING):double()
    else
       print("Getting model in : "..MODEL_ARCHITECTURE_FILE)

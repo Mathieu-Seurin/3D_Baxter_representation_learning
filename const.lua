@@ -42,7 +42,7 @@ LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
 
 now = os.date("*t")
 if USE_CONTINUOUS then
-    DAY = now.year..'_'..now.yday..'_'..now.hour..'_'..now.min..'_'..now.sec..'_'..DATA_FOLDER..' cont'
+    DAY = now.year..'_'..now.yday..'_'..now.hour..'_'..now.min..'_'..now.sec..'_'..DATA_FOLDER..'_cont'
 else
     DAY = now.year..'_'..now.yday..'_'..now.hour..'_'..now.min..'_'..now.sec..'_'..DATA_FOLDER
 end
@@ -124,7 +124,7 @@ elseif DATA_FOLDER == BABBLING then
   --
   DIMENSION_IN = 3
   DIMENSION_OUT = 3
-  REWARD_INDEX = 2 -- 2 reward values: 0, 1
+  REWARD_INDEX = 2 -- column (2 reward values: 0, 1 in this dataset)
   INDEX_TABLE = {2,3,4} --column indexes for coordinate in state file (respectively x,y)
   --
   FILENAME_FOR_REWARD = "reward_pushing_object.txt"  -- 1 if the object being pushed actually moved
