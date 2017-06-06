@@ -8,6 +8,7 @@ import random
 import sys
 
 nbr_images = -1
+LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
 
 if len(sys.argv) <= 1:
         sys.exit("Give number of neighbors (and number of images and model dir if you don't want to use the last model created")
@@ -24,7 +25,7 @@ else:
         lastModelFile = open('lastModel.txt')
         path_to_model = lastModelFile.readline()[:-1]
 
-data_file=path_to_model+"/saveImagesAndRepr.txt"
+data_file=path_to_model+"/"+LEARNED_REPRESENTATIONS_FILE
 
 #reading data
 file  = open(data_file, "r")

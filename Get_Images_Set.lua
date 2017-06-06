@@ -211,8 +211,8 @@ end
 -- Output : 2 indices of images which are neightboor in the list (and in time)
 ---------------------------------------------------------------------------------------
 function get_one_random_Temp_Set(list_lenght)
-   indice=torch.random(1,list_lenght-1)
-   return {im1=indice,im2=indice+1}
+   index = torch.random(1,list_lenght-1)
+   return {im1= index, im2=index+1}
 end
 
 function get_one_random_Prop_Set(Infos1)
