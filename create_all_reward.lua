@@ -1,6 +1,6 @@
 require 'functions'
 
-images_folder = 'mobileRobot'
+images_folder = MOBILE_ROBOT
 list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(images_folder)
 
 print("list_txt_button",list_txt_button)

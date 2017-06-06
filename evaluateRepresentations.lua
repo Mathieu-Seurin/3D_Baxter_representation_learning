@@ -385,16 +385,16 @@ function createPreloadedDataFolder(list_folders_images,list_txt,LOG_FOLDER,use_s
 						-- local data1 = load_seq_by_id(indice1)
 						-- local data2 = load_seq_by_id(indice2)
 
-            batch=getRandomBatchFromSeparateList(BATCH_SIZE,'Temp')--imgs1,imgs2,BATCH_SIZE,"Temp", USE_CONTINUOUS)--batch(imgs1,imgs2,txt1,txt2,BATCH_SIZE,"Temp")
+            batch=getRandomBatchFromSeparateList(BATCH_SIZE,'Temp', USE_CONTINUOUS)--batch(imgs1,imgs2,txt1,txt2,BATCH_SIZE,"Temp")
             lossTemp = lossTemp + Rico_Training_evaluation(models,'Temp',batch, coef_Temp,LR)
 
-            batch=getRandomBatchFromSeparateList(BATCH_SIZE,'Caus')--imgs1,imgs2,BATCH_SIZE,"Caus", USE_CONTINUOUS)
+            batch=getRandomBatchFromSeparateList(BATCH_SIZE,'Caus', USE_CONTINUOUS)
             lossCaus = lossCaus + Rico_Training_evaluation(models, 'Caus',batch, 1,LR)
 
-            batch=getRandomBatchFromSeparateList(BATCH_SIZE,'Prop')--imgs1,imgs2,BATCH_SIZE,"Prop", USE_CONTINUOUS)
+            batch=getRandomBatchFromSeparateList(BATCH_SIZE,'Prop', USE_CONTINUOUS)
             lossProp = lossProp + Rico_Training_evaluation(models, 'Prop',batch, coef_Prop,LR)
 
-            batch=getRandomBatchFromSeparateList(BATCH_SIZE,'Rep')--imgs1,imgs2,BATCH_SIZE,"Rep", USE_CONTINUOUS)
+            batch=getRandomBatchFromSeparateList(BATCH_SIZE,'Rep', USE_CONTINUOUS)
             lossRep = lossRep + Rico_Training_evaluation(models,'Rep',batch, coef_Rep,LR)
 
             xlua.progress(numBatch, NB_BATCHES)
