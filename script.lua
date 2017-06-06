@@ -183,7 +183,7 @@ function train_Epoch(Models,Prior_Used,LR, USE_CONTINUOUS)
        print("Loss Prop", Prop_loss/NB_BATCHES/BATCH_SIZE)
        print("Loss Caus", Caus_loss/NB_BATCHES/BATCH_SIZE)
        print("Loss Rep", Rep_loss/NB_BATCHES/BATCH_SIZE)
-       print("Saving continuous model in ".. NAME_SAVE)
+       print("Saving model in ".. NAME_SAVE)
        save_model(Models.Model1, NAME_SAVE)
    end
 end
