@@ -229,27 +229,9 @@ end
 
 ---------------------------------------------------------------------------------------
 -- Function : load_list(list,length,height)
--- --TODO: since load_data does not exist any longer, can we rename this method?
 -- Input ():
 -- Output ():
 ---------------------------------------------------------------------------------------
--- function load_Part_list(list,txt,txt_reward,txt_state)
---
---    assert(list, "list not found")
---    assert(txt, "Txt not found")
---    assert(txt_state, "Txt state not found")
---    assert(txt_reward, "Txt reward not found")
---
---    local im={}
---    local Infos=getInfos(txt,txt_reward,txt_state)
---    assert(Infos, "getInfos returned nil")
---    for i=1, #(Infos[1]) do
---        print(list[i])
---       table.insert(im, getImageFormated(list[i]))
---    end
---    return {images=im,Infos=Infos}
--- end
-
 function load_Part_list(list, txt, txt_reward, txt_state)
 
    assert(list, "list not found")
@@ -263,8 +245,7 @@ function load_Part_list(list, txt, txt_reward, txt_state)
    -- print('Infos[1] size: '..#Infos[1])
    -- print ('Infos size: '..#Infos)
    -- print ('#(Infos.reward): '..#(Infos.reward))-- 11, 99  2  99
-   assert(#Infos[1]==#list)
-   -- assert(#(Infos.reward)==#list)
+   assert(#Infos[1]==#list)   -- assert(#(Infos.reward)==#list)
    assert(#(Infos.reward)== #Infos[1])
    for i=1, #(Infos[1]) do
       table.insert(im, getImageFormated(list[i]))
