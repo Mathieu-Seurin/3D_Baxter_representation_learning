@@ -363,8 +363,8 @@ function createPreloadedDataFolder(list_folders_images,list_txt,LOG_FOLDER,use_s
       -- print("Correlation before training : ", corr)
       -- table.insert(list_corr,corr)
 
-			NB_BATCHES = math.floor(#imgs/BATCH_SIZE)
-			print("Training with NB_SEQUENCES "..NB_SEQUENCES..' NB_BATCHES: '..NB_BATCHES)
+      NB_BATCHES = math.floor(#imgs/BATCH_SIZE)
+      print("Training with NB_SEQUENCES "..NB_SEQUENCES..' NB_BATCHES: '..NB_BATCHES)
       for epoch=1, NB_EPOCHS do
          print('--------------Epoch : '..epoch..' ---------------')
          local lossTemp=0
@@ -385,7 +385,7 @@ function createPreloadedDataFolder(list_folders_images,list_txt,LOG_FOLDER,use_s
 						-- local data1 = load_seq_by_id(indice1)
 						-- local data2 = load_seq_by_id(indice2)
 
-            batch=getRandomBatchFromSeparateList(BATCH_SIZE,'Temp', USE_CONTINUOUS)--batch(imgs1,imgs2,txt1,txt2,BATCH_SIZE,"Temp")
+            batch=getRandomBatchFromSeparateList(BATCH_SIZE,'Temp', USE_CONTINUOUS)
             lossTemp = lossTemp + Rico_Training_evaluation(models,'Temp',batch, coef_Temp,LR)
 
             batch=getRandomBatchFromSeparateList(BATCH_SIZE,'Caus', USE_CONTINUOUS)

@@ -46,57 +46,57 @@ function Rico_Training(Models)
 
       --===========
       local mode='Temp' --Same for continuous or not
-      local batch=getRandomBatchFromSeparateList(BATCH_SIZE,mode)
+      local batch=getRandomBatchFromSeparateList(BATCH_SIZE,mode, USE_CONTINUOUS)
       LOSS_TEMP,grad=doStuff_temp(Models,temp_criterion, batch,COEF_TEMP)
 
       if USE_CONTINUOUS then
          --==========
          mode='Prop'
-         batch, action1, action2 = getRandomBatchFromSeparateListContinuous(BATCH_SIZE,mode)
+         batch, action1, action2 = getRandomBatchFromSeparateList(BATCH_SIZE,mode, USE_CONTINUOUS)
          LOSS_PROP,gradProp=doStuff_Prop_continuous(Models,prop_criterion,batch,COEF_PROP, action1, action2)
 
          --==========
          mode='Caus'
-         batch, action1, action2 = getRandomBatchFromSeparateListContinuous(BATCH_SIZE,mode)
+         batch, action1, action2 = getRandomBatchFromSeparateList(BATCH_SIZE,mode, USE_CONTINUOUS)
          LOSS_CAUS,gradCaus=doStuff_Caus_continuous(Models,caus_criterion,batch,COEF_CAUS, action1, action2)
 
          --==========
          mode='Rep'
-         batch, action1, action2 = getRandomBatchFromSeparateListContinuous(BATCH_SIZE,mode)
+         batch, action1, action2 = getRandomBatchFromSeparateList(BATCH_SIZE,mode, USE_CONTINUOUS)
          LOSS_REP,gradRep=doStuff_Rep_continuous(Models,rep_criterion,batch,COEF_REP, action1, action2)
       else
          --==========
          mode='Prop'
-         batch = getRandomBatchFromSeparateList(BATCH_SIZE,mode)
+         batch = getRandomBatchFromSeparateList(BATCH_SIZE,mode, USE_CONTINUOUS)
          LOSS_PROP,gradProp=doStuff_Prop(Models,prop_criterion,batch,COEF_PROP)
 
          --==========
          mode='Caus'
-         batch = getRandomBatchFromSeparateList(BATCH_SIZE,mode)
+         batch = getRandomBatchFromSeparateList(BATCH_SIZE,mode, USE_CONTINUOUS)
          LOSS_CAUS,gradCaus=doStuff_Caus(Models,caus_criterion,batch,COEF_CAUS)
 
          --==========
          mode='Rep'
-         batch=getRandomBatchFromSeparateList(BATCH_SIZE,mode)
+         batch=getRandomBatchFromSeparateList(BATCH_SIZE,mode, USE_CONTINUOUS)
          LOSS_REP,gradRep=doStuff_Rep(Models,rep_criterion,batch,COEF_REP)
       end
 
       return LOSS_REP+LOSS_CAUS+LOSS_PROP+LOSS_TEMP ,gradParameters
-   end
+    end
 
-   --sgdState = sgdState or { learningRate = LR, momentum = mom,learningRateDecay = 5e-7,weightDecay=coefL2 }
-   --parameters, loss=optim.sgd(feval, parameters, sgdState)
-   optimState={learningRate=LR, learningRateDecay=LR_DECAY}
+    --sgdState = sgdState or { learningRate = LR, momentum = mom,learningRateDecay = 5e-7,weightDecay=coefL2 }
+    --parameters, loss=optim.sgd(feval, parameters, sgdState)
+    optimState={learningRate=LR, learningRateDecay=LR_DECAY}
 
-   if SGD_METHOD == 'adagrad' then
-      parameters,loss=optim.adagrad(feval,parameters,optimState)
-   else
-      parameters,loss=optim.adam(feval,parameters,optimState)
-   end
+    if SGD_METHOD == 'adagrad' then
+        parameters,loss=optim.adagrad(feval,parameters,optimState)
+    else
+        parameters,loss=optim.adam(feval,parameters,optimState)
+    end
 
-   -- loss[1] table of one value transformed in just a value
-   -- grad[1] we use just the first gradient to print the figure (there are 2 or 4 gradient normally)
-   return loss[1], grad
+    -- loss[1] table of one value transformed in just a value
+    -- grad[1] we use just the first gradient to print the figure (there are 2 or 4 gradient normally)
+    return loss[1], grad
 end
 
 function train_Epoch(Models,Prior_Used,LR, USE_CONTINUOUS)
@@ -202,11 +202,10 @@ if CAN_HOLD_ALL_SEQ_IN_RAM then
    end
 end
 
-
 for nb_test=1, #PRIORS_TO_APPLY do
    if RELOAD_MODEL then
-      print("Reloading model in "..MODEL_FILE_STRING)  --TODO: undefined constants, rename NAME_SAVE to MODEL_FILE_STRING and get latest Log folder where to find it
-      Model = torch.load(MODEL_FILE_STRING):double()
+      print("Reloading model in "..SAVED_MODEL_PATH)  --TODO: undefined constant MODEL_FILE_STRING, use SAVED_MODEL_PATH = NAME_SAVE?
+      Model = torch.load(SAVED_MODEL_PATH):double()
    else
       print("Getting model in : "..MODEL_ARCHITECTURE_FILE)
       require(MODEL_ARCHITECTURE_FILE)

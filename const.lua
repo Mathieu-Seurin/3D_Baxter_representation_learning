@@ -48,6 +48,8 @@ else
     DAY = now.year..'_'..now.yday..'_'..now.day..'_'..now.month..'_'..now.hour..'_'..now.min..'_'..now.sec..'_'..DATA_FOLDER
 end
 NAME_SAVE= 'model'..DAY
+SAVED_MODEL_PATH = LOG_FOLDER..NAME_SAVE
+
 RELOAD_MODEL = false
 
 --===========================================================

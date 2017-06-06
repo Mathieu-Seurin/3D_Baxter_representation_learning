@@ -14,8 +14,8 @@ function save_model(model)
 
    os.execute("cp hyperparams.lua "..path)
 
-   print("Model saved at : "..path)
    torch.save(file_string, model)
+   print("Saved model at : "..path)
 
    f = io.open(LAST_MODEL_FILE,'w')
    f:write(path..'\n'..NAME_SAVE..'.t7')
@@ -23,7 +23,7 @@ function save_model(model)
 end
 
 ---------------------------------------------------------------------------------------
--- Function :getRandomBatchFromSeparateList(imgs1, imgs2, txt1, txt2, length, image_width, image_height, Mode, use_simulate_images)
+-- Function :getRandomBatchFromSeparateList(batch_size, mode, USE_CONTINUOUS)
 -- Input ():
 -- Output ():
 ---------------------------------------------------------------------------------------
