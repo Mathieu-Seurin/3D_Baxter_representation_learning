@@ -81,7 +81,7 @@ if states.ndim > 2 and PLOT_DIMENSIONS == 2:
     toplot = pca.transform(states)
 
     cmap = colors.ListedColormap(['blue', 'grey', 'red'])  # TODO: adjust for different cardinal of reward types according to dataset
-    bounds=[-1,0,9,15]
+    bounds=[-1,0,9,15] #TODO: parametrize according to the dataset
     norm = colors.BoundaryNorm(bounds, cmap.N)
     #cmap=plt.cm.plasma
     # print toplot[0:10,0]
