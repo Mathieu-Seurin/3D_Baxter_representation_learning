@@ -413,7 +413,7 @@ function createPreloadedDataFolder(list_folders_images,list_txt,LOG_FOLDER,use_s
       print("SAVING MODEL AND REPRESENTATIONS")
       saveMeanAndStdRepr(imgs)
       models.model1:float()
-      --save_model(models.model1,name_save)
+      --save_model(models.model1, name_save) --TODO
       list_txt[crossValStep],list_txt[#list_txt] = list_txt[#list_txt], list_txt[crossValStep]
    end
 end

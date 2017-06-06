@@ -9,9 +9,10 @@ import sys
 
 nbr_images = -1
 LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
+LAST_MODEL_FILE = 'lastModel.txt'
 
 if len(sys.argv) <= 1:
-        sys.exit("Give number of neighbors (and number of images and model dir if you don't want to use the last model created")
+    sys.exit("Give number of neighbors (and number of images and model dir if you don't want to use the last model created")
 
 # Some parameters
 nbr_neighbors= int(sys.argv[1])
@@ -22,8 +23,8 @@ if len(sys.argv) >= 3:
 if len(sys.argv) == 4:
         path_to_model = sys.argv[3]
 else:
-        lastModelFile = open('lastModel.txt')
-        path_to_model = lastModelFile.readline()[:-1]
+    lastModelFile = open(LAST_MODEL_FILE)
+    path_to_model = lastModelFile.readline()[:-1]
 
 data_file=path_to_model+"/"+LEARNED_REPRESENTATIONS_FILE
 
@@ -33,10 +34,10 @@ file  = open(data_file, "r")
 images=[]
 states=[]
 for line in file:
-        if line[0]!='#':
-                words = line.split()
-                images.append(words[0])
-                states.append(words[1:])
+    if line[0]!='#':
+        words = line.split()
+        images.append(words[0])
+        states.append(words[1:])
 
 dim_state= len(states[0])
 

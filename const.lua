@@ -39,12 +39,13 @@ MODEL_ARCHITECTURE_FILE = './models/topUniqueSimplerWOTanh'
 
 STRING_MEAN_AND_STD_FILE = PRELOAD_FOLDER..'meanStdImages_'..DATA_FOLDER..'.t7'
 LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
+LAST_MODEL_FILE = 'lastModel.txt'
 
 now = os.date("*t")
-if USE_CONTINUOUS then
-    DAY = now.year..'_'..now.yday..'_'..now.hour..'_'..now.min..'_'..now.sec..'_'..DATA_FOLDER..'_cont'
+if USE_CONTINUOUS then  --TODO remove yday if not crucial for sorting models
+    DAY = now.year..'_'..now.yday..'_'..now.day..'_'..now.month..'_'..now.hour..'_'..now.min..'_'..now.sec..'_'..DATA_FOLDER..'_cont'--DAY = now.year..'_'..now.yday..'_'..now.hour..'_'..now.min..'_'..now.sec..'_'..DATA_FOLDER..'_cont'
 else
-    DAY = now.year..'_'..now.yday..'_'..now.hour..'_'..now.min..'_'..now.sec..'_'..DATA_FOLDER
+    DAY = now.year..'_'..now.yday..'_'..now.day..'_'..now.month..'_'..now.hour..'_'..now.min..'_'..now.sec..'_'..DATA_FOLDER
 end
 NAME_SAVE= 'model'..DAY
 RELOAD_MODEL = false

@@ -13,14 +13,15 @@ local path, modelString
 -- Last model is a file where the name of the last model computed is saved
 -- this way, you just have to launch the programm without specifying anything,
 -- and it will load the good model
-if file_exists('lastModel.txt') then
-   f = io.open('lastModel.txt','r')
+
+if file_exists(LAST_MODEL_FILE) then
+   f = io.open(LAST_MODEL_FILE,'r')
    path = f:read()
    modelString = f:read()
-   print('MODEL USED : '..modelString)
+   print('MODEL USED (last model logged in ) : '..modelString)
    f:close()
 else
-   error("lastModel.txt should exist")
+   error(LAST_MODEL_FILE.." should exist")
 end
 
 local  model = torch.load(path..'/'..modelString)
