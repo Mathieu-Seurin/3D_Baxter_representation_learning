@@ -2,7 +2,6 @@
 BABBLING = 'babbling'
 MOBILE_ROBOT = 'mobileRobot'
 SIMPLEDATA3D = 'simpleData3D'
---================================================
 
 --DATA_FOLDER = BABBLING
 DATA_FOLDER = MOBILE_ROBOT
@@ -10,6 +9,7 @@ DATA_FOLDER = MOBILE_ROBOT
 print("============ DATA USED =========\n",
       DATA_FOLDER,
       "\n================================")
+--================================================
 
 --==================================================
 -- Hyperparams : Learning rate, batchsize, USE_CUDA etc...
@@ -48,7 +48,7 @@ end
 --Continuous actions SETTINGS
 --======================================================
 
-USE_CONTINUOUS = true --A switch between discrete and continuous actions (translates into calling getRandomBatchFromSeparateListContinuous instead of getRandomBatchFromSeparateList
+USE_CONTINUOUS = false --A switch between discrete and continuous actions (translates into calling getRandomBatchFromSeparateListContinuous instead of getRandomBatchFromSeparateList
 ACTION_AMPLITUDE = 0.01
 -- The following parameter eliminates the need of finding close enough actions for assessing all priors except for the temporal.one.
 -- If the actions are too far away, they will make the gradient 0 and will not be considered for the update rule
