@@ -7,7 +7,7 @@ import numpy as np
 #DATASETS AVAILABLE:
 #TODO: REMOVE TO AVOID CONFLICT WITH const.lua values
 # BABBLING = 'babbling'
-# MOBILE_ROBOT = 'mobileRobot'
+MOBILE_ROBOT = 'mobileRobot'
 # SIMPLEDATA3D = 'simpleData3D'
 
 LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
@@ -38,6 +38,7 @@ rewards_l=[]
 print 'Using saved states file: ',state_file_str
 
 if 'recorded_robot' in state_file_str :
+    print 'Plotting ', MOBILE_ROBOT,' learnt states '
     for line in state_file:
             if line[0]!='#':
                 words=line.split(' ')
@@ -90,6 +91,9 @@ if states.ndim > 2 and PLOT_DIMENSIONS == 2:
 
     plt.scatter(toplot[:,0],toplot[:,1],c=rewards,cmap=cmap, norm=norm,marker="o")
 
+else:
+    print ("The learnt representations' dimensions are not larger than 2")
+    sys.exit(-1)
 # elif PLOT_DIMENSIONS ==3: #TODO
 #     print('Plotting 3D...')
 #     plt.scatter(toplot[:,0], toplot[:,1], toplot[:,2], c=rewards,cmap=cmap, norm=norm,marker="o")

@@ -12,7 +12,7 @@ LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
 LAST_MODEL_FILE = 'lastModel.txt'
 
 if len(sys.argv) <= 1:
-    sys.exit("Give number of neighbors (and number of images and model dir if you don't want to use the last model created")
+    sys.exit("Give number of neighbors to produce, followed by number of input images (and model dir if you don't want to use the last model created)")
 
 # Some parameters
 nbr_neighbors= int(sys.argv[1])
@@ -61,7 +61,7 @@ else:
 for img_name,id,dist,state in data:
 	base_name= os.path.splitext(os.path.basename(img_name))[0]
 	seq_name= img_name.split("/")[1]
-	print('Processing ' + seq_name + "/" + base_name + '...')
+	print('Processing ' + seq_name + "/" + base_name + ' ...')
 	fig = plt.figure()
 	fig.set_size_inches(6*(nbr_neighbors+1), 6)
 	a=fig.add_subplot(1,nbr_neighbors+1,1)
@@ -88,6 +88,6 @@ for img_name,id,dist,state in data:
 
 	plt.tight_layout()
 	output_file = path_to_neighbour + seq_name + "_" + base_name + "_" + 'Neigbors.png'
-	#print('Saved nearest neighbor image to '+output_file)
 	plt.savefig(output_file,bbox_inches='tight')
 	plt.close() # efficiency: avoids keeping all images into RAM
+print('Saved nearest neighbor images to '+output_file)
