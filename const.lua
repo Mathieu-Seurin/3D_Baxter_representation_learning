@@ -19,7 +19,7 @@ require 'hyperparams'
 --===========================================================
 -- CUDA CONSTANTS
 --===========================================================
-USE_CUDA = true
+USE_CUDA = false
 USE_SECOND_GPU = true
 
 if USE_CUDA and USE_SECOND_GPU then
@@ -87,7 +87,7 @@ if DATA_FOLDER == SIMPLEDATA3D then
 
    DEFAULT_PRECISION = 0.05 -- for 'arrondit' function
    FILENAME_FOR_REWARD = "recorded_button1_is_pressed.txt"--"is_pressed"
-   FILENAME_FOR_ACTION = "recorded_robot_limb_left_endpoint_action.txt"--endpoint_action"
+   FILENAME_FOR_ACTION = "recorded_robot_limb_left_endpoint_action.txt"--endpoint_action"  -- Never written, always computed on the fly
    FILENAME_FOR_STATE = "recorded_robot_limb_left_endpoint_state.txt"--endpoint_state"
 
    SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
@@ -101,7 +101,7 @@ elseif DATA_FOLDER == MOBILE_ROBOT then
    MAX_TABLE = {10000,10000} -- for x,y
 
    DIMENSION_IN = 2
-   DIMENSION_OUT = 2
+   DIMENSION_OUT = 2  --worked just as well as 4 output dimensions
    REWARD_INDEX = 1  --3 reward values: -1, 0, 10
    INDEX_TABLE = {1,2} --column index for coordinate in state file (respectively x,y)
 

@@ -41,8 +41,6 @@ else
     -- Causality needs at least 2 different values of reward and in sparse dataset such as babbling_1, this does not occur always
     PRIORS_TO_APPLY ={{"Rep","Prop","Temp"}}
 end
---DIMENSION_OUT=2 --TODO only for mobile data? moved to const.lua and set 3 to other datasets
-
 
 --======================================================
 --Continuous actions SETTINGS

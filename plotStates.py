@@ -6,9 +6,9 @@ import numpy as np
 
 #DATASETS AVAILABLE:
 #TODO: REMOVE TO AVOID CONFLICT WITH const.lua values
-# BABBLING = 'babbling'
+BABBLING = 'babbling'
 MOBILE_ROBOT = 'mobileRobot'
-# SIMPLEDATA3D = 'simpleData3D'
+SIMPLEDATA3D = 'simpleData3D'
 
 LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
 #DATA_FOLDER = MOBILE_ROBOT
@@ -47,7 +47,14 @@ if 'recorded_robot' in state_file_str :
     toplot=states
 
 else:
-    #if DATA_FOLDER == SIMPLEDATA3D or DATA_FOLDER == BABBLING:
+    if 'pushing_object' in state_file_str : #if  DATA_FOLDER == BABBLING:
+        print 'Plotting ', BABBLING,' learnt states '
+    elif 'robot_limb_left_endpoint' in state_file_str : #if DATA_FOLDER == SIMPLEDATA3D 
+        print 'Plotting ', SIMPLEDATA3D,' learnt states '
+    else:
+        print('ERROR: Unsupported dataset, pattern not found in ', state_file_str,'. Make sure you run first script.lua and imagesAndRepr.lua with the right DATA_FOLDER setting')
+        sys.exit(-1)
+
     for line in state_file:
         if line[0]!='#':
             # Saving each image file and its learned representations
@@ -61,10 +68,6 @@ else:
         #print states_l[i][1]
         states[i] = np.array(states_l[i][1])
 
-    # else:
-    #     print('Unsupported dataset')
-    #     sys.exit(-1)
-
 # getting rewards 
 for line in reward_file:
     if line[0]!='#':
@@ -73,30 +76,32 @@ for line in reward_file:
 
 rewards=np.asarray(rewards_l)
 toplot=states
-#rewards=np.asarray(rewards_l)
 
-
-if states.ndim > 2 and PLOT_DIMENSIONS == 2:
-    pca = PCA(n_components=2)
+if states.ndim >2:
+    print "[Applying PCA to visualize the learnt representations space, with PLOT_DIMENSIONS = ", PLOT_DIMENSIONS
+    pca = PCA(n_components=PLOT_DIMENSIONS)
     pca.fit(states)
     toplot = pca.transform(states)
 
-    cmap = colors.ListedColormap(['blue', 'grey', 'red'])  # TODO: adjust for different cardinal of reward types according to dataset
-    bounds=[-1,0,9,15] #TODO: parametrize according to the dataset
-    norm = colors.BoundaryNorm(bounds, cmap.N)
     #cmap=plt.cm.plasma
     # print toplot[0:10,0]
     # print toplot[0:10,1]
     # print rewards[0:10]
-
-    plt.scatter(toplot[:,0],toplot[:,1],c=rewards,cmap=cmap, norm=norm,marker="o")
-
 else:
-    print ("The learnt representations' dimensions are not larger than 2")
-    sys.exit(-1)
-# elif PLOT_DIMENSIONS ==3: #TODO
-#     print('Plotting 3D...')
-#     plt.scatter(toplot[:,0], toplot[:,1], toplot[:,2], c=rewards,cmap=cmap, norm=norm,marker="o")
+    print "[PCA not applied since learnt representations' dimensions are not larger than 2]"
+
+cmap = colors.ListedColormap(['blue', 'grey', 'red'])  # TODO: adjust for different cardinal of reward types according to dataset
+bounds=[-1,0,9,15] #TODO: parametrize according to the dataset
+norm = colors.BoundaryNorm(bounds, cmap.N)
+if PLOT_DIMENSIONS == 2:
+    plt.scatter(toplot[:,0],toplot[:,1],c=rewards,cmap=cmap, norm=norm,marker="o")
+elif PLOT_DIMENSIONS ==3: 
+    print('Plotting 3D...')
+    plt.scatter(toplot[:,0], toplot[:,1], toplot[:,2], c=rewards,cmap=cmap, norm=norm,marker="o")
+elif PLOT_DIMENSIONS == 1:
+    plt.scatter(toplot[:,0], rewards, c=rewards, cmap=cmap, norm=norm,marker="o")
+else:
+    print " PLOT_DIMENSIONS undefined"
 
 plot_path = path+'learnedStatesPlot_'+model_name+'.png'
 print('Saving plot to '+plot_path)
