@@ -240,7 +240,11 @@ function getInfos(txt,txt_reward,txt_state)
       --print(tensor_reward[i][reward_index])
    end
    --THIS IS ALWAYS THE CASE IF WE WANT TO USE CAUSALITY PRIORS. TODO: create synthetic second value reward or do notn apply causality prior (see PRIORS_TO_APPLY in const.lua)
-   assert(there_is_reward,"Reward different than 0 (i.e. min 2 different values of reward) are needed in a sequence...")
+   if DATA_FOLDER ~= BABBLING then
+       assert(there_is_reward,"Reward different than 0 (i.e. min 2 different values of reward) are needed in a sequence...")
+   else
+       print('Causality prior will be ignored for dataset '..BABBLING)
+   end
    return Infos
 end
 

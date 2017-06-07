@@ -14,7 +14,7 @@ LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
 #DATA_FOLDER = MOBILE_ROBOT
 #DATA_FOLDER = BABBLING
 
-PLOT_DIMENSIONS = 2
+PLOT_DIMENSIONS = 3
 
 model_name = ''
 if len(sys.argv) != 3:
@@ -88,6 +88,7 @@ if states.ndim >2:
     # print rewards[0:10]
 else:
     print "[PCA not applied since learnt representations' dimensions are not larger than 2]"
+    PLOT_DIMENSIONS = 2
 
 cmap = colors.ListedColormap(['blue', 'grey', 'red'])  # TODO: adjust for different cardinal of reward types according to dataset
 bounds=[-1,0,9,15] #TODO: parametrize according to the dataset
