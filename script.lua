@@ -49,43 +49,43 @@ function Rico_Training(Models)
       local batch=getRandomBatchFromSeparateList(BATCH_SIZE,mode, USE_CONTINUOUS)
       LOSS_TEMP,grad=doStuff_temp(Models,temp_criterion, batch,COEF_TEMP)
 
-      if USE_CONTINUOUS then
+      --if USE_CONTINUOUS then
          --==========
          mode='Prop'
          batch, action1, action2 = getRandomBatchFromSeparateList(BATCH_SIZE,mode, USE_CONTINUOUS)
-         LOSS_PROP,gradProp=doStuff_Prop_continuous(Models,prop_criterion,batch,COEF_PROP, action1, action2)
+         LOSS_PROP,gradProp=doStuff_Prop(Models,prop_criterion,batch,COEF_PROP, action1, action2, USE_CONTINUOUS)
 
          --==========
          if DATA_FOLDER ~= BABBLING then
              mode='Caus'
              batch, action1, action2 = getRandomBatchFromSeparateList(BATCH_SIZE,mode, USE_CONTINUOUS)
-             LOSS_CAUS,gradCaus=doStuff_Caus_continuous(Models,caus_criterion,batch,COEF_CAUS, action1, action2)
+             LOSS_CAUS,gradCaus=doStuff_Caus(Models,caus_criterion,batch,COEF_CAUS, action1, action2, USE_CONTINUOUS)
          else
              LOSS_CAUS = 0 --Not applied for BABBLING data (sparse rewards)
          end
          --==========
          mode='Rep'
          batch, action1, action2 = getRandomBatchFromSeparateList(BATCH_SIZE,mode, USE_CONTINUOUS)
-         LOSS_REP,gradRep=doStuff_Rep_continuous(Models,rep_criterion,batch,COEF_REP, action1, action2)
-      else
-         --==========
-         mode='Prop'
-         batch = getRandomBatchFromSeparateList(BATCH_SIZE,mode, USE_CONTINUOUS)
-         LOSS_PROP,gradProp=doStuff_Prop(Models,prop_criterion,batch,COEF_PROP)
-
-         --==========
-         if DATA_FOLDER ~= BABBLING then
-             mode='Caus'
-             batch = getRandomBatchFromSeparateList(BATCH_SIZE,mode, USE_CONTINUOUS)
-             LOSS_CAUS,gradCaus=doStuff_Caus(Models,caus_criterion,batch,COEF_CAUS)
-         else
-             LOSS_CAUS = 0 -- Not applied for BABBLING data (sparse rewards)
-         end
-         --==========
-         mode='Rep'
-         batch=getRandomBatchFromSeparateList(BATCH_SIZE,mode, USE_CONTINUOUS)
-         LOSS_REP,gradRep=doStuff_Rep(Models,rep_criterion,batch,COEF_REP)
-      end
+         LOSS_REP,gradRep=doStuff_Rep(Models,rep_criterion,batch,COEF_REP, action1, action2, USE_CONTINUOUS)
+    --   else
+    --      --==========
+    --      mode='Prop'
+    --      batch = getRandomBatchFromSeparateList(BATCH_SIZE,mode, USE_CONTINUOUS)
+    --      LOSS_PROP,gradProp=doStuff_Prop(Models,prop_criterion,batch,COEF_PROP)
+      --
+    --      --==========
+    --      if DATA_FOLDER ~= BABBLING then
+    --          mode='Caus'
+    --          batch = getRandomBatchFromSeparateList(BATCH_SIZE,mode, USE_CONTINUOUS)
+    --          LOSS_CAUS,gradCaus=doStuff_Caus(Models,caus_criterion,batch,COEF_CAUS)
+    --      else
+    --          LOSS_CAUS = 0 -- Not applied for BABBLING data (sparse rewards)
+    --      end
+    --      --==========
+    --      mode='Rep'
+    --      batch=getRandomBatchFromSeparateList(BATCH_SIZE,mode, USE_CONTINUOUS)
+    --      LOSS_REP,gradRep=doStuff_Rep(Models,rep_criterion,batch,COEF_REP)
+    --   end
 
       return LOSS_REP+LOSS_CAUS+LOSS_PROP+LOSS_TEMP ,gradParameters
     end

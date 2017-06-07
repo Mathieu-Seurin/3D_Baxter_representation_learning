@@ -72,11 +72,7 @@ function getRandomBatchFromSeparateList(batch_size, mode, USE_CONTINUOUS)
          Batch[1][i]=im1
          Batch[2][i]=im2
       elseif mode=="Caus" then
-          if USE_CONTINUOUS then
-              Set=get_one_random_Caus_Set_and_actions(data1.Infos, data2.Infos)
-          else
-              Set=get_one_random_Caus_Set(data1.Infos, data2.Infos)
-          end
+          Set=get_one_random_Caus_Set(data1.Infos, data2.Infos, USE_CONTINUOUS)
           im1,im2,im3,im4 = data1.images[Set.im1], data2.images[Set.im2], data1.images[Set.im3], data2.images[Set.im4]
           --The last two are for viz purpose only
 
