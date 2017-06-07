@@ -103,15 +103,15 @@ function getRandomBatchFromSeparateList(batch_size, mode, USE_CONTINUOUS)
 end
 
 ---------------------------------------------------------------------------------------
--- Function :	Have_Todo(list_prior,prior)
+-- Function :	applies_prior(list_prior,prior)
 -- Input ():
 -- Output ():  TODO: rename list_contains_element()
 ---------------------------------------------------------------------------------------
-function Have_Todo(list_prior,prior)
+function applies_prior(list_prior,prior)
    local answer=false
    if #list_prior~=0 then
       for i=1, #list_prior do
-         if list_prior[i]==prior then answer=true end
+         if list_prior[i]==prior then return true end
       end
    end
    return answer
@@ -242,8 +242,8 @@ function getInfos(txt,txt_reward,txt_state)
    --THIS IS ALWAYS THE CASE IF WE WANT TO USE CAUSALITY PRIORS. TODO: create synthetic second value reward or do notn apply causality prior (see PRIORS_TO_APPLY in const.lua)
    if DATA_FOLDER ~= BABBLING then
        assert(there_is_reward,"Reward different than 0 (i.e. min 2 different values of reward) are needed in a sequence...")
-   else
-       print('Causality prior will be ignored for dataset '..BABBLING)
+   -- else
+   --     print('Causality prior will be ignored for dataset '..BABBLING)
    end
    return Infos
 end

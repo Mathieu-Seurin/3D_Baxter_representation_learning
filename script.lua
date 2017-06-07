@@ -56,10 +56,13 @@ function Rico_Training(Models)
          LOSS_PROP,gradProp=doStuff_Prop_continuous(Models,prop_criterion,batch,COEF_PROP, action1, action2)
 
          --==========
-         mode='Caus'
-         batch, action1, action2 = getRandomBatchFromSeparateList(BATCH_SIZE,mode, USE_CONTINUOUS)
-         LOSS_CAUS,gradCaus=doStuff_Caus_continuous(Models,caus_criterion,batch,COEF_CAUS, action1, action2)
-
+         if DATA_FOLDER ~= BABBLING then
+             mode='Caus'
+             batch, action1, action2 = getRandomBatchFromSeparateList(BATCH_SIZE,mode, USE_CONTINUOUS)
+             LOSS_CAUS,gradCaus=doStuff_Caus_continuous(Models,caus_criterion,batch,COEF_CAUS, action1, action2)
+         else
+             LOSS_CAUS = 0 --Not applied for BABBLING data (sparse rewards)
+         end
          --==========
          mode='Rep'
          batch, action1, action2 = getRandomBatchFromSeparateList(BATCH_SIZE,mode, USE_CONTINUOUS)
@@ -71,10 +74,13 @@ function Rico_Training(Models)
          LOSS_PROP,gradProp=doStuff_Prop(Models,prop_criterion,batch,COEF_PROP)
 
          --==========
-         mode='Caus'
-         batch = getRandomBatchFromSeparateList(BATCH_SIZE,mode, USE_CONTINUOUS)
-         LOSS_CAUS,gradCaus=doStuff_Caus(Models,caus_criterion,batch,COEF_CAUS)
-
+         if DATA_FOLDER ~= BABBLING then
+             mode='Caus'
+             batch = getRandomBatchFromSeparateList(BATCH_SIZE,mode, USE_CONTINUOUS)
+             LOSS_CAUS,gradCaus=doStuff_Caus(Models,caus_criterion,batch,COEF_CAUS)
+         else
+             LOSS_CAUS = 0 -- Not applied for BABBLING data (sparse rewards)
+         end
          --==========
          mode='Rep'
          batch=getRandomBatchFromSeparateList(BATCH_SIZE,mode, USE_CONTINUOUS)
@@ -115,10 +121,10 @@ function train_Epoch(Models,Prior_Used,LR, USE_CONTINUOUS)
     local Temp_grad_list,Prop_grad_list,Rep_grad_list,Caus_grad_list = {},{},{},{}
     local list_errors,list_MI, list_corr={},{},{}
 
-    local Prop=Have_Todo(Prior_Used,'Prop') --TODOrename applies_prior()
-    local Temp=Have_Todo(Prior_Used,'Temp')
-    local Rep=Have_Todo(Prior_Used,'Rep')
-    local Caus=Have_Todo(Prior_Used,'Caus')
+    local Prop= applies_prior(Prior_Used,'Prop')
+    local Temp= applies_prior(Prior_Used,'Temp')
+    local Rep= applies_prior(Prior_Used,'Rep')
+    local Caus= applies_prior(Prior_Used,'Caus')
     print(Prop)
     print(Temp)
     print(Rep)
@@ -222,8 +228,8 @@ for nb_test=1, #PRIORS_TO_APPLY do
    Model2=Model:clone('weight','bias','gradWeight','gradBias','running_mean','running_std')
    Model3=Model:clone('weight','bias','gradWeight','gradBias','running_mean','running_std')
    Model4=Model:clone('weight','bias','gradWeight','gradBias','running_mean','running_std')
-
    Models={Model1=Model,Model2=Model2,Model3=Model3,Model4=Model4}
+
 
    local Priors= PRIORS_TO_APPLY[nb_test]
    local Log_Folder=Get_Folder_Name(LOG_FOLDER, Priors)

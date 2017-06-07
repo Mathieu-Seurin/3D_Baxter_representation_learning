@@ -18,7 +18,7 @@ if file_exists(LAST_MODEL_FILE) then
    f = io.open(LAST_MODEL_FILE,'r')
    path = f:read()
    modelString = f:read()
-   print('MODEL USED (last model logged in ) : '..modelString)
+   print('MODEL USED (last model logged in '..LAST_MODEL_FILE..') : '..modelString)
    f:close()
 else
    error(LAST_MODEL_FILE.." should exist")

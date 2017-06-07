@@ -3,8 +3,8 @@ BABBLING = 'babbling'
 MOBILE_ROBOT = 'mobileRobot'
 SIMPLEDATA3D = 'simpleData3D'
 
---DATA_FOLDER = BABBLING
-DATA_FOLDER = MOBILE_ROBOT
+DATA_FOLDER = BABBLING
+--DATA_FOLDER = MOBILE_ROBOT
 
 print("============ DATA USED =========\n",
       DATA_FOLDER,
@@ -40,6 +40,7 @@ if DATA_FOLDER ~= BABBLING then
 else
     -- Causality needs at least 2 different values of reward and in sparse dataset such as babbling_1, this does not occur always
     PRIORS_TO_APPLY ={{"Rep","Prop","Temp"}}
+    print('Causality prior will be ignored for dataset '..BABBLING)
 end
 
 --======================================================
@@ -50,4 +51,4 @@ USE_CONTINUOUS = false --A switch between discrete and continuous actions (trans
 ACTION_AMPLITUDE = 0.01
 -- The following parameter eliminates the need of finding close enough actions for assessing all priors except for the temporal.one.
 -- If the actions are too far away, they will make the gradient 0 and will not be considered for the update rule
-GAUSSIAN_SIGMA = 0.1
+GAUSSIAN_SIGMA = 0.3 -- 0.1 for mobileData plots all concentrated.
