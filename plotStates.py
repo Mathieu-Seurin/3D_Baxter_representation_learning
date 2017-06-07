@@ -35,10 +35,8 @@ reward_file=open(reward_file_str)
 states_l=[]
 rewards_l=[]
 
-print 'Using saved states file: ',state_file_str
-
 if 'recorded_robot' in state_file_str :
-    print 'Plotting ', MOBILE_ROBOT,' learnt states '
+    print 'Plotting ', MOBILE_ROBOT,' observed states in ',state_file_str
     for line in state_file:
             if line[0]!='#':
                 words=line.split(' ')
@@ -47,13 +45,14 @@ if 'recorded_robot' in state_file_str :
     toplot=states
 
 else:
-    if 'pushing_object' in state_file_str : #if  DATA_FOLDER == BABBLING:
-        print 'Plotting ', BABBLING,' learnt states '
-    elif 'robot_limb_left_endpoint' in state_file_str : #if DATA_FOLDER == SIMPLEDATA3D 
-        print 'Plotting ', SIMPLEDATA3D,' learnt states '
-    else:
-        print('ERROR: Unsupported dataset, pattern not found in ', state_file_str,'. Make sure you run first script.lua and imagesAndRepr.lua with the right DATA_FOLDER setting')
-        sys.exit(-1)
+    print 'Plotting learnt states in ',state_file_str
+    # if 'pushing_object' in state_file_str : #if  DATA_FOLDER == BABBLING:
+    #     print 'Plotting ', BABBLING,' learnt states '
+    # elif 'robot_limb_left_endpoint' in state_file_str : #if DATA_FOLDER == SIMPLEDATA3D 
+    #     print 'Plotting ', SIMPLEDATA3D,' learnt states '
+    # else:
+    #     print 'ERROR: Unsupported dataset, pattern not found in ', state_file_str,'. Make sure you run first script.lua and imagesAndRepr.lua with the right DATA_FOLDER setting'
+    #     sys.exit(-1)
 
     for line in state_file:
         if line[0]!='#':
