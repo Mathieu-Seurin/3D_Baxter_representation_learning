@@ -8,10 +8,12 @@ import random
 import sys
 
 nbr_images = -1
+LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
+LAST_MODEL_FILE = 'lastModel.txt'
 
 if len(sys.argv) <= 1:
-        sys.exit("Give number of neighbors (and number of images and model dir if you don't want to use the last model created")
-        
+    sys.exit("Give number of neighbors to produce, followed by number of input images (and model dir if you don't want to use the last model created)")
+
 # Some parameters
 nbr_neighbors= int(sys.argv[1])
 
@@ -21,10 +23,10 @@ if len(sys.argv) >= 3:
 if len(sys.argv) == 4:
         path_to_model = sys.argv[3]
 else:
-        lastModelFile = open('lastModel.txt')
-        path_to_model = lastModelFile.readline()[:-1]
+    lastModelFile = open(LAST_MODEL_FILE)
+    path_to_model = lastModelFile.readline()[:-1]
 
-data_file=path_to_model+"/saveImagesAndRepr.txt"
+data_file=path_to_model+"/"+LEARNED_REPRESENTATIONS_FILE
 
 #reading data
 file  = open(data_file, "r")
@@ -32,34 +34,35 @@ file  = open(data_file, "r")
 images=[]
 states=[]
 for line in file:
-        if line[0]!='#':
-                words = line.split()
-                images.append(words[0])
-                states.append(words[1:])
+    if line[0]!='#':
+        words = line.split()
+        images.append(words[0])
+        states.append(words[1:])
 
 dim_state= len(states[0])
 
 #Compute nearest neighbors
 nbrs = NearestNeighbors(n_neighbors=(nbr_neighbors+1), algorithm='ball_tree').fit(states)
-distances, indices = nbrs.kneighbors(states)
+distances, indexes = nbrs.kneighbors(states)
 
 #Generate mosaics
 path_to_neighbour = path_to_model + '/NearestNeighbors/'
-print "path_to_neighbour",path_to_neighbour
+print "path_to_model: ",path_to_model
+print "path_to_neighbour: ",path_to_neighbour
 #shutil.rmtree('NearestNeighbors', 1)
 if not os.path.exists(path_to_neighbour):
 	os.mkdir(path_to_neighbour)
 
 if nbr_images == -1:
-	data= zip(images,indices,distances,states)
+	data= zip(images,indexes,distances,states)
 else:
-	data= random.sample(zip(images,indices,distances,states),nbr_images)
+	data= random.sample(zip(images,indexes,distances,states),nbr_images)
 
 
 for img_name,id,dist,state in data:
 	base_name= os.path.splitext(os.path.basename(img_name))[0]
 	seq_name= img_name.split("/")[1]
-	print('Processing ' + seq_name + "/" + base_name + '...')
+	print('Processing ' + seq_name + "/" + base_name + ' ...')
 	fig = plt.figure()
 	fig.set_size_inches(6*(nbr_neighbors+1), 6)
 	a=fig.add_subplot(1,nbr_neighbors+1,1)
@@ -85,7 +88,7 @@ for img_name,id,dist,state in data:
 		a.axis('off')
 
 	plt.tight_layout()
-	output_file = path_to_neighbour + seq_name + "_" + base_name + "_" + 'Neigbors.png'
-	#print('Saved nearest neighbor image to '+output_file)
+	output_file = path_to_neighbour + seq_name + "_" + base_name + "_" + path_to_model.replace('.t7','')+' Neigbors.png'
 	plt.savefig(output_file,bbox_inches='tight')
 	plt.close() # efficiency: avoids keeping all images into RAM
+print('Saved nearest neighbor images to '+output_file)

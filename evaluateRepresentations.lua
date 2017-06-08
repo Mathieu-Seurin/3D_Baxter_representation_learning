@@ -115,9 +115,6 @@ local function HeadPosFromTxts(txts, isData)
    end
    return T
 end
-
-local function RewardsFromTxts(txts)
-    y = {}
 	  for l, txt in ipairs(txts) do
 	     truth = getTruth(txt)
 	     for i, head_pos in ipairs(truth) do
@@ -335,19 +332,19 @@ function createPreloadedDataFolder(list_folders_images,list_txt,LOG_FOLDER,use_s
       else
          print("Preloaded Data Does Not Exists. Loading Training and Test from "..DATA.." and saving to "..current_preload_file)
 
-				 local imgs = torch.load(DATA) --local imgs, imgs_test = loadTrainTest(list_folders_images,crossValStep, PRELOAD_FOLDER)
-				 if crossValStep ==NB_SEQUENCES then
-					 test_sequence_index = crossValStep +1
-				 else
-					 test_sequence_index = 1
-				 end
-				 local imgs_test = load_seq_by_id(test_sequence_index)
-				 print ("imgs "..#imgs)
-				 print ("load_seq_by_id #imgs_test"..#imgs_test)
+		 local imgs = torch.load(DATA) --local imgs, imgs_test = loadTrainTest(list_folders_images,crossValStep, PRELOAD_FOLDER)
+		--  if crossValStep ==NB_SEQUENCES then
+		-- 	 test_sequence_index = crossValStep +1
+		--  else
+		-- 	 test_sequence_index = 1
+		--  end
+		 local imgs_test = load_seq_by_id(crossValStep)
+		 print ("imgs "..#imgs)
+		 print ("load_seq_by_id #imgs_test: "..#imgs_test)
 
-				 imgs[1], imgs[#imgs] = imgs[#imgs], imgs[1] -- Because during database creation we swapped those values
+		 imgs[1], imgs[#imgs] = imgs[#imgs], imgs[1] -- Because during database creation we swapped those values
 
-				 torch.save(current_preload_file, imgs)
+		 torch.save(current_preload_file, imgs)
       end
 
       -- we use last list as test
@@ -366,8 +363,8 @@ function createPreloadedDataFolder(list_folders_images,list_txt,LOG_FOLDER,use_s
       -- print("Correlation before training : ", corr)
       -- table.insert(list_corr,corr)
 
-			NB_BATCHES = math.floor(#imgs/BATCH_SIZE)
-			print("Training with NB_SEQUENCES "..NB_SEQUENCES..' NB_BATCHES: '..NB_BATCHES)
+      NB_BATCHES = math.floor(#imgs/BATCH_SIZE)
+      print("Training with NB_SEQUENCES "..NB_SEQUENCES..' NB_BATCHES: '..NB_BATCHES)
       for epoch=1, NB_EPOCHS do
          print('--------------Epoch : '..epoch..' ---------------')
          local lossTemp=0
@@ -388,16 +385,16 @@ function createPreloadedDataFolder(list_folders_images,list_txt,LOG_FOLDER,use_s
 						-- local data1 = load_seq_by_id(indice1)
 						-- local data2 = load_seq_by_id(indice2)
 
-            batch=getRandomBatchFromSeparateList(imgs1,imgs2,BATCH_SIZE,"Temp", USE_CONTINUOUS)--batch(imgs1,imgs2,txt1,txt2,BATCH_SIZE,"Temp")
+            batch=getRandomBatchFromSeparateList(BATCH_SIZE,'Temp', USE_CONTINUOUS)
             lossTemp = lossTemp + Rico_Training_evaluation(models,'Temp',batch, coef_Temp,LR)
 
-            batch=getRandomBatchFromSeparateList(imgs1,imgs2,BATCH_SIZE,"Caus", USE_CONTINUOUS)
+            batch=getRandomBatchFromSeparateList(BATCH_SIZE,'Caus', USE_CONTINUOUS)
             lossCaus = lossCaus + Rico_Training_evaluation(models, 'Caus',batch, 1,LR)
 
-            batch=getRandomBatchFromSeparateList(imgs1,imgs2,BATCH_SIZE,"Prop", USE_CONTINUOUS)
+            batch=getRandomBatchFromSeparateList(BATCH_SIZE,'Prop', USE_CONTINUOUS)
             lossProp = lossProp + Rico_Training_evaluation(models, 'Prop',batch, coef_Prop,LR)
 
-            batch=getRandomBatchFromSeparateList(imgs1,imgs2,BATCH_SIZE,"Rep", USE_CONTINUOUS)
+            batch=getRandomBatchFromSeparateList(BATCH_SIZE,'Rep', USE_CONTINUOUS)
             lossRep = lossRep + Rico_Training_evaluation(models,'Rep',batch, coef_Rep,LR)
 
             xlua.progress(numBatch, NB_BATCHES)
@@ -416,7 +413,7 @@ function createPreloadedDataFolder(list_folders_images,list_txt,LOG_FOLDER,use_s
       print("SAVING MODEL AND REPRESENTATIONS")
       saveMeanAndStdRepr(imgs)
       models.model1:float()
-      --save_model(models.model1,name_save)
+      --save_model(models.model1, name_save) --TODO
       list_txt[crossValStep],list_txt[#list_txt] = list_txt[#list_txt], list_txt[crossValStep]
    end
 end
@@ -567,12 +564,12 @@ avg_error = 0
 seq_id = 1 --TODO provide for each sequence and give final avg reconstruction error  local indice_test = torch.random(1,NB_SEQUENCES-1)
 
 if #list_folders_images >0 then
-	local list_image_paths= images_Paths(list_folders_images[indice_test])
+	local images_in_path= images_Paths(list_folders_images[indice_test])
 	print('images_paths (First test:)'..list_folders_images[indice_test])
 	txt_test=list_txt_state[indice_test]
 	txt_reward_test=list_txt_button[indice_test]
 	--part_test=1
-	--Data_test=load_Part_list(list_image_paths,txt_test,txt_reward_test,image_width,image_height,nb_part,part_test,0,txt_test) --avoid, call only  load_seq_by_id(seq_id)
+	--Data_test=load_Part_list(images_in_path,txt_test,txt_reward_test,image_width,image_height,nb_part,part_test,0,txt_test) --avoid, call only  load_seq_by_id(seq_id)
 	--Data_test=load_Part_list(list,txt,txt_reward,IM_LENGTH,IM_HEIGHT,DATA_AUGMENTATION,txt_state)
 	data_test=load_seq_by_id(seq_id)
 	print ('data_test: '..#data_test)
@@ -604,7 +601,7 @@ if #list_folders_images >0 then
 	-- predict:
 	X = getReprFromImgs(imgs, PATH_PRELOAD_DATA,representationsName, MODEL_FULL_PATH)
 
-	train(X,y,reconstructingTask)
+	train(X,y, reconstructingTask, NB_SEQUENCES)
 else
 	print("Input image files not found, check your DATA_FOLDER global variable (should be named 'simpleData3D')")
 	os.exit()
