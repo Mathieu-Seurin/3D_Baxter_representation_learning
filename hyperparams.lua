@@ -2,8 +2,9 @@
 BABBLING = 'babbling'
 MOBILE_ROBOT = 'mobileRobot'
 SIMPLEDATA3D = 'simpleData3D'
+PUSHING_BUTTON_AUGMENTED = 'pushingButton3DAugmented'
 
-DATA_FOLDER = BABBLING
+DATA_FOLDER = PUSHING_BUTTON_AUGMENTED --BABBLING
 --DATA_FOLDER = MOBILE_ROBOT
 
 print("============ DATA USED =========\n",
