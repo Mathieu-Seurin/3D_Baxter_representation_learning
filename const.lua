@@ -102,7 +102,7 @@ elseif DATA_FOLDER == BUTTON_AUGMENTED_3D then
    MAX_TABLE = {0.75,0.6,10} -- for x,y,z doesn't really matter in fact
 
    DIMENSION_IN = 3
-   DIMENSION_OUT = 3 --TODO better specify here than leave it up to the model?
+   DIMENSION_OUT = 3
 
    REWARD_INDEX = 2 --2 reward values: -0, 1
    INDEX_TABLE = {2,3,4} --column index for coordinates in state file, respectively (x,y,z)
@@ -160,6 +160,26 @@ elseif DATA_FOLDER == BABBLING then
 
   SUB_DIR_IMAGE = 'baxter_pushing_objects'
   AVG_FRAMES_PER_RECORD = 60
+
+elseif DATA_FOLDER == PUSHING_BUTTON_AUGMENTED then
+    CLAMP_CAUSALITY = true
+
+    MIN_TABLE = {0.42,-0.2,-10} -- for x,y,z
+    MAX_TABLE = {0.8,0.7,10} -- for x,y,z
+
+    DIMENSION_IN = 3
+    DIMENSION_OUT = 3
+
+    REWARD_INDEX = 2 --2 reward values: -0, 1 ?
+    INDEX_TABLE = {2,3,4} --column index for coordinates in state file, respectively (x,y,z)
+
+    DEFAULT_PRECISION = 0.05 -- for 'arrondit' function
+    FILENAME_FOR_REWARD = "recorded_button1_is_pressed.txt"--"is_pressed"
+    FILENAME_FOR_ACTION = "recorded_robot_limb_left_endpoint_action.txt"--endpoint_action"  -- Never written, always computed on the fly
+    FILENAME_FOR_STATE = "recorded_robot_limb_left_endpoint_state.txt"--endpoint_state"
+
+    SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
+    AVG_FRAMES_PER_RECORD = 1000
 
 else
   print("No supported data folder provided, please add either of the data folders defined in hyperparams: "..BABBLING..", "..MOBILE_ROBOT.." "..SIMPLEDATA3D )
