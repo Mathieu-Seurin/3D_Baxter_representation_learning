@@ -36,7 +36,7 @@ outStr = ''
 tempSeq = {}
 for dir_seq_str in lfs.dir(imagesFolder) do
    if string.find(dir_seq_str,'record') then
-      print("Sequence (data record id): ",dir_seq_str)
+      print("Data sequence folder: ",dir_seq_str)
       local imagesPath = imagesFolder..'/'..dir_seq_str..'/'..SUB_DIR_IMAGE
       for imageStr in lfs.dir(imagesPath) do
          if string.find(imageStr,'jpg') then

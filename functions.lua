@@ -174,7 +174,7 @@ function load_seq_by_id(id)
      data = torch.load(string_preloaded_and_normalized_data)
      --print("load_seq_by_id: Data exists in "..string_preloaded_and_normalized_data..".  Loading...")
   else   -- DATA DOESN'T EXIST AT ALL
-     print("load_seq_by_id input file DOES NOT exists (input id "..id..") Getting files and saving them to "..string_preloaded_and_normalized_data..' from DATA_FOLDER '..DATA_FOLDER)
+     print("load_seq_by_id ("..id.."): input file DOES NOT exists-> Preloading files and saving them to "..string_preloaded_and_normalized_data)--..' from DATA_FOLDER '..DATA_FOLDER)
      local list_folders_images, list_txt_action,list_txt_button, list_txt_state = Get_HeadCamera_View_Files(DATA_FOLDER)
      --print('Get_HeadCamera_View_Files returned #folders: '..#list_folders_images) --print(list_folders_images)
      if #list_folders_images == 0 then

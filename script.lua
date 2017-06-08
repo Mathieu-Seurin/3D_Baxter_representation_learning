@@ -136,7 +136,8 @@ if LOGGING_ACTIONS then
 end
 
 if CAN_HOLD_ALL_SEQ_IN_RAM then
-   print("Preloading all sequences in memory in order to accelerate batch selection [WARNING: In CPU only mode (USE_CUDA = false), RAM memory runs out]")  --Torch: not enough memory: you tried to allocate 0GB. Buy new RAM!
+   print("Preloading all sequences in memory in order to accelerate batch selection ")
+   --[WARNING: In CPU only mode (USE_CUDA = false), RAM memory runs out]	 Torch: not enough memory: you tried to allocate 0GB. Buy new RAM!
    ALL_SEQ = {} -- Preload all the sequences instead of loading specific sequences during batch selection
    for id=1,NB_SEQUENCES do
       ALL_SEQ[#ALL_SEQ+1] = load_seq_by_id(id)
@@ -167,8 +168,8 @@ for nb_test=1, #PRIORS_CONFIGS_TO_APPLY do
 
    local priors_used= PRIORS_CONFIGS_TO_APPLY[nb_test]
    local Log_Folder=Get_Folder_Name(LOG_FOLDER, priors_used)
-   print("Training epoch : "..nb_test ..' using Log_Folder: '..Log_Folder)
 
+   print("Training experiment "..nb_test .." with priors config: "..priors_used.." using Log_Folder: "..Log_Folder)
    train_Epoch(Models,priors_used)
 
 end

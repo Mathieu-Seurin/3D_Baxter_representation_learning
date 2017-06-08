@@ -307,10 +307,10 @@ end
 -- Output : structure with 4 indices which represente a quadruplet (2 Pair of images from 2 different list) for Training with prop prior,
 --  and an array of the delta in between actions (the distance in between 2 actions as Euclidean distance)
 -- The variation of joint for one pair should be close enough (<CLOSE_ENOUGH_PRECISION_THRESHOLD) in continuous actions, to the variation for the second
-function get_one_random_Caus_Set(Infos1,Infos2)
-
+function get_one_random_Caus_Set(Infos1, Infos2)
+   local size1=#Infos1[1]
+   local size2=#Infos2[1]
    local watchDog=0
-
 
    while watchDog<100 do
 

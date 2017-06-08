@@ -164,7 +164,7 @@ elseif DATA_FOLDER == BABBLING then
   -- Causality needs at least 2 different values of reward and in sparse dataset such as babbling_1, this does not occur always
   --PRIORS_TO_APPLY ={{"Rep","Prop","Temp"}}
   PRIORS_CONFIGS_TO_APPLY ={{"Temp"}}  --TODO compare 1 vs 2 vs 3 priors
-  print('WARNING: Causality prior, at least, will be ignored for dataset '..BABBLING)
+  --print('WARNING: Causality prior, at least, will be ignored for dataset '..BABBLING)
 
 elseif DATA_FOLDER == PUSHING_BUTTON_AUGMENTED then
     CLAMP_CAUSALITY = true
