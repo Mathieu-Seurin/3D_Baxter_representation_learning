@@ -15,7 +15,6 @@ require 'cutorch'
 require 'hyperparams'
 --torch.manualSeed(100)
 
-
 --===========================================================
 -- CUDA CONSTANTS
 --===========================================================
@@ -42,7 +41,7 @@ LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
 LAST_MODEL_FILE = 'lastModel.txt'
 
 now = os.date("*t")
-if USE_CONTINUOUS then  --TODO remove yday if not crucial for sorting models
+if USE_CONTINUOUS then
     DAY = now.year..'_'..now.yday..'_'..now.day..'_'..now.month..'_'..now.hour..'_'..now.min..'_'..now.sec..'_'..DATA_FOLDER..'_cont'--DAY = now.year..'_'..now.yday..'_'..now.hour..'_'..now.min..'_'..now.sec..'_'..DATA_FOLDER..'_cont'
 else
     DAY = now.year..'_'..now.yday..'_'..now.day..'_'..now.month..'_'..now.hour..'_'..now.min..'_'..now.sec..'_'..DATA_FOLDER
@@ -73,6 +72,8 @@ IM_CHANNEL = 3 --image channels (RGB)
 --================================================
 -- dataFolder specific constants : filename, dim_in, indexes in state file etc...
 --===============================================
+PRIORS_TO_APPLY ={"Prop","Temp","Caus","Rep"}
+
 if DATA_FOLDER == SIMPLEDATA3D then
    CLAMP_CAUSALITY = true
 
@@ -135,9 +136,13 @@ elseif DATA_FOLDER == BABBLING then
   FILENAME_FOR_ACTION_DELTAS = "state_pushing_object_deltas.txt"
   FILENAME_FOR_ACTION = FILENAME_FOR_ACTION_DELTAS --""action_pushing_object.txt"
 
-
   SUB_DIR_IMAGE = 'baxter_pushing_objects'
   AVG_FRAMES_PER_RECORD = 60
+
+  -- Causality needs at least 2 different values of reward and in sparse dataset such as babbling_1, this does not occur always
+  --PRIORS_TO_APPLY ={{"Rep","Prop","Temp"}}
+  PRIORS_TO_APPLY ={"Temp"}  --TODO compare 1 vs 2 vs 3 priors
+  print('WARNING: Causality prior will be ignored for dataset '..BABBLING)
 
 elseif DATA_FOLDER == PUSHING_BUTTON_AUGMENTED then
     CLAMP_CAUSALITY = true
@@ -160,9 +165,10 @@ elseif DATA_FOLDER == PUSHING_BUTTON_AUGMENTED then
     AVG_FRAMES_PER_RECORD = 1000
 
 else
-  print("No supported data folder provided, please add either of the data folders defined in hyperparams: "..BABBLING..", "..MOBILE_ROBOT.." "..SIMPLEDATA3D )
+  print("No supported data folder provided, please add either of the data folders defined in hyperparams: "..BABBLING..", "..MOBILE_ROBOT.." "..SIMPLEDATA3D..' or others in const.lua' )
   os.exit()
 end
+
 
 
 FILE_PATTERN_TO_EXCLUDE = 'deltas'

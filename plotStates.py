@@ -115,7 +115,6 @@ if PLOT_DIMENSIONS == 2:
     plt.scatter(toplot[:,0],toplot[:,1],c=rewards,cmap=cmap, norm=norm,marker="o")
 elif PLOT_DIMENSIONS ==3: 
     plot_3D(toplot[:,0], toplot[:,1], toplot[:,2], dataset=model_name)
-    #plt.scatter(toplot[:,0], toplot[:,1], toplot[:,2], c=rewards, cmap=cmap, norm=norm, marker="o")
 elif PLOT_DIMENSIONS == 1:
     plt.scatter(toplot[:,0], rewards, c=rewards, cmap=cmap, norm=norm,marker="o")
 else:

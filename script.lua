@@ -45,48 +45,37 @@ function Rico_Training(Models)
       gradParameters:zero()
 
       --===========
-      local mode='Temp' --Same for continuous or not
-      local batch=getRandomBatchFromSeparateList(BATCH_SIZE,mode, USE_CONTINUOUS)
-      LOSS_TEMP,grad=doStuff_temp(Models,temp_criterion, batch,COEF_TEMP)
-
-      --if USE_CONTINUOUS then
+      local mode='Temp' --Same for continuous or discrete actions
+      if applying_prior(mode) then
+          local batch=getRandomBatchFromSeparateList(BATCH_SIZE,mode)
+          LOSS_TEMP,grad=doStuff_temp(Models,temp_criterion, batch,COEF_TEMP)
+      else
+          LOSS_TEMP = 0
+      end
          --==========
-         mode='Prop'
-         batch, action1, action2 = getRandomBatchFromSeparateList(BATCH_SIZE,mode, USE_CONTINUOUS)
-         LOSS_PROP,gradProp=doStuff_Prop(Models,prop_criterion,batch,COEF_PROP, action1, action2, USE_CONTINUOUS)
-
-         --==========
-         if DATA_FOLDER ~= BABBLING then
-             mode='Caus'
-             batch, action1, action2 = getRandomBatchFromSeparateList(BATCH_SIZE,mode, USE_CONTINUOUS)
-             LOSS_CAUS,gradCaus=doStuff_Caus(Models,caus_criterion,batch,COEF_CAUS, action1, action2, USE_CONTINUOUS)
-         else
-             LOSS_CAUS = 0 --Not applied for BABBLING data (sparse rewards)
-         end
-         --==========
-         mode='Rep'
-         batch, action1, action2 = getRandomBatchFromSeparateList(BATCH_SIZE,mode, USE_CONTINUOUS)
-         LOSS_REP,gradRep=doStuff_Rep(Models,rep_criterion,batch,COEF_REP, action1, action2, USE_CONTINUOUS)
-    --   else
-    --      --==========
-    --      mode='Prop'
-    --      batch = getRandomBatchFromSeparateList(BATCH_SIZE,mode, USE_CONTINUOUS)
-    --      LOSS_PROP,gradProp=doStuff_Prop(Models,prop_criterion,batch,COEF_PROP)
-      --
-    --      --==========
-    --      if DATA_FOLDER ~= BABBLING then
-    --          mode='Caus'
-    --          batch = getRandomBatchFromSeparateList(BATCH_SIZE,mode, USE_CONTINUOUS)
-    --          LOSS_CAUS,gradCaus=doStuff_Caus(Models,caus_criterion,batch,COEF_CAUS)
-    --      else
-    --          LOSS_CAUS = 0 -- Not applied for BABBLING data (sparse rewards)
-    --      end
-    --      --==========
-    --      mode='Rep'
-    --      batch=getRandomBatchFromSeparateList(BATCH_SIZE,mode, USE_CONTINUOUS)
-    --      LOSS_REP,gradRep=doStuff_Rep(Models,rep_criterion,batch,COEF_REP)
-    --   end
-
+      mode='Prop'
+      if applying_prior(mode) then
+          batch, action1, action2 = getRandomBatchFromSeparateList(BATCH_SIZE,mode)
+          LOSS_PROP,gradProp=doStuff_Prop(Models,prop_criterion,batch,COEF_PROP, action1, action2)
+      else
+          LOSS_PROP = 0
+      end
+      --==========
+      mode='Caus'
+      if applying_prior(mode) then
+        batch, action1, action2 = getRandomBatchFromSeparateList(BATCH_SIZE,mode)
+        LOSS_CAUS,gradCaus=doStuff_Caus(Models,caus_criterion,batch,COEF_CAUS, action1, action2)
+      else
+        LOSS_CAUS = 0 --Not applied for BABBLING data (sparse rewards)
+      end
+      --==========
+      mode='Rep'
+      if applying_prior(mode) then
+          batch, action1, action2 = getRandomBatchFromSeparateList(BATCH_SIZE,mode)
+          LOSS_REP,gradRep=doStuff_Rep(Models,rep_criterion,batch,COEF_REP, action1, action2)
+      else
+          LOSS_REP = 0
+      end
       return LOSS_REP+LOSS_CAUS+LOSS_PROP+LOSS_TEMP ,gradParameters
     end
 
@@ -105,7 +94,7 @@ function Rico_Training(Models)
     return loss[1], grad
 end
 
-function train_Epoch(Models,Prior_Used,LR, USE_CONTINUOUS)
+function train_Epoch(Models,Prior_Used,LR)
     local NB_BATCHES= math.ceil(NB_SEQUENCES*AVG_FRAMES_PER_RECORD/BATCH_SIZE/(4+4+2+2))
     --90 is the FRAMES_PER_RECORD (average number of images per sequences for mobileRobot data), div by 12 because the network sees 12 images per iteration (i.e. record)
     -- (4*2 for rep and prop, 2*2 for temp and caus)
@@ -120,15 +109,6 @@ function train_Epoch(Models,Prior_Used,LR, USE_CONTINUOUS)
     local Sum_loss_train, Sum_loss_test = {},{}
     local Temp_grad_list,Prop_grad_list,Rep_grad_list,Caus_grad_list = {},{},{},{}
     local list_errors,list_MI, list_corr={},{},{}
-
-    local Prop= applies_prior(Prior_Used,'Prop')
-    local Temp= applies_prior(Prior_Used,'Temp')
-    local Rep= applies_prior(Prior_Used,'Rep')
-    local Caus= applies_prior(Prior_Used,'Caus')
-    print(Prop)
-    print(Temp)
-    print(Rep)
-    print(Caus)
 
     local coef_Temp=1
     local coef_Prop=1
@@ -160,23 +140,23 @@ function train_Epoch(Models,Prior_Used,LR, USE_CONTINUOUS)
           assert(data1, "Something went wrong while loading data1")
           assert(data2, "Something went wrong while loading data2")
 
-          if Temp then
-             Loss,Grad=Rico_Training(Models,'Temp',data1,data2,TEMP_criterion, coef_Temp,LR,BATCH_SIZE, USE_CONTINUOUS)
+          if applying_prior('Temp') then
+             Loss,Grad=Rico_Training(Models,'Temp',data1,data2,TEMP_criterion, coef_Temp,LR,BATCH_SIZE)
              Grad_Temp=Grad_Temp+Grad
              Temp_loss=Temp_loss+Loss
           end
-          if Prop then
-             Loss,Grad=Rico_Training(Models,'Prop',data1,data2, PROP_criterion, coef_Prop,LR,BATCH_SIZE, USE_CONTINUOUS)
+          if applying_prior('Prop') then
+             Loss,Grad=Rico_Training(Models,'Prop',data1,data2, PROP_criterion, coef_Prop,LR,BATCH_SIZE)
              Grad_Prop=Grad_Prop+Grad
              Prop_loss=Prop_loss+Loss
           end
-          if Rep then
-             Loss,Grad=Rico_Training(Models,'Rep',data1,data2,REP_criterion, coef_Rep,LR,BATCH_SIZE, USE_CONTINUOUS)
+          if applying_prior('Rep') then
+             Loss,Grad=Rico_Training(Models,'Rep',data1,data2,REP_criterion, coef_Rep,LR,BATCH_SIZE)
              Grad_Rep=Grad_Rep+Grad
              Rep_loss=Rep_loss+Loss
           end
-          if Caus then
-             Loss,Grad=Rico_Training(Models,'Caus',data1,data2,CAUS_criterion,coef_Caus,LR,BATCH_SIZE, USE_CONTINUOUS)
+          if applying_prior('Caus') then
+             Loss,Grad=Rico_Training(Models,'Caus',data1,data2,CAUS_criterion,coef_Caus,LR,BATCH_SIZE)
              Grad_Caus=Grad_Caus+Grad
              Caus_loss=Caus_loss+Loss
           end
@@ -210,7 +190,7 @@ end
 
 for nb_test=1, #PRIORS_TO_APPLY do
    if RELOAD_MODEL then
-      print("Reloading model in "..SAVED_MODEL_PATH)  --TODO: undefined constant MODEL_FILE_STRING, use SAVED_MODEL_PATH = NAME_SAVE?
+      print("Reloading model in "..SAVED_MODEL_PATH)
       Model = torch.load(SAVED_MODEL_PATH):double()
    else
       print("Getting model in : "..MODEL_ARCHITECTURE_FILE)
@@ -234,7 +214,7 @@ for nb_test=1, #PRIORS_TO_APPLY do
    local Priors= PRIORS_TO_APPLY[nb_test]
    local Log_Folder=Get_Folder_Name(LOG_FOLDER, Priors)
    print("Training epoch : "..nb_test ..' using Log_Folder: '..Log_Folder)
-   train_Epoch(Models,Priors, LR, USE_CONTINUOUS)
+   train_Epoch(Models,Priors, LR)
 end
 
 imgs={} --memory is free!!!!!

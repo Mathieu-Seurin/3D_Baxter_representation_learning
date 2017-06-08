@@ -15,7 +15,7 @@ function save_model(model)
    os.execute("cp hyperparams.lua "..path)
 
    torch.save(file_string, model)
-   print("Saved model at : "..path)
+   print("Saved model "..NAME_SAVE.." at : "..path)
 
    f = io.open(LAST_MODEL_FILE,'w')
    f:write(path..'\n'..NAME_SAVE..'.t7')
@@ -23,11 +23,12 @@ function save_model(model)
 end
 
 ---------------------------------------------------------------------------------------
--- Function :getRandomBatchFromSeparateList(batch_size, mode, USE_CONTINUOUS)
+-- Function :getRandomBatchFromSeparateList(batch_size, mode)
 -- Input ():
--- Output ():
+-- Output (): returns the batch with images and the two actions associated to be
+-- considered in the computation of the loss funtion based on priors
 ---------------------------------------------------------------------------------------
-function getRandomBatchFromSeparateList(batch_size, mode, USE_CONTINUOUS)
+function getRandomBatchFromSeparateList(batch_size, mode)
    if mode=="Prop" or mode=="Rep" then
       Batch=torch.Tensor(4, batch_size, IM_CHANNEL, IM_LENGTH, IM_HEIGHT)
    else
@@ -55,11 +56,7 @@ function getRandomBatchFromSeparateList(batch_size, mode, USE_CONTINUOUS)
       assert(data2, "Something went wrong while loading data2")
 
       if mode=="Prop" or mode=="Rep" then
-        if USE_CONTINUOUS then
-            Set = get_two_Prop_Pair_and_actions(data1.Infos, data2.Infos)
-        else
-            Set = get_two_Prop_Pair(data1.Infos, data2.Infos)
-        end
+        Set = get_two_Prop_Pair(data1.Infos, data2.Infos)
         im1,im2 = data1.images[Set.im1], data1.images[Set.im2]
         im3,im4 = data2.images[Set.im3], data2.images[Set.im4]
         Batch[1][i]= im1
@@ -72,7 +69,7 @@ function getRandomBatchFromSeparateList(batch_size, mode, USE_CONTINUOUS)
          Batch[1][i]=im1
          Batch[2][i]=im2
       elseif mode=="Caus" then
-          Set=get_one_random_Caus_Set(data1.Infos, data2.Infos, USE_CONTINUOUS)
+          Set=get_one_random_Caus_Set(data1.Infos, data2.Infos)
           im1,im2,im3,im4 = data1.images[Set.im1], data2.images[Set.im2], data1.images[Set.im3], data2.images[Set.im4]
           --The last two are for viz purpose only
 
@@ -91,28 +88,31 @@ function getRandomBatchFromSeparateList(batch_size, mode, USE_CONTINUOUS)
       print("MODE :",mode)
       visualize_set(im1,im2,im3,im4)
    end
-   if USE_CONTINUOUS then
-       return Batch, Set.act1, Set.act2
-   else
-       return Batch
-   end
+   return Batch, Set.act1, Set.act2
 end
 
 ---------------------------------------------------------------------------------------
 -- Function :	applies_prior(list_prior,prior)
 -- Input ():
--- Output ():  TODO: rename list_contains_element()
+-- Output ():
 ---------------------------------------------------------------------------------------
-function applies_prior(list_prior,prior)
-   local answer=false
-   if #list_prior~=0 then
-      for i=1, #list_prior do
-         if list_prior[i]==prior then return true end
-      end
-   end
-   return answer
+function applying_prior(prior)
+   return list_contains_element(PRIORS_TO_APPLY, prior)
 end
 
+---------------------------------------------------------------------------------------
+-- Function :	list_contains_element(list, element)
+-- Input ():
+-- Output ():
+---------------------------------------------------------------------------------------
+function list_contains_element(list, element)
+   if #list ~=0 then
+      for i=1, #list do
+         if list[i] == element then return true end
+      end
+   end
+   return false
+end
 ---------------------------------------------------------------------------------------
 -- Function :	Get_Folder_Name(Log_Folder,Prior_Used)
 -- Input ():

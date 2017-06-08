@@ -148,7 +148,7 @@ local function RandomBatch(X,y,BATCH_SIZE)
    return batch, y_temp
 end
 
-function Rico_Training_evaluation(model,batch,y,reconstruct, LR, USE_CONTINUOUS) --TODO USE ONLY ONE, SAME AS IN SCRIPT-> move to functions?
+function Rico_Training_evaluation(model,batch,y,reconstruct, LR) --TODO USE ONLY ONE, SAME AS IN SCRIPT-> move to functions?
    local criterion
    local optimizer = optim.adam
    if reconstruct then
@@ -385,16 +385,16 @@ function createPreloadedDataFolder(list_folders_images,list_txt,LOG_FOLDER,use_s
 						-- local data1 = load_seq_by_id(indice1)
 						-- local data2 = load_seq_by_id(indice2)
 
-            batch=getRandomBatchFromSeparateList(BATCH_SIZE,'Temp', USE_CONTINUOUS)
+            batch=getRandomBatchFromSeparateList(BATCH_SIZE,'Temp')
             lossTemp = lossTemp + Rico_Training_evaluation(models,'Temp',batch, coef_Temp,LR)
 
-            batch=getRandomBatchFromSeparateList(BATCH_SIZE,'Caus', USE_CONTINUOUS)
+            batch=getRandomBatchFromSeparateList(BATCH_SIZE,'Caus')
             lossCaus = lossCaus + Rico_Training_evaluation(models, 'Caus',batch, 1,LR)
 
-            batch=getRandomBatchFromSeparateList(BATCH_SIZE,'Prop', USE_CONTINUOUS)
+            batch=getRandomBatchFromSeparateList(BATCH_SIZE,'Prop')
             lossProp = lossProp + Rico_Training_evaluation(models, 'Prop',batch, coef_Prop,LR)
 
-            batch=getRandomBatchFromSeparateList(BATCH_SIZE,'Rep', USE_CONTINUOUS)
+            batch=getRandomBatchFromSeparateList(BATCH_SIZE,'Rep')
             lossRep = lossRep + Rico_Training_evaluation(models,'Rep',batch, coef_Rep,LR)
 
             xlua.progress(numBatch, NB_BATCHES)
