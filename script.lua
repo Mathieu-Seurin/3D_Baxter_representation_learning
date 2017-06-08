@@ -169,8 +169,9 @@ for nb_test=1, #PRIORS_CONFIGS_TO_APPLY do
    local priors_used= PRIORS_CONFIGS_TO_APPLY[nb_test]
    local Log_Folder=Get_Folder_Name(LOG_FOLDER, priors_used)
 
-   print("Training experiment "..nb_test .." with priors config: "..priors_used.." using Log_Folder: "..Log_Folder)
-   train_Epoch(Models,priors_used)
+   print("Experiment "..nb_test .." (using Log_Folder "..Log_Folder.."): Training model using priors config: ")
+   print(priors_used)
+   train_Epoch(Models, priors_used)
 
 end
 
