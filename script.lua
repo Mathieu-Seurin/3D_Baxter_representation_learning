@@ -23,8 +23,7 @@ require "Get_Images_Set"
 require 'optim_priors'
 require 'definition_priors'
 
-function Rico_Training(Models)
-
+function Rico_Training(Models,priors_used)
    local rep_criterion=get_Rep_criterion()
    local prop_criterion=get_Prop_criterion()
    local caus_criterion=get_Caus_criterion()
@@ -32,6 +31,7 @@ function Rico_Training(Models)
 
    -- create closure to evaluate f(X) and df/dX
    local feval = function(x)
+      loss_rep, loss_caus, loss_prop, loss_temp = 0, 0, 0, 0
       -- just in case:
       collectgarbage()
 
@@ -46,37 +46,35 @@ function Rico_Training(Models)
 
       --===========
       local mode='Temp' --Same for continuous or discrete actions
-      if applying_prior(mode) then
+      if applying_prior(priors_used, mode) then
           local batch=getRandomBatchFromSeparateList(BATCH_SIZE,mode)
-          LOSS_TEMP,grad=doStuff_temp(Models,temp_criterion, batch,COEF_TEMP)
-      else
-          LOSS_TEMP = 0
+          loss_temp, grad=doStuff_temp(Models,temp_criterion, batch,COEF_TEMP)
+          TOTAL_LOSS_TEMP = loss_temp + TOTAL_LOSS_TEMP
       end
          --==========
       mode='Prop'
-      if applying_prior(mode) then
+      if applying_prior(priors_used, mode) then
           batch, action1, action2 = getRandomBatchFromSeparateList(BATCH_SIZE,mode)
-          LOSS_PROP,gradProp=doStuff_Prop(Models,prop_criterion,batch,COEF_PROP, action1, action2)
-      else
-          LOSS_PROP = 0
+          loss_prop, gradProp=doStuff_Prop(Models,prop_criterion,batch,COEF_PROP, action1, action2)
+          TOTAL_LOSS_PROP = loss_prop + TOTAL_LOSS_PROP
       end
       --==========
-      mode='Caus'
-      if applying_prior(mode) then
+      mode='Caus'  --Not applied for BABBLING data (sparse rewards)
+      if applying_prior(priors_used, mode) then
         batch, action1, action2 = getRandomBatchFromSeparateList(BATCH_SIZE,mode)
-        LOSS_CAUS,gradCaus=doStuff_Caus(Models,caus_criterion,batch,COEF_CAUS, action1, action2)
-      else
-        LOSS_CAUS = 0 --Not applied for BABBLING data (sparse rewards)
+        loss_caus, gradCaus=doStuff_Caus(Models,caus_criterion,batch,COEF_CAUS, action1, action2)
+        TOTAL_LOSS_CAUS = loss_caus + TOTAL_LOSS_CAUS
       end
+
       --==========
       mode='Rep'
-      if applying_prior(mode) then
+      if applying_prior(priors_used, mode) then
           batch, action1, action2 = getRandomBatchFromSeparateList(BATCH_SIZE,mode)
-          LOSS_REP,gradRep=doStuff_Rep(Models,rep_criterion,batch,COEF_REP, action1, action2)
-      else
-          LOSS_REP = 0
+          loss_rep, gradRep=doStuff_Rep(Models,rep_criterion,batch,COEF_REP, action1, action2)
+          TOTAL_LOSS_REP = loss_rep + TOTAL_LOSS_REP
       end
-      return LOSS_REP+LOSS_CAUS+LOSS_PROP+LOSS_TEMP ,gradParameters
+
+      return loss_rep+loss_caus+loss_prop+loss_temp, gradParameters
     end
 
     --sgdState = sgdState or { learningRate = LR, momentum = mom,learningRateDecay = 5e-7,weightDecay=coefL2 }
@@ -94,81 +92,27 @@ function Rico_Training(Models)
     return loss[1], grad
 end
 
-function train_Epoch(Models,Prior_Used,LR)
+function train_Epoch(Models,priors_used)
     local NB_BATCHES= math.ceil(NB_SEQUENCES*AVG_FRAMES_PER_RECORD/BATCH_SIZE/(4+4+2+2))
-    --90 is the FRAMES_PER_RECORD (average number of images per sequences for mobileRobot data), div by 12 because the network sees 12 images per iteration (i.e. record)
-    -- (4*2 for rep and prop, 2*2 for temp and caus)
-
-    local REP_criterion=get_Rep_criterion()
-    local PROP_criterion=get_Prop_criterion()
-    local CAUS_criterion=get_Caus_criterion()
-    local TEMP_criterion=nn.MSDCriterion()
-
-    local Temp_loss_list, Prop_loss_list, Rep_loss_list, Caus_loss_list = {},{},{},{}
-    local Temp_loss_list_test,Prop_loss_list_test,Rep_loss_list_test,Caus_loss_list_test = {},{},{},{}
-    local Sum_loss_train, Sum_loss_test = {},{}
-    local Temp_grad_list,Prop_grad_list,Rep_grad_list,Caus_grad_list = {},{},{},{}
-    local list_errors,list_MI, list_corr={},{},{}
-
-    local coef_Temp=1
-    local coef_Prop=1
-    local coef_Rep=1
-    local coef_Caus=1
-    local coef_list={coef_Temp,coef_Prop,coef_Rep,coef_Caus}
-
+    --AVG_FRAMES_PER_RECORD to get an idea of the total number of images
+    --div by 12 because the network sees 12 images per iteration (i.e. record)
+    -- (4*2 for rep and prop +  2*2 for temp and caus = 12)
     print(NB_SEQUENCES..' : sequences. '..NB_BATCHES..' batches')
 
     for epoch=1, NB_EPOCHS do
        print('--------------Epoch : '..epoch..' ---------------')
-       local Temp_loss,Prop_loss,Rep_loss,Caus_loss=0,0,0,0
-       local Grad_Temp,Grad_Prop,Grad_Rep,Grad_Caus=0,0,0,0
+       TOTAL_LOSS_TEMP,TOTAL_LOSS_CAUS,TOTAL_LOSS_PROP, TOTAL_LOSS_REP = 0,0,0,0
 
        xlua.progress(0, NB_BATCHES)
        for numBatch=1, NB_BATCHES do
-          index1=torch.random(1,NB_SEQUENCES-1)
-          index2=torch.random(1,NB_SEQUENCES-1)
-          ------------- only one list used----------
-          --       print([[====================================================
-          -- WARNING TESTING PRIOR, THIS IS NOT RANDOM AT ALL
-          -- ====================================================]])
-          --       local index1=8
-          --       local index2=3
-
-          local data1 = load_seq_by_id(index1)
-          local data2 = load_seq_by_id(index2)
-
-          assert(data1, "Something went wrong while loading data1")
-          assert(data2, "Something went wrong while loading data2")
-
-          if applying_prior('Temp') then
-             Loss,Grad=Rico_Training(Models,'Temp',data1,data2,TEMP_criterion, coef_Temp,LR,BATCH_SIZE)
-             Grad_Temp=Grad_Temp+Grad
-             Temp_loss=Temp_loss+Loss
-          end
-          if applying_prior('Prop') then
-             Loss,Grad=Rico_Training(Models,'Prop',data1,data2, PROP_criterion, coef_Prop,LR,BATCH_SIZE)
-             Grad_Prop=Grad_Prop+Grad
-             Prop_loss=Prop_loss+Loss
-          end
-          if applying_prior('Rep') then
-             Loss,Grad=Rico_Training(Models,'Rep',data1,data2,REP_criterion, coef_Rep,LR,BATCH_SIZE)
-             Grad_Rep=Grad_Rep+Grad
-             Rep_loss=Rep_loss+Loss
-          end
-          if applying_prior('Caus') then
-             Loss,Grad=Rico_Training(Models,'Caus',data1,data2,CAUS_criterion,coef_Caus,LR,BATCH_SIZE)
-             Grad_Caus=Grad_Caus+Grad
-             Caus_loss=Caus_loss+Loss
-          end
+          Loss,Grad = Rico_Training(Models,priors_used)
           xlua.progress(numBatch, NB_BATCHES)
        end
 
-       local id=name..epoch -- variable used to not mix several log files
-
-       print("Loss Temp", Temp_loss/NB_BATCHES/BATCH_SIZE)
-       print("Loss Prop", Prop_loss/NB_BATCHES/BATCH_SIZE)
-       print("Loss Caus", Caus_loss/NB_BATCHES/BATCH_SIZE)
-       print("Loss Rep", Rep_loss/NB_BATCHES/BATCH_SIZE)
+       print("Loss Temp", TOTAL_LOSS_TEMP/NB_BATCHES/BATCH_SIZE)
+       print("Loss Prop", TOTAL_LOSS_PROP/NB_BATCHES/BATCH_SIZE)
+       print("Loss Caus", TOTAL_LOSS_CAUS/NB_BATCHES/BATCH_SIZE)
+       print("Loss Rep", TOTAL_LOSS_REP/NB_BATCHES/BATCH_SIZE)
        print("Saving model in ".. NAME_SAVE)
        save_model(Models.Model1, NAME_SAVE)
    end
@@ -176,19 +120,30 @@ end
 
 local records_paths = Get_Folders(DATA_FOLDER, 'record') --local list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(DATA_FOLDER)
 NB_SEQUENCES= #records_paths
+
 if NB_SEQUENCES ==0  then --or not folder_exists(DATA_FOLDER) then
     error('Error: data was not found in input directory INPUT_DIR= '.. DATA_FOLDER)
 end
 
+if LOGGING_ACTIONS then
+   print("LOGGING ACTIONS")
+   LOG_ACTION = {}
+
+   for i=1,NB_SEQUENCES do
+      LOG_ACTION[#LOG_ACTION+1] = {}
+   end
+
+end
+
 if CAN_HOLD_ALL_SEQ_IN_RAM then
-   print("Preloading all sequences in memory, that way, to accelerate batch selection")
+   print("Preloading all sequences in memory in order to accelerate batch selection [WARNING: In CPU only mode (USE_CUDA = false), RAM memory runs out]")  --Torch: not enough memory: you tried to allocate 0GB. Buy new RAM!
    ALL_SEQ = {} -- Preload all the sequences instead of loading specific sequences during batch selection
    for id=1,NB_SEQUENCES do
       ALL_SEQ[#ALL_SEQ+1] = load_seq_by_id(id)
    end
 end
 
-for nb_test=1, #PRIORS_TO_APPLY do
+for nb_test=1, #PRIORS_CONFIGS_TO_APPLY do
    if RELOAD_MODEL then
       print("Reloading model in "..SAVED_MODEL_PATH)
       Model = torch.load(SAVED_MODEL_PATH):double()
@@ -210,11 +165,22 @@ for nb_test=1, #PRIORS_TO_APPLY do
    Model4=Model:clone('weight','bias','gradWeight','gradBias','running_mean','running_std')
    Models={Model1=Model,Model2=Model2,Model3=Model3,Model4=Model4}
 
-
-   local Priors= PRIORS_TO_APPLY[nb_test]
-   local Log_Folder=Get_Folder_Name(LOG_FOLDER, Priors)
+   local priors_used= PRIORS_CONFIGS_TO_APPLY[nb_test]
+   local Log_Folder=Get_Folder_Name(LOG_FOLDER, priors_used)
    print("Training epoch : "..nb_test ..' using Log_Folder: '..Log_Folder)
-   train_Epoch(Models,Priors, LR)
+
+   train_Epoch(Models,priors_used)
+
 end
 
-imgs={} --memory is free!!!!!
+if LOGGING_ACTIONS then
+   print("LOG_ACTION")
+   for key,items in ipairs(LOG_ACTION) do
+      i = 0
+      for k,j in pairs(items) do
+         i = i+1
+      end
+      print(key,i)
+   end
+
+end

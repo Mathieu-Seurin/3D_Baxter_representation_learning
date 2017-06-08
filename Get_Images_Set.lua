@@ -311,9 +311,6 @@ function get_one_random_Caus_Set(Infos1,Infos2)
 
    local watchDog=0
 
-   local size1=#Infos1[1]
-   local size2=#Infos2[1]
-   vector=torch.randperm(size2-1)
 
    while watchDog<100 do
 
@@ -377,6 +374,9 @@ function get_one_random_Caus_Set(Infos1,Infos2)
    error("CAUS WATCHDOG ATTACK!!!!!!!!!!!!!!!!!!")
 end
 
+
+
+
 ---------------------------------------------------------------------------------------
 -- Function : arrondit(value)
 -- Input (tensor) :
@@ -435,10 +435,6 @@ end
 --   end
 --   return close_enough
 -- end
-
-function get_one_random_Prop_Set_and_actions(Infos1)
-   return get_two_Prop_Pair_and_actions(Infos1,Infos1)
-end
 
 ---------------------------------------------------------------------------------------
 -- Function : get_two_Prop_Pair_and_action_deltas(txt1, txt2,use_simulate_images)
