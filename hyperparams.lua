@@ -1,6 +1,4 @@
---DATA_FOLDER = 'simpleData3D'
-DATA_FOLDER = 'mobileRobot'
-
+DATA_FOLDER = 'pushingButton3DAugmented'
 print("============ DATA USED =========\n",
       DATA_FOLDER,
       "\n================================")
@@ -18,8 +16,8 @@ LR=0.001
 LR_DECAY = 1e-6
 
 SGD_METHOD = 'adam' -- Can be adam or adagrad
-BATCH_SIZE = 2
-NB_EPOCHS=15
+BATCH_SIZE = 10
+NB_EPOCHS=10
 
 DATA_AUGMENTATION = 0.01
 NORMALIZE_IMAGE = true
@@ -28,7 +26,7 @@ COEF_TEMP=1
 COEF_PROP=1
 COEF_REP=1
 COEF_CAUS=1
-DIMENSION_OUT=2
+DIMENSION_OUT=5
 
 
 --======================================================

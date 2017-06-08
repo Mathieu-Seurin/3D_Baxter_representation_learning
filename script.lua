@@ -163,6 +163,16 @@ Tests_Todo={
 local list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(DATA_FOLDER)
 NB_SEQUENCES= #list_folders_images
 
+if LOGGING_ACTIONS then
+   print("LOGGING ACTIONS")
+   LOG_ACTION = {}
+
+   for i=1,NB_SEQUENCES do
+      LOG_ACTION[#LOG_ACTION+1] = {}
+   end
+   
+end
+
 if CAN_HOLD_ALL_SEQ_IN_RAM then
    print("Preloading all sequences in memory, that way, to accelerate batch selection")
    ALL_SEQ = {} -- Preload all the sequences instead of loading specific sequences during batch selection
@@ -200,4 +210,16 @@ for nb_test=1, #Tests_Todo do
    train_Epoch(Models,Priors,Log_Folder,LR, USE_CONTINUOUS)
 end
 
-imgs={} --memory is free!!!!!
+if LOGGING_ACTIONS then
+   print("LOG_ACTION")
+   for key,items in ipairs(LOG_ACTION) do
+      i = 0
+      for k,j in pairs(items) do
+         i = i+1
+      end
+      print(key,i)
+   end
+   
+   
+   
+end

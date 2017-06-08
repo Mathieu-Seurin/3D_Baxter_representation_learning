@@ -41,8 +41,7 @@ function getRandomBatchFromSeparateList(batch_size, mode)
 
       INDICE1=torch.random(1,NB_SEQUENCES) -- Global only for visualisation purpose
       INDICE2=torch.random(1,NB_SEQUENCES) -- Global only for visualisation purpose
-
-      local data1,data2
+      local data1,data2,set
       
       if CAN_HOLD_ALL_SEQ_IN_RAM then
          data1 = ALL_SEQ[INDICE1]
@@ -56,22 +55,22 @@ function getRandomBatchFromSeparateList(batch_size, mode)
       assert(data2, "Something went wrong while loading data2")
          
       if mode=="Prop" or mode=="Rep" then
-         Set=get_two_Prop_Pair(data1.Infos, data2.Infos)
-         im1,im2 = data1.images[Set.im1], data1.images[Set.im2]
-         im3,im4 = data2.images[Set.im3], data2.images[Set.im4]
+         set=get_two_Prop_Pair(data1.Infos, data2.Infos)
+         im1,im2 = data1.images[set.im1], data1.images[set.im2]
+         im3,im4 = data2.images[set.im3], data2.images[set.im4]
          Batch[1][i]= im1
          Batch[2][i]= im2
          Batch[3][i]= im3
          Batch[4][i]= im4
       elseif mode=="Temp" then
-         Set=get_one_random_Temp_Set(#data1.images)
-         im1,im2 = data1.images[Set.im1], data1.images[Set.im2]
+         set=get_one_random_Temp_Set(#data1.images)
+         im1,im2 = data1.images[set.im1], data1.images[set.im2]
          Batch[1][i]=im1
          Batch[2][i]=im2
       elseif mode=="Caus" then
-         Set=get_one_random_Caus_Set(data1.Infos, data2.Infos)
+         set=get_one_random_Caus_Set(data1.Infos, data2.Infos)
 
-         im1,im2,im3,im4 = data1.images[Set.im1], data2.images[Set.im2], data1.images[Set.im3], data2.images[Set.im4]
+         im1,im2,im3,im4 = data1.images[set.im1], data2.images[set.im2], data1.images[set.im3], data2.images[set.im4]
          --The last two are for viz purpose only
 
          Batch[1][i]=im1
@@ -82,7 +81,38 @@ function getRandomBatchFromSeparateList(batch_size, mode)
       else
          print "getRandomBatchFromSeparateList Wrong mode "
       end
+
+
+      if LOGGING_ACTIONS and mode=='Caus' then
+      
+         if LOG_ACTION[INDICE1][set.im1] then
+            LOG_ACTION[INDICE1][set.im1] = LOG_ACTION[INDICE1][set.im1]+ 1
+            print("here")
+         else
+            LOG_ACTION[INDICE1][set.im1] = 1
+         end
+
+         if LOG_ACTION[INDICE2][set.im2] then
+            LOG_ACTION[INDICE2][set.im2] = LOG_ACTION[INDICE2][set.im2]+ 1
+            print("here")
+         else
+            LOG_ACTION[INDICE2][set.im2] = 1
+         end
+         
+      end
+
+      -- if LOGGING_ACTIONS and mode=='Temp' then
+
+      --    if LOG_ACTION[INDICE1][set.im1] then
+      --       LOG_ACTION[INDICE1][set.im1] = LOG_ACTION[INDICE1][set.im1]+ 1
+      --       print("here")
+      --    else
+      --       LOG_ACTION[INDICE1][set.im1] = 1
+      --    end
+      -- end
    end
+
+
 
    --Very useful tool to check if prior are coherent
    if VISUALIZE_IMAGES_TAKEN then
@@ -123,22 +153,22 @@ function getRandomBatchFromSeparateListContinuous(batch_size, mode)
       assert(data2, "Something went wrong while loading data2")
       
       if mode=="Prop" or mode=="Rep" then
-         Set =get_two_Prop_Pair_and_actions(data1.Infos, data2.Infos)
-         im1,im2 = data1.images[Set.im1], data1.images[Set.im2]
-         im3,im4 = data2.images[Set.im3], data2.images[Set.im4]
+         set =get_two_Prop_Pair_and_actions(data1.Infos, data2.Infos)
+         im1,im2 = data1.images[set.im1], data1.images[set.im2]
+         im3,im4 = data2.images[set.im3], data2.images[set.im4]
          Batch[1][i]= im1
          Batch[2][i]= im2
          Batch[3][i]= im3
          Batch[4][i]= im4
       elseif mode=="Temp" then
-         Set=get_one_random_Temp_Set(#data1.images)
-         im1,im2 = data1.images[Set.im1], data1.images[Set.im2]
+         set=get_one_random_Temp_Set(#data1.images)
+         im1,im2 = data1.images[set.im1], data1.images[set.im2]
          Batch[1][i]=im1
          Batch[2][i]=im2
       elseif mode=="Caus" then
-         Set =get_one_random_Caus_Set_and_actions(data1.Infos, data2.Infos)
+         set =get_one_random_Caus_Set_and_actions(data1.Infos, data2.Infos)
 
-         im1,im2,im3,im4 = data1.images[Set.im1], data2.images[Set.im2], data1.images[Set.im3], data2.images[Set.im4]
+         im1,im2,im3,im4 = data1.images[set.im1], data2.images[set.im2], data1.images[set.im3], data2.images[set.im4]
          --The last two are for viz purpose only
 
          Batch[1][i]=im1
@@ -153,7 +183,7 @@ function getRandomBatchFromSeparateListContinuous(batch_size, mode)
       print("MODE :",mode)
       visualize_set(im1,im2,im3,im4)
    end
-   return Batch, Set.act1, Set.act2
+   return Batch, set.act1, set.act2
 end
 
 ---------------------------------------------------------------------------------------

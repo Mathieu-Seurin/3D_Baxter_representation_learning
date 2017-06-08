@@ -49,6 +49,8 @@ if VISUALIZE_IMAGES_TAKEN or VISUALIZE_CAUS_IMAGE or VISUALIZE_IMAGE_CROP or VIS
    WINDOW = image.display(image.lena())
 end
 
+LOGGING_ACTIONS = true
+
 IM_CHANNEL = 3
 IM_LENGTH = 200
 IM_HEIGHT = 200
@@ -70,8 +72,8 @@ end
 if DATA_FOLDER == 'simpleData3D' then
    CLAMP_CAUSALITY = true
 
-   MIN_TABLE = {0.42,-0.2,-10} -- for x,y,z
-   MAX_TABLE = {0.8,0.7,10} -- for x,y,z
+   MIN_TABLE = {0.42,-0.2,-10} -- for x,y,z doesn't really matter in fact
+   MAX_TABLE = {0.8,0.7,10} -- for x,y,z doesn't really matter in fact
 
    DIMENSION_IN = 3
 
@@ -85,6 +87,25 @@ if DATA_FOLDER == 'simpleData3D' then
 
    SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
 
+elseif DATA_FOLDER == 'pushingButton3DAugmented' then
+   CLAMP_CAUSALITY = false
+
+   MIN_TABLE = {0.42,-0.1,-10} -- for x,y,z doesn't really matter in fact
+   MAX_TABLE = {0.75,0.6,10} -- for x,y,z doesn't really matter in fact
+
+   DIMENSION_IN = 3
+
+   REWARD_INDICE = 2
+   INDICE_TABLE = {2,3,4} --column indice for coordinate in state file (respectively x,y,z)
+
+   DEFAULT_PRECISION = 0.05 -- for 'arrondit' function
+   FILENAME_FOR_REWARD = "is_pressed"
+   FILENAME_FOR_ACTION = "endpoint_action"
+   FILENAME_FOR_STATE = "endpoint_state"
+
+   SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
+
+   
 elseif DATA_FOLDER == 'mobileRobot' then
 
    CLAMP_CAUSALITY = false
