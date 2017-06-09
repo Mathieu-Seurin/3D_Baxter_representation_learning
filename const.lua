@@ -34,18 +34,18 @@ lfs.mkdir(PRELOAD_FOLDER)
 LOG_FOLDER = 'Log/'
 MODEL_PATH = LOG_FOLDER
 
-MODEL_ARCHITECTURE_FILE = './models/topUniqueSimplerWOTanh'
-
 STRING_MEAN_AND_STD_FILE = PRELOAD_FOLDER..'meanStdImages_'..DATA_FOLDER..'.t7'
 LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
 LAST_MODEL_FILE = 'lastModel.txt'
 
 now = os.date("*t")
-if USE_CONTINUOUS then
-    DAY = now.year..'_'..now.yday..'_'..now.day..'_'..now.month..'_'..now.hour..'_'..now.min..'_'..now.sec..'_'..DATA_FOLDER..'_cont'--DAY = now.year..'_'..now.yday..'_'..now.hour..'_'..now.min..'_'..now.sec..'_'..DATA_FOLDER..'_cont'
+
+if USE_CONTINUOUS then 
+    DAY = 'Y'..now.year..'_D'..now.day..'_M'..now.month..'_H'..now.hour..'M'..now.min..'S'..now.sec..'_'..DATA_FOLDER..'_cont'
 else
-    DAY = now.year..'_'..now.yday..'_'..now.day..'_'..now.month..'_'..now.hour..'_'..now.min..'_'..now.sec..'_'..DATA_FOLDER
+    DAY = 'Y'..now.year..'_D'..now.day..'_M'..now.month..'_H'..now.hour..'M'..now.min..'S'..now.sec..'_'..DATA_FOLDER
 end
+
 NAME_SAVE= 'model'..DAY
 SAVED_MODEL_PATH = LOG_FOLDER..NAME_SAVE
 
@@ -65,12 +65,25 @@ if VISUALIZE_IMAGES_TAKEN or VISUALIZE_CAUS_IMAGE or VISUALIZE_IMAGE_CROP or VIS
    WINDOW = image.display(image.lena())
 end
 
-LOGGING_ACTIONS = true
+LOGGING_ACTIONS = false
 
-IM_LENGTH = 200
-IM_HEIGHT = 200
+IS_INCEPTION = string.find(MODEL_ARCHITECTURE_FILE, 'inception')
+-- since the model require images to be a 3x299x299, and normalize differently, we need to adapt
+
+if IS_INCEPTION then
+   IM_LENGTH = 299
+   IM_HEIGHT = 299
+
+   MEAN_INCEPTION = torch.ones(3):double()*0.5
+   STD_INCEPTION = torch.ones(3):double()*0.5
+
+else
+   IM_LENGTH = 200
+   IM_HEIGHT = 200
+end
+
+
 IM_CHANNEL = 3 --image channels (RGB)
-
 --================================================
 -- dataFolder specific constants : filename, dim_in, indexes in state file etc...
 --===============================================

@@ -51,13 +51,18 @@ function Rico_Training(Models,priors_used)
           loss_temp, grad=doStuff_temp(Models,temp_criterion, batch,COEF_TEMP)
           TOTAL_LOSS_TEMP = loss_temp + TOTAL_LOSS_TEMP
       end
-         --==========
+      --==========
+
+      -- print("after temp")
+      -- io.read()
+      
       mode='Prop'
       if applying_prior(priors_used, mode) then
           batch, action1, action2 = getRandomBatchFromSeparateList(BATCH_SIZE,mode)
           loss_prop, gradProp=doStuff_Prop(Models,prop_criterion,batch,COEF_PROP, action1, action2)
           TOTAL_LOSS_PROP = loss_prop + TOTAL_LOSS_PROP
       end
+
       --==========
       mode='Caus'  --Not applied for BABBLING data (sparse rewards)
       if applying_prior(priors_used, mode) then

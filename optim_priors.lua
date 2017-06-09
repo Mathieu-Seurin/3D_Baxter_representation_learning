@@ -5,6 +5,10 @@ function doStuff_temp(Models,criterion,Batch,coef)
 
    local batchSize = Batch:size(2)
 
+   -- print("before batch")
+   -- io.read()
+
+   
    if USE_CUDA then
       im1=Batch[1]:cuda()
       im2=Batch[2]:cuda()
@@ -13,11 +17,18 @@ function doStuff_temp(Models,criterion,Batch,coef)
       im2=Batch[2]
    end
 
+   -- print("after batch")
+   -- io.read()
+
+   
    Model=Models.Model1
    Model2=Models.Model2
    State1=Model:forward(im1)
    State2=Model2:forward(im2)
 
+   -- print("after forward")
+   -- io.read()
+   
    assert(batchSize==State1:size(1), "Batch Size changed during 'forward method, maybe a nn.view is done badly ...")
 
    if USE_CUDA then

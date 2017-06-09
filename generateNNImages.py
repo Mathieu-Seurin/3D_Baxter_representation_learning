@@ -88,7 +88,8 @@ for img_name,id,dist,state in data:
 		a.axis('off')
 
 	plt.tight_layout()
-	output_file = path_to_neighbour + seq_name + "_" + base_name + "_" + path_to_model.replace('.t7','')+' Neigbors.png'
+	output_file = path_to_neighbour + seq_name + "_" + base_name
+        
 	plt.savefig(output_file,bbox_inches='tight')
 	plt.close() # efficiency: avoids keeping all images into RAM
 print('Saved nearest neighbor images to '+output_file)
