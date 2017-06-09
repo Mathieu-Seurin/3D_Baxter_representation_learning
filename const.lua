@@ -18,7 +18,7 @@ require 'hyperparams'
 --===========================================================
 -- CUDA CONSTANTS
 --===========================================================
-USE_CUDA = false
+USE_CUDA = true
 USE_SECOND_GPU = true
 
 if USE_CUDA and USE_SECOND_GPU then
@@ -66,6 +66,7 @@ if VISUALIZE_IMAGES_TAKEN or VISUALIZE_CAUS_IMAGE or VISUALIZE_IMAGE_CROP or VIS
 end
 
 LOGGING_ACTIONS = false
+
 
 IS_INCEPTION = string.find(MODEL_ARCHITECTURE_FILE, 'inception')
 -- since the model require images to be a 3x299x299, and normalize differently, we need to adapt
@@ -197,13 +198,12 @@ elseif DATA_FOLDER == PUSHING_BUTTON_AUGMENTED then
     FILENAME_FOR_STATE = "recorded_robot_limb_left_endpoint_state.txt"--endpoint_state"
 
     SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
-    AVG_FRAMES_PER_RECORD = 1000
+    AVG_FRAMES_PER_RECORD = 100
 
 else
   print("No supported data folder provided, please add either of the data folders defined in hyperparams: "..BABBLING..", "..MOBILE_ROBOT.." "..SIMPLEDATA3D..' or others in const.lua' )
   os.exit()
 end
-
 
 
 FILE_PATTERN_TO_EXCLUDE = 'deltas'
