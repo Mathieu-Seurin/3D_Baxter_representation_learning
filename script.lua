@@ -48,13 +48,20 @@ function Rico_Training(Models,priors_used)
       local mode='Temp' --Same for continuous or not
       local batch=getRandomBatchFromSeparateList(BATCH_SIZE,mode)
       loss_temp,grad=doStuff_temp(Models,temp_criterion, batch,COEF_TEMP)
+      -- print("after compute")
+      -- io.read()
       TOTAL_LOSS_TEMP = loss_temp + TOTAL_LOSS_TEMP
+      -- io.read()
 
       mode='Prop'
       batch, action1, action2 = getRandomBatchFromSeparateList(BATCH_SIZE,mode)
       loss_prop,gradProp=doStuff_Prop(Models,prop_criterion,batch,COEF_PROP, action1, action2)
       TOTAL_LOSS_PROP = loss_prop + TOTAL_LOSS_PROP
-      
+
+      -- print("batch:size",batch:size())
+      -- print("prop ok")
+      -- io.read()
+
       --==========
       if DATA_FOLDER ~= BABBLING then
          mode='Caus'
