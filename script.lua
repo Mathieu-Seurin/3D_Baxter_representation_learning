@@ -123,6 +123,7 @@ function train_Epoch(Models,priors_used)
    end
 end
 
+
 local records_paths = Get_Folders(DATA_FOLDER, 'record') --local list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(DATA_FOLDER)
 NB_SEQUENCES= #records_paths
 

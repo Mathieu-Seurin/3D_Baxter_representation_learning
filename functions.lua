@@ -70,6 +70,10 @@ function getRandomBatchFromSeparateList(batch_size, mode)
       elseif mode=="Temp" then
          set=get_one_random_Temp_Set(#data1.images)
          im1,im2 = data1.images[set.im1], data1.images[set.im2]
+
+         print("im1",im1:size())
+         print("im2",im2:size())
+
          batch[1][i]=im1
          batch[2][i]=im2
       elseif mode=="Caus" then
@@ -292,41 +296,6 @@ function Get_Folder_Name(Log_Folder,list_prior)
       end
    end
    return Log_Folder..name..'/'
-end
-
----------------------------------------------------------------------------------------
--- Function :	load_seq_by_id(id)
--- Input (): id of the record file. Loads data of that sequence id, and if it does not exists, it creates the preprocessed data and saves into the PRELOAD_FOLDER
--- Output ():  Returns a Lua Table with the fields:
--- images (e.g., array of 100 float Tensors of 200x200)
--- Infos: 2 indexed arrays, e.g. in mobileData: of 100 values
--- reward (array of 100 indexed rewards)
----------------------------------------------------------------------------------------
-function load_seq_by_id(id)
-   local string_preloaded_and_normalized_data = PRELOAD_FOLDER..'preloaded_'..DATA_FOLDER..'_Seq'..id..'_normalized.t7'
-
-   -- DATA + NORMALIZATION EXISTS
-   if file_exists(string_preloaded_and_normalized_data) then
-      data = torch.load(string_preloaded_and_normalized_data)
-      --print("load_seq_by_id: Data exists in "..string_preloaded_and_normalized_data..".  Loading...")
-   else   -- DATA DOESN'T EXIST AT ALL
-      print("load_seq_by_id ("..id.."): input file DOES NOT exists-> Preloading files and saving them to "..string_preloaded_and_normalized_data)--..' from DATA_FOLDER '..DATA_FOLDER)
-      local list_folders_images, list_txt_action,list_txt_button, list_txt_state = Get_HeadCamera_View_Files(DATA_FOLDER)
-      --print('Get_HeadCamera_View_Files returned #folders: '..#list_folders_images) --print(list_folders_images)
-      if #list_folders_images == 0 then
-         error("load_seq_by_id: list_folders_images returned by Get_HeadCamera_View_Files is empty! ",#list_folders_images)
-      end
-      assert(list_folders_images[id], 'The frame with order id '..id..'  within the record '..string_preloaded_and_normalized_data..' does not correspond to any existing frame. Check the NB_BATCHES parameter for this dataset and adjust it accounting for the average nr of frames per record')
-      local list= images_Paths(list_folders_images[id])
-      local txt = list_txt_action[id]
-      local txt_reward = list_txt_button[id] --nil
-      local txt_state = list_txt_state[id]--nil
-
-      data = load_Part_list(list, txt, txt_reward, txt_state)--      print("load_Part_list: ",#data) --for tables, #table returns 0 despite not being empty table.       print (data)
-      torch.save(string_preloaded_and_normalized_data, data)
-   end
-   assert(data, 'Failure in load_seq_by_id: data to be saved is nil')
-   return data
 end
 
 ---------------------------------------------------------------------------------------

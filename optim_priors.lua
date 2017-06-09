@@ -4,10 +4,8 @@ function doStuff_temp(Models,criterion,Batch,coef)
    local im1, im2, Model, Model2, State1, State2
 
    local batchSize = Batch:size(2)
-
-   -- print("before batch")
-   -- io.read()
-
+   print("before batch")
+   io.read()
 
    if USE_CUDA then
       im1=Batch[1]:cuda()
@@ -17,8 +15,8 @@ function doStuff_temp(Models,criterion,Batch,coef)
       im2=Batch[2]
    end
 
-   -- print("after batch")
-   -- io.read()
+   print("after batch")
+   io.read()
 
 
    Model=Models.Model1
@@ -40,6 +38,10 @@ function doStuff_temp(Models,criterion,Batch,coef)
    -- calculer les gradients pour les deux images
    Model:backward(im1,coef*GradOutputs[2])
    Model2:backward(im2,coef*GradOutputs[1])
+
+   print("after backward")
+   io.read()
+
    return loss, coef*GradOutputs[1]:cmul(GradOutputs[1]):mean()
 end
 

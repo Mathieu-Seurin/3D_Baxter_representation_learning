@@ -18,7 +18,7 @@ require 'hyperparams'
 --===========================================================
 -- CUDA CONSTANTS
 --===========================================================
-USE_CUDA = false
+USE_CUDA = true
 USE_SECOND_GPU = true
 
 if USE_CUDA and USE_SECOND_GPU then
@@ -66,6 +66,7 @@ if VISUALIZE_IMAGES_TAKEN or VISUALIZE_CAUS_IMAGE or VISUALIZE_IMAGE_CROP or VIS
 end
 
 LOGGING_ACTIONS = false
+
 
 IS_INCEPTION = string.find(MODEL_ARCHITECTURE_FILE, 'inception')
 -- since the model require images to be a 3x299x299, and normalize differently, we need to adapt
@@ -199,20 +200,19 @@ elseif DATA_FOLDER == PUSHING_BUTTON_AUGMENTED then
     FILENAME_FOR_STATE = "recorded_robot_limb_left_endpoint_state.txt"--endpoint_state"
 
     SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
-    AVG_FRAMES_PER_RECORD = 1000
+    AVG_FRAMES_PER_RECORD = 100
     MAX_DIST_AMONG_ACTIONS = 8 -- TODO set after running report_results.py
+
 
 else
   print("No supported data folder provided, please add either of the data folders defined in hyperparams: "..BABBLING..", "..MOBILE_ROBOT.." "..SIMPLEDATA3D..' or others in const.lua' )
   os.exit()
 end
 
-
 --In contiuous actions, we take 2 actions, if they are very similar, the coef factor
 --is high (1 if the actions are the same), if not, the coef is 0. You could add a small constraints because the network will see a lot
 --of actions that are not similar, so instead of taking '2 random actions', we take '2 random actions, but above a certain similarity threshold'
 MAX_DIST_AMONG_ACTIONS_THRESHOLD = MAX_DIST_AMONG_ACTIONS/3  --TODO Find best value
-
 FILE_PATTERN_TO_EXCLUDE = 'deltas'
 print("\nUSE_CUDA ",USE_CUDA," \nUSE_CONTINUOUS ACTIONS: ",USE_CONTINUOUS)
 
