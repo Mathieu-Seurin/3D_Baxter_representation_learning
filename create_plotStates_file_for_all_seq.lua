@@ -28,7 +28,7 @@ all_path = {}
 for dir_seq_str in lfs.dir(images_folder) do
    if string.find(dir_seq_str,'record') then
       print("Sequence : ",dir_seq_str)
-      
+
       local images_path = images_folder..'/'..dir_seq_str..'/'..SUB_DIR_IMAGE
       for image_str in lfs.dir(images_path) do
          if string.find(image_str,'jpg') then
