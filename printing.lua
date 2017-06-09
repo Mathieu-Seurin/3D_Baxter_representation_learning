@@ -275,7 +275,6 @@ function print_experiment_config()
                         DATA_FOLDER,
                         "\nUSE_CUDA ",USE_CUDA,", USE_CONTINUOUS ACTIONS: ",USE_CONTINUOUS, " USED PRIORS: ")
     print(PRIORS_CONFIGS_TO_APPLY)
-    print('MAX_DIST_AMONG_ACTIONS: '..MAX_DIST_AMONG_ACTIONS)
     print('MAX_DIST_AMONG_ACTIONS_THRESHOLD: '..MAX_DIST_AMONG_ACTIONS_THRESHOLD, ' CONTINUOUS_ACTION_SIGMA: '..CONTINUOUS_ACTION_SIGMA)
     print("\n================================")
 end

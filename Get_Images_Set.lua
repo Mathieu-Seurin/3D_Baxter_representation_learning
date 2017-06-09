@@ -281,7 +281,7 @@ function get_two_Prop_Pair(Infos1, Infos2)
             id_second_action_end=id_second_action_begin+1
             action2 = action_amplitude(Infos2, id_second_action_begin, id_second_action_end)
             if USE_CONTINUOUS then
-                if actions_are_close_enough(action1, action2) then
+                if action_vectors_are_similar_enough(action1, action2) then
                     return {im1=id_ref_action_begin,im2=id_ref_action_end,im3=id_second_action_begin,im4=id_second_action_end, act1=action1, act2=action2}
                 end
             elseif is_same_action(action1, action2) then --TODO UNIFY TWO IFS, remove this one when continuous works?
@@ -363,7 +363,7 @@ function get_one_random_Caus_Set(Infos1, Infos2)
                io.read()
             end
             if USE_CONTINUOUS then
-               if actions_are_close_enough(action1, action2) then
+               if action_vectors_are_similar_enough(action1, action2) then
                    return {im1=id_second_action_begin,im2=id_ref_action_begin, im3=id_second_action_end, im4=id_ref_action_end, act1=action1, act2=action2}
                end
             elseif is_same_action(action1, action2) then
@@ -419,17 +419,72 @@ function sign(value)
    end
 end
 
-
-
-
 ------------------ CONTINUOUS actions
 --Making actions not be the same but close enough for handling continous actions with priors,
--- This method calibratese the use of sigma in the continuous_factor_term
-function actions_are_close_enough(action1, action2)
+-- This method calibrates the use of sigma in the continuous_factor_term
+-- function actions_are_close_enough(action1, action2)
+--   --print(action1)
+--   local close_enough = true
+--   --for each dim, check that the magnitude of the action is close (smaller than MAX_DIST_AMONG_ACTIONS)
+--   for dim=1, DIMENSION_IN do
+--      close_enough = close_enough and arrondit(action1[dim] - action2[dim]) < MAX_DIST_AMONG_ACTIONS_THRESHOLD
+--   end
+--   print("actions_are_close_enough ")
+--   print(close_enough)
+--   return close_enough
+-- end
+
+function tensor2table(tensor)
+    -- This assumes `t1` is a 2-dimensional tensor!
+    local t2 = {}
+    for i=1,t1:size(1) do
+      t2[i] = {}
+      for j=1,t1:size(2) do
+        t2[i][j] = t1[i][j]
+      end
+      return t2
+    end
+end
+
+function table2tensor(table)
+  -- local tensorSize = table[1]:size()
+  -- local tensorSizeTable = {-1}
+  -- for i=1,tensorSize:size(1) do
+  --   tensorSizeTable[i+1] = tensorSize[i]
+  -- end
+  -- merge=nn.Sequential()
+  --   :add(nn.JoinTable(1))
+  --   :add(nn.View(unpack(tensorSizeTable)))
+  -- return merge:forward(table)
+
+    t2 = torch.Tensor(table)--{table})
+    -- print('converted to tensor')
+    -- print(type(t2))
+    -- print(t2)
+    return t2
+end
+
+
+function action_vectors_are_similar_enough(action1, action2)--tensor1xX, tensor2xX)
+    --{
+    -- examples of actions--
+    --   1 : -1.3799996700925e-09
+    --   2 : 0.372556582859
+    -- }
+    --}    -- print(#action1) 2
   local close_enough = true
-  --for each dim, check that the magnitude of the action is close (smaller than MAX_DIST_AMONG_ACTIONS)
-  for dim=1, DIMENSION_IN do
-     close_enough = close_enough and arrondit(action1[dim] - action2[dim]) < MAX_DIST_AMONG_ACTIONS_THRESHOLD
+  cos = nn.CosineDistance()
+
+  t1 = table2tensor(action1)
+  t2 = table2tensor(action2)
+  cosDistance = cos:forward({t1, t2})
+  if math.abs(cosDistance[1]) < MAX_DIST_AMONG_ACTIONS_THRESHOLD then
+      close_enough = true
+  else
+      close_enough = false
   end
+  -- print("action_vectors_are_similar_enough: cosDistance:")
+  -- print(close_enough)
+  -- print(cosDistance)
   return close_enough
 end
