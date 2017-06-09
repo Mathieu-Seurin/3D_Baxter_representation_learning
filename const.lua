@@ -94,7 +94,7 @@ if DATA_FOLDER == SIMPLEDATA3D then
 
    SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
    AVG_FRAMES_PER_RECORD = 95
-
+   MAX_DIST_AMONG_ACTIONS = 8 -- TODO set after running report_results.py
 
 elseif DATA_FOLDER == BUTTON_AUGMENTED_3D then
    CLAMP_CAUSALITY = false
@@ -105,7 +105,7 @@ elseif DATA_FOLDER == BUTTON_AUGMENTED_3D then
    DIMENSION_IN = 3
    DIMENSION_OUT = 3
 
-   REWARD_INDEX = 2 --2 reward values: -0, 1
+   REWARD_INDEX = 2 --2 reward values: 0, 1
    INDEX_TABLE = {2,3,4} --column index for coordinates in state file, respectively (x,y,z)
 
    DEFAULT_PRECISION = 0.05 -- for 'arrondit' function
@@ -115,6 +115,7 @@ elseif DATA_FOLDER == BUTTON_AUGMENTED_3D then
 
    SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
    AVG_FRAMES_PER_RECORD = 100
+   MAX_DIST_AMONG_ACTIONS = 8 -- TODO set after running report_results.py
 
 elseif DATA_FOLDER == MOBILE_ROBOT then
 
@@ -135,7 +136,7 @@ elseif DATA_FOLDER == MOBILE_ROBOT then
 
    SUB_DIR_IMAGE = 'recorded_camera_top'
    AVG_FRAMES_PER_RECORD = 90
-
+   MAX_DIST_AMONG_ACTIONS = 8 -- TODO set after running report_results.py
 
 elseif DATA_FOLDER == BABBLING then
   -- Leni's real Baxter data on  ISIR dataserver. It is named "data_archive_sim_1".
@@ -163,8 +164,9 @@ elseif DATA_FOLDER == BABBLING then
 
   -- Causality needs at least 2 different values of reward and in sparse dataset such as babbling_1, this does not occur always
   --PRIORS_TO_APPLY ={{"Rep","Prop","Temp"}}
-  PRIORS_CONFIGS_TO_APPLY ={{"Temp"}}  --TODO compare 1 vs 2 vs 3 priors
-  --print('WARNING: Causality prior, at least, will be ignored for dataset '..BABBLING)
+  PRIORS_CONFIGS_TO_APPLY ={{"Temp"}}--, {"Prop","Temp"}, {"Prop","Rep"},  {"Temp","Rep"}, {"Prop","Temp","Rep"}}  --TODO report 1 vs 2 vs 3 priors
+  --print('WARNING: Causality prior, at least, will be ignored for dataset because of too sparse rewards. TODO: convert to 3 reward values'..BABBLING)
+  MAX_DIST_AMONG_ACTIONS = 8 -- TODO set after running report_results.py
 
 elseif DATA_FOLDER == PUSHING_BUTTON_AUGMENTED then
     CLAMP_CAUSALITY = true
@@ -185,6 +187,7 @@ elseif DATA_FOLDER == PUSHING_BUTTON_AUGMENTED then
 
     SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
     AVG_FRAMES_PER_RECORD = 1000
+    MAX_DIST_AMONG_ACTIONS = 8 -- TODO set after running report_results.py
 
 else
   print("No supported data folder provided, please add either of the data folders defined in hyperparams: "..BABBLING..", "..MOBILE_ROBOT.." "..SIMPLEDATA3D..' or others in const.lua' )
@@ -192,6 +195,10 @@ else
 end
 
 
+--In contiuous actions, we take 2 actions, if they are very similar, the coef factor
+--is high (1 if the actions are the same), if not, the coef is 0. You could add a small constraints because the network will see a lot
+--of actions that are not similar, so instead of taking '2 random actions', we take '2 random actions, but above a certain similarity threshold'
+MIN_DISTANCE_THRESHOLD = MAX_DIST_AMONG_ACTIONS/3  --TODO Find best value
 
 FILE_PATTERN_TO_EXCLUDE = 'deltas'
 print("\nUSE_CUDA ",USE_CUDA," \nUSE_CONTINUOUS ACTIONS: ",USE_CONTINUOUS)

@@ -269,3 +269,13 @@ function Print_Corr(corr,epoch,path)
 	f:write(str)
 	f:close()
 end
+
+function print_experiment_config()
+    print("============ Experiment run successfully: DATA USED =========\n",
+                        DATA_FOLDER,
+                        "\nUSE_CUDA ",USE_CUDA,", USE_CONTINUOUS ACTIONS: ",USE_CONTINUOUS, " USED PRIORS: ")
+    print(PRIORS_CONFIGS_TO_APPLY)
+    print('MIN_DISTANCE_THRESHOLD: '..MIN_DISTANCE_THRESHOLD)
+    print('MAX_DIST_AMONG_ACTIONS: '..MAX_DIST_AMONG_ACTIONS)
+    print("\n================================")
+end

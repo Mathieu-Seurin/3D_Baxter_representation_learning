@@ -184,5 +184,6 @@ if LOGGING_ACTIONS then
       end
       print(key,i)
    end
-
 end
+
+print_experiment_config()

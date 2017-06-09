@@ -281,9 +281,10 @@ function get_two_Prop_Pair(Infos1, Infos2)
             id_second_action_end=id_second_action_begin+1
             action2 = action_amplitude(Infos2, id_second_action_begin, id_second_action_end)
             if USE_CONTINUOUS then
-                return {im1=id_ref_action_begin,im2=id_ref_action_end,im3=id_second_action_begin,im4=id_second_action_end, act1=action1, act2=action2}
-            end
-            if is_same_action(action1, action2) then --TODO UNIFY TWO IFS, remove this one when continuous works?
+                if actions_are_close_enough(action1, action2) then
+                    return {im1=id_ref_action_begin,im2=id_ref_action_end,im3=id_second_action_begin,im4=id_second_action_end, act1=action1, act2=action2}
+                end
+            elseif is_same_action(action1, action2) then --TODO UNIFY TWO IFS, remove this one when continuous works?
                -- print("indices", INDICE1, INDICE2)
                -- print("id_ref_action_begin,id_ref_action_end,id_second_action_begin,id_second_action_end",id_ref_action_begin,id_ref_action_end,id_second_action_begin,id_second_action_end)
                -- print("action1",action1[1],action1[2],action1[3])
@@ -362,9 +363,10 @@ function get_one_random_Caus_Set(Infos1, Infos2)
                io.read()
             end
             if USE_CONTINUOUS then
-               return {im1=id_second_action_begin,im2=id_ref_action_begin, im3=id_second_action_end, im4=id_ref_action_end, act1=action1, act2=action2}
-            end
-            if is_same_action(action1, action2) then
+               if actions_are_close_enough(action1, action2) then
+                   return {im1=id_second_action_begin,im2=id_ref_action_begin, im3=id_second_action_end, im4=id_ref_action_end, act1=action1, act2=action2}
+               end
+            elseif is_same_action(action1, action2) then
                return {im1=id_second_action_begin,im2=id_ref_action_begin, im3=id_second_action_end, im4=id_ref_action_end}
             end
          end
@@ -374,8 +376,9 @@ function get_one_random_Caus_Set(Infos1, Infos2)
    error("CAUS WATCHDOG ATTACK!!!!!!!!!!!!!!!!!!")
 end
 
+function get_2_random_actions_above_distance_threshold_apart()
 
-
+end
 
 ---------------------------------------------------------------------------------------
 -- Function : arrondit(value)
@@ -424,17 +427,16 @@ end
 
 
 ------------------ CONTINUOUS actions
-
--- Making actions not be the same but close enough for the continous handling of priors,
--- however with the use of the GAUSSIAN_SIGMA this method should not be needed
--- function actions_are_close_enough(action1,action2)
---   local close_enough = true
---   --for each dim, check that the magnitude of the action is close
---   for dim=1,DIMENSION_IN do
---      close_enough = close_enough and arrondit(action1[dim] - action2[dim]) < CLOSE_ENOUGH_PRECISION_THRESHOLD
---   end
---   return close_enough
--- end
+--Making actions not be the same but close enough for handling continous actions with priors,
+-- This method calibratese the use of sigma in the continuous_factor_term
+function actions_are_close_enough(action1, action2)
+  local close_enough = true
+  --for each dim, check that the magnitude of the action is close (smaller than MAX_DIST_AMONG_ACTIONS)
+  for dim=1, DIMENSION_IN do
+     close_enough = close_enough and arrondit(action1[dim] - action2[dim]) < MAX_DIST_AMONG_ACTIONS
+  end
+  return close_enough
+end
 
 ---------------------------------------------------------------------------------------
 -- Function : get_two_Prop_Pair_and_action_deltas(txt1, txt2,use_simulate_images)

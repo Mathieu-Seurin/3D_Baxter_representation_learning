@@ -190,6 +190,6 @@ end
 function get_continuous_action_factor_term(action1, action2)
   -- This methods avoids having to check for actions that are close enough or
   -- far away enough for the priors constraints by multiplying by a continuous
-  -- factor  based on sigma GAUSSIAN_SIGMA
-  return math.exp((-1 * actions_distance(action1, action2))/GAUSSIAN_SIGMA)
+  -- factor  based on sigma CONTINUOUS_ACTION_SIGMA
+  return math.exp((-1 * actions_distance(action1, action2))/CONTINUOUS_ACTION_SIGMA)
 end
