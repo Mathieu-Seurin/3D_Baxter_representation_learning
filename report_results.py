@@ -15,7 +15,7 @@ MOBILE_ROBOT = 'mobileRobot'
 SIMPLEDATA3D = 'simpleData3D'
 
 LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
-#DATA_FOLDER = MOBILE_ROBOT
+DATA_FOLDER = MOBILE_ROBOT
 #DATA_FOLDER = BABBLING
 
 PLOT_CONFIGURATIONS = [2, 3]
@@ -139,15 +139,8 @@ def real_file_to_simulated_file(record_id, input_f=INPUT_DATA_FILE, input_f_targ
 def plot_states_and_rewards(all_data_df, all_rewards_df):
     print "plot_states_and_rewards..."
     test_file = 'saveImagesAndRepr.txt'
-
-
-def get_min_and_max_dist_btw_actions(df):
-    # TODO
-    return 8
  
 def get_positive_reward_ratio(df):
-    print df[df.value == 1.0].shape[0] 
-    print df[df.value != 1.0].shape[0] 
     return df[df.value == 1.0].shape[0] / float(df[df.value != 1.0].shape[0])
 
 def Euclidean_distance(a, b):
@@ -166,6 +159,7 @@ def plot_3D(x =[1,2,3,4,5,6,7,8,9,10], y =[5,6,2,3,13,4,1,2,4,8], z =[2,3,3,3,5,
     ax.set_title(title+dataset)
     
 
+
 ################
 
 ####   MAIN program
@@ -177,8 +171,10 @@ if len(data_iteration_folders)==0:
     print OUTPUT_DIR," not found: No output data folder was created yet, run first real_data2simulated_data.py using the input directory ", INPUT_DIR
     sys.exit(-1)
 
-all_data_df = pd.DataFrame(columns=('#time', 'x', 'y', 'z'))
-all_rewards_df = pd.DataFrame(columns=('#time', 'value'))
+records = pd.DataFrame(columns=('#time', 'x', 'y', 'z'))
+records_rewards = pd.DataFrame(columns=('#time', 'value'))
+
+positive_reward_ratio = 0
 
 print "READING DATA FOLDER STRUCTURE DIRECTORIES: ",len(data_iteration_folders)
 folder_pattern_index = 1
@@ -186,28 +182,29 @@ for folder in data_iteration_folders:
     record_folder = OUTPUT_DIR+ SUBFOLDER_CONTAINING_RECORDS_PATTERN_OUTPUT.replace('X', str(folder_pattern_index))
     # reading each record_X folder
     if os.path.exists(record_folder):
-        output_path = OUTPUT_DIR+ SUBFOLDER_CONTAINING_RECORDS_PATTERN_OUTPUT.replace('X', str(record_id))
-        data_file = output_path +output_f
-        reward_file = output_path +output_f_reward
+        output_path = OUTPUT_DIR+ SUBFOLDER_CONTAINING_RECORDS_PATTERN_OUTPUT.replace('X', str(folder_pattern_index))
+        data_file = output_path +OUTPUT_FILE
+        reward_file = output_path +OUTPUT_FILE_REWARD
 
         # adding each record's position data to a general overall dataframe
-        data_df = pd.read_csv(data_file, columns=('#time', 'x', 'y', 'z')) #    df_deltas = pd.DataFrame(columns=('#time', 'dx', 'dy', 'dz'))
-        rewards_df = pd.read_csv(reward_file, columns=('#time', 'value'))
+        data_df = pd.read_csv(data_file, sep='\t') #    df_deltas = pd.DataFrame(columns=('#time', 'dx', 'dy', 'dz'))
+        rewards_df = pd.read_csv(reward_file, sep='\t')
         print data_df.head()
         print rewards_df.head()
-        all_data_df.append(data_df, ignore_index= True)
-        all_rewards_df.append(data_df, ignore_index=True)
+        records = records.append(data_df)#, ignore_index= True)
+        records_rewards = records_rewards.append(rewards_df)#, ignore_index=True)
+        folder_pattern_index += 1
 
+# all_data_df = pd.concat(records)
+# all_rewards_df = pd.concat(records_rewards)
 # Sorting frames, as they are not written in the original yml files in timely consecutive real order
-all_data_df.sort_values(by='#time', inplace=True )
-all_rewards_df.sort_values(by='#time', inplace=True )
-print "Final data contains ", len(all_data_df), ' datapoints and ', len(rewards_df), ' rewards (', positive_reward_ratio,' % positive rewards)'
-print 'MIN_DISTANCE_THRESHOLD: ',MIN_DISTANCE_THRESHOLD
-print 'MAX_DIST_AMONG_ACTIONS: ',MAX_DIST_AMONG_ACTIONS
+records.sort_values(by='#time', inplace=True )
+records_rewards.sort_values(by='#time', inplace=True )
 
-print all_data_df.head()
-print all_rewards_df.head()
+print records.head()
+print records_rewards.head()
+print "Final data contains ", len(records), ' datapoints and ', len(records), ' rewards (', round(get_positive_reward_ratio(records_rewards), 3),'% positive rewards)'
 
 # Plot all actions (position) data
-print "PLOTTING ALL ACTUAL FILES WITHIN THE DIRECTORIES: ",len(data_iteration_folders)
-plot_states_and_rewards(all_data_df. all_rewards_df)
+print "PLOTTING ALL ACTUAL FILES WITHIN THE DIRECTORIES... Nr of records: ",len(data_iteration_folders), " in ",DATA_FOLDER
+plot_states_and_rewards(records, records_rewards)

@@ -6,7 +6,12 @@ require 'xlua'
 require 'math'
 require 'string'
 require 'nngraph'
-
+require 'MSDC'
+require 'functions'
+require 'printing'
+require "Get_Images_Set"
+require 'optim_priors'
+require 'definition_priors'
 -- THIS IS WHERE ALL THE CONSTANTS SHOULD COME FROM
 -- See const.lua file for more details
 require 'const'
@@ -15,13 +20,6 @@ require 'const'
 if USE_CUDA then
    require 'cunn'
 end
-
-require 'MSDC'
-require 'functions'
-require 'printing'
-require "Get_Images_Set"
-require 'optim_priors'
-require 'definition_priors'
 
 function Rico_Training(Models,priors_used)
    local rep_criterion=get_Rep_criterion()
@@ -78,8 +76,6 @@ function Rico_Training(Models,priors_used)
           loss_rep, gradRep=doStuff_Rep(Models,rep_criterion,batch,COEF_REP, action1, action2)
           TOTAL_LOSS_REP = loss_rep + TOTAL_LOSS_REP
       end
-
-      return loss_rep+loss_caus+loss_prop+loss_temp, gradParameters
     end
 
     --sgdState = sgdState or { learningRate = LR, momentum = mom,learningRateDecay = 5e-7,weightDecay=coefL2 }
@@ -97,7 +93,7 @@ function Rico_Training(Models,priors_used)
     return loss[1], grad
 end
 
-function train_Epoch(Models,priors_used)
+function train_Epoch(Models, priors_used)
     local NB_BATCHES= math.ceil(NB_SEQUENCES*AVG_FRAMES_PER_RECORD/BATCH_SIZE/(4+4+2+2))
     --AVG_FRAMES_PER_RECORD to get an idea of the total number of images
     --div by 12 because the network sees 12 images per iteration (i.e. record)
@@ -175,7 +171,7 @@ for nb_test=1, #PRIORS_CONFIGS_TO_APPLY do
    local priors_used= PRIORS_CONFIGS_TO_APPLY[nb_test]
    local Log_Folder=Get_Folder_Name(LOG_FOLDER, priors_used)
 
-   print("Experiment "..nb_test .." (using Log_Folder "..Log_Folder.."): Training model using priors config: ")
+   print("Experiment "..nb_test .." (Log_Folder="..Log_Folder.."): Training model using priors: ")
    print(priors_used)
    train_Epoch(Models, priors_used)
 

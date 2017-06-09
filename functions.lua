@@ -71,8 +71,8 @@ function getRandomBatchFromSeparateList(batch_size, mode)
          set=get_one_random_Temp_Set(#data1.images)
          im1,im2 = data1.images[set.im1], data1.images[set.im2]
 
-         print("im1",im1:size())
-         print("im2",im2:size())
+        --  print("im1",im1:size())
+        --  print("im2",im2:size())
 
          batch[1][i]=im1
          batch[2][i]=im2
