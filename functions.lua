@@ -112,7 +112,6 @@ function getRandomBatchFromSeparateList(batch_size, mode)
    return batch, set.act1, set.act2
 end
 
-<<<<<<< HEAD
 ---------------------------------------------------------------------------------------
 -- Function :	load_seq_by_id(id)
 -- Input (): id of the record file. Loads data of that sequence id, and if it does not exists, it creates the preprocessed data and saves into the PRELOAD_FOLDER

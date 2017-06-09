@@ -43,7 +43,7 @@ now = os.date("*t")
 if USE_CONTINUOUS then 
     DAY = 'Y'..now.year..'_D'..now.day..'_M'..now.month..'_H'..now.hour..'M'..now.min..'S'..now.sec..'_'..DATA_FOLDER..'_cont'
 else
-    DAY = 'Y'now.year..'_D'..now.day..'_M'..now.month..'_H'..now.hour..'M'..now.min..'S'..now.sec..'_'..DATA_FOLDER
+    DAY = 'Y'..now.year..'_D'..now.day..'_M'..now.month..'_H'..now.hour..'M'..now.min..'S'..now.sec..'_'..DATA_FOLDER
 end
 
 NAME_SAVE= 'model'..DAY
