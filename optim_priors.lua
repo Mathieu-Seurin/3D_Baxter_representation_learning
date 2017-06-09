@@ -8,7 +8,7 @@ function doStuff_temp(Models,criterion,Batch,coef)
    -- print("before batch")
    -- io.read()
 
-   
+
    if USE_CUDA then
       im1=Batch[1]:cuda()
       im2=Batch[2]:cuda()
@@ -20,7 +20,7 @@ function doStuff_temp(Models,criterion,Batch,coef)
    -- print("after batch")
    -- io.read()
 
-   
+
    Model=Models.Model1
    Model2=Models.Model2
    State1=Model:forward(im1)
@@ -28,7 +28,7 @@ function doStuff_temp(Models,criterion,Batch,coef)
 
    -- print("after forward")
    -- io.read()
-   
+
    assert(batchSize==State1:size(1), "Batch Size changed during 'forward method, maybe a nn.view is done badly ...")
 
    if USE_CUDA then
@@ -134,8 +134,6 @@ function doStuff_Prop(Models,criterion,Batch, coef, action1, action2)
 end
 
 function doStuff_Rep(Models,criterion,Batch, coef, action1, action2)
-    print('actions')
-    print(action1)
    -- Returns the loss and the gradient
    local coef= coef or 1
    local im1, im2, im3, im4, Model, Model2, Model3, Model4, State1, State2, State3, State4

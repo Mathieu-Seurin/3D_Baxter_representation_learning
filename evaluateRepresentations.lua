@@ -115,17 +115,20 @@ local function HeadPosFromTxts(txts, isData)
    end
    return T
 end
-	  for l, txt in ipairs(txts) do
-	     truth = getTruth(txt)
-	     for i, head_pos in ipairs(truth) do
-	        if head_pos < 0.1 and head_pos > -0.1 then
-	           y[#y+1] = 1
-	        else
-	           y[#y+1] = 2
-	        end
-	     end
-	  end
-    return torch.Tensor(y)
+
+local function RewardsFromTxts(txts)
+  y = {}
+  for l, txt in ipairs(txts) do
+     truth = getTruth(txt)
+     for i, head_pos in ipairs(truth) do
+        if head_pos < 0.1 and head_pos > -0.1 then
+           y[#y+1] = 1
+        else
+           y[#y+1] = 2
+        end
+     end
+  end
+  return torch.Tensor(y)
 end
 
 local function RandomBatch(X,y,BATCH_SIZE)

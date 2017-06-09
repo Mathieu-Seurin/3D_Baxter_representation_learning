@@ -55,7 +55,7 @@ function Rico_Training(Models,priors_used)
 
       -- print("after temp")
       -- io.read()
-      
+
       mode='Prop'
       if applying_prior(priors_used, mode) then
           batch, action1, action2 = getRandomBatchFromSeparateList(BATCH_SIZE,mode)

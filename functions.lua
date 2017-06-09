@@ -122,8 +122,8 @@ end
 ---------------------------------------------------------------------------------------
 function load_seq_by_id(id)
    local string_precomputed_data
-   
-   if IS_INCEPTION then 
+
+   if IS_INCEPTION then
       -- since the model require images to be a 3x299x299
       --and normalize differently, we need to adapt
       string_precomputed_data =
@@ -133,7 +133,7 @@ function load_seq_by_id(id)
       string_precomputed_data =
          PRELOAD_FOLDER..'preloaded_'..DATA_FOLDER..'_Seq'..id..'_normalized.t7'
    end
-   
+
    -- DATA EXISTS
    if file_exists(string_precomputed_data) then
       data = torch.load(string_precomputed_data)
@@ -190,7 +190,7 @@ function load_Part_list(list, txt, txt_reward, txt_state)
          im = image.scale(image.load(list[i],3,'float'), IM_LENGTH, IM_HEIGHT)
          table.insert(all_images, augmentation(im))
       end
-      
+
    else
       for i=1, #(Infos[1]) do
          table.insert(all_images, getImageFormated(list[i]))
@@ -405,7 +405,7 @@ end
 
 function scaleAndCrop(img)
    --No random cropping at the moment, but might me useful in the future.
-   
+
    local format=IM_LENGTH.."x"..IM_HEIGHT
    local imgAfter=image.scale(img,format)
 

@@ -53,13 +53,3 @@ COEF_PROP=1
 COEF_REP=1
 COEF_CAUS=1
 DIMENSION_OUT=5
-
-
-if DATA_FOLDER ~= BABBLING then
-    PRIORS_TO_APPLY ={{"Prop","Temp","Caus","Rep"}}
-else
-    -- Causality needs at least 2 different values of reward and in sparse dataset such as babbling_1, this does not occur always
-    PRIORS_TO_APPLY ={{"Rep","Prop","Temp"}}
-    print('WARNING: Causality prior will be ignored for dataset '..BABBLING)
-end
-

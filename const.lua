@@ -40,7 +40,7 @@ LAST_MODEL_FILE = 'lastModel.txt'
 
 now = os.date("*t")
 
-if USE_CONTINUOUS then 
+if USE_CONTINUOUS then
     DAY = 'Y'..now.year..'_D'..now.day..'_M'..now.month..'_H'..now.hour..'M'..now.min..'S'..now.sec..'_'..DATA_FOLDER..'_cont'
 else
     DAY = 'Y'..now.year..'_D'..now.day..'_M'..now.month..'_H'..now.hour..'M'..now.min..'S'..now.sec..'_'..DATA_FOLDER
@@ -211,7 +211,7 @@ end
 --In contiuous actions, we take 2 actions, if they are very similar, the coef factor
 --is high (1 if the actions are the same), if not, the coef is 0. You could add a small constraints because the network will see a lot
 --of actions that are not similar, so instead of taking '2 random actions', we take '2 random actions, but above a certain similarity threshold'
-MIN_DISTANCE_THRESHOLD = MAX_DIST_AMONG_ACTIONS/3  --TODO Find best value
+MAX_DIST_AMONG_ACTIONS_THRESHOLD = MAX_DIST_AMONG_ACTIONS/3  --TODO Find best value
 
 FILE_PATTERN_TO_EXCLUDE = 'deltas'
 print("\nUSE_CUDA ",USE_CUDA," \nUSE_CONTINUOUS ACTIONS: ",USE_CONTINUOUS)
