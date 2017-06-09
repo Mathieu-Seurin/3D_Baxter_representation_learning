@@ -34,7 +34,7 @@ EXTRAPOLATE_ACTION = false
 LR=0.001
 LR_DECAY = 1e-6
 
-SGD_METHOD = 'adagrad'--'adam' -- Can be adam or adagrad
+SGD_METHOD = 'adam' -- Can be adam or adagrad
 BATCH_SIZE = 2
 NB_EPOCHS=10
 

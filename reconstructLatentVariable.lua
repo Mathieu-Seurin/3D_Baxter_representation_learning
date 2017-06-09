@@ -93,6 +93,10 @@ function Rico_Training(Models,priors_used)
     --parameters, loss=optim.sgd(feval, parameters, sgdState)
     optimState={learningRate=LR, learningRateDecay=LR_DECAY}
 
+    -- print('adam(feval,parameters,optimState)')
+    -- print(feval)
+    -- print(parameters)
+    -- print(optimState)
     if SGD_METHOD == 'adagrad' then
         parameters,loss=optim.adagrad(feval,parameters,optimState)
     else
@@ -478,7 +482,7 @@ end
 --       end
 --       corr=Print_performance(models, imgs_test,txt_test,"Test",currentLogFolder,truth,plot)
 --       --show_figure(list_corr,currentLogFolder..'correlation.log','-')
---
+--PRIORS_CONFIGS_TO_APPLY
 --       --for reiforcement, we need mean and std to normalize representation
 --       print("SAVING MODEL AND REPRESENTATIONS")
 --       saveMeanAndStdRepr(imgs)
@@ -619,13 +623,13 @@ if NB_SEQUENCES ==0  then --or not folder_exists(DATA_FOLDER) then
 end
 
 if CAN_HOLD_ALL_SEQ_IN_RAM then
-   print("Preloading all sequences in memory in order to accelerate batch selection ")
+   print("Preloading all sequences in memory in order to accelerate batch selection ...")
    --[WARNING: In CPU only mode (USE_CUDA = false), RAM memory runs out]	 Torch: not enough memory: you tried to allocate 0GB. Buy new RAM!
    ALL_SEQ = {} -- Preload all the sequences instead of loading specific sequences during batch selection
-   for id=1, NB_SEQUENCES -1 do  -- We leave last sequence as test sequence to be predicted
+   for id=1, NB_SEQUENCES do
       ALL_SEQ[#ALL_SEQ+1] = load_seq_by_id(id)
    end
-   test_sequence = load_seq_by_id(NB_SEQUENCES)
+   test_sequence = ALL_SEQ[NB_SEQUENCES]
 end
 ---
 

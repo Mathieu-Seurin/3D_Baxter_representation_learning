@@ -435,7 +435,7 @@ end
 -- end
 
 function tensor2table(tensor)
-    -- This assumes `t1` is a 2-dimensional tensor!
+    -- Assumes `t1` is a 2-dimensional tensor
     local t2 = {}
     for i=1,t1:size(1) do
       t2[i] = {}
@@ -447,16 +447,6 @@ function tensor2table(tensor)
 end
 
 function table2tensor(table)
-  -- local tensorSize = table[1]:size()
-  -- local tensorSizeTable = {-1}
-  -- for i=1,tensorSize:size(1) do
-  --   tensorSizeTable[i+1] = tensorSize[i]
-  -- end
-  -- merge=nn.Sequential()
-  --   :add(nn.JoinTable(1))
-  --   :add(nn.View(unpack(tensorSizeTable)))
-  -- return merge:forward(table)
-
     t2 = torch.Tensor(table)--{table})
     -- print('converted to tensor')
     -- print(type(t2))
