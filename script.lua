@@ -50,10 +50,8 @@ function Rico_Training(Models,priors_used)
           TOTAL_LOSS_TEMP = loss_temp + TOTAL_LOSS_TEMP
       end
       --==========
-
       -- print("after temp")
       -- io.read()
-
       mode='Prop'
       if applying_prior(priors_used, mode) then
           batch, action1, action2 = getRandomBatchFromSeparateList(BATCH_SIZE,mode)
@@ -76,6 +74,8 @@ function Rico_Training(Models,priors_used)
           loss_rep, gradRep=doStuff_Rep(Models,rep_criterion,batch,COEF_REP, action1, action2)
           TOTAL_LOSS_REP = loss_rep + TOTAL_LOSS_REP
       end
+      --NOTE: shouldnt gradParameters be here  the sum of all gradRep, gradCaus, etc?
+      return loss_rep+loss_caus+loss_prop+loss_temp, gradParameters
     end
 
     --sgdState = sgdState or { learningRate = LR, momentum = mom,learningRateDecay = 5e-7,weightDecay=coefL2 }
@@ -83,9 +83,9 @@ function Rico_Training(Models,priors_used)
     optimState={learningRate=LR, learningRateDecay=LR_DECAY}
 
     if SGD_METHOD == 'adagrad' then
-        parameters,loss=optim.adagrad(feval,parameters,optimState)
+        parameters,loss = optim.adagrad(feval,parameters,optimState)
     else
-        parameters,loss=optim.adam(feval,parameters,optimState)
+        parameters,loss = optim.adam(feval,parameters,optimState)
     end
 
     -- loss[1] table of one value transformed in just a value
@@ -106,7 +106,7 @@ function train_Epoch(Models, priors_used)
 
        xlua.progress(0, NB_BATCHES)
        for numBatch=1, NB_BATCHES do
-          Loss,Grad = Rico_Training(Models,priors_used)
+          Loss, Grad = Rico_Training(Models,priors_used)
           xlua.progress(numBatch, NB_BATCHES)
        end
 
@@ -115,8 +115,9 @@ function train_Epoch(Models, priors_used)
        print("Loss Caus", TOTAL_LOSS_CAUS/NB_BATCHES/BATCH_SIZE)
        print("Loss Rep", TOTAL_LOSS_REP/NB_BATCHES/BATCH_SIZE)
        print("Saving model in ".. NAME_SAVE)
-       save_model(Models.Model1, NAME_SAVE)
+       save_model(Models.Model1, NAME_SAVE) --Do we need to write NB_EPOCH TIMES? isnt enough the last time to write once and not overwrite NB_EPOCH TIMES?
    end
+   return Models.Model1, NAME_SAVE
 end
 
 

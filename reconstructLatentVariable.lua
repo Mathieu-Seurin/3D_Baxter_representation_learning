@@ -22,117 +22,13 @@ require 'lfs'
 require 'math'
 require 'string'
 require 'MSDC'
---require 'script' --for trainEpoch
+require 'script' --for trainEpoch
 
 ---------------------------------------
 PLOT = true
---RELOAD_MODEL = true
 print('Reconstructing Latent Variable (hand position of Baxter arm) with USE_CUDA flag: '..tostring(USE_CUDA))
 print('DIMENSION_OUT: '..DIMENSION_OUT.." LearningRate: "..LR.." BATCH_SIZE: "..BATCH_SIZE..". Using data folder: "..DATA_FOLDER.." Model file Torch: "..MODEL_ARCHITECTURE_FILE)
 
-
-
-function Rico_Training(Models,priors_used)
-   local rep_criterion=get_Rep_criterion()
-   local prop_criterion=get_Prop_criterion()
-   local caus_criterion=get_Caus_criterion()
-   local temp_criterion=nn.MSDCriterion()
-
-   -- create closure to evaluate f(X) and df/dX
-   local feval = function(x)
-      loss_rep, loss_caus, loss_prop, loss_temp = 0, 0, 0, 0
-      -- just in case:
-      collectgarbage()
-
-      local action1, action2 --,lossTemp,lossProp,lossCaus,lossRep
-      -- get new parameters
-      if x ~= parameters then
-         parameters:copy(x)
-      end
-
-      -- reset gradients
-      gradParameters:zero()
-
-      --===========
-      local mode='Temp' --Same for continuous or discrete actions
-      if applying_prior(priors_used, mode) then
-          local batch=getRandomBatchFromSeparateList(BATCH_SIZE,mode)
-          loss_temp, grad=doStuff_temp(Models,temp_criterion, batch,COEF_TEMP)
-          TOTAL_LOSS_TEMP = loss_temp + TOTAL_LOSS_TEMP
-      end
-      --==========
-
-      -- print("after temp")
-      -- io.read()
-
-      mode='Prop'
-      if applying_prior(priors_used, mode) then
-          batch, action1, action2 = getRandomBatchFromSeparateList(BATCH_SIZE,mode)
-          loss_prop, gradProp=doStuff_Prop(Models,prop_criterion,batch,COEF_PROP, action1, action2)
-          TOTAL_LOSS_PROP = loss_prop + TOTAL_LOSS_PROP
-      end
-
-      --==========
-      mode='Caus'  --Not applied for BABBLING data (sparse rewards)
-      if applying_prior(priors_used, mode) then
-        batch, action1, action2 = getRandomBatchFromSeparateList(BATCH_SIZE,mode)
-        loss_caus, gradCaus=doStuff_Caus(Models,caus_criterion,batch,COEF_CAUS, action1, action2)
-        TOTAL_LOSS_CAUS = loss_caus + TOTAL_LOSS_CAUS
-      end
-
-      --==========
-      mode='Rep'
-      if applying_prior(priors_used, mode) then
-          batch, action1, action2 = getRandomBatchFromSeparateList(BATCH_SIZE,mode)
-          loss_rep, gradRep=doStuff_Rep(Models,rep_criterion,batch,COEF_REP, action1, action2)
-          TOTAL_LOSS_REP = loss_rep + TOTAL_LOSS_REP
-      end
-    end
-
-    --sgdState = sgdState or { learningRate = LR, momentum = mom,learningRateDecay = 5e-7,weightDecay=coefL2 }
-    --parameters, loss=optim.sgd(feval, parameters, sgdState)
-    optimState={learningRate=LR, learningRateDecay=LR_DECAY}
-
-    -- print('adam(feval,parameters,optimState)')
-    -- print(feval)
-    -- print(parameters)
-    -- print(optimState)
-    if SGD_METHOD == 'adagrad' then
-        parameters,loss=optim.adagrad(feval,parameters,optimState)
-    else
-        parameters,loss=optim.adam(feval,parameters,optimState)
-    end
-
-    -- loss[1] table of one value transformed in just a value
-    -- grad[1] we use just the first gradient to print the figure (there are 2 or 4 gradient normally)
-    return loss[1], grad
-end
-
-function train_Epoch(Models, priors_used)
-    local NB_BATCHES= math.ceil(NB_SEQUENCES*AVG_FRAMES_PER_RECORD/BATCH_SIZE/(4+4+2+2))
-    --AVG_FRAMES_PER_RECORD to get an idea of the total number of images
-    --div by 12 because the network sees 12 images per iteration (i.e. record)
-    -- (4*2 for rep and prop +  2*2 for temp and caus = 12)
-    print(NB_SEQUENCES..' : sequences. '..NB_BATCHES..' batches')
-
-    for epoch=1, NB_EPOCHS do
-       print('--------------Epoch : '..epoch..' ---------------')
-       TOTAL_LOSS_TEMP,TOTAL_LOSS_CAUS,TOTAL_LOSS_PROP, TOTAL_LOSS_REP = 0,0,0,0
-
-       xlua.progress(0, NB_BATCHES)
-       for numBatch=1, NB_BATCHES do
-          Loss,Grad = Rico_Training(Models,priors_used)
-          xlua.progress(numBatch, NB_BATCHES)
-       end
-
-       print("Loss Temp", TOTAL_LOSS_TEMP/NB_BATCHES/BATCH_SIZE)
-       print("Loss Prop", TOTAL_LOSS_PROP/NB_BATCHES/BATCH_SIZE)
-       print("Loss Caus", TOTAL_LOSS_CAUS/NB_BATCHES/BATCH_SIZE)
-       print("Loss Rep", TOTAL_LOSS_REP/NB_BATCHES/BATCH_SIZE)
-       print("Saving model in ".. NAME_SAVE)
-       save_model(Models.Model1, NAME_SAVE)
-   end
-end
 
 local function getReprFromImgs(imgs, PRELOAD_FOLDER, epresentations_name, model_full_path)
   -- we save all metrics that are going to be used in the network for
@@ -326,53 +222,6 @@ function createModelReconstruction()
    end
 end
 
--- function train(X,y, reconstruct, NB_SEQUENCES)
---    reconstruct = reconstruct or true
---
---    --local nbList = 10  --TODO nbList= #list_folders_images?
---    local numEx = X:size(1)
---    local splitTrainTest = 0.75
---
---    local sizeTest = math.floor(numEx/NB_SEQUENCES)
---
---    id_test = {{math.floor(numEx*splitTrainTest), numEx}}
---    X_test = X[id_test]
---    y_test = y[id_test]
---
---    id_train = {{1,math.floor(numEx*splitTrainTest)}}
---    X_train = X[id_train]
---    y_train = y[id_train]
---
---    if reconstruct then
---       model = createModelReconstruction()
---       print("Test accuracy before training",accuracy_reconstruction(X_test,y_test,model))
---
---    else
---       model = createModelReward()
---       print("Test accuracy before training",accuracy(X_test,y_test,model))
---       print("Random accuracy", rand_accuracy(y_test))
---    end
---    parameters,gradParameters = model:getParameters()
---
---    for epoch=1, NB_EPOCH do
---       local lossTemp=0
---       for numBatch=1, NB_BATCHES do
---          batch_temp, y = RandomBatch(X_train,y_train,BATCH_SIZE)
---          lossTemp = lossTemp + Rico_Training_evaluation(model,batch_temp,y, reconstruct, LR)
---       end
---
---       if epoch==NB_EPOCH then
---          print("lossTemp",lossTemp/NB_BATCHES)
---
---          if reconstruct then
---             print("Test accuracy = ",accuracy_reconstruction(X_test,y_test,model))
---          else
---             print("Test accuracy = ",accuracy(X_test,y_test,model))
---          end
---       end
---    end
--- end
-
 -- function createPreloadedDataFolder(list_folders_images,list_txt,LOG_FOLDER,use_simulate_images,LR, model_full_path)
 --   --  local BATCH_SIZE=16
 --   --  local NB_EPOCHS=2
@@ -541,7 +390,7 @@ function get_true_hand_position(data_file_with_hand_pos)
 	--DO NOT USE SHOULD BE DONE ALREADY IN getInfos
 	print ('get_true_hand_position tensor and label: ')
 	local truth={}
-	local tensor, label=tensorFromTxt(data_file_with_hand_pos)
+	local tensor, label=  tensorFromTxt(data_file_with_hand_pos)
 	--print (tensor) -- tensor and truth are a DoubleTensor of size 100*4
 	print ((#tensor[{}])[1])
 	for i=1, (#tensor[{}])[1] do
@@ -609,8 +458,53 @@ local function getRewardsFromTxts(txt_joint, nb_parts, part)
    return torch.Tensor(y)
 end
 
+function splitDataTrainTest(X, y, NB_SEQUENCES)
+     local nDatapoints = X:size(1)
+     local splitTrainTest = 0.75
+
+     local sizeTest = math.floor(nDatapoints/NB_SEQUENCES)--
+
+     id_test = {{math.floor(NB_SEQUENCES*splitTrainTest), NB_SEQUENCES}}
+     X_test = X[id_test]
+     y_test = y[id_test]
+
+     id_train = {{1,math.floor(nDatapoints *splitTrainTest)}}
+     X_train = X[id_train]
+     y_train = y[id_train]
+     print('Split for train and test: ',NB_SEQUENCES, ": ")
+     print(id_test)
+     print(X_train)
+     return X_train, y_train, X_test, y_test
+end
+
+function predict(X_test, y_test, prior)
+  --    parameters,gradParameters = model:getParameters()
+      --    if RECONSTRUCT then
+      --       model = createModelReconstruction()
+     --        reconstruction_errors = get_3Dpos_reconstruction_error(getX(test_sequence), getY(test_sequence))
+      --       print("Test accuracy before training",accuracy_reconstruction(X_test,y_test,model))
+      --    else
+      --       model = createModelReward()
+      --       print("Test accuracy before training",get_reward_error(X_test, y_test, model) --accuracy(X_test,y_test,model))
+      --       print("Random accuracy", rand_accuracy(y_test))
+      --    end
+  --       end
+  --    end
+  return Y_hat
+end
 
 ------------------------------------
+---------- MAIN PROGRAM ------------
+--TODO: command line params:
+-- Command-line options
+-- local cmd = torch.CmdLine()
+-- cmd:option('-optimiser', 'sgd', 'Optimiser : adam|sgd|rmsprop')
+-- cmd:option('-execution', 'release', 'execution : debug|release')
+-- cmd:option('-network', 'deep', 'network : deep|base')
+-- cmd:option('-model', 'AE', 'model : AE|DAE')
+-- cmd:option('-dimension', '1D', 'dimension : 1D|3D')
+-- opt = cmd:parse(arg)
+
 -- Our representation learnt should be coordinate independent, as it is not aware of
 -- what is x,y,z and thus, we should be able to reconstruct the state by switching
 -- to y,x,z, or if we add Gaussian noise to the true positions x,y,z of Baxter arm.
@@ -626,13 +520,15 @@ if CAN_HOLD_ALL_SEQ_IN_RAM then
    print("Preloading all sequences in memory in order to accelerate batch selection ...")
    --[WARNING: In CPU only mode (USE_CUDA = false), RAM memory runs out]	 Torch: not enough memory: you tried to allocate 0GB. Buy new RAM!
    ALL_SEQ = {} -- Preload all the sequences instead of loading specific sequences during batch selection
+   test_sequence =  train_sequences = {}
    for id=1, NB_SEQUENCES do
       ALL_SEQ[#ALL_SEQ+1] = load_seq_by_id(id)
+      train_sequences[#train_sequences+1] = ALL_SEQ[#ALL_SEQ] --TODO fix loadTrainTest to use load_seq_by_id
    end
    test_sequence = ALL_SEQ[NB_SEQUENCES]
 end
 ---
-
+RECONSTRUCT = true  -- false if we want to predict instead the reward
 for nb_test=1, #PRIORS_CONFIGS_TO_APPLY do
    if RELOAD_MODEL then
       print("Reloading model in "..SAVED_MODEL_PATH)
@@ -653,15 +549,11 @@ for nb_test=1, #PRIORS_CONFIGS_TO_APPLY do
    Model2=Model:clone('weight','bias','gradWeight','gradBias','running_mean','running_std')
    Model3=Model:clone('weight','bias','gradWeight','gradBias','running_mean','running_std')
    Model4=Model:clone('weight','bias','gradWeight','gradBias','running_mean','running_std')
-   Models={Model1=Model,Model2=Model2,Model3=Model3,Model4=Model4}
+   Models = {Model1=Model,Model2=Model2,Model3=Model3,Model4=Model4}
 
-   local priors_used= PRIORS_CONFIGS_TO_APPLY[nb_test]
-   local Log_Folder=Get_Folder_Name(LOG_FOLDER, priors_used)
-
-   print("Experiment "..nb_test .." (using Log_Folder "..Log_Folder.."): Training model using priors config: ")
-   print(priors_used)
+   local priors_used= PRIORS_CONFIGS_TO_APPLY[nb_test]    --local Log_Folder=Get_Folder_Name(LOG_FOLDER, priors_used)
    path_to_model_trained = train_Epoch(Models, priors_used)
-   predicted_states_for_test_seq = predict_state(path_to_model_trained, test_sequence)
-   reconstruction_errors = get_reconstruction_error(test_sequence, predicted_states_for_test_seq)
+   test_sequence_yhat = predict(path_to_model_trained, test_sequence, priors_used)
+   print (test_sequence_yhat)
    print_experiment_config()
 end

@@ -25,20 +25,6 @@ if USE_CUDA and USE_SECOND_GPU then
    cutorch.setDevice(2)
 end
 
-
---======================================================
---Continuous actions SETTINGS
---======================================================
-USE_CONTINUOUS = true --A switch between discrete and continuous actions (translates into calling getRandomBatchFromSeparateListContinuous instead of getRandomBatchFromSeparateList
-ACTION_AMPLITUDE = 0.01
--- The following parameter eliminates the need of finding close enough actions for assessing all priors except for the temporal.one.
--- If the actions are too far away, they will make the gradient 0 and will not be considered for the update rule
-CONTINUOUS_ACTION_SIGMA = 0.3 -- 0.1 for mobileData plots all concentrated.
---In contiuous actions, we take 2 actions, if they are very similar, the coef factor
---is high (1 if the actions are the same), if not, the coef is 0. You could add a small constraints because the network will see a lot
---of actions that are not similar, so instead of taking '2 random actions', we take '2 random actions, but above a certain similarity threshold'
-MAX_DIST_AMONG_ACTIONS_THRESHOLD = 0.5--TODO Find best value
-
 --=====================================
 --DATA AND LOG FOLDER NAME etc..
 --====================================

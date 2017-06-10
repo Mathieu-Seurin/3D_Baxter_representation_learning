@@ -273,8 +273,9 @@ end
 function print_experiment_config()
     print("============ Experiment run successfully: DATA USED =========\n",
                         DATA_FOLDER,
-                        "\nUSE_CUDA ",USE_CUDA,", USE_CONTINUOUS ACTIONS: ",USE_CONTINUOUS, " USED PRIORS: ")
-    print(PRIORS_CONFIGS_TO_APPLY)
-    print('MAX_DIST_AMONG_ACTIONS_THRESHOLD: '..MAX_DIST_AMONG_ACTIONS_THRESHOLD, ' CONTINUOUS_ACTION_SIGMA: '..CONTINUOUS_ACTION_SIGMA)
+												" (LOG_FOLDER ", LOG_FOLDER,
+                        ")\nUSE_CUDA ",USE_CUDA,", USE_CONTINUOUS ACTIONS: ",USE_CONTINUOUS, " MODEL: ",MODEL_ARCHITECTURE_FILE,". USED PRIORS: ")
+    print(PRIORS_CONFIGS_TO_APPLY)    
+    print('MAX_DIST_AMONG_ACTIONS_THRESHOLD: ',MAX_DIST_AMONG_ACTIONS_THRESHOLD, ' CONTINUOUS_ACTION_SIGMA: ',CONTINUOUS_ACTION_SIGMA)
     print("\n================================")
 end
