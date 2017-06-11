@@ -3,7 +3,7 @@ require 'functions'
 images_folder = MOBILE_ROBOT
 list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(images_folder)
 
-print("list_txt_button",list_txt_button)
+print("Reading rewards from file list_txt_button= ",list_txt_button)
 all_button = {}
 
 for num_line, seq_str in ipairs(list_txt_button) do

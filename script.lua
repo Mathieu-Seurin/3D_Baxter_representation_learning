@@ -114,7 +114,6 @@ function train_Epoch(Models, priors_used)
        print("Loss Prop", TOTAL_LOSS_PROP/NB_BATCHES/BATCH_SIZE)
        print("Loss Caus", TOTAL_LOSS_CAUS/NB_BATCHES/BATCH_SIZE)
        print("Loss Rep", TOTAL_LOSS_REP/NB_BATCHES/BATCH_SIZE)
-       print("Saving model in ".. NAME_SAVE)
        save_model(Models.Model1, NAME_SAVE) --Do we need to write NB_EPOCH TIMES? isnt enough the last time to write once and not overwrite NB_EPOCH TIMES?
    end
    return Models.Model1, NAME_SAVE
@@ -135,7 +134,6 @@ if LOGGING_ACTIONS then
    for i=1,NB_SEQUENCES do
       LOG_ACTION[#LOG_ACTION+1] = {}
    end
-
 end
 
 if CAN_HOLD_ALL_SEQ_IN_RAM then
@@ -175,7 +173,7 @@ for nb_test=1, #PRIORS_CONFIGS_TO_APPLY do
    print("Experiment "..nb_test .." (Log_Folder="..Log_Folder.."): Training model using priors: ")
    print(priors_used)
    train_Epoch(Models, priors_used)
-
+   print_experiment_config()
 end
 
 if LOGGING_ACTIONS then
@@ -188,5 +186,3 @@ if LOGGING_ACTIONS then
       print(key,i)
    end
 end
-
-print_experiment_config()

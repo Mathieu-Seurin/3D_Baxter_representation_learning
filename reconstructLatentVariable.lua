@@ -458,23 +458,56 @@ local function getRewardsFromTxts(txt_joint, nb_parts, part)
    return torch.Tensor(y)
 end
 
-function splitDataTrainTest(X, y, NB_SEQUENCES)
-     local nDatapoints = X:size(1)
-     local splitTrainTest = 0.75
+-- function splitDataTrainTest(X, y, NB_SEQUENCES)
+--      local nDatapoints = X:size(1)
+--      local splitTrainTest = 0.75
+--
+--      local sizeTest = math.floor(nDatapoints/NB_SEQUENCES)--
+--
+--      id_test = {{math.floor(NB_SEQUENCES*splitTrainTest), NB_SEQUENCES}}
+--      X_test = X[id_test]
+--      y_test = y[id_test]
+--
+--      id_train = {{1,math.floor(nDatapoints *splitTrainTest)}}
+--      X_train = X[id_train]
+--      y_train = y[id_train]
+--      print('Split for train and test: ',NB_SEQUENCES, ": ")
+--      print(id_test)
+--      print(X_train)
+--      return X_train, y_train, X_test, y_test
+-- end
 
-     local sizeTest = math.floor(nDatapoints/NB_SEQUENCES)--
+function get_all_rewards_from_seq(data_seq)
+  return {}
+end
 
-     id_test = {{math.floor(NB_SEQUENCES*splitTrainTest), NB_SEQUENCES}}
-     X_test = X[id_test]
-     y_test = y[id_test]
+function get_x_y_from_data_seq(data_seq)
+  y = get_all_rewards()
+  return x, y
+end
 
-     id_train = {{1,math.floor(nDatapoints *splitTrainTest)}}
-     X_train = X[id_train]
-     y_train = y[id_train]
-     print('Split for train and test: ',NB_SEQUENCES, ": ")
-     print(id_test)
-     print(X_train)
-     return X_train, y_train, X_test, y_test
+function get_train_test_fold_k(all_data_seqs, k)
+  --returns split of data for fold 1 for LOO cross validation
+  train_seqs = {}
+  test_seqs = {}
+
+  train_seqs = table.remove(all_data_seqs, k)
+  test_seqs = all_data_seqs[k]
+
+  splitTrainTest = 0.75
+   id_test = {{math.floor(NB_SEQUENCES*splitTrainTest), NB_SEQUENCES}}
+   X_test = X[id_test]
+   y_test = y[id_test]
+
+   id_train = {{1,math.floor(nDatapoints *splitTrainTest)}}
+   X_train = X[id_train]
+   y_train = y[id_train]
+   print('Split for train and test: ',k, ": ")
+   print(id_test)
+   print(X_train)
+   assert(table.getn(X_train)==table.getn(y_train), 'X and y training should be same size')
+   assert(table.getn(X_test)==table.getn(y_test), 'X and y test should be same size')
+   return X_train, y_train, X_test, y_test
 end
 
 function predict(X_test, y_test, prior)
@@ -490,9 +523,71 @@ function predict(X_test, y_test, prior)
       --    end
   --       end
   --    end
-  return Y_hat
+  accuracy = MSE(y_train, yhat)
+  print ('yhat and accuracy')
+  print(yhat)
+  print(accuracy)
+  return yhat, accuracy
 end
 
+function load_observed_states(record_path)
+  ts_states = record2tensor(record_path) -- todo need ts to sort it?
+  rewards = record2tensor(reward_path)
+  data_x_y = {ts_states, rewards}
+  table.sort(data_x_y, function (a,b) return a[1] < b[1] end)
+  return data_x_y
+end
+
+--returns the representation of the image (a tensor of size {1xDIM})
+function predict(imagesFolder, record_id)
+  tempSeq = {}
+  for dir_seq_str in lfs.dir(imagesFolder) do
+     if string.find(dir_seq_str,'record'..str(record_id)) then
+        print("Predicting data sequence folder: ",dir_seq_str)
+        local imagesPath = imagesFolder..'/'..dir_seq_str..'/'..SUB_DIR_IMAGE
+        for imageStr in lfs.dir(imagesPath) do
+           if string.find(imageStr,'jpg') then
+              local fullImagesPath = imagesPath..'/'..imageStr
+              local reprStr = ''
+              --img = getImageFormated(fullImagesPath):cuda():reshape(1,3,200,200)
+              if USE_CUDA then
+                img = getImageFormated(fullImagesPath):cuda():reshape(1,3,200,200)
+              else
+                img = getImageFormated(fullImagesPath):double():reshape(1,3,200,200)
+              end
+              repr = model:forward(img)
+              print (' repr')
+              print (type(repr))
+              print(repr)
+              tempSeq[#tempSeq+1] = {fullImagesPath, fullImagesPath..' '..reprStr}
+              -- we write to file only second part of the tuple and use the first as key to sort them
+           end
+        end
+     end
+  end
+  return repr
+end
+
+function get_reconstruction_error_MSE(real, predicted)
+  return MSE(real, predicted)
+end
+
+function LOO_cross_validation(data_folder, data_seqs)
+  kfolds = NB_SEQUENCES
+  totalMSE = 0
+  for k=1, kfolds do
+    x_train, y_train, x_test, y_test = get_x_y_from_data_seq(data_seqs, k)
+    reconstructed_states =  = predict(data_folder, k)
+    mse = get_reconstruction_error_MSE(observed_states, reconstructed_states)
+    totalMSE += mse
+  end
+  totalMSE = totalMSE / kfolds
+  if RECONSTRUCT then
+    print('LOO_cross_validation MSE (Reconstruction error): '..acc)
+  else
+    print('LOO_cross_validation MSE (Predicting reward): '..acc)
+  return totalMSE
+end
 ------------------------------------
 ---------- MAIN PROGRAM ------------
 --TODO: command line params:
@@ -520,12 +615,9 @@ if CAN_HOLD_ALL_SEQ_IN_RAM then
    print("Preloading all sequences in memory in order to accelerate batch selection ...")
    --[WARNING: In CPU only mode (USE_CUDA = false), RAM memory runs out]	 Torch: not enough memory: you tried to allocate 0GB. Buy new RAM!
    ALL_SEQ = {} -- Preload all the sequences instead of loading specific sequences during batch selection
-   test_sequence =  train_sequences = {}
    for id=1, NB_SEQUENCES do
-      ALL_SEQ[#ALL_SEQ+1] = load_seq_by_id(id)
-      train_sequences[#train_sequences+1] = ALL_SEQ[#ALL_SEQ] --TODO fix loadTrainTest to use load_seq_by_id
+      ALL_SEQ[#ALL_SEQ+1] = load_seq_by_id(id)--TODO fix loadTrainTest to use load_seq_by_id
    end
-   test_sequence = ALL_SEQ[NB_SEQUENCES]
 end
 ---
 RECONSTRUCT = true  -- false if we want to predict instead the reward
@@ -552,8 +644,7 @@ for nb_test=1, #PRIORS_CONFIGS_TO_APPLY do
    Models = {Model1=Model,Model2=Model2,Model3=Model3,Model4=Model4}
 
    local priors_used= PRIORS_CONFIGS_TO_APPLY[nb_test]    --local Log_Folder=Get_Folder_Name(LOG_FOLDER, priors_used)
-   path_to_model_trained = train_Epoch(Models, priors_used)
-   test_sequence_yhat = predict(path_to_model_trained, test_sequence, priors_used)
-   print (test_sequence_yhat)
+   path_to_model_trained = train_Epoch(Models, priors_used) --todo
+   LOO_cross_validation(DATA_FOLDER, ALL_SEQ)
    print_experiment_config()
 end

@@ -1,4 +1,5 @@
 require 'const'
+require 'functions' -- for cosineDistance
 
 ---------------------------------------------------------------------------------------
 -- Function : images_Paths(path)  #TODO remove to avoid conflict with 1D
@@ -298,16 +299,16 @@ function get_two_Prop_Pair(Infos1, Infos2)
    error("PROP WATCHDOG ATTACK!!!!!!!!!!!!!!!!!!")
 end
 
-
 ---------------------------------------------------------------------------------------
 -- Function : get_one_random_Caus_Set(Infos1, Infos2)
--- Input  -- I need to search images representing a starting state.
--- then the same action applied to this state (the same variation of joint) should lead to a different reward.
--- for instance, we choose as reward the fact of having a joint value = 0
--- NB : the two states will be took from different list but the two list can be the same
--- Output : structure with 4 indices which represente a quadruplet (2 Pair of images from 2 different list) for Training with prop prior,
+-- Input We need to find images representing a starting state, then the same
+-- action applied to this state. The same variation of joint or close enough, should lead to a different reward.
+-- for instance, we choose as reward the fact of having a joint value = 0  TODO: ???
+-- NB : the two states will be took from different lists but the two list can be the same
+-- Output : structure with 4 indices which represente a quadruplet (2 Pair of images from 2 different list) for Training with caus prior,
 --  and an array of the delta in between actions (the distance in between 2 actions as Euclidean distance)
--- The variation of joint for one pair should be close enough (<CLOSE_ENOUGH_PRECISION_THRESHOLD) in continuous actions, to the variation for the second
+-- The variation of the joint position for one pair should be close enough
+-- (< MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD) in continuous actions, to the variation for the positiono in the second frame
 function get_one_random_Caus_Set(Infos1, Infos2)
    local size1=#Infos1[1]
    local size2=#Infos2[1]
@@ -352,7 +353,7 @@ function get_one_random_Caus_Set(Infos1, Infos2)
          end
 
          --if Infos1.reward[id_second_action_begin]==0 and Infos1.reward[id_second_action_end]~=reward1 then
-         if Infos1.reward[id_second_action_end]~=reward1 then -- The constrain is softer
+         if Infos1.reward[id_second_action_end]~=reward1 then -- The constraint is softer
             action2 = action_amplitude(Infos1, id_second_action_begin, id_second_action_end)
 
             --Visualize images taken if you want
@@ -395,6 +396,7 @@ end
 
 function clamp_causality_prior_value(value, prec, action_amplitude)
    -- ======================================================
+   -- Selects the next available consecutive action with a given hard-coded action_amplitude
    -- WARNING THIS VERY DIRTY, WE SHOULD DO CONTINOUS PRIOR
    -- INSTEAD OF THIS
    -- ======================================================
@@ -425,9 +427,9 @@ end
 -- function actions_are_close_enough(action1, action2)
 --   --print(action1)
 --   local close_enough = true
---   --for each dim, check that the magnitude of the action is close (smaller than MAX_DIST_AMONG_ACTIONS)
+--   --for each dim, check that the magnitude of the action is close (smaller than MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD)
 --   for dim=1, DIMENSION_IN do
---      close_enough = close_enough and arrondit(action1[dim] - action2[dim]) < MAX_DIST_AMONG_ACTIONS_THRESHOLD
+--      close_enough = close_enough and arrondit(action1[dim] - action2[dim]) < MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD
 --   end
 --   print("actions_are_close_enough ")
 --   print(close_enough)
@@ -454,27 +456,25 @@ function table2tensor(table)
     return t2
 end
 
-
-function action_vectors_are_similar_enough(action1, action2)--tensor1xX, tensor2xX)
-    --{
-    -- examples of actions--
-    --   1 : -1.3799996700925e-09
+---------------------------------------------------------------------------------------
+-- Function : action_vectors_are_similar_enough(action1, action2)
+-- Input (): 2 tables of dim DIMENSION_IN
+-- Because actions are vectors (from one position state to the next one), the distance
+-- between actions is 1 - cos similarity (act1, act2).
+-- Output (): Returns true if the cosDistance is smaller than MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD
+---------------------------------------------------------------------------------------
+function action_vectors_are_similar_enough(action1, action2)
+    --    -- examples of action
+    --  {{  1 : -1.3799996700925e-09
     --   2 : 0.372556582859
-    -- }
-    --}    -- print(#action1) 2
-  local close_enough = true
-  cos = nn.CosineDistance()
-
-  t1 = table2tensor(action1)
-  t2 = table2tensor(action2)
-  cosDistance = cos:forward({t1, t2})
-  if math.abs(cosDistance[1]) < MAX_DIST_AMONG_ACTIONS_THRESHOLD then
-      close_enough = true
+    -- }}
+  cosDistance = cosineDistance(action1, action2)
+  if math.abs(cosDistance[1]) < MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD then
+      local close_enough = true
   else
-      close_enough = false
+      local close_enough = false
   end
-  -- print("action_vectors_are_similar_enough: cosDistance:")
-  -- print(close_enough)
-  -- print(cosDistance)
+  print("action_vectors_are_similar_enough cosDistance:")
+  print(cosDistance)
   return close_enough
 end

@@ -1,3 +1,5 @@
+require 'functions'
+
 function doStuff_temp(Models,criterion,Batch,coef)
    -- Returns the loss and the gradient
    local coef= coef or 1
@@ -12,7 +14,6 @@ function doStuff_temp(Models,criterion,Batch,coef)
       im1=Batch[1]
       im2=Batch[2]
    end
-
 
    Model=Models.Model1
    Model2=Models.Model2
@@ -177,19 +178,17 @@ end
 
 --------------------------------------------------------------
 ----CONTINUOUS ACTION PRIORS VERSION
-function actions_distance(action1, action2)
-  -- Returns a double indicating the Euclidean distance among actions
-  local distance = 0
-  --for each dim, check that the magnitude of the action is close
-  for dim=1, DIMENSION_IN do
-     distance = distance + (math.pow(arrondit(action1[dim]) - arrondit(action2[dim]), 2))
-  end
-  return math.sqrt(distance)
-end
+----------------------------------------
 
+---------------------------------------------------------------------------------------
+-- Function :get_continuous_action_factor_term(action1, action2)
+-- Input ():
+-- Output ():
+-- This methods avoids having to check for actions that are close enough or
+-- far away enough for the priors constraints by multiplying by a continuous
+-- factor  based on sigma CONTINUOUS_ACTION_SIGMA
+---------------------------------------------------------------------------------------
 function get_continuous_action_factor_term(action1, action2)
-  -- This methods avoids having to check for actions that are close enough or
-  -- far away enough for the priors constraints by multiplying by a continuous
-  -- factor  based on sigma CONTINUOUS_ACTION_SIGMA
-  return math.exp((-1 * actions_distance(action1, action2))/CONTINUOUS_ACTION_SIGMA)
+  --return math.exp((-1 * actions_difference(action1, action2))/CONTINUOUS_ACTION_SIGMA)
+  return math.exp((-1 * cosineDistance(action1, action2))/CONTINUOUS_ACTION_SIGMA)
 end

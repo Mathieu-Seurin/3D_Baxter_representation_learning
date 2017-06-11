@@ -18,7 +18,7 @@ function save_model(model)
    os.execute("cp hyperparams.lua "..path)
 
    torch.save(file_string, model)
-   print("Saved model "..NAME_SAVE.." at : "..path)
+   print("Saved model at : "..path)
 
    f = io.open(LAST_MODEL_FILE,'w')
    f:write(path..'\n'..NAME_SAVE..'.t7')
@@ -584,4 +584,57 @@ function visualize_set(im1,im2,im3,im4)
       image.display{image=imgMerge, win=WINDOW}
    end
    io.read()
+end
+
+
+
+---------------------------------------------------------------------------------------
+-- Function : actions_difference(action1, action2).
+-- Input: two vectors representing 2 actions (because actions represent the movement of the arm from one position state to the next one)
+-- Output (): Returns a double indicating the MSE (Euclidean distance for our vectors) among actions
+---------------------------------------------------------------------------------------
+function actions_difference(action1, action2)
+  --for each dim, check that the magnitude of the action is close
+  return MSE(action1, action2) --TODO change to cosDistance?
+  --return CosineDistance(action1, action2)
+end
+
+---------------------------------------------------------------------------------------
+-- Function : MSE(vec1, vec2, dim)
+-- Output (): Returns a double indicating the Euclidean distance among the two points of dimension dim
+---------------------------------------------------------------------------------------
+function MSE(vec1, vec2)
+  local mse = 0
+  --for each dimension, add the magnitude of the difference
+  for dim=1, #(vec1[1]) do
+     mse = mse + (math.pow(arrondit(vec1[dim]) - arrondit(vec2[dim]), 2))
+  end
+  print ('mse v1 and 2: ')
+  print(vec1)
+  print('arrondit')
+  print(vec1[dim])
+  print(arrondit(vec1[dim]))
+  print(vec2)
+  if USE_CUDA then
+    print(vec2[dim]:cudaHalf())
+    print('half precision')
+  end
+  print(math.sqrt(mse))
+  print("MSE for vectors size ", #(vec1[1])
+  return math.sqrt(mse)
+end
+
+
+---------------------------------------------------------------------------------------
+-- Function : action_vectors_are_similar_enough(action1, action2)
+-- Input (): 2 tables of dim DIMENSION_IN
+-- Cos(a,b) can be in [-1, 1] (two vectors
+-- at 90° have a similarity of 0, and two vectors diametrically opposed have a similarity of -1,
+-- independent of their magnitude.
+---------------------------------------------------------------------------------------
+function cosineDistance(table1, table2)
+  -- Returns 1- cos(table1, table2)
+  cos = nn.CosineDistance()
+  --return cos:forward({t1, t2})-- input is Tensors
+  return cos:forward({table2tensor(table1), table2tensor(table1)})
 end

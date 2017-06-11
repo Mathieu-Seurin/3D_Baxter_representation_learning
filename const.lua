@@ -41,7 +41,7 @@ LAST_MODEL_FILE = 'lastModel.txt'
 now = os.date("*t")
 
 if USE_CONTINUOUS then
-    DAY = 'Y'..now.year..'_D'..now.day..'_M'..now.month..'_H'..now.hour..'M'..now.min..'S'..now.sec..'_'..DATA_FOLDER..'_cont'
+    DAY = 'Y'..now.year..'_D'..now.day..'_M'..now.month..'_H'..now.hour..'M'..now.min..'S'..now.sec..'_'..DATA_FOLDER..'_cont'..'_MCD0.'..str(MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD*10)..'_S0.'..str(CONTINUOUS_ACTION_SIGMA*10))
 else
     DAY = 'Y'..now.year..'_D'..now.day..'_M'..now.month..'_H'..now.hour..'M'..now.min..'S'..now.sec..'_'..DATA_FOLDER
 end
@@ -91,7 +91,7 @@ IM_CHANNEL = 3 --image channels (RGB)
 PRIORS_CONFIGS_TO_APPLY ={{"Prop","Temp","Caus","Rep"}}
 
 if DATA_FOLDER == SIMPLEDATA3D then
-   CLAMP_CAUSALITY = true
+   CLAMP_CAUSALITY = true  --TODO: make false when continuous works
 
    MIN_TABLE = {0.42,-0.2,-10} -- for x,y,z doesn't really matter in fact
    MAX_TABLE = {0.8,0.7,10} -- for x,y,z doesn't really matter in fact
@@ -108,7 +108,6 @@ if DATA_FOLDER == SIMPLEDATA3D then
 
    SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
    AVG_FRAMES_PER_RECORD = 95
-   MAX_DIST_AMONG_ACTIONS = 8 -- TODO set after running report_results.py
 
    MIN_TABLE = {0.42,-0.1,-10} -- for x,y,z doesn't really matter in fact
    MAX_TABLE = {0.75,0.6,10} -- for x,y,z doesn't really matter in fact
@@ -173,11 +172,11 @@ elseif DATA_FOLDER == BABBLING then
 
   -- Causality needs at least 2 different values of reward and in sparse dataset such as babbling_1, this does not occur always
   --PRIORS_TO_APPLY ={{"Rep","Prop","Temp"}}
-  PRIORS_CONFIGS_TO_APPLY ={{"Temp"}}--, {"Prop","Temp"}, {"Prop","Rep"},  {"Temp","Rep"}, {"Prop","Temp","Rep"}}  --TODO report 1 vs 2 vs 3 priors
-  --print('WARNING: Causality prior, at least, will be ignored for dataset because of too sparse rewards. TODO: convert to 3 reward values'..BABBLING)
+  PRIORS_CONFIGS_TO_APPLY ={{"Temp"}}--, {"Prop","Temp"}, {"Prop","Rep"},  {"Temp","Rep"}, {"Prop","Temp","Rep"}}  --TODO report 1 vs 2 vs 3 priors, add all prioris when Babbling contains +1 reward value
+  --print('WARNING: Causality prior, at least, will be ignored for dataset because of too sparse rewards (<2 value types). TODO: convert to 3 reward values'..BABBLING)
 
 elseif DATA_FOLDER == PUSHING_BUTTON_AUGMENTED then
-    CLAMP_CAUSALITY = true
+    CLAMP_CAUSALITY = true --TODO: make false when continuous works
 
     MIN_TABLE = {0.42,-0.2,-10} -- for x,y,z
     MAX_TABLE = {0.8,0.7,10} -- for x,y,z

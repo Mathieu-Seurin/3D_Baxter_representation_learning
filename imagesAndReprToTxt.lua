@@ -32,8 +32,38 @@ else
 end
 
 outStr = ''
-
 tempSeq = {}
+
+-- --returns the representation of the image (a tensor of size {1xDIM})
+-- function predict(imagesFolder, record_id)
+--   tempSeq = {}
+--   for dir_seq_str in lfs.dir(imagesFolder) do
+--      if string.find(dir_seq_str,'record'..str(record_id)) then
+--         print("Predicting data sequence folder: ",dir_seq_str)
+--         local imagesPath = imagesFolder..'/'..dir_seq_str..'/'..SUB_DIR_IMAGE
+--         for imageStr in lfs.dir(imagesPath) do
+--            if string.find(imageStr,'jpg') then
+--               local fullImagesPath = imagesPath..'/'..imageStr
+--               local reprStr = ''
+--               --img = getImageFormated(fullImagesPath):cuda():reshape(1,3,200,200)
+--               if USE_CUDA then
+--                 img = getImageFormated(fullImagesPath):cuda():reshape(1,3,200,200)
+--               else
+--                 img = getImageFormated(fullImagesPath):double():reshape(1,3,200,200)
+--               end
+--               repr = model:forward(img)
+--               print (' repr')
+--               print (type(repr))
+--               print(repr)
+--               tempSeq[#tempSeq+1] = {fullImagesPath, fullImagesPath..' '..reprStr}
+--               -- we write to file only second part of the tuple and use the first as key to sort them
+--            end
+--         end
+--      end
+--   end
+--   return repr
+-- end  --TODO call predict and add predict to script?
+
 for dir_seq_str in lfs.dir(imagesFolder) do
    if string.find(dir_seq_str,'record') then
       print("Data sequence folder: ",dir_seq_str)
@@ -57,11 +87,10 @@ for dir_seq_str in lfs.dir(imagesFolder) do
                --print (reprStr)
             end
             tempSeq[#tempSeq+1] = {fullImagesPath, fullImagesPath..' '..reprStr}
+            -- we write to file only second part of the tuple and use the first as key to sort them
          end
       end
    end
-
-
 end
 
 table.sort(tempSeq, function (a,b) return a[1] < b[1] end)
