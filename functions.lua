@@ -620,7 +620,7 @@ function MSE(vec1, vec2)
     print('half precision')
   end
   print(math.sqrt(mse))
-  print("MSE for vectors size ", #(vec1[1])
+  print("MSE for vectors size ", #(vec1[1]))
   return math.sqrt(mse)
 end
 
@@ -636,5 +636,5 @@ function cosineDistance(table1, table2)
   -- Returns 1- cos(table1, table2)
   cos = nn.CosineDistance()
   --return cos:forward({t1, t2})-- input is Tensors
-  return cos:forward({table2tensor(table1), table2tensor(table1)})
+  return cos:forward({table2tensor(table1), table2tensor(table2)})
 end

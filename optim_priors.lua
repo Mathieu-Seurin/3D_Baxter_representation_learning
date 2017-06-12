@@ -189,6 +189,8 @@ end
 -- factor  based on sigma CONTINUOUS_ACTION_SIGMA
 ---------------------------------------------------------------------------------------
 function get_continuous_action_factor_term(action1, action2)
+    print(action1)
+    print(action2)
   --return math.exp((-1 * actions_difference(action1, action2))/CONTINUOUS_ACTION_SIGMA)
   return math.exp((-1 * cosineDistance(action1, action2))/CONTINUOUS_ACTION_SIGMA)
 end

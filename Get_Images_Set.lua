@@ -1,5 +1,5 @@
 require 'const'
-require 'functions' -- for cosineDistance
+--require 'functions' -- for cosineDistance
 
 ---------------------------------------------------------------------------------------
 -- Function : images_Paths(path)  #TODO remove to avoid conflict with 1D
@@ -257,7 +257,7 @@ function get_two_Prop_Pair(Infos1, Infos2)
 
    local vector=torch.randperm(size2-1)
 
-   while watchDog<100 do
+   while watchDog < 1000 do
       local id_ref_action_begin=torch.random(1,size1-1)
 
       if EXTRAPOLATE_ACTION then --Look at const.lua for more details about extrapolate
@@ -449,11 +449,11 @@ function tensor2table(tensor)
 end
 
 function table2tensor(table)
-    t2 = torch.Tensor(table)--{table})
+    --t2 = torch.Tensor(table)--{table})
     -- print('converted to tensor')
     -- print(type(t2))
     -- print(t2)
-    return t2
+    return torch.Tensor(table)
 end
 
 ---------------------------------------------------------------------------------------
@@ -469,12 +469,15 @@ function action_vectors_are_similar_enough(action1, action2)
     --   2 : 0.372556582859
     -- }}
   cosDistance = cosineDistance(action1, action2)
+  -- print(action1)
+  -- print(action2)
+  -- print("action_vectors_are_similar_enough cosDistance:")
+  -- print(cosDistance[1]) --[torch.DoubleTensor of size 1]
+  -- print(MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD)
+
   if math.abs(cosDistance[1]) < MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD then
-      local close_enough = true
+      return true
   else
-      local close_enough = false
+      return false
   end
-  print("action_vectors_are_similar_enough cosDistance:")
-  print(cosDistance)
-  return close_enough
 end

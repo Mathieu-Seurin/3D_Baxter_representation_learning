@@ -577,15 +577,16 @@ function LOO_cross_validation(data_folder, data_seqs)
   totalMSE = 0
   for k=1, kfolds do
     x_train, y_train, x_test, y_test = get_x_y_from_data_seq(data_seqs, k)
-    reconstructed_states =  = predict(data_folder, k)
+    reconstructed_states = predict(data_folder, k)
     mse = get_reconstruction_error_MSE(observed_states, reconstructed_states)
-    totalMSE += mse
+    totalMSE = totalMSE + mse
   end
   totalMSE = totalMSE / kfolds
   if RECONSTRUCT then
     print('LOO_cross_validation MSE (Reconstruction error): '..acc)
   else
     print('LOO_cross_validation MSE (Predicting reward): '..acc)
+  end
   return totalMSE
 end
 ------------------------------------

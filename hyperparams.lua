@@ -15,7 +15,7 @@ print("============ DATA USED =========\n",
 --======================================================
 --Continuous actions SETTINGS
 --======================================================
-USE_CONTINUOUS = true --A switch between discrete and continuous actions (translates into calling getRandomBatchFromSeparateListContinuous instead of getRandomBatchFromSeparateList
+USE_CONTINUOUS = false --A switch between discrete and continuous actions (translates into calling getRandomBatchFromSeparateListContinuous instead of getRandomBatchFromSeparateList
 ACTION_AMPLITUDE = 0.01
 -- The following parameter eliminates the need of finding close enough actions for assessing all priors except for the temporal.one.
 -- If the actions are too far away, they will make the gradient 0 and will not be considered for the update rule
@@ -24,7 +24,7 @@ CONTINUOUS_ACTION_SIGMA = 0.3 -- 0.1 for mobileData plots all concentrated.TODO 
 --is high (1 if the actions are the same), if not, the coef is close to 0. We add a constraint with the method
 --action_vectors_are_similar_enough to impose a cosine distance constraint when comparing actions, because the network will see a lot
 --of actions that are not similar, so instead of taking '2 random actions', we take '2 random actions, but above a certain similarity threshold'.
-MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.3
+MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 1-- TODO 0.6
 -- TODO shall it be different for each dataset depending on the variance of the input state space?
 --If so, What is a good proxy  parameter to set it?
 

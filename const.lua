@@ -41,7 +41,7 @@ LAST_MODEL_FILE = 'lastModel.txt'
 now = os.date("*t")
 
 if USE_CONTINUOUS then
-    DAY = 'Y'..now.year..'_D'..now.day..'_M'..now.month..'_H'..now.hour..'M'..now.min..'S'..now.sec..'_'..DATA_FOLDER..'_cont'..'_MCD0.'..str(MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD*10)..'_S0.'..str(CONTINUOUS_ACTION_SIGMA*10))
+    DAY = 'Y'..now.year..'_D'..now.day..'_M'..now.month..'_H'..now.hour..'M'..now.min..'S'..now.sec..'_'..DATA_FOLDER..'_cont'..'_MCD0.'..(MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD*10)..'_S0.'..(CONTINUOUS_ACTION_SIGMA*10)
 else
     DAY = 'Y'..now.year..'_D'..now.day..'_M'..now.month..'_H'..now.hour..'M'..now.min..'S'..now.sec..'_'..DATA_FOLDER
 end
@@ -115,13 +115,7 @@ if DATA_FOLDER == SIMPLEDATA3D then
    DIMENSION_IN = 3
    DIMENSION_OUT = 3
 
-   REWARD_INDEX = 2 --2 reward values: 0, 1
-   INDEX_TABLE = {2,3,4} --column index for coordinates in state file, respectively (x,y,z)
-
-   DEFAULT_PRECISION = 0.05 -- for 'arrondit' function
-   FILENAME_FOR_REWARD = "recorded_button1_is_pressed.txt"--"is_pressed"
-   FILENAME_FOR_ACTION = "recorded_robot_limb_left_endpoint_action.txt"--endpoint_action"  -- Never written, always computed on the fly
-   FILENAME_FOR_STATE = "recorded_robot_limb_left_endpoint_state.txt"--endpoint_state"
+   REWARD_INDEX = 2 --2 reward va_robot_limb_left_endpoint_state.txt"--endpoint_state"
 
    SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
    AVG_FRAMES_PER_RECORD = 100
