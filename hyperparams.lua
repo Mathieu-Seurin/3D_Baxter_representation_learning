@@ -1,11 +1,13 @@
------------------DATASETS AVAILABLE:
-BABBLING = 'babbling'
+-----------------DATASETS AVAILABLE:  (in order of model robustness and reliability so far)
 MOBILE_ROBOT = 'mobileRobot'
-SIMPLEDATA3D = 'simpleData3D'
+----Baxter datasets:
+SIMPLEDATA3D = 'simpleData3D' --  oldest simplest dataset
 PUSHING_BUTTON_AUGMENTED = 'pushingButton3DAugmented'
+BABBLING = 'babbling'
 
-DATA_FOLDER = MOBILE_ROBOT
---DATA_FOLDER = PUSHING_BUTTON_AUGMENTED
+
+--DATA_FOLDER = MOBILE_ROBOT
+DATA_FOLDER = PUSHING_BUTTON_AUGMENTED
 --DATA_FOLDER = BABBLING
 
 print("============ DATA USED =========\n",
@@ -19,7 +21,7 @@ USE_CONTINUOUS = true --A switch between discrete and continuous actions (transl
 ACTION_AMPLITUDE = 0.01
 -- The following parameter eliminates the need of finding close enough actions for assessing all priors except for the temporal.one.
 -- If the actions are too far away, they will make the gradient 0 and will not be considered for the update rule
-CONTINUOUS_ACTION_SIGMA = 0.6 -- 0.1 for mobileData plots all concentrated.TODO REDO
+CONTINUOUS_ACTION_SIGMA = 0.6
 --In contiuous actions, we take 2 actions, if they are very similar, the coef factor
 --is high (1 if the actions are the same), if not, the coef is close to 0. We add a constraint with the method
 --action_vectors_are_similar_enough to impose a cosine distance constraint when comparing actions, because the network will see a lot
@@ -33,7 +35,7 @@ MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.4
 -- Models
 --======================================================
 
-INCEPTIONV4 = './models/inceptionFineTunning.lua' --finetuned trained model
+INCEPTIONV4 = './models/inceptionFineTunning' --finetuned trained model
 BASE_TIMNET = './models/topUniqueSimplerWOTanh'  --without last layer as Tanh
 
 --MODEL_ARCHITECTURE_FILE = INCEPTIONV4
