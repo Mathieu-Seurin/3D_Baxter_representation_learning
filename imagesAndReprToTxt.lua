@@ -3,10 +3,14 @@ require 'torch'
 require 'image'
 require 'nn'
 require 'nngraph'
-require 'cunn'
 
 require 'const'
 require 'functions'
+
+if USE_CUDA then
+   require 'cunn'
+   require 'cudnn'
+end
 
 local imagesFolder = DATA_FOLDER
 local path, modelString
@@ -34,6 +38,14 @@ end
 outStr = ''
 
 tempSeq = {}
+
+augmentation = tnt.transform.compose{
+   vision.image.transformimage.colorNormalize{
+      mean = MEAN_MODEL, std  = STD_MODEL
+   },
+   function(img) return img:float() end
+}
+
 for dir_seq_str in lfs.dir(imagesFolder) do
    if string.find(dir_seq_str,'record') then
       print("Data sequence folder: ",dir_seq_str)
@@ -42,12 +54,20 @@ for dir_seq_str in lfs.dir(imagesFolder) do
          if string.find(imageStr,'jpg') then
             local fullImagesPath = imagesPath..'/'..imageStr
             local reprStr = ''
-            --img = getImageFormated(fullImagesPath):cuda():reshape(1,3,200,200)
-            if USE_CUDA then
-              img = getImageFormated(fullImagesPath):cuda():reshape(1,3,200,200)
+
+            if DIFFERENT_FORMAT then
+               img = image.scale(image.load(fullImagesPath,3,'float'), IM_LENGTH, IM_HEIGHT)
+               img = augmentation(img)
             else
-              img = getImageFormated(fullImagesPath):double():reshape(1,3,200,200)
+               img = getImageFormated(fullImagesPath)
             end
+
+            img = img:double():reshape(1,IM_CHANNEL,IM_LENGTH,IM_HEIGHT)
+            
+            if USE_CUDA then
+              img = img:cuda()
+            end
+
             repr = model:forward(img)
             -- print ('img and repr')
             -- print (#img)

@@ -1,4 +1,6 @@
---DATASETS AVAILABLE:
+--================ DATASETS AVAILABLE =====================
+--=================================================
+
 BABBLING = 'babbling'
 MOBILE_ROBOT = 'mobileRobot'
 SIMPLEDATA3D = 'simpleData3D'
@@ -12,13 +14,22 @@ print("============ DATA USED =========\n",
                     DATA_FOLDER,
       "\n================================")
 
+--================ MODEL USED =====================
+--=================================================
 INCEPTIONV4 = './models/inceptionFineTunning.lua'
+
+RESNET = './models/resnet.lua'
+RESNET_VERSION = 18 --34 or 50 maybe
+FROZEN_LAYER = 3 --learning_rate=0 for those layer, meaning : number of layer who don't learn at all
+
 BASE_TIMNET = './models/topUniqueSimplerWOTanh'
 
-MODEL_ARCHITECTURE_FILE = INCEPTIONV4
+--MODEL_ARCHITECTURE_FILE = INCEPTIONV4 --Too big
 --MODEL_ARCHITECTURE_FILE = BASE_TIMNET
+MODEL_ARCHITECTURE_FILE = RESNET
 
 print("Model :",MODEL_ARCHITECTURE_FILE)
+
 
 --======================================================
 --Continuous actions SETTINGS
@@ -38,11 +49,11 @@ GAUSSIAN_SIGMA = 0.3 -- 0.1 for mobileData plots all concentrated.
 -- Cannot be applied in every scenario !!!!
 EXTRAPOLATE_ACTION = false
 
-LR=0.001
+LR=0.0001
 LR_DECAY = 1e-6
 
 SGD_METHOD = 'adam' -- Can be adam or adagrad
-BATCH_SIZE = 2
+BATCH_SIZE = 5
 NB_EPOCHS=10
 
 DATA_AUGMENTATION = 0.01
@@ -52,7 +63,7 @@ COEF_TEMP=1
 COEF_PROP=1
 COEF_REP=1
 COEF_CAUS=1
-DIMENSION_OUT=5
+DIMENSION_OUT=2
 
 
 if DATA_FOLDER ~= BABBLING then
