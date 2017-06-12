@@ -1,10 +1,12 @@
+require 'functions'
+
 function doStuff_temp(Models,criterion,Batch,coef)
    -- Returns the loss and the gradient
    local coef= coef or 1
    local im1, im2, Model, Model2, State1, State2
 
    local batchSize = Batch:size(2)
-   
+
    if USE_CUDA then
       im1=Batch[1]:cuda()
       im2=Batch[2]:cuda()
@@ -105,7 +107,6 @@ function doStuff_Prop(Models,criterion,Batch, coef, action1, action2)
 
    --we backward with a starting gradient initialized at 1
    GradOutputs=criterion:backward({State1, State2, State3, State4},torch.ones(1))
-
    -- compute the gradients for the two images
    if USE_CONTINUOUS then
        continuous_factor_term = get_continuous_action_factor_term(action1, action2)
@@ -124,8 +125,7 @@ function doStuff_Prop(Models,criterion,Batch, coef, action1, action2)
 end
 
 function doStuff_Rep(Models,criterion,Batch, coef, action1, action2)
-    -- print('actions')
-    -- print(action1)
+
    -- Returns the loss and the gradient
    local coef= coef or 1
    local im1, im2, im3, im4, Model, Model2, Model3, Model4, State1, State2, State3, State4
@@ -178,19 +178,17 @@ end
 
 --------------------------------------------------------------
 ----CONTINUOUS ACTION PRIORS VERSION
-function actions_distance(action1, action2)
-  -- Returns a double indicating the Euclidean distance among actions
-  local distance = 0
-  --for each dim, check that the magnitude of the action is close
-  for dim=1, DIMENSION_IN do
-     distance = distance + (math.pow(arrondit(action1[dim]) - arrondit(action2[dim]), 2))
-  end
-  return math.sqrt(distance)
-end
+----------------------------------------
 
+---------------------------------------------------------------------------------------
+-- Function :get_continuous_action_factor_term(action1, action2)
+-- Input (): 2 tables (userdata) with DIMENSION_IN elements
+-- Output ():
+-- This methods avoids having to check for actions that are close enough or
+-- far away enough for the priors constraints by multiplying by a continuous
+-- factor  based on sigma CONTINUOUS_ACTION_SIGMA
+---------------------------------------------------------------------------------------
 function get_continuous_action_factor_term(action1, action2)
-  -- This methods avoids having to check for actions that are close enough or
-  -- far away enough for the priors constraints by multiplying by a continuous
-  -- factor  based on sigma GAUSSIAN_SIGMA
-  return math.exp((-1 * actions_distance(action1, action2))/GAUSSIAN_SIGMA)
+  --return math.exp((-1 * actions_difference(action1, action2))/CONTINUOUS_ACTION_SIGMA)
+  return math.exp((-1 * cosineDistance(action1, action2))/CONTINUOUS_ACTION_SIGMA)
 end

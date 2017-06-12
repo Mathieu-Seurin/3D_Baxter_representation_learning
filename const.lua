@@ -40,10 +40,12 @@ LAST_MODEL_FILE = 'lastModel.txt'
 
 now = os.date("*t")
 
-if USE_CONTINUOUS then 
-    DAY = 'Y'..now.year..'_D'..now.day..'_M'..now.month..'_H'..now.hour..'M'..now.min..'S'..now.sec..'_'..DATA_FOLDER..'_cont'
+-- architecture_name = split(MODEL_ARCHITECTURE_FILE, '/')[3]
+-- print(architecture_name)
+if USE_CONTINUOUS then
+    DAY = 'Y'..now.year..'_D'..now.day..'_M'..now.month..'_H'..now.hour..'M'..now.min..'S'..now.sec..'_'..DATA_FOLDER..'_cont'..'_MCD0_'..(MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD*10)..'_S0_'..(CONTINUOUS_ACTION_SIGMA*10)--..'_'..architecture_name
 else
-    DAY = 'Y'..now.year..'_D'..now.day..'_M'..now.month..'_H'..now.hour..'M'..now.min..'S'..now.sec..'_'..DATA_FOLDER
+    DAY = 'Y'..now.year..'_D'..now.day..'_M'..now.month..'_H'..now.hour..'M'..now.min..'S'..now.sec..'_'..DATA_FOLDER--..'_'..architecture_name
 end
 
 NAME_SAVE= 'model'..DAY
@@ -98,7 +100,7 @@ IM_CHANNEL = 3 --image channels (RGB)
 PRIORS_CONFIGS_TO_APPLY ={{"Prop","Temp","Caus","Rep"}}
 
 if DATA_FOLDER == SIMPLEDATA3D then
-   CLAMP_CAUSALITY = true
+   CLAMP_CAUSALITY = true  --TODO: make false when continuous works
 
    MIN_TABLE = {0.42,-0.2,-10} -- for x,y,z doesn't really matter in fact
    MAX_TABLE = {0.8,0.7,10} -- for x,y,z doesn't really matter in fact
@@ -116,23 +118,13 @@ if DATA_FOLDER == SIMPLEDATA3D then
    SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
    AVG_FRAMES_PER_RECORD = 95
 
-
-elseif DATA_FOLDER == BUTTON_AUGMENTED_3D then
-   CLAMP_CAUSALITY = false
-
    MIN_TABLE = {0.42,-0.1,-10} -- for x,y,z doesn't really matter in fact
    MAX_TABLE = {0.75,0.6,10} -- for x,y,z doesn't really matter in fact
 
    DIMENSION_IN = 3
    DIMENSION_OUT = 3
 
-   REWARD_INDEX = 2 --2 reward values: -0, 1
-   INDEX_TABLE = {2,3,4} --column index for coordinates in state file, respectively (x,y,z)
-
-   DEFAULT_PRECISION = 0.05 -- for 'arrondit' function
-   FILENAME_FOR_REWARD = "recorded_button1_is_pressed.txt"--"is_pressed"
-   FILENAME_FOR_ACTION = "recorded_robot_limb_left_endpoint_action.txt"--endpoint_action"  -- Never written, always computed on the fly
-   FILENAME_FOR_STATE = "recorded_robot_limb_left_endpoint_state.txt"--endpoint_state"
+   REWARD_INDEX = 2 --2 reward va_robot_limb_left_endpoint_state.txt"--endpoint_state"
 
    SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
    AVG_FRAMES_PER_RECORD = 100
@@ -187,11 +179,11 @@ elseif DATA_FOLDER == BABBLING then
 
   -- Causality needs at least 2 different values of reward and in sparse dataset such as babbling_1, this does not occur always
   --PRIORS_TO_APPLY ={{"Rep","Prop","Temp"}}
-  PRIORS_CONFIGS_TO_APPLY ={{"Temp"}}  --TODO compare 1 vs 2 vs 3 priors
-  --print('WARNING: Causality prior, at least, will be ignored for dataset '..BABBLING)
+  PRIORS_CONFIGS_TO_APPLY ={{"Temp"}}--, {"Prop","Temp"}, {"Prop","Rep"},  {"Temp","Rep"}, {"Prop","Temp","Rep"}}  --TODO report 1 vs 2 vs 3 priors, add all prioris when Babbling contains +1 reward value
+  --print('WARNING: Causality prior, at least, will be ignored for dataset because of too sparse rewards (<2 value types). TODO: convert to 3 reward values'..BABBLING)
 
 elseif DATA_FOLDER == PUSHING_BUTTON_AUGMENTED then
-    CLAMP_CAUSALITY = true
+    CLAMP_CAUSALITY = true --TODO: make false when continuous works
 
     MIN_TABLE = {0.42,-0.2,-10} -- for x,y,z
     MAX_TABLE = {0.8,0.7,10} -- for x,y,z

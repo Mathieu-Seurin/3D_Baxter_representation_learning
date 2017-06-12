@@ -18,7 +18,7 @@ function save_model(model)
    os.execute("cp hyperparams.lua "..path)
 
    torch.save(file_string, model)
-   print("Saved model "..NAME_SAVE.." at : "..path)
+   print("Saved model at : "..path)
 
    f = io.open(LAST_MODEL_FILE,'w')
    f:write(path..'\n'..NAME_SAVE..'.t7')
@@ -123,8 +123,8 @@ end
 ---------------------------------------------------------------------------------------
 function load_seq_by_id(id)
    local string_precomputed_data
-   
-   if IS_INCEPTION then 
+
+   if IS_INCEPTION then
       -- since the model require images to be a 3x299x299
       --and normalize differently, we need to adapt
       string_precomputed_data =
@@ -195,7 +195,7 @@ function load_Part_list(list, txt, txt_reward, txt_state)
          im = image.scale(image.load(list[i],3,'float'), IM_LENGTH, IM_HEIGHT)
          table.insert(all_images, augmentation(im))
       end
-      
+
    else
       for i=1, #(Infos[1]) do
          table.insert(all_images, getImageFormated(list[i]))
@@ -348,7 +348,7 @@ end
 
 function scaleAndCrop(img)
    --No random cropping at the moment, but might me useful in the future.
-   
+
    local format=IM_LENGTH.."x"..IM_HEIGHT
    local imgAfter=image.scale(img,format)
 
@@ -558,4 +558,58 @@ function visualize_set(im1,im2,im3,im4)
       image.display{image=imgMerge, win=WINDOW}
    end
    io.read()
+end
+
+
+
+---------------------------------------------------------------------------------------
+-- Function : actions_difference(action1, action2).
+-- Input: two vectors representing 2 actions (because actions represent the movement of the arm from one position state to the next one)
+-- Output (): Returns a double indicating the MSE (Euclidean distance for our vectors) among actions
+---------------------------------------------------------------------------------------
+function actions_difference(action1, action2)
+  --for each dim, check that the magnitude of the action is close
+  return MSE(action1, action2) --TODO change to cosDistance?
+  --return CosineDistance(action1, action2)
+end
+
+---------------------------------------------------------------------------------------
+-- Function : MSE(vec1, vec2, dim)
+-- Output (): Returns a double indicating the Euclidean distance among the two points of dimension dim
+---------------------------------------------------------------------------------------
+function MSE(vec1, vec2)
+  local mse = 0
+  --for each dimension, add the magnitude of the difference
+  for dim=1, #(vec1[1]) do
+     mse = mse + (math.pow(arrondit(vec1[dim]) - arrondit(vec2[dim]), 2))
+  end
+  print ('mse v1 and 2: ')
+  print(vec1)
+  print('arrondit')
+  print(vec1[dim])
+  print(arrondit(vec1[dim]))
+  print(vec2)
+  if USE_CUDA then
+      v = vec2[dim]:cudaHalf()
+    print(v)
+    print('half precision')
+  end
+  print(math.sqrt(mse))
+  print("MSE for vectors size ", #(vec1[1]))
+  return math.sqrt(mse)
+end
+
+---------------------------------------------------------------------------------------
+-- Function : action_vectors_are_similar_enough(action1, action2)
+-- Input (): 2 tables of dim DIMENSION_IN
+-- Output(): A float value
+-- Cos(a,b) can be in [-1, 1] (two vectors
+-- at 90° have a similarity of 0, and two vectors diametrically opposed have a similarity of -1,
+-- independent of their magnitude.
+---------------------------------------------------------------------------------------
+function cosineDistance(table1, table2)
+  -- Returns 1- cos(table1, table2)
+  cos = nn.CosineDistance()
+  --return cos:forward({t1, t2})-- input is Tensors
+  return cos:forward({table2tensor(table1), table2tensor(table2)})[1] --if input is a table, the output too, so we return its element (of type 'number')
 end
