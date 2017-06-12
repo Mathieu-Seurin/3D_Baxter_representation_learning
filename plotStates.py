@@ -108,7 +108,7 @@ else:
     print "[PCA not applied since learnt representations' dimensions are not larger than 2]"
 print "Visualizing states with #REPRESENTATIONS_DIMENSIONS =", REPRESENTATIONS_DIMENSIONS, ' in ',PLOT_DIMENSIONS,'D'
 
-cmap = colors.ListedColormap(['blue', 'grey', 'red'])  # TODO: adjust for different cardinal of reward types according to dataset
+cmap = colors.ListedColormap(['blue', 'red', 'grey'])  # TODO: adjust for different cardinal of reward types according to dataset
 bounds=[-1,0,9,15] #TODO: parametrize according to the dataset
 norm = colors.BoundaryNorm(bounds, cmap.N)
 if PLOT_DIMENSIONS == 2:

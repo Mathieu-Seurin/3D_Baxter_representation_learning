@@ -482,7 +482,7 @@ function get_all_rewards_from_seq(data_seq)
 end
 
 function get_x_y_from_data_seq(data_seq)
-  y = get_all_rewards()
+  y = getRewardsFromTxts()
   return x, y
 end
 
@@ -575,6 +575,7 @@ end
 function LOO_cross_validation(data_folder, data_seqs)
   kfolds = NB_SEQUENCES
   totalMSE = 0
+  print(data_seqs[1])
   for k=1, kfolds do
     x_train, y_train, x_test, y_test = get_x_y_from_data_seq(data_seqs, k)
     reconstructed_states = predict(data_folder, k)

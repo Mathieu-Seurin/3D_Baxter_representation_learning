@@ -18,7 +18,7 @@ require 'hyperparams'
 --===========================================================
 -- CUDA CONSTANTS
 --===========================================================
-USE_CUDA = false
+USE_CUDA = true
 USE_SECOND_GPU = true
 
 if USE_CUDA and USE_SECOND_GPU then
@@ -40,10 +40,12 @@ LAST_MODEL_FILE = 'lastModel.txt'
 
 now = os.date("*t")
 
+-- architecture_name = split(MODEL_ARCHITECTURE_FILE, '/')[3]
+-- print(architecture_name)
 if USE_CONTINUOUS then
-    DAY = 'Y'..now.year..'_D'..now.day..'_M'..now.month..'_H'..now.hour..'M'..now.min..'S'..now.sec..'_'..DATA_FOLDER..'_cont'..'_MCD0.'..(MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD*10)..'_S0.'..(CONTINUOUS_ACTION_SIGMA*10)
+    DAY = 'Y'..now.year..'_D'..now.day..'_M'..now.month..'_H'..now.hour..'M'..now.min..'S'..now.sec..'_'..DATA_FOLDER..'_cont'..'_MCD0_'..(MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD*10)..'_S0_'..(CONTINUOUS_ACTION_SIGMA*10)--..'_'..architecture_name
 else
-    DAY = 'Y'..now.year..'_D'..now.day..'_M'..now.month..'_H'..now.hour..'M'..now.min..'S'..now.sec..'_'..DATA_FOLDER
+    DAY = 'Y'..now.year..'_D'..now.day..'_M'..now.month..'_H'..now.hour..'M'..now.min..'S'..now.sec..'_'..DATA_FOLDER--..'_'..architecture_name
 end
 
 NAME_SAVE= 'model'..DAY
