@@ -18,7 +18,7 @@ require 'hyperparams'
 --===========================================================
 -- CUDA CONSTANTS
 --===========================================================
-USE_CUDA = false
+USE_CUDA = true
 USE_SECOND_GPU = true
 
 if USE_CUDA and USE_SECOND_GPU then
@@ -39,10 +39,10 @@ LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
 LAST_MODEL_FILE = 'lastModel.txt'
 
 now = os.date("*t")
-_, architecture_name = MODEL_ARCHITECTURE_FILE:match("(.+)/(.+)")
-
+_, architecture_name = MODEL_ARCHITECTURE_FILE:match("(.+)/(.+)") --architecture_name, _ = split(architecture_name, ".")
+print('Architecture name: '..architecture_name)
 if USE_CONTINUOUS then
-    DAY = 'Y'..now.year..'_D'..now.day..'_M'..now.month..'_H'..now.hour..'M'..now.min..'S'..now.sec..'_'..DATA_FOLDER..'_cont'..'_MCD0_'..(MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD*10)..'_S0_'..(CONTINUOUS_ACTION_SIGMA*10)..'_'..architecture_name
+    DAY = 'Y'..now.year..'_D'..now.day..'_M'..now.month..'_H'..now.hour..'M'..now.min..'S'..now.sec..'_'..DATA_FOLDER..'_'..architecture_name..'_cont'..'_MCD0_'..(MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD*10)..'_S0_'..(CONTINUOUS_ACTION_SIGMA*10)
 else
     DAY = 'Y'..now.year..'_D'..now.day..'_M'..now.month..'_H'..now.hour..'M'..now.min..'S'..now.sec..'_'..DATA_FOLDER..'_'..architecture_name
 end
@@ -97,6 +97,7 @@ IM_CHANNEL = 3 --image channels (RGB)
 -- dataFolder specific constants : filename, dim_in, indexes in state file etc...
 --===============================================
 PRIORS_CONFIGS_TO_APPLY ={{"Prop","Temp","Caus","Rep"}}
+--cant add to functions because it creates an import loop
 
 if DATA_FOLDER == SIMPLEDATA3D then
    CLAMP_CAUSALITY = true  --TODO: make false when continuous works
@@ -130,10 +131,8 @@ if DATA_FOLDER == SIMPLEDATA3D then
 
 elseif DATA_FOLDER == MOBILE_ROBOT then
 
-   CLAMP_CAUSALITY = false
+   CLAMP_CAUSALITY = false--cant add to functions because it creates an import loop
 
-   --Represents the start of the valid coordinate values, outside which, a synthetic negative reward is
-   --created to signify the fact of having the effector (Baxter arm) out of sight in the images
    MIN_TABLE = {-10000,-10000} -- for x,y
    MAX_TABLE = {10000,10000} -- for x,y
 

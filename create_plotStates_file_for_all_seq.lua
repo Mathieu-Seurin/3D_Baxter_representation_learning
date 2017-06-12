@@ -1,8 +1,9 @@
 require 'functions'
 
-images_folder = 'mobileRobot'
-list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(images_folder)
 
+images_folder = DATA_FOLDER --MOBILE_ROBOT
+list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(images_folder)
+print("Reading rewards from file list_txt_button= ",list_txt_button, ' in DATA_FOLDER: ', DATA_FOLDER)
 print("list_txt_state",list_txt_state)
 
 outStr = ''
@@ -16,7 +17,13 @@ for num_line, seq_str in ipairs(list_txt_state) do
    local t,_ = tensorFromTxt(seq_str)
 
    for num_state=1,t:size(1) do
-         all_state[#all_state+1] = {t[num_state][1], t[num_state][2]}
+       if DIMENSION_IN ==2 then
+         all_state[#all_state+1] = {t[num_state][INDEX_TABLE[1]], t[num_state][INDEX_TABLE[2]]}
+     elseif DIMENSION_IN == 3 then
+         all_state[#all_state+1] = {t[num_state][INDEX_TABLE[1]], t[num_state][INDEX_TABLE[2]], t[num_state][INDEX_TABLE[3]]}
+     else
+         error('Extend method to handle other than DIMENSION_IN 2 or 3')
+     end
    end
 end
 

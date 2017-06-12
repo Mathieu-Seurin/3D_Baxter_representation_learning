@@ -133,7 +133,7 @@ function load_seq_by_id(id)
       -- since the model require images to be a 3x224x224
       --and normalize differently, we need to adapt
       string_precomputed_data =
-         PRELOAD_FOLDER..'preloaded_'..DATA_FOLDER..'_Seq'..id..'_resnet.t7'      
+         PRELOAD_FOLDER..'preloaded_'..DATA_FOLDER..'_Seq'..id..'_resnet.t7'
    else
       string_precomputed_data =
          PRELOAD_FOLDER..'preloaded_'..DATA_FOLDER..'_Seq'..id..'_normalized.t7'
@@ -560,7 +560,14 @@ function visualize_set(im1,im2,im3,im4)
    io.read()
 end
 
-
+--Splits a string by the delimiter character
+function split(s, delimiter)
+    result = {};
+    for match in (s..delimiter):gmatch("(.-)"..delimiter) do
+        table.insert(result, match);
+    end
+    return result;
+end
 
 ---------------------------------------------------------------------------------------
 -- Function : actions_difference(action1, action2).
