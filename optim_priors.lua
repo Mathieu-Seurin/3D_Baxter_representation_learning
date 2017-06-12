@@ -107,7 +107,6 @@ function doStuff_Prop(Models,criterion,Batch, coef, action1, action2)
 
    --we backward with a starting gradient initialized at 1
    GradOutputs=criterion:backward({State1, State2, State3, State4},torch.ones(1))
-
    -- compute the gradients for the two images
    if USE_CONTINUOUS then
        continuous_factor_term = get_continuous_action_factor_term(action1, action2)
@@ -182,15 +181,13 @@ end
 
 ---------------------------------------------------------------------------------------
 -- Function :get_continuous_action_factor_term(action1, action2)
--- Input ():
+-- Input (): 2 tables (userdata) with DIMENSION_IN elements
 -- Output ():
 -- This methods avoids having to check for actions that are close enough or
 -- far away enough for the priors constraints by multiplying by a continuous
 -- factor  based on sigma CONTINUOUS_ACTION_SIGMA
 ---------------------------------------------------------------------------------------
 function get_continuous_action_factor_term(action1, action2)
-    print(action1)
-    print(action2)
   --return math.exp((-1 * actions_difference(action1, action2))/CONTINUOUS_ACTION_SIGMA)
   return math.exp((-1 * cosineDistance(action1, action2))/CONTINUOUS_ACTION_SIGMA)
 end

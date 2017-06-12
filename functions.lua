@@ -616,7 +616,8 @@ function MSE(vec1, vec2)
   print(arrondit(vec1[dim]))
   print(vec2)
   if USE_CUDA then
-    print(vec2[dim]:cudaHalf())
+      v = vec2[dim]:cudaHalf()
+    print(v)
     print('half precision')
   end
   print(math.sqrt(mse))
@@ -624,10 +625,10 @@ function MSE(vec1, vec2)
   return math.sqrt(mse)
 end
 
-
 ---------------------------------------------------------------------------------------
 -- Function : action_vectors_are_similar_enough(action1, action2)
 -- Input (): 2 tables of dim DIMENSION_IN
+-- Output(): A float value
 -- Cos(a,b) can be in [-1, 1] (two vectors
 -- at 90° have a similarity of 0, and two vectors diametrically opposed have a similarity of -1,
 -- independent of their magnitude.
@@ -636,5 +637,5 @@ function cosineDistance(table1, table2)
   -- Returns 1- cos(table1, table2)
   cos = nn.CosineDistance()
   --return cos:forward({t1, t2})-- input is Tensors
-  return cos:forward({table2tensor(table1), table2tensor(table2)})
+  return cos:forward({table2tensor(table1), table2tensor(table2)})[1] --if input is a table, the output too, so we return its element (of type 'number')
 end

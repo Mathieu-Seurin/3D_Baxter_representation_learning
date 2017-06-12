@@ -257,7 +257,7 @@ function get_two_Prop_Pair(Infos1, Infos2)
 
    local vector=torch.randperm(size2-1)
 
-   while watchDog < 1000 do
+   while watchDog < 100 do
       local id_ref_action_begin=torch.random(1,size1-1)
 
       if EXTRAPOLATE_ACTION then --Look at const.lua for more details about extrapolate
@@ -475,7 +475,7 @@ function action_vectors_are_similar_enough(action1, action2)
   -- print(cosDistance[1]) --[torch.DoubleTensor of size 1]
   -- print(MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD)
 
-  if math.abs(cosDistance[1]) < MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD then
+  if math.abs(cosDistance) < MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD then
       return true
   else
       return false
