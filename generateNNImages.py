@@ -92,4 +92,6 @@ for img_name,id,dist,state in data:
         
 	plt.savefig(output_file,bbox_inches='tight')
 	plt.close() # efficiency: avoids keeping all images into RAM
+
+
 print('Saved nearest neighbor images to '+output_file)
