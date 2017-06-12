@@ -19,6 +19,7 @@ require 'const'
 
 if USE_CUDA then
    require 'cunn'
+   require 'cudnn'
 end
 
 function Rico_Training(Models,priors_used)
@@ -33,7 +34,7 @@ function Rico_Training(Models,priors_used)
       -- just in case:
       collectgarbage()
 
-      local action1, action2 --,lossTemp,lossProp,lossCaus,lossRep
+      local action1, action2, lossTemp,lossProp,lossCaus,lossRep
       -- get new parameters
       if x ~= parameters then
          parameters:copy(x)
@@ -49,9 +50,7 @@ function Rico_Training(Models,priors_used)
           loss_temp, grad=doStuff_temp(Models,temp_criterion, batch,COEF_TEMP)
           TOTAL_LOSS_TEMP = loss_temp + TOTAL_LOSS_TEMP
       end
-      --==========
-      -- print("after temp")
-      -- io.read()
+
       mode='Prop'
       if applying_prior(priors_used, mode) then
           batch, action1, action2 = getRandomBatchFromSeparateList(BATCH_SIZE,mode)

@@ -71,19 +71,26 @@ LOGGING_ACTIONS = false
 
 IS_INCEPTION = string.find(MODEL_ARCHITECTURE_FILE, 'inception')
 -- since the model require images to be a 3x299x299, and normalize differently, we need to adapt
+IS_RESNET = string.find(MODEL_ARCHITECTURE_FILE, 'resnet')
+
+DIFFERENT_FORMAT = IS_INCEPTION or IS_RESNET
 
 if IS_INCEPTION then
    IM_LENGTH = 299
    IM_HEIGHT = 299
+   MEAN_MODEL = torch.ones(3):double()*0.5
+   STD_MODEL = torch.ones(3):double()*0.5
 
-   MEAN_INCEPTION = torch.ones(3):double()*0.5
-   STD_INCEPTION = torch.ones(3):double()*0.5
+elseif IS_RESNET then
+   IM_LENGTH = 224
+   IM_HEIGHT = 224
+   MEAN_MODEL = torch.DoubleTensor({ 0.485, 0.456, 0.406 })
+   STD_MODEL = torch.DoubleTensor({ 0.229, 0.224, 0.225 })
 
 else
    IM_LENGTH = 200
    IM_HEIGHT = 200
 end
-
 
 IM_CHANNEL = 3 --image channels (RGB)
 --================================================
@@ -125,6 +132,8 @@ elseif DATA_FOLDER == MOBILE_ROBOT then
 
    CLAMP_CAUSALITY = false
 
+   --Represents the start of the valid coordinate values, outside which, a synthetic negative reward is
+   --created to signify the fact of having the effector (Baxter arm) out of sight in the images
    MIN_TABLE = {-10000,-10000} -- for x,y
    MAX_TABLE = {10000,10000} -- for x,y
 
@@ -138,7 +147,11 @@ elseif DATA_FOLDER == MOBILE_ROBOT then
    FILENAME_FOR_STATE = "recorded_robot_state.txt"
    FILENAME_FOR_REWARD = "recorded_robot_reward.txt"
 
+   -- WARNING : If you change the folder (top, pano, front)
+   -- do rm preload_folder/* because the images won't be good
    SUB_DIR_IMAGE = 'recorded_camera_top'
+   -- ====================================================
+
    AVG_FRAMES_PER_RECORD = 90
 
 elseif DATA_FOLDER == BABBLING then

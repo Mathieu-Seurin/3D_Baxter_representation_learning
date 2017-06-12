@@ -71,9 +71,6 @@ function getRandomBatchFromSeparateList(batch_size, mode)
          set=get_one_random_Temp_Set(#data1.images)
          im1,im2 = data1.images[set.im1], data1.images[set.im2]
 
-        --  print("im1",im1:size())
-        --  print("im2",im2:size())
-
          batch[1][i]=im1
          batch[2][i]=im2
       elseif mode=="Caus" then
@@ -131,8 +128,12 @@ function load_seq_by_id(id)
       -- since the model require images to be a 3x299x299
       --and normalize differently, we need to adapt
       string_precomputed_data =
-         PRELOAD_FOLDER..'preloaded_'..DATA_FOLDER..'_Seq'..id..'_299.t7'
-
+         PRELOAD_FOLDER..'preloaded_'..DATA_FOLDER..'_Seq'..id..'_inception.t7'
+   elseif IS_RESNET then
+      -- since the model require images to be a 3x224x224
+      --and normalize differently, we need to adapt
+      string_precomputed_data =
+         PRELOAD_FOLDER..'preloaded_'..DATA_FOLDER..'_Seq'..id..'_resnet.t7'      
    else
       string_precomputed_data =
          PRELOAD_FOLDER..'preloaded_'..DATA_FOLDER..'_Seq'..id..'_normalized.t7'
@@ -183,10 +184,10 @@ function load_Part_list(list, txt, txt_reward, txt_state)
    assert(#Infos[1]==#list)   -- assert(#(Infos.reward)==#list)
    assert(#(Infos.reward)== #Infos[1])
 
-   if IS_INCEPTION then
+   if DIFFERENT_FORMAT then
       augmentation = tnt.transform.compose{
          vision.image.transformimage.colorNormalize{
-            mean = MEAN_INCEPTION, std  = STD_INCEPTION
+            mean = MEAN_MODEL, std  = STD_MODEL
          },
          function(img) return img:float() end
       }
@@ -296,33 +297,6 @@ function Get_Folder_Name(Log_Folder,list_prior)
       end
    end
    return Log_Folder..name..'/'
-end
-
----------------------------------------------------------------------------------------
--- Function : load_list(list,length,height)
--- Input ():
--- Output ():
----------------------------------------------------------------------------------------
-function load_Part_list(list, txt, txt_reward, txt_state)
-
-   assert(list, "list not found")
-   assert(txt, "Txt not found")
-   assert(txt_state, "Txt state not found")
-   assert(txt_reward, "Txt reward not found")
-
-   local im={}
-   local Infos = getInfos(txt,txt_reward,txt_state)
-   -- print('list size: '..#list)
-   -- print('Infos[1] size: '..#Infos[1])
-   -- print ('Infos size: '..#Infos)
-   -- print ('#(Infos.reward): '..#(Infos.reward))-- 11, 99  2  99
-   assert(#Infos[1]==#list)   -- assert(#(Infos.reward)==#list)
-   assert(#(Infos.reward)== #Infos[1])
-   for i=1, #(Infos[1]) do
-      table.insert(im, getImageFormated(list[i]))
-   end
-
-   return {images=im, Infos=Infos}
 end
 
 function getInfos(txt,txt_reward,txt_state)
