@@ -2,6 +2,8 @@ require 'functions'
 
 
 images_folder = DATA_FOLDER --MOBILE_ROBOT
+print("images_folder used :",images_folder)
+
 list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(images_folder)
 print("Reading rewards from file list_txt_button= ",list_txt_button, ' in DATA_FOLDER: ', DATA_FOLDER)
 print("list_txt_state",list_txt_state)
@@ -17,19 +19,15 @@ for num_line, seq_str in ipairs(list_txt_state) do
    local t,_ = tensorFromTxt(seq_str)
 
    for num_state=1,t:size(1) do
-       if DIMENSION_IN ==2 then
-         all_state[#all_state+1] = {t[num_state][INDEX_TABLE[1]], t[num_state][INDEX_TABLE[2]]}
-     elseif DIMENSION_IN == 3 then
-         all_state[#all_state+1] = {t[num_state][INDEX_TABLE[1]], t[num_state][INDEX_TABLE[2]], t[num_state][INDEX_TABLE[3]]}
-     else
-         error('Extend method to handle other than DIMENSION_IN 2 or 3')
-     end
+      all_state[#all_state+1] = {}
+      for dim=1,DIMENSION_IN do
+         all_state[#all_state][dim] = t[num_state][INDEX_TABLE[dim]]
+      end
    end
 end
 
 -- print("all_state",all_state)
 -- io.read()
-
 
 all_path = {}
 for dir_seq_str in lfs.dir(images_folder) do
@@ -52,7 +50,11 @@ assert(#all_path==#all_state,"He fucked up.")
 
 outStr = ''
 for num_line=1,#all_path do
-   outStr = outStr..all_path[num_line][1]..' '..all_state[num_line][1]..' '..all_state[num_line][2]..' \n'
+   outStr = outStr..all_path[num_line][1]..' '
+   for dim=1,DIMENSION_IN do
+      outStr = outStr..all_state[num_line][dim]..' '
+   end
+   outStr = outStr..'\n'
 end
 
 f = io.open('allStates.txt', 'w')
