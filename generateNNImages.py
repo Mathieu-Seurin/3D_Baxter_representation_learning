@@ -14,10 +14,12 @@ test = unittest.TestCase('__init__')
 nbr_images = -1
 
 subprocess.call(['th','create_plotStates_file_for_all_seq.lua'])
+subprocess.call(['th','create_all_reward.lua'])
 
 ALL_STATE_FILE = 'allStates.txt'
 LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
 LAST_MODEL_FILE = 'lastModel.txt'
+
 GLOBAL_SCORE_LOG_FILE = 'globalScoreLog.csv'
 
 

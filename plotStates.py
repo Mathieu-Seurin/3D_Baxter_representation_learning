@@ -15,7 +15,6 @@ PUSHING_BUTTON_AUGMENTED = 'pushingButton3DAugmented'
 
 LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
 
-PLOT_DIMENSIONS = 3  # Default, if mobileData used, we plot just 2
 plotGroundTruthStates = False 
 # true if we plot ground truth observed states, and false to plot the learned state representations
 
@@ -115,9 +114,11 @@ else:
 for line in reward_file:
     if line[0]!='#':
         words=line.split(' ')
-        rewards_l.append(float(words[0]))
+        rewards_l.append(words[0])
 
-rewards=np.asarray(rewards_l)
+rewards=rewards_l
+#rewards=rewards_l
+
 toplot=states
 REPRESENTATIONS_DIMENSIONS = len(states[0])
 
@@ -133,11 +134,14 @@ if REPRESENTATIONS_DIMENSIONS >3:
     # print rewards[0:10]
 elif REPRESENTATIONS_DIMENSIONS ==2:
     PLOT_DIMENSIONS = 2 #    print "[PCA not applied since learnt representations' dimensions are not larger than 2]"
+else:
+    PLOT_DIMENSIONS = 3  # Default, if mobileData used, we plot just 2
 print "\nVisualizing states with #REPRESENTATIONS_DIMENSIONS =", REPRESENTATIONS_DIMENSIONS, ' in ',PLOT_DIMENSIONS,'D'
 
-cmap = colors.ListedColormap(['blue', 'red', 'green'])  # TODO: adjust for different cardinal of reward types according to dataset
+cmap = colors.ListedColormap(['blue', 'grey', 'red'])  # TODO: adjust for different cardinal of reward types according to dataset
 bounds=[-1,0,9,15] #TODO: parametrize according to the dataset?
 norm = colors.BoundaryNorm(bounds, cmap.N)
+
 if PLOT_DIMENSIONS == 2:
     plt.scatter(toplot[:,0],toplot[:,1],c=rewards,cmap=cmap, norm=norm,marker="o")
 elif PLOT_DIMENSIONS ==3: 

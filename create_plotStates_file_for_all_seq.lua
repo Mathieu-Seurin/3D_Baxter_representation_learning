@@ -1,8 +1,7 @@
 require 'functions'
 
+print("Creating all state for NN-Quantitative Criterion")
 images_folder = DATA_FOLDER --MOBILE_ROBOT
-print("images_folder used :",images_folder)
-
 list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(images_folder)
 print("Reading rewards from file list_txt_button= ",list_txt_button, ' in DATA_FOLDER: ', images_folder)
 print("list_txt_state",list_txt_state)
@@ -31,8 +30,6 @@ end
 all_path = {}
 for dir_seq_str in lfs.dir(images_folder) do
    if string.find(dir_seq_str,'record') then
-      print("Sequence : ",dir_seq_str)
-
       local images_path = images_folder..'/'..dir_seq_str..'/'..SUB_DIR_IMAGE
       for image_str in lfs.dir(images_path) do
          if string.find(image_str,'jpg') then
