@@ -40,7 +40,7 @@ LAST_MODEL_FILE = 'lastModel.txt'
 
 now = os.date("*t")
 _, architecture_name = MODEL_ARCHITECTURE_FILE:match("(.+)/(.+)") --architecture_name, _ = split(architecture_name, ".")
-print('Architecture name: '..architecture_name)
+--print('Architecture name: '..architecture_name)
 if USE_CONTINUOUS then
     DAY = 'Y'..now.year..'_D'..now.day..'_M'..now.month..'_H'..now.hour..'M'..now.min..'S'..now.sec..'_'..DATA_FOLDER..'_'..architecture_name..'_cont'..'_MCD0_'..(MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD*10)..'_S0_'..(CONTINUOUS_ACTION_SIGMA*10)
 else
@@ -207,8 +207,6 @@ else
   os.exit()
 end
 
-
 FILE_PATTERN_TO_EXCLUDE = 'deltas'
-print("\nUSE_CUDA ",USE_CUDA," \nUSE_CONTINUOUS ACTIONS: ",USE_CONTINUOUS)
 
 CAN_HOLD_ALL_SEQ_IN_RAM = true

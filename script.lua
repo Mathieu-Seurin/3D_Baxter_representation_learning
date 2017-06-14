@@ -18,6 +18,13 @@ require 'definition_priors'
 require 'const'
 -- try to avoid global variable as much as possible
 
+print("Model :",MODEL_ARCHITECTURE_FILE)
+print("\nUSE_CUDA ",USE_CUDA," \nUSE_CONTINUOUS ACTIONS: ",USE_CONTINUOUS)
+
+print("============ DATA USED =========\n",
+                    DATA_FOLDER,
+      "\n================================")
+
 if USE_CUDA then
    require 'cunn'
    require 'cudnn'

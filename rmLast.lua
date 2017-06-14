@@ -11,8 +11,5 @@ else
    error(LAST_MODEL_FILE.." should exist")
 end
 
-print("Do you really want to delete last model ? Enter if okay Ctrl-C otherwise")
-io.read()
-
 os.execute("rm -r "..path)
 print("Deleted last model successfully")

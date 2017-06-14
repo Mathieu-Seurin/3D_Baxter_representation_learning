@@ -11,10 +11,6 @@ DATA_FOLDER = MOBILE_ROBOT
 --DATA_FOLDER = PUSHING_BUTTON_AUGMENTED
 --DATA_FOLDER = BABBLING
 
-print("============ DATA USED =========\n",
-                    DATA_FOLDER,
-      "\n================================")
-
 --================ MODEL USED =====================
 --=================================================
 INCEPTIONV4 = './models/inceptionFineTunning' --finetuned trained model
@@ -28,7 +24,6 @@ BASE_TIMNET = './models/topUniqueSimplerWOTanh'
 --MODEL_ARCHITECTURE_FILE = INCEPTIONV4 --Too big
 MODEL_ARCHITECTURE_FILE = BASE_TIMNET--without last layer as Tanh
 --MODEL_ARCHITECTURE_FILE = RESNET
-print("Model :",MODEL_ARCHITECTURE_FILE)
 
 --======================================================
 --Continuous actions SETTINGS

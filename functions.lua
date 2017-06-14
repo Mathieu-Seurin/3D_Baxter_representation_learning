@@ -14,9 +14,6 @@ function save_autoencoder(model)
    path = LOG_FOLDER..NAME_SAVE
    lfs.mkdir(path)
    file_string = path..'/'..NAME_SAVE..'.t7'
-
-   print("model",model.modules[1])
-   
    torch.save(file_string, model.modules[1]:float()) --saving only encoding module
    print("Saved model at : "..path)
 
