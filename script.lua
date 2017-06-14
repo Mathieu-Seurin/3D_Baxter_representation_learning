@@ -17,11 +17,6 @@ require 'definition_priors'
 require 'const'
 -- try to avoid global variable as much as possible
 
-if USE_CUDA then
-   require 'cunn'
-   require 'cudnn'
-end
-
 function Rico_Training(Models,priors_used)
    local rep_criterion=get_Rep_criterion()
    local prop_criterion=get_Prop_criterion()

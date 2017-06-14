@@ -2,11 +2,11 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
-import os
 import shutil
 import random
 import sys
-
+import pandas
+import os, os.path
 import subprocess
 
 nbr_images = -1
@@ -16,7 +16,7 @@ subprocess.call(['th','create_plotStates_file_for_all_seq.lua'])
 ALL_STATE_FILE = 'allStates.txt'
 LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
 LAST_MODEL_FILE = 'lastModel.txt'
-
+GLOBAL_SCORE_LOG_FILE = 'globalScoreLog.csv'
 
 if len(sys.argv) <= 1:
     sys.exit("Give number of neighbors to produce, followed by number of input images (and model dir if you don't want to use the last model created)")
@@ -134,10 +134,27 @@ for img_name,id,dist,state in data:
 	plt.close() # efficiency: avoids keeping all images into RAM
 
 mean_error = total_error/nb_tot_img
-print "MEAN ERROR : ", str(mean_error)[:5]
+print "MEAN MSE ERROR : ", str(mean_error)[:5]
 
-f = open(path_to_model+'/scoreNN.txt','w')
+score_file = path_to_model+'/scoreNN.txt'
+f = open(score_file,'w')
 f.write(str(mean_error)[:5])
 f.close()
 
+# writing scores to global log for plotting and reporting
+header = ['#MODEL', 'MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD','CONTINUOUS_ACTION_SIGMA']
+#if os.path.isfile(GLOBAL_SCORE_LOG_FILE):
+# 	global_scores_df = pd.DataFrame(columns= header)
+# else:
+	#global_scores_df = pd.read_csv(GLOBAL_SCORE_LOG_FILE, columns= header)
+	
+global_scores_df = pd.DataFrame({'#MODEL':model, 'KNN-MSE': mean_error}) #'MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD': MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD, 'CONTINUOUS_ACTION_SIGMA':CONTINUOUS_ACTION_SIGMA})
+
+if not os.path.isfile(GLOBAL_SCORE_LOG_FILE):
+   global_scores_df.to_csv(GLOBAL_SCORE_LOG_FILE, header = header)
+else: # else it exists so append without writing the header
+    global_scores_df.to_csv(GLOBAL_SCORE_LOG_FILE, mode ='a', header=False)
+    
+print 'Saved mean KNN MSE scores to ',score_file , ' and to ', GLOBAL_SCORE_LOG_FILE
+print global_scores_df.head()
 

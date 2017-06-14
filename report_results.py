@@ -2,9 +2,10 @@
 import yaml
 import pandas as pd
 import numpy as np
-import os, sys
 import cv2
 import math
+import pandas
+import sys, os, os.path
 
 from config import INPUT_DIR, OUTPUT_DIR, INPUT_DATA_FILE, INPUT_DATA_FILE_TARGET, SUBFOLDER_CONTAINING_RECORDS_PATTERN_INPUT
 from config import SUBFOLDER_CONTAINING_RECORDS_PATTERN_OUTPUT, EFFECTOR_CLOSE_ENOUGH_THRESHOLD, OUTPUT_FILE
@@ -15,6 +16,8 @@ MOBILE_ROBOT = 'mobileRobot'
 SIMPLEDATA3D = 'simpleData3D'
 
 LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
+GLOBAL_SCORE_LOG_FILE = 'globalScoreLog.csv'
+
 DATA_FOLDER = MOBILE_ROBOT
 #DATA_FOLDER = BABBLING
 
@@ -207,4 +210,24 @@ print "Final data contains ", len(records), ' datapoints and ', len(records), ' 
 
 # Plot all actions (position) data
 print "PLOTTING ALL ACTUAL FILES WITHIN THE DIRECTORIES... Nr of records: ",len(data_iteration_folders), " in ",DATA_FOLDER
+plot_states_and_rewards(records, records_rewards)
+
+
+
+############ PLOT ALL EXPERIMENTS SCORES
+
+# writing scores to global log for plotting and reporting
+header = ['#MODEL', 'MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD','CONTINUOUS_ACTION_SIGMA']
+#if os.path.isfile(GLOBAL_SCORE_LOG_FILE):
+#   global_scores_df = pd.DataFrame(columns= header)
+# else:
+    #global_scores_df = pd.read_csv(GLOBAL_SCORE_LOG_FILE, columns= header)
+    
+global_scores_df = pd.DataFrame({'#MODEL':model, 'KNN-MSE': mean_error}) #'MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD': MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD, 'CONTINUOUS_ACTION_SIGMA':CONTINUOUS_ACTION_SIGMA})
+
+
+
+global_scores_df.sort_values(by='#MODEL', inplace=True )
+# Plot all actions (position) data
+print "PLOTTING ALL experiments scores for a varying number of MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD and  CONTINUOUS_ACTION_SIGMA  in ",DATA_FOLDER
 plot_states_and_rewards(records, records_rewards)
