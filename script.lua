@@ -12,6 +12,7 @@ require 'printing'
 require "Get_Images_Set"
 require 'optim_priors'
 require 'definition_priors'
+
 -- THIS IS WHERE ALL THE CONSTANTS SHOULD COME FROM
 -- See const.lua file for more details
 require 'const'
@@ -135,14 +136,8 @@ if LOGGING_ACTIONS then
    end
 end
 
-if CAN_HOLD_ALL_SEQ_IN_RAM then
-   print("Preloading all sequences in memory in order to accelerate batch selection ")
-   --[WARNING: In CPU only mode (USE_CUDA = false), RAM memory runs out]	 Torch: not enough memory: you tried to allocate 0GB. Buy new RAM!
-   ALL_SEQ = {} -- Preload all the sequences instead of loading specific sequences during batch selection
-   for id=1,NB_SEQUENCES do
-      ALL_SEQ[#ALL_SEQ+1] = load_seq_by_id(id)
-   end
-end
+
+ALL_SEQ = precompute_all_seq()
 
 for nb_test=1, #PRIORS_CONFIGS_TO_APPLY do
    if RELOAD_MODEL then

@@ -1,9 +1,10 @@
 require 'functions'
 
+print("Creating all rewards for plot")
+
 images_folder = DATA_FOLDER --MOBILE_ROBOT
 list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(images_folder)
 
-print("Reading rewards from file list_txt_button= ",list_txt_button, ' in DATA_FOLDER: ', DATA_FOLDER)
 all_button = {}
 
 for num_line, seq_str in ipairs(list_txt_button) do

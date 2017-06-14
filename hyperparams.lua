@@ -1,4 +1,3 @@
-
 -----------------DATASETS AVAILABLE:  (in order of model robustness and reliability so far)
 --=================================================
 MOBILE_ROBOT = 'mobileRobot'
@@ -8,8 +7,8 @@ PUSHING_BUTTON_AUGMENTED = 'pushingButton3DAugmented'
 BABBLING = 'babbling'
 
 
---DATA_FOLDER = MOBILE_ROBOT
-DATA_FOLDER = PUSHING_BUTTON_AUGMENTED
+DATA_FOLDER = MOBILE_ROBOT
+--DATA_FOLDER = PUSHING_BUTTON_AUGMENTED
 --DATA_FOLDER = BABBLING
 
 print("============ DATA USED =========\n",
@@ -27,14 +26,14 @@ FROZEN_LAYER = 3 --the number of layers that don't learn at all (i.e., their lea
 BASE_TIMNET = './models/topUniqueSimplerWOTanh'
 
 --MODEL_ARCHITECTURE_FILE = INCEPTIONV4 --Too big
---MODEL_ARCHITECTURE_FILE = BASE_TIMNET--without last layer as Tanh
-MODEL_ARCHITECTURE_FILE = RESNET
+MODEL_ARCHITECTURE_FILE = BASE_TIMNET--without last layer as Tanh
+--MODEL_ARCHITECTURE_FILE = RESNET
 print("Model :",MODEL_ARCHITECTURE_FILE)
 
 --======================================================
 --Continuous actions SETTINGS
 --======================================================
-USE_CONTINUOUS = true --A switch between discrete and continuous actions (translates into calling getRandomBatchFromSeparateListContinuous instead of getRandomBatchFromSeparateList
+USE_CONTINUOUS = false --A switch between discrete and continuous actions (translates into calling getRandomBatchFromSeparateListContinuous instead of getRandomBatchFromSeparateList
 ACTION_AMPLITUDE = 0.01
 -- The following parameter eliminates the need of finding close enough actions for assessing all priors except for the temporal.one.
 -- If the actions are too far away, they will make the gradient 0 and will not be considered for the update rule

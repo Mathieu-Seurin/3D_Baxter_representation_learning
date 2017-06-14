@@ -9,6 +9,22 @@ vision = require 'torchnet-vision'
 -- Input ():
 -- Output ():
 ---------------------------------------------------------------------------------------
+function save_autoencoder(model)
+
+   path = LOG_FOLDER..NAME_SAVE
+   lfs.mkdir(path)
+   file_string = path..'/'..NAME_SAVE..'.t7'
+
+   print("model",model.modules[1])
+   
+   torch.save(file_string, model.modules[1]:float()) --saving only encoding module
+   print("Saved model at : "..path)
+
+   f = io.open(LAST_MODEL_FILE,'w')
+   f:write(path..'\n'..NAME_SAVE..'.t7')
+   f:close()
+end
+
 function save_model(model)
 
    path = LOG_FOLDER..NAME_SAVE
@@ -25,6 +41,22 @@ function save_model(model)
    f:close()
 end
 
+function precompute_all_seq()
+   if CAN_HOLD_ALL_SEQ_IN_RAM then
+      print("Preloading all sequences in memory in order to accelerate batch selection ")
+      --[WARNING: In CPU only mode (USE_CUDA = false), RAM memory runs out]	 Torch: not enough memory: you tried to allocate 0GB. Buy new RAM!
+      all_seq = {} -- Preload all the sequences instead of loading specific sequences during batch selection
+      for id=1,NB_SEQUENCES do
+         all_seq[#all_seq+1] = load_seq_by_id(id)
+      end
+   else
+      all_seq = nil
+   end
+
+   return all_seq
+end
+
+
 ---------------------------------------------------------------------------------------
 -- Function :getRandomBatchFromSeparateList(batch_size, mode)
 -- Input ():
@@ -35,8 +67,10 @@ function getRandomBatchFromSeparateList(batch_size, mode)
 
    if mode=="Prop" or mode=="Rep" then
       batch=torch.Tensor(4, batch_size, IM_CHANNEL, IM_LENGTH, IM_HEIGHT)
-   else
+   elseif mode=='Caus' or mode=='Temp' then
       batch=torch.Tensor(2, batch_size, IM_CHANNEL, IM_LENGTH, IM_HEIGHT)
+   else
+      batch=torch.Tensor(batch_size, IM_CHANNEL, IM_LENGTH, IM_HEIGHT)
    end
 
    local im1,im2,im3,im4,set
@@ -84,7 +118,12 @@ function getRandomBatchFromSeparateList(batch_size, mode)
          im2,im3 = im3,im2 --I switch them for a better viz, that's all
 
       else
-         print "getRandomBatchFromSeparateList Wrong mode "
+         set = {} --dummy placeholder, not needed for auto-encoder
+         set.act1 = nil
+         set.act2 = nil
+
+         id = torch.random(1,#data1.images)
+         batch[i] = data1.images[id]
       end
 
       if LOGGING_ACTIONS and mode=='Caus' then

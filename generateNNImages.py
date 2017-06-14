@@ -12,11 +12,11 @@ import subprocess
 nbr_images = -1
 
 subprocess.call(['th','create_plotStates_file_for_all_seq.lua'])
+subprocess.call(['th','create_all_reward.lua'])
 
 ALL_STATE_FILE = 'allStates.txt'
 LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
 LAST_MODEL_FILE = 'lastModel.txt'
-
 
 if len(sys.argv) <= 1:
     sys.exit("Give number of neighbors to produce, followed by number of input images (and model dir if you don't want to use the last model created)")
