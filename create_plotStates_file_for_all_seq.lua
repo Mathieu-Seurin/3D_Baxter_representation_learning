@@ -1,11 +1,10 @@
 require 'functions'
 
-
 images_folder = DATA_FOLDER --MOBILE_ROBOT
 print("images_folder used :",images_folder)
 
 list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(images_folder)
-print("Reading rewards from file list_txt_button= ",list_txt_button, ' in DATA_FOLDER: ', DATA_FOLDER)
+print("Reading rewards from file list_txt_button= ",list_txt_button, ' in DATA_FOLDER: ', images_folder)
 print("list_txt_state",list_txt_state)
 
 outStr = ''
@@ -57,6 +56,8 @@ for num_line=1,#all_path do
    outStr = outStr..'\n'
 end
 
-f = io.open('allStates.txt', 'w')
+f = io.open('allStates.txt', 'w')-- for last model run
+f:write(outStr)
+f = io.open('allStates_'..images_folder..'.txt', 'w') -- for evaluation purposes efficiency
 f:write(outStr)
 f:close()

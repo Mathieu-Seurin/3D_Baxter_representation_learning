@@ -19,6 +19,8 @@ for num_line=1,#all_button do
    outStr = outStr..all_button[num_line]..' \n'
 end
 
-f = io.open('allRewards.txt', 'w')
+f = io.open('allRewards.txt', 'w') -- for last model run
+f:write(outStr)
+f = io.open('allRewards_'..images_folder..'.txt', 'w') -- for evaluation purposes efficiency
 f:write(outStr)
 f:close()

@@ -5,9 +5,11 @@ from sklearn.neighbors import NearestNeighbors
 import shutil
 import random
 import sys
-import pandas
+import pandas as pd
 import os, os.path
 import subprocess
+import unittest 
+test = unittest.TestCase('__init__')
 
 nbr_images = -1
 
@@ -17,6 +19,7 @@ ALL_STATE_FILE = 'allStates.txt'
 LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
 LAST_MODEL_FILE = 'lastModel.txt'
 GLOBAL_SCORE_LOG_FILE = 'globalScoreLog.csv'
+
 
 if len(sys.argv) <= 1:
     sys.exit("Give number of neighbors to produce, followed by number of input images (and model dir if you don't want to use the last model created)")
@@ -51,7 +54,6 @@ for line in file_representation:
         images.append(words[0])
         representations.append(words[1:])
 
-
 #Parsing true state file
 #===================
 true_states = {}
@@ -62,14 +64,14 @@ for line in file_state:
         words = line.split()
         true_states[words[0]] = np.array(map(float,words[1:]))
 
-
 #Compute nearest neighbors
 nbrs = NearestNeighbors(n_neighbors=(nbr_neighbors+1), algorithm='ball_tree').fit(representations)
 distances, indexes = nbrs.kneighbors(representations)
 
 #Generate mosaics
 path_to_neighbour = path_to_model + '/NearestNeighbors/'
-print "path_to_model: ",path_to_model
+last_model_name = path_to_model.split('/')[-1]
+print "path_to_model: ",path_to_model 
 print "path_to_neighbour: ",path_to_neighbour
 #shutil.rmtree('NearestNeighbors', 1)
 if not os.path.exists(path_to_neighbour):
@@ -104,14 +106,13 @@ for img_name,id,dist,state in data:
 	state_str='[' + ",".join(['{:.3f}'.format(float(x)) for x in state]) + "]"
 	a.set_title(seq_name + "/" + base_name + ": \n" + state_str)
 
-        original_coord = true_states[img_name]
+	original_coord = true_states[img_name]
 
 	for i in range(0,nbr_neighbors):
 		a=fig.add_subplot(1,nbr_neighbors+1,i+2)
 		img_name=images[id[i+1]]
 		img = mpimg.imread(img_name)
 		imgplot = plt.imshow(img)
-
 
 		base_name_n= os.path.splitext(os.path.basename(img_name))[0]
 		seq_name_n= img_name.split("/")[1]
@@ -122,9 +123,9 @@ for img_name,id,dist,state in data:
 		a.set_title(seq_name_n + "/" + base_name_n + ": \n" + state_str +dist_str)
 		a.axis('off')
 
-                neighbour_coord = true_states[img_name]
-                total_error += np.linalg.norm(neighbour_coord-original_coord)
-                nb_tot_img += 1
+        neighbour_coord = true_states[img_name]
+        total_error += np.linalg.norm(neighbour_coord-original_coord)
+        nb_tot_img += 1
 
 
 	plt.tight_layout()
@@ -142,19 +143,18 @@ f.write(str(mean_error)[:5])
 f.close()
 
 # writing scores to global log for plotting and reporting
-header = ['#MODEL', 'MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD','CONTINUOUS_ACTION_SIGMA']
+header = ('#MODEL', 'KNN_MSE')#['#MODEL', 'MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD','CONTINUOUS_ACTION_SIGMA']
 #if os.path.isfile(GLOBAL_SCORE_LOG_FILE):
 # 	global_scores_df = pd.DataFrame(columns= header)
 # else:
 	#global_scores_df = pd.read_csv(GLOBAL_SCORE_LOG_FILE, columns= header)
 	
-global_scores_df = pd.DataFrame({'#MODEL':model, 'KNN-MSE': mean_error}) #'MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD': MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD, 'CONTINUOUS_ACTION_SIGMA':CONTINUOUS_ACTION_SIGMA})
+#global_scores_df = pd.DataFrame(columns=('#MODEL', 'KNN-MSE')) #'MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD': MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD, 'CONTINUOUS_ACTION_SIGMA':CONTINUOUS_ACTION_SIGMA})
+global_scores_df = pd.DataFrame.from_dict({'#MODEL':[last_model_name], 'KNN_MSE': [mean_error]})#, columns= header) 
 
 if not os.path.isfile(GLOBAL_SCORE_LOG_FILE):
    global_scores_df.to_csv(GLOBAL_SCORE_LOG_FILE, header = header)
 else: # else it exists so append without writing the header
-    global_scores_df.to_csv(GLOBAL_SCORE_LOG_FILE, mode ='a', header=False)
+    global_scores_df.to_csv(GLOBAL_SCORE_LOG_FILE, mode ='a', header=False) 
     
-print 'Saved mean KNN MSE scores to ',score_file , ' and to ', GLOBAL_SCORE_LOG_FILE
-print global_scores_df.head()
-
+print 'Saved mean KNN MSE score entry from model ', last_model_name, ' to ', GLOBAL_SCORE_LOG_FILE, '. Last score is in: ',score_file 
