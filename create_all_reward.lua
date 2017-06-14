@@ -10,7 +10,7 @@ all_button = {}
 for num_line, seq_str in ipairs(list_txt_button) do
    local t,_ = tensorFromTxt(seq_str)
 
-   for num_button=1,t:size(1)-1 do
+   for num_button=1,t:size(1) do
          all_button[#all_button+1] = t[num_button][REWARD_INDEX]
    end
 end

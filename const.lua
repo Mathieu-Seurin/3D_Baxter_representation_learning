@@ -21,6 +21,11 @@ require 'hyperparams'
 USE_CUDA = true
 USE_SECOND_GPU = true
 
+if USE_CUDA then
+   require 'cunn'
+   require 'cudnn'
+end
+
 if USE_CUDA and USE_SECOND_GPU then
    cutorch.setDevice(2)
 end
@@ -37,6 +42,7 @@ MODEL_PATH = LOG_FOLDER
 STRING_MEAN_AND_STD_FILE = PRELOAD_FOLDER..'meanStdImages_'..DATA_FOLDER..'.t7'
 LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
 LAST_MODEL_FILE = 'lastModel.txt'
+GLOBAL_SCORE_LOG_FILE = 'globalScoreLog.csv'
 
 now = os.date("*t")
 _, architecture_name = MODEL_ARCHITECTURE_FILE:match("(.+)/(.+)") --architecture_name, _ = split(architecture_name, ".")

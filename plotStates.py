@@ -28,7 +28,7 @@ def plot_3D(x =[1,2,3,4,5,6,7,8,9,10], y =[5,6,2,3,13,4,1,2,4,8], z =[2,3,3,3,5,
     ax.set_xlabel(axes_labels[0])
     ax.set_ylabel(axes_labels[1])
     ax.set_zlabel(axes_labels[2])
-    ax.set_title(title+dataset)
+    ax.set_title(title+dataset) # TODO: add to plot title the dataset name with getDatasetNameFromModelName()
     # plt.savefig(plot_path)
     # plt.show()
 
@@ -87,9 +87,11 @@ else:
 for line in reward_file:
     if line[0]!='#':
         words=line.split(' ')
-        rewards_l.append(float(words[0]))
+        rewards_l.append(words[0])
 
-rewards=np.asarray(rewards_l)
+rewards=rewards_l
+#rewards=rewards_l
+
 toplot=states
 REPRESENTATIONS_DIMENSIONS = len(states[0])
 
@@ -102,20 +104,20 @@ if REPRESENTATIONS_DIMENSIONS >2: #.ndim >2:
     #cmap=plt.cm.plasma
     # print toplot[0:10,0]
     # print toplot[0:10,1]
-    # print rewards[0:10]
 else:
     PLOT_DIMENSIONS = 2
     print "[PCA not applied since learnt representations' dimensions are not larger than 2]"
 print "Visualizing states with #REPRESENTATIONS_DIMENSIONS =", REPRESENTATIONS_DIMENSIONS, ' in ',PLOT_DIMENSIONS,'D'
 
-cmap = colors.ListedColormap(['blue', 'red', 'green'])  # TODO: adjust for different cardinal of reward types according to dataset
-bounds=[-1,0,9,15] #TODO: parametrize according to the dataset
+cmap = colors.ListedColormap(['blue', 'grey', 'red'])  # TODO: adjust for different cardinal of reward types according to dataset
+bounds=[-1,0,9,15] #TODO: parametrize according to the dataset?
 norm = colors.BoundaryNorm(bounds, cmap.N)
+
 if PLOT_DIMENSIONS == 2:
     plt.scatter(toplot[:,0],toplot[:,1],c=rewards,cmap=cmap, norm=norm,marker="o")
 elif PLOT_DIMENSIONS ==3: 
     plot_3D(toplot[:,0], toplot[:,1], toplot[:,2], dataset=model_name)
-    plt.scatter(toplot[:,0],toplot[:,1],c=rewards,cmap=cmap, norm=norm,marker="o")
+    #plt.scatter(toplot[:,0],toplot[:,1],c=rewards,cmap=cmap, norm=norm,marker="o")
 elif PLOT_DIMENSIONS == 1:
     plt.scatter(toplot[:,0], rewards, c=rewards, cmap=cmap, norm=norm,marker="o")
 else:
@@ -129,7 +131,7 @@ if PLOT_DIMENSIONS == 3:
 else:
     d1_mean = d2_mean = d3_mean = d1_std = d2_std = d3_std  = ''
 
-plot_path = path+'ActionsSparsityPlot_'+model_name+'.png'
+plot_path = path+'LearnedStatesSparsityPlot_'+model_name+'.png'
 print('Saving plot to '+plot_path)
 plt.savefig(plot_path)
 plt.show()
