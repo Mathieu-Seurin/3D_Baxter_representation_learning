@@ -1,10 +1,10 @@
 require 'functions'
 
-print("Creating all state for NN-Quantitative Criterion")
 images_folder = DATA_FOLDER --MOBILE_ROBOT
+print("Creating all states file for NN-Quantitative Criterion plot. DATA_FOLDER: "..images_folder)
 list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(images_folder)
-print("Reading rewards from file list_txt_button= ",list_txt_button, ' in DATA_FOLDER: ', images_folder)
-print("list_txt_state",list_txt_state)
+print("Reading rewards from file list_txt_button= ",list_txt_button)
+print("list_txt_state: ",list_txt_state)
 
 outStr = ''
 

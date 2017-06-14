@@ -4,6 +4,7 @@ from matplotlib import colors
 from mpl_toolkits.mplot3d import Axes3D
 import sys
 import numpy as np
+import os, os.path
 import unittest 
 test = unittest.TestCase('__init__')
 
@@ -65,8 +66,17 @@ else:
     state_file_str = sys.argv[1]
     reward_file_str = sys.argv[2]
 
-state_file=open(state_file_str)
-reward_file=open(reward_file_str)
+if os.path.isfile(state_file_str):
+    state_file=open(state_file_str)
+else:
+    print 'ERROR: states file does not exist: ', state_file_str,'. Make sure you run first script.lua and imagesAndRepr.lua with the right DATA_FOLDER setting, as well as create_all_reward.lua and create_plotStates_file_for_all_seq.lua'
+    sys.exit(-1)
+if os.path.isfile(reward_file_str):
+    reward_file=open(reward_file_str)
+else:
+    print 'ERROR: rewards file does not exist: ', reward_file_str,'. Make sure you run first script.lua and imagesAndRepr.lua with the right DATA_FOLDER setting, as well as create_all_reward.lua and create_plotStates_file_for_all_seq.lua'
+    sys.exit(-1)
+
 total_rewards = sum(1 for line in reward_file)
 total_states = sum(1 for line in state_file)
 print "Ploting total states and total rewards: ",total_states, " ", total_rewards," in files: ",state_file_str," and ", reward_file_str
@@ -145,8 +155,7 @@ norm = colors.BoundaryNorm(bounds, cmap.N)
 if PLOT_DIMENSIONS == 2:
     plt.scatter(toplot[:,0],toplot[:,1],c=rewards,cmap=cmap, norm=norm,marker="o")
 elif PLOT_DIMENSIONS ==3: 
-    plot_3D(toplot[:,0], toplot[:,1], toplot[:,2], dataset=model_name)
-    #plt.scatter(toplot[:,0],toplot[:,1],c=rewards,cmap=cmap, norm=norm,marker="o")
+    plot_3D(toplot[:,0], toplot[:,1], toplot[:,2], dataset=model_name)     #plt.scatter(toplot[:,0],toplot[:,1],c=rewards,cmap=cmap, norm=norm,marker="o")
 elif PLOT_DIMENSIONS == 1:
     plt.scatter(toplot[:,0], rewards, c=rewards, cmap=cmap, norm=norm,marker="o")
 else:

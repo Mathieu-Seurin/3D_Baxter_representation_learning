@@ -1,8 +1,7 @@
 require 'functions'
 
-print("Creating all rewards for plot")
-
 images_folder = DATA_FOLDER --MOBILE_ROBOT
+print("Creating all rewards for plot. DATA_FOLDER: "..images_folder)
 list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(images_folder)
 
 all_button = {}
