@@ -17,6 +17,7 @@ SIMPLEDATA3D = 'simpleData3D'
 
 LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
 GLOBAL_SCORE_LOG_FILE = 'globalScoreLog.csv'
+MODELS_CONFIG_LOG_FILE  = 'modelsConfigLog.csv'
 
 DATA_FOLDER = MOBILE_ROBOT
 #DATA_FOLDER = BABBLING
@@ -217,17 +218,15 @@ plot_states_and_rewards(records, records_rewards)
 ############ PLOT ALL EXPERIMENTS SCORES
 
 # writing scores to global log for plotting and reporting
-header = ['#MODEL', 'MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD','CONTINUOUS_ACTION_SIGMA']
-#if os.path.isfile(GLOBAL_SCORE_LOG_FILE):
-#   global_scores_df = pd.DataFrame(columns= header)
-# else:
-    #global_scores_df = pd.read_csv(GLOBAL_SCORE_LOG_FILE, columns= header)
-    
-global_scores_df = pd.DataFrame({'#MODEL':model, 'KNN-MSE': mean_error}) #'MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD': MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD, 'CONTINUOUS_ACTION_SIGMA':CONTINUOUS_ACTION_SIGMA})
+header = ['#MODEL', 'KNN_MSE']#MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD','CONTINUOUS_ACTION_SIGMA'] # TODO: JOIN
+if os.path.isfile(GLOBAL_SCORE_LOG_FILE) and os.path.isfile(MODELS_CONFIG_LOG_FILE):
+    global_scores_df = pd.DataFrame.read_csv(GLOBAL_SCORE_LOG_FILE, columns = header) #'MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD': MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD, 'CONTINUOUS_ACTION_SIGMA':CONTINUOUS_ACTION_SIGMA})
+    models_header = ['#MODEL', 'MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD','CONTINUOUS_ACTION_SIGMA']
+    models_df = pd.DataFrame.read_csv(MODELS_CONFIG_LOG_FILE, columns = header) 
 
-
-
-global_scores_df.sort_values(by='#MODEL', inplace=True )
-# Plot all actions (position) data
-print "PLOTTING ALL experiments scores for a varying number of MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD and  CONTINUOUS_ACTION_SIGMA  in ",DATA_FOLDER
-plot_states_and_rewards(records, records_rewards)
+    global_scores_df.sort_values(by='#MODEL', inplace=True )
+    # Plot all actions (position) data
+    print "PLOTTING ALL experiments scores for a varying number of MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD and  CONTINUOUS_ACTION_SIGMA  in ",DATA_FOLDER
+    plot_states_and_rewards(records, records_rewards)
+else:
+    print 'Error: the following files must exist to plot MSE over configuration values: ',GLOBAL_SCORE_LOG_FILE, ' and ', MODELS_CONFIG_LOG_FILE

@@ -1,9 +1,10 @@
 require 'functions'
 
-print("Creating all state for NN-Quantitative Criterion")
-
 images_folder = DATA_FOLDER --MOBILE_ROBOT
+print("Creating all states file for NN-Quantitative Criterion plot. DATA_FOLDER: "..images_folder)
 list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(images_folder)
+print("Reading rewards from file list_txt_button= ",list_txt_button)
+print("list_txt_state: ",list_txt_state)
 
 outStr = ''
 
@@ -52,6 +53,8 @@ for num_line=1,#all_path do
    outStr = outStr..'\n'
 end
 
-f = io.open('allStates.txt', 'w')
+f = io.open('allStates.txt', 'w')-- for last model run
+f:write(outStr)
+f = io.open('allStates_'..images_folder..'.txt', 'w') -- for evaluation purposes efficiency
 f:write(outStr)
 f:close()
