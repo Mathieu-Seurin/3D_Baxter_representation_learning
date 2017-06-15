@@ -14,7 +14,9 @@ MOBILE_ROBOT = 'mobileRobot'
 SIMPLEDATA3D = 'simpleData3D'
 PUSHING_BUTTON_AUGMENTED = 'pushingButton3DAugmented'
 
+# 2 options of plotting:
 LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
+#ALL_GROUND_TRUTH_STATES_FILE = 
 
 plotGroundTruthStates = False 
 # true if we plot ground truth observed states, and false to plot the learned state representations
@@ -66,23 +68,17 @@ else:
     state_file_str = sys.argv[1]
     reward_file_str = sys.argv[2]
 
-if os.path.isfile(state_file_str):
-    state_file=open(state_file_str)
-else:
+if not os.path.isfile(state_file_str):
+    #state_file=open(state_file_str)
     print 'ERROR: states file does not exist: ', state_file_str,'. Make sure you run first script.lua and imagesAndRepr.lua with the right DATA_FOLDER setting, as well as create_all_reward.lua and create_plotStates_file_for_all_seq.lua'
     sys.exit(-1)
-if os.path.isfile(reward_file_str):
+if not os.path.isfile(reward_file_str):
     reward_file=open(reward_file_str)
-else:
     print 'ERROR: rewards file does not exist: ', reward_file_str,'. Make sure you run first script.lua and imagesAndRepr.lua with the right DATA_FOLDER setting, as well as create_all_reward.lua and create_plotStates_file_for_all_seq.lua'
     sys.exit(-1)
 
-total_rewards = sum(1 for line in reward_file)
-total_states = sum(1 for line in state_file)
-print "Ploting total states and total rewards: ",total_states, " ", total_rewards," in files: ",state_file_str," and ", reward_file_str
-if plotGroundTruthStates:
-    test.assertEqual(total_rewards, total_states, "Datapoints size discordance! Length of rewards and state files should be equal, and it is "+str(len(rewards))+" and "+str(len(toplot))+" Run first create_all_reward.lua and create_plotStates_file_for_all_seq.lua")
-        
+total_rewards = 0#sum(1 for line in reward_file)
+total_states = 0 #sum(1 for line in state_file)        
 states_l=[]
 rewards_l=[]
 
@@ -102,18 +98,15 @@ else:
     # else:
     #     print 'ERROR: Unsupported dataset, pattern not found in ', state_file_str,'. Make sure you run first script.lua and imagesAndRepr.lua with the right DATA_FOLDER setting'
     #     sys.exit(-1)
-
-    for line in state_file:
-        print 'line'
-        if line[0]!='#':
-            # Saving each image file and its learned representations
-            words=line.split(' ')
-            states_l.append((words[0],list(map(float,words[1:-1]))))
+    with open(state_file_str) as f:
+        for line in f:
+            if line[0]!='#':
+                # Saving each image file and its learned representations
+                words=line.split(' ')
+                states_l.append((words[0], list(map(float,words[1:-1]))))
+                total_states += 1
 
     states_l.sort(key= lambda x : x[0])
-    print 'states: '
-    print(states_l)
-    print(type(states_l))
     states = np.zeros((len(states_l), len(states_l[0][1])))
 
     for i in range(len(states_l)):
@@ -121,15 +114,18 @@ else:
         states[i] = np.array(states_l[i][1])
 
 # getting rewards 
-for line in reward_file:
-    if line[0]!='#':
-        words=line.split(' ')
-        rewards_l.append(words[0])
-
+with open(reward_file_str) as f:
+    for line in f:
+        if line[0]!='#':
+            words=line.split(' ')
+            rewards_l.append(words[0])
+            total_rewards+= 1
 rewards=rewards_l
-#rewards=rewards_l
-
 toplot=states
+
+print "Ploting total states and total rewards: ",total_states, " ", total_rewards," in files: ",state_file_str," and ", reward_file_str
+test.assertEqual(total_rewards, total_states, "Datapoints size discordance! Length of rewards and state files should be equal, and it is "+str(len(rewards))+" and "+str(len(toplot))+" Run first create_all_reward.lua and create_plotStates_file_for_all_seq.lua")
+
 REPRESENTATIONS_DIMENSIONS = len(states[0])
 
 if REPRESENTATIONS_DIMENSIONS >3: 
@@ -161,7 +157,6 @@ elif PLOT_DIMENSIONS == 1:
 else:
     print " PLOT_DIMENSIONS undefined"
 
-print rewards
 print('\nSaved plot to '+plot_path)
 plt.savefig(plot_path)
 plt.show()

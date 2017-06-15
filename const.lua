@@ -18,12 +18,12 @@ require 'hyperparams'
 --===========================================================
 -- CUDA CONSTANTS
 --===========================================================
-USE_CUDA = true
+USE_CUDA = false
 USE_SECOND_GPU = true
 
 if USE_CUDA then
-   require 'cunn'
-   require 'cudnn'
+    require 'cunn'
+    require 'cudnn'
 end
 
 if USE_CUDA and USE_SECOND_GPU then
