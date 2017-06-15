@@ -1,7 +1,5 @@
 require 'nn'
 
--- network-------------------------------------------------------
-
 function getModel()
 
    encoder = nn.Sequential()
@@ -51,9 +49,9 @@ function getModel()
    decoder:add(nn.SpatialConvolution(16, 3, 3, 3, 1, 1, 1, 1))
    decoder:add(nn.View(3, 200, 200))
 
-   -- Initiallisation : "Understanding the difficulty of training deep feedforward neural networks"
-   local method = 'xavier'
-   local encoder = require('weight-init')(encoder, method)
+   -- -- Initiallisation : "Understanding the difficulty of training deep feedforward neural networks"
+   -- local method = 'xavier'
+   -- local encoder = require('weight-init')(encoder, method)
    
    -- Create autoencoder
    autoencoder = nn.Sequential()

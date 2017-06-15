@@ -21,9 +21,8 @@ FROZEN_LAYER = 3 --the number of layers that don't learn at all (i.e., their lea
 BASE_TIMNET = './models/topUniqueSimplerWOTanh'
 
 --MODEL_ARCHITECTURE_FILE = INCEPTIONV4 --Too big
---MODEL_ARCHITECTURE_FILE = BASE_TIMNET--without last layer as Tanh
-MODEL_ARCHITECTURE_FILE = RESNET
-print("Model :",MODEL_ARCHITECTURE_FILE)
+MODEL_ARCHITECTURE_FILE = BASE_TIMNET--without last layer as Tanh
+--MODEL_ARCHITECTURE_FILE = RESNET
 
 --======================================================
 --Continuous actions SETTINGS
@@ -56,7 +55,7 @@ LR_DECAY = 1e-6
 
 SGD_METHOD = 'adam' -- Can be adam or adagrad
 BATCH_SIZE = 5
-NB_EPOCHS=10
+NB_EPOCHS=20
 
 DATA_AUGMENTATION = 0.01
 NORMALIZE_IMAGE = true

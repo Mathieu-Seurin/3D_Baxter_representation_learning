@@ -19,16 +19,14 @@ print("============ DATA USED =========\n",
       "\n================================")
 
 -- OVERRIDING hyperparameters since it's not for auto-encoders :
-LR = 0.001
+LR = 0.0001
 BATCH_SIZE=20
-NUM_HIDDEN = DIMENSION_OUT
-NORMALIZE_IMAGE = false
-IM_LENGTH = 200
-IM_HEIGHT = 200
+NUM_HIDDEN = 20
+NOISE = true
 
 if DIFFERENT_FORMAT then
    error([[Don't forget to switch model to BASE_TIMNET in hyperparameters
-Because the images' format is the same for auto-encoder"]])
+Because the images' format is the same for auto-encoder]])
 end
 
 
@@ -38,12 +36,11 @@ function AE_Training(model,batch)
    if opt.optimiser=="sgd" then  optimizer = optim.sgd end
    if opt.optimiser=="rmsprop" then  optimizer = optim.rmsprop end
    if opt.optimiser=="adam" then optimizer = optim.adam end
-   model:cuda()
 
    input=batch
    expected=batch
 
-   if opt.model=="DAE" then
+   if NOISE then
       noise=torch.rand(batch:size())
       noise=(noise-noise:mean())/(noise:std())
       noise=noise:cuda()
@@ -60,7 +57,7 @@ function AE_Training(model,batch)
       end
       --reset gradients
       gradParameters:zero()
-      criterion=nn.AbsCriterion()
+      criterion=nn.SmoothL1Criterion()
       criterion=criterion:cuda()
       ouput=model:forward(input)
       loss = criterion:forward(ouput, expected)
@@ -74,12 +71,30 @@ function AE_Training(model,batch)
    return loss[1]
 end
 
+function test_model(model, list_folders_images)
+
+   criterion=nn.SmoothL1Criterion()
+   criterion:cuda()
+
+   for num_test=0,NB_TEST-1 do
+      local id_test = #list_folders_images - num_test
+      local seq = load_seq_by_id(id_test)
+      for im=1,#seq.images do
+         current_img = seq.images[im]:view(1,3,200,200):cuda()
+         output = model:forward(current_img)
+
+         if VISUALIZE_AE and im == 1 then
+            local img_merge = image.toDisplayTensor({current_img[1],output})
+            image.display{image=img_merge,win=WINDOW}
+            io.read()
+         end
+      end
+   end
+end
 
 function train_Epoch(list_folders_images,list_txt,Log_Folder)
 
-   nbList= #list_folders_images
-   local nbEpoch=5
-   local totImg=AVG_FRAMES_PER_RECORD*nbList
+   local totImg=AVG_FRAMES_PER_RECORD*NB_SEQUENCES
 
    print("totImg",totImg)
    local nbIter=math.floor(totImg/BATCH_SIZE)
@@ -89,7 +104,7 @@ function train_Epoch(list_folders_images,list_txt,Log_Folder)
    local loss=0
 
    print("Begin Learning")
-   for epoch=1, nbEpoch do
+   for epoch=1,NB_EPOCHS do
       loss=0
       print('--------------Epoch : '..epoch..' ---------------')
       for iter=1, nbIter do
@@ -102,6 +117,10 @@ function train_Epoch(list_folders_images,list_txt,Log_Folder)
       end
       print("Mean Loss : "..loss/(nbIter*BATCH_SIZE))
       save_autoencoder(model,name_save)
+
+      if epoch > 15 then
+         test_model(model, list_folders_images)
+      end
    end
 end
 
@@ -111,20 +130,17 @@ cmd:option('-optimiser', 'adam', 'Optimiser : adam|sgd|rmsprop')
 cmd:option('-model', 'DAE', 'model : AE|DAE')
 opt = cmd:parse(arg)
 
-
-torch.manualSeed(1337)
-LR=0.001
-
-local Log_Folder='./Log/'
 local list_folders_images, list_txt=Get_HeadCamera_View_Files(DATA_FOLDER)
+ 
+NB_TEST = 3
+NB_SEQUENCES = #list_folders_images-NB_TEST --That way, the last X sequences are used as test
 
-NB_SEQUENCES = #list_folders_images
 ALL_SEQ = precompute_all_seq()
 
 image_width=IM_LENGTH
 image_height=IM_HEIGHT
 
-require('./models/autoencoder_conv.lua')
+require('./models/autoencoder_conv')
 model = getModel()
 model=model:cuda()
 

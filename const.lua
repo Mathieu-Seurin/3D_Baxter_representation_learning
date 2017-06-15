@@ -67,14 +67,15 @@ VISUALIZE_IMAGES_TAKEN = false
 VISUALIZE_CAUS_IMAGE = false
 VISUALIZE_IMAGE_CROP = false
 VISUALIZE_MEAN_STD = false
+VISUALIZE_AE = true
 
-if VISUALIZE_IMAGES_TAKEN or VISUALIZE_CAUS_IMAGE or VISUALIZE_IMAGE_CROP or VISUALIZE_MEAN_STD then
+
+if VISUALIZE_IMAGES_TAKEN or VISUALIZE_CAUS_IMAGE or VISUALIZE_IMAGE_CROP or VISUALIZE_MEAN_STD or VISUALIZE_AE then
    --Creepy, but need a placeholder, to prevent many window to pop
    WINDOW = image.display(image.lena())
 end
 
 LOGGING_ACTIONS = false
-
 
 IS_INCEPTION = string.find(MODEL_ARCHITECTURE_FILE, 'inception')
 -- since the model require images to be a 3x299x299, and normalize differently, we need to adapt
