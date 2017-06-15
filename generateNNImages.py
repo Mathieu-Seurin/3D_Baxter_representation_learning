@@ -153,7 +153,7 @@ header = ('#MODEL', 'KNN_MSE')#['#MODEL', 'MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD'
 	
 #global_scores_df = pd.DataFrame(columns=('#MODEL', 'KNN-MSE')) #'MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD': MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD, 'CONTINUOUS_ACTION_SIGMA':CONTINUOUS_ACTION_SIGMA})
 global_scores_df = pd.DataFrame.from_dict({'#MODEL':[last_model_name], 'KNN_MSE': [mean_error]})#, columns= header) 
-
+global_scores_df.reset_index()
 if not os.path.isfile(GLOBAL_SCORE_LOG_FILE):
    global_scores_df.to_csv(GLOBAL_SCORE_LOG_FILE, header = header)
 else: # else it exists so append without writing the header
