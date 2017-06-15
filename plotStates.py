@@ -144,14 +144,18 @@ else:
     PLOT_DIMENSIONS = 3  # Default, if mobileData used, we plot just 2
 print "\nVisualizing states with #REPRESENTATIONS_DIMENSIONS =", REPRESENTATIONS_DIMENSIONS, ' in ',PLOT_DIMENSIONS,'D'
 
-cmap = colors.ListedColormap(['blue', 'grey', 'red'])  # TODO: adjust for different cardinal of reward types according to dataset
-bounds=[-1,0,9,15] #TODO: parametrize according to the dataset?
-norm = colors.BoundaryNorm(bounds, cmap.N)
 
 if PLOT_DIMENSIONS == 2:
-    plt.scatter(toplot[:,0],toplot[:,1],c=rewards,cmap=cmap, norm=norm,marker="o")
-elif PLOT_DIMENSIONS ==3: 
-    plot_3D(toplot[:,0], toplot[:,1], toplot[:,2], dataset=model_name)     #plt.scatter(toplot[:,0],toplot[:,1],c=rewards,cmap=cmap, norm=norm,marker="o")
+    fig = plt.figure()
+    ax = fig.add_subplot(111)#, projection = '2d')
+    for c, m, zlow, zhigh in [('r', 'o', -10, 0.4), ('b', '^', 0.5, 10)]:
+        ax.scatter(toplot[:,0],toplot[:,1], c=c, marker=m)
+    #plt.scatter(toplot[:,0],toplot[:,1],c=rewards,cmap=cmap, norm=norm,marker="o")
+elif PLOT_DIMENSIONS ==3:
+    cmap = colors.ListedColormap(['blue', 'green', 'red'])  # TODO: adjust for different cardi$
+    bounds=[-1,0,9,15] # TODO: parametrize according to the dataset?
+    norm = colors.BoundaryNorm(bounds, cmap.N)
+    plot_3D(toplot[:,0], toplot[:,1], toplot[:,2], dataset=model_name)     #plt.scatter(toplot$
 elif PLOT_DIMENSIONS == 1:
     plt.scatter(toplot[:,0], rewards, c=rewards, cmap=cmap, norm=norm,marker="o")
 else:
