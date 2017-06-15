@@ -160,12 +160,15 @@ print "\nVisualizing states with #REPRESENTATIONS_DIMENSIONS =", REPRESENTATIONS
 
 
 if PLOT_DIMENSIONS == 2:
-    plotStates('2D', rewards, toplot, plot_path, dataset=model_name)     
     # fig = plt.figure()
     # ax = fig.add_subplot(111)#, projection = '2d')
-    # for c, m, zlow, zhigh in [('r', 'o', -10, 0.4), ('b', '^', 0.5, 10)]:
+    # bounds=[-1,0,9,15] #TODO: parametrize according to the dataset
+    # cmap = colors.ListedColormap(['blue','grey','red'])
+    # norm = colors.BoundaryNorm(bounds, cmap.N)
+    # plt.scatter(toplot[:,0],toplot[:,1],c=rewards,cmap=cmap, norm=norm,marker="o")
+    # b) for c, m, zlow, zhigh in [('r', 'o', -10, 0.4), ('b', '^', 0.5, 10)]:
     #     ax.scatter(toplot[:,0],toplot[:,1], c=c, marker=m)
-    #plt.scatter(toplot[:,0],toplot[:,1],c=rewards,cmap=cmap, norm=norm,marker="o")
+    plotStates('2D', rewards, toplot, plot_path, dataset=model_name) 
 elif PLOT_DIMENSIONS ==3:
     plotStates('3D', rewards, toplot, plot_path, dataset=model_name)    
 # elif PLOT_DIMENSIONS == 1:  #TODO  extend plotStates('1D') or allow cmap to run without gray -1 error
