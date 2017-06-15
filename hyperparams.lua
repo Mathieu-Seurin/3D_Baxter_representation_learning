@@ -6,8 +6,8 @@ SIMPLEDATA3D = 'simpleData3D' --  oldest simplest dataset
 PUSHING_BUTTON_AUGMENTED = 'pushingButton3DAugmented'
 BABBLING = 'babbling'
 
-DATA_FOLDER = MOBILE_ROBOT
---DATA_FOLDER = PUSHING_BUTTON_AUGMENTED
+--DATA_FOLDER = MOBILE_ROBOT
+DATA_FOLDER = PUSHING_BUTTON_AUGMENTED
 --DATA_FOLDER = BABBLING
 
 --================ MODEL USED =====================
@@ -21,8 +21,8 @@ FROZEN_LAYER = 3 --the number of layers that don't learn at all (i.e., their lea
 BASE_TIMNET = './models/topUniqueSimplerWOTanh'
 
 --MODEL_ARCHITECTURE_FILE = INCEPTIONV4 --Too big
-MODEL_ARCHITECTURE_FILE = BASE_TIMNET--without last layer as Tanh
---MODEL_ARCHITECTURE_FILE = RESNET
+--MODEL_ARCHITECTURE_FILE = BASE_TIMNET--without last layer as Tanh
+MODEL_ARCHITECTURE_FILE = RESNET
 print("Model :",MODEL_ARCHITECTURE_FILE)
 
 --======================================================

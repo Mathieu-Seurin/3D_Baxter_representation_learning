@@ -13,13 +13,12 @@ test = unittest.TestCase('__init__')
 
 nbr_images = -1
 
-subprocess.call(['th','create_plotStates_file_for_all_seq.lua'])
+subprocess.call(['th','create_plotStates_file_for_all_seq.lua'])  # COOL trick!!;)
 subprocess.call(['th','create_all_reward.lua'])
 
 ALL_STATE_FILE = 'allStates.txt'
 LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
 LAST_MODEL_FILE = 'lastModel.txt'
-
 GLOBAL_SCORE_LOG_FILE = 'globalScoreLog.csv'
 
 
@@ -152,8 +151,10 @@ header = ('#MODEL', 'KNN_MSE')#['#MODEL', 'MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD'
 	#global_scores_df = pd.read_csv(GLOBAL_SCORE_LOG_FILE, columns= header)
 	
 #global_scores_df = pd.DataFrame(columns=('#MODEL', 'KNN-MSE')) #'MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD': MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD, 'CONTINUOUS_ACTION_SIGMA':CONTINUOUS_ACTION_SIGMA})
-global_scores_df = pd.DataFrame.from_dict({'#MODEL':[last_model_name], 'KNN_MSE': [mean_error]})#, columns= header) 
-global_scores_df.reset_index()
+global_scores_df = pd.DataFrame({'#MODEL':[last_model_name], 'KNN_MSE': [mean_error]})#, columns= header) 
+#global_scores_df.reset_index()
+#global_scores_df.columns = header
+print global_scores_df.head()
 if not os.path.isfile(GLOBAL_SCORE_LOG_FILE):
    global_scores_df.to_csv(GLOBAL_SCORE_LOG_FILE, header = header)
 else: # else it exists so append without writing the header

@@ -1,4 +1,4 @@
-from sklearn.decomposition import PCA
+#from sklearn.decomposition import PCA  # with some version of sklearn fails with ImportError: undefined symbol: PyFPE_jbuf
 import matplotlib.pyplot as plt
 from matplotlib import colors
 from mpl_toolkits.mplot3d import Axes3D
@@ -7,6 +7,7 @@ import numpy as np
 import os, os.path
 import unittest 
 test = unittest.TestCase('__init__')
+import matplotlib
 
 #DATASETS AVAILABLE:
 BABBLING = 'babbling'
@@ -16,10 +17,24 @@ PUSHING_BUTTON_AUGMENTED = 'pushingButton3DAugmented'
 
 # 2 options of plotting:
 LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
-#ALL_GROUND_TRUTH_STATES_FILE = 
 
-plotGroundTruthStates = False 
 # true if we plot ground truth observed states, and false to plot the learned state representations
+plotGroundTruthStates = True 
+
+
+def library_versions_tests():
+    if not matplotlib.__version__.startswith('2.'):
+        print "Using a too old matplotlib version (can be critical for properly plotting reward colours, otherwise the colors are difficult to see), to update, you need to do it via Anaconda: "
+        print "Min version required is 2.0.0. Current version: ", matplotlib.__version__
+        print "Option 1) (Preferred)\n - sudo pip install --upgrade matplotlib"
+        print "2) To install anaconda (WARNING: can make sklearn PCA not work by installing a second version of numpy): \n -wget https://repo.continuum.io/archive/Anaconda2-4.4.0-Linux-x86_64.sh  \n -bash Anaconda2-4.4.0-Linux-x86_64.sh  \n -Restart terminal \n -conda update matplotlib"
+        sys.exit(-1)
+
+    numpy_versions_installed = np.__path__
+    print "numpy_versions_installed: ", numpy_versions_installed 
+    if len(numpy_versions_installed)>1:
+        print "Probably you have installed numpy with and without Anaconda, so there is a conflict because two numpy versions can be used."
+        print "Remove non-Anaconda numpy:\n 1) pip uninstall numpy \n and if needed, install 2.1) pip install numpy  \n 2.2) If 1 does not work: last version in: \n -https://anaconda.org/anaconda/numpy"
 
 def get_data_folder_from_model_name(model_name):
     if BABBLING in model_name:
@@ -34,8 +49,12 @@ def get_data_folder_from_model_name(model_name):
         print "Unsupported dataset!"
 
 def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension 1','State Dimension 2','State Dimension 3'], title='Learned Representations-Rewards Distribution\n', dataset=''): 
+    # Plots states either learned or the ground truth
+    # Useful documentation: https://matplotlib.org/examples/mplot3d/scatter3d_demo.html
+    # TODO: add vertical color bar for representing reward values  https://matplotlib.org/examples/api/colorbar_only.html
     reward_values = set(rewards)
     rewards_cardinal = len(reward_values)
+    rewards = map(float, rewards)
     print'plotStates ',mode,' for rewards cardinal: ',rewards_cardinal,' (', reward_values,')'
     cmap = colors.ListedColormap(['green', 'blue', 'red'])  # TODO: adjust for different cardi$
     bounds=[-1,0,9,15] 
@@ -69,6 +88,10 @@ def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension
     plt.savefig(plot_path)
     print('\nSaved plot to '+plot_path)
 
+
+# PLOTTING #####################
+
+library_versions_tests()
 model_name = ''
 if len(sys.argv) != 3:
     lastModelFile = open('lastModel.txt')
@@ -92,13 +115,13 @@ else:
 
 if not os.path.isfile(state_file_str):
     #state_file=open(state_file_str)
-    print 'ERROR: states file does not exist: ', state_file_str,'. Make sure you run first script.lua and imagesAndRepr.lua with the right DATA_FOLDER setting, as well as create_all_reward.lua and create_plotStates_file_for_all_seq.lua'
-    sys.exit(-1)
+    #print 'ERROR: states file does not exist: ', state_file_str,'. Make sure you run first script.lua and imagesAndRepr.lua with the right DATA_FOLDER setting, as well as create_all_reward.lua and create_plotStates_file_for_all_seq.lua'  ##else:
+    subprocess.call(['th','create_plotStates_file_for_all_seq.lua'])  
 if not os.path.isfile(reward_file_str):
     reward_file=open(reward_file_str)
-    print 'ERROR: rewards file does not exist: ', reward_file_str,'. Make sure you run first script.lua and imagesAndRepr.lua with the right DATA_FOLDER setting, as well as create_all_reward.lua and create_plotStates_file_for_all_seq.lua'
-    sys.exit(-1)
-
+    #print 'ERROR: rewards file does not exist: ', reward_file_str,'. Make sure you run first script.lua and imagesAndRepr.lua with the right DATA_FOLDER setting, as well as create_all_reward.lua and create_plotStates_file_for_all_seq.lua'  #sys.exit(-1)
+#else:
+    subprocess.call(['th','create_all_reward.lua'])
 total_rewards = 0 
 total_states = 0 
 states_l=[]
@@ -147,11 +170,6 @@ if REPRESENTATIONS_DIMENSIONS >3:
     pca = PCA(n_components=PLOT_DIMENSIONS) # default to 3
     pca.fit(states)
     toplot = pca.transform(states)
-
-    #cmap=plt.cm.plasma
-    # print toplot[0:10,0]
-    # print toplot[0:10,1]
-    # print rewards[0:10]
 elif REPRESENTATIONS_DIMENSIONS ==2:
     PLOT_DIMENSIONS = 2 #    print "[PCA not applied since learnt representations' dimensions are not larger than 2]"
 else:
