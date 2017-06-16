@@ -5,9 +5,10 @@ MOBILE_ROBOT = 'mobileRobot'
 SIMPLEDATA3D = 'simpleData3D' --  oldest simplest dataset
 PUSHING_BUTTON_AUGMENTED = 'pushingButton3DAugmented'
 BABBLING = 'babbling'
+STATIC_BUTTON_SIMPLEST = 'staticButtonSimplest'
 
 --DATA_FOLDER = MOBILE_ROBOT
-DATA_FOLDER = PUSHING_BUTTON_AUGMENTED
+DATA_FOLDER = STATIC_BUTTON_SIMPLEST --PUSHING_BUTTON_AUGMENTED
 --DATA_FOLDER = BABBLING
 
 --================ MODEL USED =====================
@@ -66,12 +67,3 @@ COEF_PROP=1
 COEF_REP=1
 COEF_CAUS=1
 DIMENSION_OUT=2
-
-
-if DATA_FOLDER ~= BABBLING then
-    PRIORS_TO_APPLY ={{"Prop","Temp","Caus","Rep"}}
-else
-    -- Causality needs at least 2 different values of reward and in sparse dataset such as babbling_1, this does not occur always
-    PRIORS_TO_APPLY ={{"Rep","Prop","Temp"}}
-    print('WARNING: Until no more than one reward is available, Causality prior will be ignored for dataset '..BABBLING)
-end

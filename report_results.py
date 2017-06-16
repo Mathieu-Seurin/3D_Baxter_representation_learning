@@ -19,7 +19,8 @@ from Utils import GLOBAL_SCORE_LOG_FILE, MODELS_CONFIG_LOG_FILE, ALL_STATS_FILE
 
 def plot_all_config_performance(df):
     # Plot all MSE_KNN scores for each experiment
-    print 'plotting all configurations performance'
+    print "Reporting all experiments KNN_MSE scores for a varying number of MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD and  CONTINUOUS_ACTION_SIGMA "
+    
 
 
 # writing scores to global log for plotting and reporting
@@ -33,7 +34,6 @@ if os.path.isfile(GLOBAL_SCORE_LOG_FILE) and os.path.isfile(MODELS_CONFIG_LOG_FI
     # Sorting frames, as they are not written in the original yml files in timely consecutive real order
     #all_scores_logs.sort_values(by='#Model', inplace=True )
     print "All data joined: \n", all_scores_logs.head()
-    print "PLOTTING ALL experiments scores for a varying number of MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD and  CONTINUOUS_ACTION_SIGMA "
     plot_all_config_performance(all_scores_logs)
     all_scores_logs.to_csv(ALL_STATS_FILE)
 else:

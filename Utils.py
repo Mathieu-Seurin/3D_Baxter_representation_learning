@@ -7,8 +7,6 @@ from mpl_toolkits.mplot3d import Axes3D
 import sys
 import numpy as np
 import os, os.path
-import unittest 
-test = unittest.TestCase('__init__')
 import matplotlib
 
 #DATASETS AVAILABLE:
@@ -16,6 +14,7 @@ BABBLING = 'babbling'
 MOBILE_ROBOT = 'mobileRobot'
 SIMPLEDATA3D = 'simpleData3D'
 PUSHING_BUTTON_AUGMENTED = 'pushingButton3DAugmented'
+STATIC_BUTTON_SIMPLEST = 'staticButtonSimplest'
 
 # 2 options of plotting:
 LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
@@ -34,7 +33,7 @@ def library_versions_tests():
         sys.exit(-1)
 
     numpy_versions_installed = np.__path__
-    print "numpy_versions_installed: ", numpy_versions_installed 
+    #print "numpy_versions_installed: ", numpy_versions_installed 
     if len(numpy_versions_installed)>1:
         print "Probably you have installed numpy with and without Anaconda, so there is a conflict because two numpy versions can be used."
         print "Remove non-Anaconda numpy:\n 1) pip uninstall numpy \n and if needed, install 2.1) pip install -U numpy  \n "

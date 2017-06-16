@@ -9,7 +9,7 @@ import unittest
 test = unittest.TestCase('__init__')
 # True if we plot ground truth observed states, and false to plot the learned state representations
 #plotGroundTruthStates = True 
-plotGroundTruthStates = True
+plotGroundTruthStates = False
 
 
 # PLOTTING GROUND TRUTH OR LEARNED STATES 
