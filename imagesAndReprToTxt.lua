@@ -3,39 +3,26 @@ require 'torch'
 require 'image'
 require 'nn'
 require 'nngraph'
-
 require 'const'
 require 'functions'
 
-if USE_CUDA then
-   require 'cunn'
-   require 'cudnn'
-end
-
 local imagesFolder = DATA_FOLDER
-local path, model_string
+local path, modelString
 -- Last model is a file where the name of the last model computed is saved
 -- this way, you just have to launch the programm without specifying anything,
 -- and it will load the good model
 
-if arg[2] then
-   path = arg[1]
-   model_string = arg[2]
-   DIFFERENT_FORMAT = false
-   IM_LENGTH = 200
-   IM_HEIGHT = 200
-   
-elseif file_exists(LAST_MODEL_FILE) then
+if file_exists(LAST_MODEL_FILE) then
    f = io.open(LAST_MODEL_FILE,'r')
    path = f:read()
-   model_string = f:read()
-   print('MODEL USED (last model logged in '..LAST_MODEL_FILE..') : '..model_string)
+   modelString = f:read()
+   print('MODEL USED (last model logged in '..LAST_MODEL_FILE..') : '..modelString)
    f:close()
 else
    error(LAST_MODEL_FILE.." should exist")
 end
 
-local  model = torch.load(path..'/'..model_string)
+local  model = torch.load(path..'/'..modelString)
 if USE_CUDA then
    model = model:cuda()
 else
@@ -72,7 +59,7 @@ function represent_all_images(imagesFolder)
                end
 
                img = img:double():reshape(1,IM_CHANNEL,IM_LENGTH,IM_HEIGHT)
-               
+
                if USE_CUDA then
                   img = img:cuda()
                end
@@ -91,19 +78,17 @@ function represent_all_images(imagesFolder)
          end
       end
    end
-   
+
    return tempSeq
-end
+end  --TODO call predict and add predict to script?
 
 tempSeq = represent_all_images(imagesFolder)
 
 table.sort(tempSeq, function (a,b) return a[1] < b[1] end)
 tempSeqStr = ''
-
 for key in pairs(tempSeq) do
    tempSeqStr = tempSeqStr..tempSeq[key][2]..'\n'
 end
-
 path_to_output_file = path..'/'..LEARNED_REPRESENTATIONS_FILE
 
 print('Saving images and their learnt representations to file '..path_to_output_file)

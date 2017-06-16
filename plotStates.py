@@ -1,10 +1,15 @@
 # coding: utf-8
 from Utils import library_versions_tests, get_data_folder_from_model_name, plotStates
 from Utils import BABBLING, MOBILE_ROBOT, SIMPLEDATA3D, PUSHING_BUTTON_AUGMENTED, LEARNED_REPRESENTATIONS_FILE
-
+import numpy as np 
+import sys
+import os.path
+import subprocess
+import unittest 
+test = unittest.TestCase('__init__')
 # True if we plot ground truth observed states, and false to plot the learned state representations
 #plotGroundTruthStates = True 
-plotGroundTruthStates = False
+plotGroundTruthStates = True
 
 
 # PLOTTING GROUND TRUTH OR LEARNED STATES 
@@ -16,16 +21,16 @@ model_name = ''
 if len(sys.argv) != 3:
     lastModelFile = open('lastModel.txt')
     path = lastModelFile.readline()[:-1]+'/'
-    model_name = path.split('/')[1]
+    model_name = path.split('/')[1]     #model_name = 'pushingButton3DAugmented' #TODO REMOVE-testing
     data_folder = get_data_folder_from_model_name(model_name)
     reward_file_str = 'allRewards_'+data_folder+'.txt'
     if plotGroundTruthStates:
         state_file_str = 'allStates_'+data_folder+'.txt'
-        print "*********************\nPLOTTING GROUND TRUTH (OBSERVED) STATES (Baxter left wrist position for 3D PUSHING_BUTTON_AUGMENTED dataset, or grid 2D position for MOBILE_ROBOT dataset): ", state_file_str#, ' for model: ', model_name
+        print "*********************\nPLOTTING GROUND TRUTH (OBSERVED) STATES from ", state_file_str#, ' for model: ', model_name#(Baxter left wrist position for 3D PUSHING_BUTTON_AUGMENTED dataset, or grid 2D position for MOBILE_ROBOT dataset)
         plot_path = path+'GroundTruthStatesPlot_'+model_name+'.png'
     else:
         state_file_str = path+ LEARNED_REPRESENTATIONS_FILE
-        print "*********************\nPLOTTING LEARNT STATES (3D for Baxter PUSHING_BUTTON_AUGMENTED dataset, or 2D position for MOBILE_ROBOT dataset): ", state_file_str
+        print "*********************\nPLOTTING LEARNT STATES from ", state_file_str#, ' for model: ', model_name #(3D for Baxter PUSHING_BUTTON_AUGMENTED dataset, or 2D position for MOBILE_ROBOT dataset): ", state_file_str
         plot_path = path+'LearnedStatesPlot_'+model_name+'.png'
     lastModelFile.close()
 else:
