@@ -100,7 +100,7 @@ function Rico_Training(Models,priors_used)
     return loss[1], grad
 end
 
-function train_Epoch(Models, priors_used)
+function train(Models, priors_used)
     local NB_BATCHES= math.ceil(NB_SEQUENCES*AVG_FRAMES_PER_RECORD/BATCH_SIZE/(4+4+2+2))
     --AVG_FRAMES_PER_RECORD to get an idea of the total number of images
     --div by 12 because the network sees 12 images per iteration (i.e. record)
@@ -121,8 +121,9 @@ function train_Epoch(Models, priors_used)
        print("Loss Prop", TOTAL_LOSS_PROP/NB_BATCHES/BATCH_SIZE)
        print("Loss Caus", TOTAL_LOSS_CAUS/NB_BATCHES/BATCH_SIZE)
        print("Loss Rep", TOTAL_LOSS_REP/NB_BATCHES/BATCH_SIZE)
-       save_model(Models.Model1, NAME_SAVE) --Do we need to write NB_EPOCH TIMES? isnt enough the last time to write once and not overwrite NB_EPOCH TIMES?
+       save_model(Models.Model1, NAME_SAVE) --TODO Do we need to write NB_EPOCH TIMES? isnt enough the last time to write once and not overwrite NB_EPOCH TIMES?
    end
+   log_model_params()
    return Models.Model1, NAME_SAVE
 end
 
@@ -173,7 +174,7 @@ for nb_test=1, #PRIORS_CONFIGS_TO_APPLY do
 
    print("Experiment "..nb_test .." (Log_Folder="..Log_Folder.."): Training model using priors: ")
    print(priors_used)
-   train_Epoch(Models, priors_used)
+   train(Models, priors_used)
    print_experiment_config()
 end
 

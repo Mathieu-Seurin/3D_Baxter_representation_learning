@@ -55,7 +55,6 @@ function precompute_all_seq()
    return all_seq
 end
 
-
 ---------------------------------------------------------------------------------------
 -- Function :getRandomBatchFromSeparateList(batch_size, mode)
 -- Input ():
@@ -544,6 +543,19 @@ function getImageFormated(im)
    return img
 end
 
+function log_model_params()
+    if not file_exists(MODELS_CONFIG_LOG_FILE) then
+        columns = '#Model, DATA_FOLDER, MODEL_ARCHITECTURE_FILE, MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD, CONTINUOUS_ACTION_SIGMA\n'
+        f = io.open(MODELS_CONFIG_LOG_FILE, 'w') -- for evaluation purposes efficiency
+        f:write(columns)
+    else
+        f = io.open(MODELS_CONFIG_LOG_FILE, 'a') -- we append
+    end
+
+    entry = NAME_SAVE..', '..DATA_FOLDER..', '..MODEL_ARCHITECTURE_FILE..', '..MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD..', '..CONTINUOUS_ACTION_SIGMA..' \n'
+    f:write(entry)
+    f:close()
+end
 
 function file_exists(name)
    --tests whether the file can be opened for reading
