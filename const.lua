@@ -18,7 +18,7 @@ require 'hyperparams'
 --===========================================================
 -- CUDA CONSTANTS
 --===========================================================
-USE_CUDA = false
+USE_CUDA = true
 USE_SECOND_GPU = true
 
 if USE_CUDA then
