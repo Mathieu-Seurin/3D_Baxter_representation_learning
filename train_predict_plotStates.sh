@@ -1,6 +1,6 @@
 #!/bin/bash
 
-th script.lua
+th script.lua -use_continuous -use_cuda
 th imagesAndReprToTxt.lua
 python generateNNImages.py 10 25
 #   ----- includes the call to:

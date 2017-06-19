@@ -22,10 +22,8 @@ if len(sys.argv) != 3:
     lastModelFile = open('lastModel.txt')
     path = lastModelFile.readline()[:-1]+'/'
     model_name = path.split('/')[1]     
-    # FOR FAST TESTING:  model_name = STATIC_BUTTON_SIMPLEST#'pushingButton3DAugmented' #TODO REMOVE-testing
-    model_name = MOBILE_ROBOT
-    data_folder = get_data_folder_from_model_name(model_name)
-    print data_folder
+    # FOR FAST TESTING:  model_name = STATIC_BUTTON_SIMPLEST#'pushingButton3DAugmented' #TODO REMOVE-testing  model_name = MOBILE_ROBOT
+    data_folder = get_data_folder_from_model_name(model_name) 
     reward_file_str = 'allRewards_'+data_folder+'.txt'
     if plotGroundTruthStates:
         state_file_str = 'allStates_'+data_folder+'.txt'

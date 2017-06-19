@@ -4,6 +4,13 @@ require 'Get_Images_Set'
 tnt = require 'torchnet'
 vision = require 'torchnet-vision'  -- Install via https://github.com/Cadene/torchnet-vision
 
+function print_hyperparameters()
+    print("Model :",MODEL_ARCHITECTURE_FILE)
+    print("\nUSE_CUDA ",USE_CUDA," \nUSE_CONTINUOUS ACTIONS: ",USE_CONTINUOUS)
+    print("============ DATA USED =========\n",
+                    DATA_FOLDER,
+      "\n================================")
+end
 ---------------------------------------------------------------------------------------
 -- Function :save_model(model,path)
 -- Input ():
