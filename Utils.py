@@ -48,6 +48,8 @@ def get_data_folder_from_model_name(model_name):
         return SIMPLEDATA3D
     elif PUSHING_BUTTON_AUGMENTED in model_name:
         return PUSHING_BUTTON_AUGMENTED
+    elif STATIC_BUTTON_SIMPLEST in model_name:
+        return STATIC_BUTTON_SIMPLEST
     else:
         print "Unsupported dataset!"
 
@@ -91,18 +93,6 @@ def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension
     plt.savefig(plot_path)
     print('\nSaved plot to '+plot_path)
 
-
-def get_data_folder_from_model_name(model_name):
-    if BABBLING in model_name:
-        return BABBLING
-    elif MOBILE_ROBOT in model_name:
-        return MOBILE_ROBOT
-    elif SIMPLEDATA3D in model_name:
-        return SIMPLEDATA3D
-    elif PUSHING_BUTTON_AUGMENTED in model_name:
-        return PUSHING_BUTTON_AUGMENTED
-    else:
-        print "Unsupported dataset!"
 
 def plot_3D(x =[1,2,3,4,5,6,7,8,9,10], y =[5,6,2,3,13,4,1,2,4,8], z =[2,3,3,3,5,7,9,11,9,10], axes_labels = ['U','V','W'], title='Learned representations-rewards distribution\n', dataset=''):
 

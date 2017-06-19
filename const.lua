@@ -196,7 +196,6 @@ elseif DATA_FOLDER == BABBLING then
 
   SUB_DIR_IMAGE = 'baxter_pushing_objects'
   AVG_FRAMES_PER_RECORD = 60
-
   -- Causality needs at least 2 different values of reward and in sparse dataset such as babbling_1, this does not occur always
   --PRIORS_TO_APPLY ={{"Rep","Prop","Temp"}}
   PRIORS_CONFIGS_TO_APPLY ={{"Temp"}}--, works best than 3 priors for babbling so far  {"Prop","Temp"}, {"Prop","Rep"},  {"Temp","Rep"}, {"Prop","Temp","Rep"}}  --TODO report 1 vs 2 vs 3 priors, add all prioris when Babbling contains +1 reward value
@@ -240,7 +239,7 @@ elseif DATA_FOLDER == STATIC_BUTTON_SIMPLEST then  -- TODO if nothing changes, a
     FILENAME_FOR_STATE = "recorded_robot_limb_left_endpoint_state.txt"--endpoint_state"
 
     SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
-    AVG_FRAMES_PER_RECORD = 100
+    AVG_FRAMES_PER_RECORD = 90
 
 else
   print("No supported data folder provided, please add either of the data folders defined in hyperparams: "..BABBLING..", "..MOBILE_ROBOT.." "..SIMPLEDATA3D..' or others in const.lua' )
