@@ -30,6 +30,19 @@ if USE_CUDA then
    require 'cudnn'
 end
 
+
+local cmd = torch.CmdLine()
+
+-- Basic options
+cmd:option('-use_cuda', false, 'true (default) to use GPU version, false for CPU only mode (not use cuda)')
+-- cmd:option('-use_continuous', true, 'true (default) to use a continuous action space, false for discrete one (0.5 range actions)')
+-- cmd:option('-data_folder', STATIC_BUTTON_SIMPLEST, 'Dataset to use: staticButtonSimplest (default), mobileRobot, simpleData3D, pushingButton3DAugmented, babbling')
+-- cmd:option('-mcd', 0.4, 'Max. cosine distance allowed among actions for priors loss function evaluation (MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD)')
+-- cmd:option('-sigma', 0.6, "Sigma: denominator in continuous actions' extra factor (CONTINUOUS_ACTION_SIGMA)")
+    -- cmd:option('-image_size', 512, 'Maximum height / width of generated image')
+-- cmd:option('-gpu', '0', 'Zero-indexed ID of the GPU to use; for CPU mode set -gpu = -1')
+
+
 function Rico_Training(Models,priors_used)
    local rep_criterion=get_Rep_criterion()
    local prop_criterion=get_Prop_criterion()
@@ -127,64 +140,78 @@ function train(Models, priors_used)
    return Models.Model1, NAME_SAVE
 end
 
+local function main(params)
+    USE_CUDA = params.use_cuda
+    print (USE_CUDA)
+    --USE_CONTINUOUS = params.use_continuous
+    -- -use_cuda', true, 'true (default) to use GPU version, false for CPU only mode (not use cuda)')
+    -- cmd:option('-use_continuous', true, 'true (default) to use a continuous action space, false for discrete one (0.5 range actions)')
+    -- cmd:option('-data_folder', STATIC_BUTTON_SIMPLEST, 'Dataset to use: staticButtonSimplest (default), mobileRobot, simpleData3D, pushingButton3DAugmented, babbling')
+    -- cmd:option('-mcd', 0.4, 'Max. cosine distance allowed among actions for priors loss function evaluation (MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD)')
+    -- cmd:option('-sigma'
 
-local records_paths = Get_Folders(DATA_FOLDER, 'record') --local list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(DATA_FOLDER)
-NB_SEQUENCES= #records_paths
+    local records_paths = Get_Folders(DATA_FOLDER, 'record') --local list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(DATA_FOLDER)
+    NB_SEQUENCES= #records_paths
 
-if NB_SEQUENCES ==0  then --or not folder_exists(DATA_FOLDER) then
-    error('Error: data was not found in input directory INPUT_DIR= '.. DATA_FOLDER)
+    if NB_SEQUENCES ==0  then --or not folder_exists(DATA_FOLDER) then
+        error('Error: data was not found in input directory INPUT_DIR= '.. DATA_FOLDER)
+    end
+
+    if LOGGING_ACTIONS then
+       print("LOGGING ACTIONS")
+       LOG_ACTION = {}
+
+       for i=1,NB_SEQUENCES do
+          LOG_ACTION[#LOG_ACTION+1] = {}
+       end
+    end
+
+
+    ALL_SEQ = precompute_all_seq()
+
+    for nb_test=1, #PRIORS_CONFIGS_TO_APPLY do
+       if RELOAD_MODEL then
+          print("Reloading model in "..SAVED_MODEL_PATH)
+          Model = torch.load(SAVED_MODEL_PATH):double()
+       else
+          print("Getting model in : "..MODEL_ARCHITECTURE_FILE)
+          require(MODEL_ARCHITECTURE_FILE)
+          Model=getModel(DIMENSION_OUT)
+          --graph.dot(Model.fg, 'Our Model')
+       end
+
+       if USE_CUDA then
+          Model=Model:cuda()
+       end
+
+       parameters,gradParameters = Model:getParameters()
+
+       Model2=Model:clone('weight','bias','gradWeight','gradBias','running_mean','running_std')
+       Model3=Model:clone('weight','bias','gradWeight','gradBias','running_mean','running_std')
+       Model4=Model:clone('weight','bias','gradWeight','gradBias','running_mean','running_std')
+       Models={Model1=Model,Model2=Model2,Model3=Model3,Model4=Model4}
+
+       local priors_used= PRIORS_CONFIGS_TO_APPLY[nb_test]
+       local Log_Folder=Get_Folder_Name(LOG_FOLDER, priors_used)
+
+       print("Experiment "..nb_test .." (Log_Folder="..Log_Folder.."): Training model using priors: ")
+       print(priors_used)
+       train(Models, priors_used)
+       print_experiment_config()
+    end
+
+    if LOGGING_ACTIONS then
+       print("LOG_ACTION")
+       for key,items in ipairs(LOG_ACTION) do
+          i = 0
+          for k,j in pairs(items) do
+             i = i+1
+          end
+          print(key,i)
+       end
+    end
 end
 
-if LOGGING_ACTIONS then
-   print("LOGGING ACTIONS")
-   LOG_ACTION = {}
 
-   for i=1,NB_SEQUENCES do
-      LOG_ACTION[#LOG_ACTION+1] = {}
-   end
-end
-
-
-ALL_SEQ = precompute_all_seq()
-
-for nb_test=1, #PRIORS_CONFIGS_TO_APPLY do
-   if RELOAD_MODEL then
-      print("Reloading model in "..SAVED_MODEL_PATH)
-      Model = torch.load(SAVED_MODEL_PATH):double()
-   else
-      print("Getting model in : "..MODEL_ARCHITECTURE_FILE)
-      require(MODEL_ARCHITECTURE_FILE)
-      Model=getModel(DIMENSION_OUT)
-      --graph.dot(Model.fg, 'Our Model')
-   end
-
-   if USE_CUDA then
-      Model=Model:cuda()
-   end
-
-   parameters,gradParameters = Model:getParameters()
-
-   Model2=Model:clone('weight','bias','gradWeight','gradBias','running_mean','running_std')
-   Model3=Model:clone('weight','bias','gradWeight','gradBias','running_mean','running_std')
-   Model4=Model:clone('weight','bias','gradWeight','gradBias','running_mean','running_std')
-   Models={Model1=Model,Model2=Model2,Model3=Model3,Model4=Model4}
-
-   local priors_used= PRIORS_CONFIGS_TO_APPLY[nb_test]
-   local Log_Folder=Get_Folder_Name(LOG_FOLDER, priors_used)
-
-   print("Experiment "..nb_test .." (Log_Folder="..Log_Folder.."): Training model using priors: ")
-   print(priors_used)
-   train(Models, priors_used)
-   print_experiment_config()
-end
-
-if LOGGING_ACTIONS then
-   print("LOG_ACTION")
-   for key,items in ipairs(LOG_ACTION) do
-      i = 0
-      for k,j in pairs(items) do
-         i = i+1
-      end
-      print(key,i)
-   end
-end
+local params = cmd:parse(arg)
+main(params)
