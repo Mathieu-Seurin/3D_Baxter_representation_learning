@@ -9,7 +9,7 @@ import unittest
 test = unittest.TestCase('__init__')
 # True if we plot ground truth observed states, and false to plot the learned state representations
 #plotGroundTruthStates = True 
-plotGroundTruthStates = True
+plotGroundTruthStates = False
 
 
 # PLOTTING GROUND TRUTH OR LEARNED STATES 
@@ -22,8 +22,7 @@ if len(sys.argv) != 3:
     lastModelFile = open('lastModel.txt')
     path = lastModelFile.readline()[:-1]+'/'
     model_name = path.split('/')[1]     
-    # FOR FAST TESTING: 
-    model_name = STATIC_BUTTON_SIMPLEST#'pushingButton3DAugmented' #TODO REMOVE-testing
+    # FOR FAST TESTING:  model_name = STATIC_BUTTON_SIMPLEST#'pushingButton3DAugmented' #TODO REMOVE-testing
     data_folder = get_data_folder_from_model_name(model_name)
     print data_folder
     reward_file_str = 'allRewards_'+data_folder+'.txt'

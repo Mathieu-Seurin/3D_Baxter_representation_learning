@@ -155,13 +155,13 @@ f.write(str(mean_error)[:5])
 f.close()
 
 # writing scores to global log for plotting and reporting
-header = ('#Model', 'KNN_MSE')
+header = ('Model', 'KNN_MSE')
 #if os.path.isfile(GLOBAL_SCORE_LOG_FILE):
 # 	global_scores_df = pd.DataFrame(columns= header)
 # else:
 	#global_scores_df = pd.read_csv(GLOBAL_SCORE_LOG_FILE, columns= header)
 	
-global_scores_df = pd.DataFrame({'#Model':[last_model_name], 'KNN_MSE': [mean_error]})#, columns= header) 
+global_scores_df = pd.DataFrame({'Model':[last_model_name], 'KNN_MSE': [mean_error]})#, columns= header) 
 #global_scores_df.reset_index()
 #global_scores_df.columns = header
 print global_scores_df.head()
