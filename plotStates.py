@@ -78,14 +78,6 @@ with open(reward_file_str) as f:
             rewards_l.append(words[0])
             total_rewards+= 1
 
-if data_folder == MOBILE_ROBOT:
-    # Adjustment for mobileRobot dataset, which logs for a given line in the files, 
-    # s_t, a_t and r_(t+1) instead of s_t, a_t and r_t  (This might explain some of the scattered plots for mobile robot data)
-    states = states[0:len(states)-1, :]
-    rewards_l = rewards_l[1:]
-    total_states -= 1
-    total_rewards -= 1
-
 rewards=rewards_l
 toplot=states
 print "Ploting total states and total rewards: ",total_states, " ", total_rewards," in files: ",state_file_str," and ", reward_file_str
