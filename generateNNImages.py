@@ -170,4 +170,4 @@ if not os.path.isfile(GLOBAL_SCORE_LOG_FILE):
 else: # else it exists so append without writing the header
     global_scores_df.to_csv(GLOBAL_SCORE_LOG_FILE, mode ='a', header=False) 
     
-print 'Saved mean KNN MSE score entry from model ', last_model_name, ' to ', GLOBAL_SCORE_LOG_FILE, '. Last score is in: ',score_file 
+print 'Saved mean KNN MSE score entry from model +++ ', last_model_name, ' +++ to ', GLOBAL_SCORE_LOG_FILE, '. Last score is in: ',score_file 

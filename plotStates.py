@@ -102,7 +102,7 @@ elif REPRESENTATIONS_DIMENSIONS ==2:
     PLOT_DIMENSIONS = 2 #    print "[PCA not applied since learnt representations' dimensions are not larger than 2]"
 else:
     PLOT_DIMENSIONS = 3  # Default, if mobileData used, we plot just 2
-print "\nVisualizing states with #REPRESENTATIONS_DIMENSIONS =", REPRESENTATIONS_DIMENSIONS, ' in ',PLOT_DIMENSIONS,'D'
+print "\n #REPRESENTATIONS_DIMENSIONS =", REPRESENTATIONS_DIMENSIONS
 
 
 if PLOT_DIMENSIONS == 2:

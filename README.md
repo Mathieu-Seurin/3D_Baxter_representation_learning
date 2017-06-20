@@ -29,14 +29,7 @@ Note: This repo is an extension of https://github.com/Mathieu-Seurin/baxter_repr
 
 
 ## DEPENDENCIES
-* torchnet and torchnet-vision
-luarocks install torchnet-vision does not suffice:
 
-1. luarocks install torchnet  
-2. Install torchnet-vision via https://github.com/Cadene/torchnet-vision
-
-
-Other:
 
 1. For nearest neighbors visualization:
 
@@ -51,26 +44,43 @@ sudo apt-get install build-essential python-dev python-setuptools python-numpy p
 Step 3:
 pip install --user --install-option="--prefix=" -U scikit-learn
 
-* Tkinker: if you encounter "_tkinter.TclError: no display name and no $DISPLAY environment variable" while running
+* Tkinker: if you encounter `tkinter.TclError: no display name and no $DISPLAY environment variable` while running
 ```
 python generateNNImages.py
 ```
 
-run instead 'ssh -X' instead of 'ssh'
-
-or
+run instead 'ssh -X' instead of 'ssh', or
 
 ```
 import matplotlib
 matplotlib.use('GTK')  # Or any other X11 back-end
 ```
 
+2. torchnet and torchnet-vision
+luarocks install torchnet-vision does not suffice:
+
+* luarocks install torchnet  
+* Install torchnet-vision via https://github.com/Cadene/torchnet-vision
+
+
+3. Pandas for Python results plotting and reporting:
+sudo apt-get pandas  ---see full scipy stack and add to readme
+
+Mac install: cd /etc/   and $ Natalias-MacBook:etc natalia$ sudo nano tsocks.conf
+
+
+4. When using ResNet, you
+require 'cunn'
+require 'cudnn'  --If trouble, installing, follow step 6 in https://github.com/jcjohnson/neural-style/blob/master/INSTALL.md
+
+
 
 ## POTENTIAL ISSUES:
 
-If using the dataset STATIC_BUTTON_SIMPLEST, the following error appears: `PANIC: unprotected error in call to Lua API (not enough memory)`
+1. If using the dataset STATIC_BUTTON_SIMPLEST, the following error appears: `PANIC: unprotected error in call to Lua API (not enough memory)`
 
 Do:
+
 ```
 cd ~/torch
 ./clean.sh
@@ -79,6 +89,34 @@ And then everything should work
 ```
 
 and after, reinstall torchnet and torchnet-vision as above indicated
+
+
+2. SKLEARN AND SCIPY VERSION CONFLICTS: USE ONLY CONDA INSTALL SPECIFIC ONLINE COMMAND OR PIP INSTALL -U _ WITHOUT SUDO.
+
+If sklearn.neighbours import fails, remove  and install:
+Either use conda (in which case all your installed packages would be in ~/miniconda/ or pip install --user don't mix the two. Removing either
+```
+rm -rf ~/.local/lib/python2.7/site-packages/sklearn or your ~/miniconda folder and reinstalling it cleanly should fix this.
+sudo rm -rf scikit_learn-0.18.1.egg-info/
+pip uninstall sklearn
+```
+and
+```
+1)  pip install -U scikit-learn
+```
+or
+```
+2) conda install -c anaconda scikit-learn=0.18.1
+```
+
+If needed, also do
+```
+pip install -U numpy
+pip install -U scipy
+```
+
+3. Matplotlib: If plots are not showing properly reward colours, or datapoints too small, your version of matplotlib may be too old, it needs to be at least 2.0. Run test in Utils.py library_versions_tests().
+
 
 
 ## REFERENCES
