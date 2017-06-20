@@ -24,6 +24,8 @@ ALL_STATE_FILE = 'allStates.txt'
 LAST_MODEL_FILE = 'lastModel.txt'
 ALL_STATS_FILE ='allStats.csv'
 
+VISUALIZE_PLOTS = True  # Make False when running remotely via ssh for plots and KNN figures to be saved
+
 def library_versions_tests():
     if not matplotlib.__version__.startswith('2.'):
         print "Using a too old matplotlib version (can be critical for properly plotting reward colours, otherwise the colors are difficult to see), to update, you need to do it via Anaconda: "

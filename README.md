@@ -27,6 +27,17 @@ Note: This repo is an extension of https://github.com/Mathieu-Seurin/baxter_repr
 
 
 
+## RUNNING: script.lua or the shell pipeline scripts:
+
+```
+# CONFIG OPTIONS:
+# -use_cuda
+# -use_continuous
+# -params.sigma  is CONTINUOUS_ACTION_SIGMA
+# -params.mcd is MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD
+# -data_folder options: DATA_FOLDER (Dataset to use):
+#          staticButtonSimplest, mobileRobot, simpleData3D, pushingButton3DAugmented, babbling')
+```
 
 ## DEPENDENCIES
 

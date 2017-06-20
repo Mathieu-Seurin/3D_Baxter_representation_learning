@@ -4,13 +4,7 @@ require 'Get_Images_Set'
 tnt = require 'torchnet'
 vision = require 'torchnet-vision'  -- Install via https://github.com/Cadene/torchnet-vision
 
-function print_hyperparameters()
-    print("Model :",MODEL_ARCHITECTURE_FILE)
-    print("\nUSE_CUDA ",USE_CUDA," \nUSE_CONTINUOUS ACTIONS: ",USE_CONTINUOUS)
-    print("============ DATA USED =========\n",
-                    DATA_FOLDER,
-      "\n================================")
-end
+
 ---------------------------------------------------------------------------------------
 -- Function :save_model(model,path)
 -- Input ():
@@ -466,7 +460,7 @@ function calculate_mean_and_std()
 
    mean[1] = mean[1] / totImg
    mean[2] = mean[2] / totImg
-   mean[3] = mean[3] / totImglog_mod
+   mean[3] = mean[3] / totImg
 
    for seqStr in lfs.dir(imagesFolder) do
       if string.find(seqStr,'record') then

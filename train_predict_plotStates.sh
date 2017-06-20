@@ -1,9 +1,13 @@
 #!/bin/bash
 
 # CONFIG OPTIONS:
-# -data_folder options: Dataset to use:
-#          staticButtonSimplest (default), mobileRobot, simpleData3D, pushingButton3DAugmented, babbling')
-th script.lua -use_continuous -use_cuda
+# -use_cuda
+# -use_continuous
+# -params.sigma  is CONTINUOUS_ACTION_SIGMA
+# -params.mcd is MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD
+# -data_folder options: DATA_FOLDER (Dataset to use):
+#          staticButtonSimplest, mobileRobot, simpleData3D, pushingButton3DAugmented, babbling')
+th script.lua -use_continuous -mcd 0.8 -sigma 0.8 -data_folder staticButtonSimplest
 # -data_folder mobileRobot
 th imagesAndReprToTxt.lua
 python generateNNImages.py 10 25

@@ -18,17 +18,11 @@ require 'definition_priors'
 require 'const'
 -- try to avoid global variable as much as possible
 
-if USE_CUDA then
-   require 'cunn'
-   require 'cudnn'
-end
-
 local cmd = torch.CmdLine()
-
 -- Basic options
-cmd:option('-use_cuda', false, 'true (default) to use GPU version, false for CPU only mode (not use cuda)')
-cmd:option('-use_continuous', false, 'true (default) to use a continuous action space, false for discrete one (0.5 range actions)')
---cmd:option('-data_folder', STATIC_BUTTON_SIMPLEST, 'Dataset to use: staticButtonSimplest (default), mobileRobot, simpleData3D, pushingButton3DAugmented, babbling')
+cmd:option('-use_cuda', false, 'true to use GPU version, false (default) for CPU only mode')
+cmd:option('-use_continuous', false, 'true to use a continuous action space, false (default) for discrete one (0.5 range actions)')
+cmd:option('-data_folder', MOBILE_ROBOT, 'Possible Datasets to use: staticButtonSimplest, mobileRobot, staticButtonSimplest, simpleData3D, pushingButton3DAugmented, babbling')
 cmd:option('-mcd', 0.4, 'Max. cosine distance allowed among actions for priors loss function evaluation (MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD)')
 cmd:option('-sigma', 0.6, "Sigma: denominator in continuous actions' extra factor (CONTINUOUS_ACTION_SIGMA)")
 
@@ -129,13 +123,10 @@ function train(Models, priors_used)
    return Models.Model1, NAME_SAVE
 end
 
+
+
 local function main(params)
-    USE_CUDA = params.use_cuda
-    USE_CONTINUOUS = params.use_continuous
-    CONTINUOUS_ACTION_SIGMA = params.sigma
-    MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = params.mcd
-    --DATA_FOLDER = params.data_folder --TODO not working yet thorough the program
-    print_hyperparameters()
+    set_hyperparams(params)
 
     local records_paths = Get_Folders(DATA_FOLDER, 'record') --local list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(DATA_FOLDER)
     NB_SEQUENCES= #records_paths
@@ -152,7 +143,6 @@ local function main(params)
           LOG_ACTION[#LOG_ACTION+1] = {}
        end
     end
-
 
     ALL_SEQ = precompute_all_seq()
 
