@@ -28,7 +28,7 @@ local cmd = torch.CmdLine()
 -- Basic options
 cmd:option('-use_cuda', false, 'true (default) to use GPU version, false for CPU only mode (not use cuda)')
 cmd:option('-use_continuous', false, 'true (default) to use a continuous action space, false for discrete one (0.5 range actions)')
-cmd:option('-data_folder', STATIC_BUTTON_SIMPLEST, 'Dataset to use: staticButtonSimplest (default), mobileRobot, simpleData3D, pushingButton3DAugmented, babbling')
+--cmd:option('-data_folder', STATIC_BUTTON_SIMPLEST, 'Dataset to use: staticButtonSimplest (default), mobileRobot, simpleData3D, pushingButton3DAugmented, babbling')
 cmd:option('-mcd', 0.4, 'Max. cosine distance allowed among actions for priors loss function evaluation (MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD)')
 cmd:option('-sigma', 0.6, "Sigma: denominator in continuous actions' extra factor (CONTINUOUS_ACTION_SIGMA)")
 
@@ -134,7 +134,7 @@ local function main(params)
     USE_CONTINUOUS = params.use_continuous
     CONTINUOUS_ACTION_SIGMA = params.sigma
     MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = params.mcd
-    DATA_FOLDER = params.data_folder
+    --DATA_FOLDER = params.data_folder --TODO not working yet thorough the program
     print_hyperparameters()
 
     local records_paths = Get_Folders(DATA_FOLDER, 'record') --local list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(DATA_FOLDER)

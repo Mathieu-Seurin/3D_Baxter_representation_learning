@@ -53,6 +53,9 @@ def get_data_folder_from_model_name(model_name):
     else:
         print "Unsupported dataset!"
 
+"""
+Use this function if rewards need to be visualized, use plot_3D otherwise
+"""
 def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension 1','State Dimension 2','State Dimension 3'], title='Learned Representations-Rewards Distribution\n', dataset=''): 
     # Plots states either learned or the ground truth
     # Useful documentation: https://matplotlib.org/examples/mplot3d/scatter3d_demo.html
@@ -94,6 +97,9 @@ def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension
     print('\nSaved plot to '+plot_path)
 
 
+"""
+Use this function if rewards DO NOT need to be visualized, use plotStates otherwise
+"""
 def plot_3D(x =[1,2,3,4,5,6,7,8,9,10], y =[5,6,2,3,13,4,1,2,4,8], z =[2,3,3,3,5,7,9,11,9,10], axes_labels = ['U','V','W'], title='Learned representations-rewards distribution\n', dataset=''):
 
     fig = plt.figure()
@@ -105,3 +111,7 @@ def plot_3D(x =[1,2,3,4,5,6,7,8,9,10], y =[5,6,2,3,13,4,1,2,4,8], z =[2,3,3,3,5,
     ax.set_ylabel(axes_labels[1])
     ax.set_zlabel(axes_labels[2])
     ax.set_title(title+dataset)
+
+
+
+#library_versions_tests()
