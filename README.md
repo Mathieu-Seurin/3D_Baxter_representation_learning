@@ -29,6 +29,14 @@ Note: This repo is an extension of https://github.com/Mathieu-Seurin/baxter_repr
 
 
 ## DEPENDENCIES
+* torchnet and torchnet-vision
+luarocks install torchnet-vision does not suffice:
+
+1. luarocks install torchnet  
+2. Install torchnet-vision via https://github.com/Cadene/torchnet-vision
+
+
+Other:
 
 1. For nearest neighbors visualization:
 
@@ -58,6 +66,19 @@ matplotlib.use('GTK')  # Or any other X11 back-end
 ```
 
 
+## POTENTIAL ISSUES:
+
+If using the dataset STATIC_BUTTON_SIMPLEST, the following error appears: `PANIC: unprotected error in call to Lua API (not enough memory)`
+
+Do:
+```
+cd ~/torch
+./clean.sh
+TORCH_LUA_VERSION=LUA52 ./install.sh
+And then everything should work
+```
+
+and after, reinstall torchnet and torchnet-vision as above indicated
 
 
 ## REFERENCES

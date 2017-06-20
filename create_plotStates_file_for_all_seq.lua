@@ -26,7 +26,6 @@ end
 
 -- print("all_state",all_state)
 -- io.read()
-
 all_path = {}
 for dir_seq_str in lfs.dir(images_folder) do
    if string.find(dir_seq_str,'record') then

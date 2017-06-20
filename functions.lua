@@ -2,8 +2,15 @@ require 'const'
 require 'image'
 require 'Get_Images_Set'
 tnt = require 'torchnet'
-vision = require 'torchnet-vision'
+vision = require 'torchnet-vision'  -- Install via https://github.com/Cadene/torchnet-vision
 
+function print_hyperparameters()
+    print("Model :",MODEL_ARCHITECTURE_FILE)
+    print("\nUSE_CUDA ",USE_CUDA," \nUSE_CONTINUOUS ACTIONS: ",USE_CONTINUOUS)
+    print("============ DATA USED =========\n",
+                    DATA_FOLDER,
+      "\n================================")
+end
 ---------------------------------------------------------------------------------------
 -- Function :save_model(model,path)
 -- Input ():
@@ -54,7 +61,6 @@ function precompute_all_seq()
 
    return all_seq
 end
-
 
 ---------------------------------------------------------------------------------------
 -- Function :getRandomBatchFromSeparateList(batch_size, mode)
@@ -299,8 +305,6 @@ function applying_prior(priors_used, prior)
    return list_contains_element(priors_used, prior)
 end
 
-
-
 ---------------------------------------------------------------------------------------
 -- Function :	list_contains_element(list, element)
 -- Input ():
@@ -462,7 +466,7 @@ function calculate_mean_and_std()
 
    mean[1] = mean[1] / totImg
    mean[2] = mean[2] / totImg
-   mean[3] = mean[3] / totImg
+   mean[3] = mean[3] / totImglog_mod
 
    for seqStr in lfs.dir(imagesFolder) do
       if string.find(seqStr,'record') then
@@ -544,6 +548,20 @@ function getImageFormated(im)
    return img
 end
 
+function log_model_params()
+    if not file_exists(MODELS_CONFIG_LOG_FILE) then
+
+        columns = 'Model,DATA_FOLDER,MODEL_ARCHITECTURE_FILE,MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD,CONTINUOUS_ACTION_SIGMA\n'
+        f = io.open(MODELS_CONFIG_LOG_FILE, 'w') -- for evaluation purposes efficiency
+        f:write(columns)
+    else
+        f = io.open(MODELS_CONFIG_LOG_FILE, 'a') -- we append
+    end
+
+    entry = NAME_SAVE..','..DATA_FOLDER..','..MODEL_ARCHITECTURE_FILE..','..MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD..','..CONTINUOUS_ACTION_SIGMA..'\n'  --Important not to have spaces in between commas for later pandas processing
+    f:write(entry)
+    f:close()
+end
 
 function file_exists(name)
    --tests whether the file can be opened for reading
