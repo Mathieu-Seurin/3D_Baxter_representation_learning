@@ -160,13 +160,13 @@ header = ('Model', 'KNN_MSE')
 # 	global_scores_df = pd.DataFrame(columns= header)
 # else:
 	#global_scores_df = pd.read_csv(GLOBAL_SCORE_LOG_FILE, columns= header)
-	
-global_scores_df = pd.DataFrame({'Model':[last_model_name], 'KNN_MSE': [mean_error]})#, columns= header) 
+d = {'Model':[last_model_name], 'KNN_MSE': [mean_error]}	
+global_scores_df = pd.DataFrame(data=d, columns = header)#, columns= header) 
 #global_scores_df.reset_index()
 #global_scores_df.columns = header
 print global_scores_df.head()
 if not os.path.isfile(GLOBAL_SCORE_LOG_FILE):
-   global_scores_df.to_csv(GLOBAL_SCORE_LOG_FILE, header = header)
+   global_scores_df.to_csv(GLOBAL_SCORE_LOG_FILE, header=True, cols=header)
 else: # else it exists so append without writing the header
     global_scores_df.to_csv(GLOBAL_SCORE_LOG_FILE, mode ='a', header=False) 
     
