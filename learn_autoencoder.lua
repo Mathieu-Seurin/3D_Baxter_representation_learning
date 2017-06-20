@@ -21,8 +21,8 @@ print("============ DATA USED =========\n",
 -- OVERRIDING hyperparameters since it's not for auto-encoders :
 LR = 0.0001
 BATCH_SIZE=20
-NUM_HIDDEN = 20
-NOISE = true
+NUM_HIDDEN = 2
+NOISE = false
 
 if DIFFERENT_FORMAT then
    error([[Don't forget to switch model to BASE_TIMNET in hyperparameters
@@ -42,10 +42,15 @@ function AE_Training(model,batch)
 
    if NOISE then
       noise=torch.rand(batch:size())
-      noise=(noise-noise:mean())/(noise:std())
+      noise = noise/3
       noise=noise:cuda()
       input=input+noise
    end
+
+   -- local img_merge = image.toDisplayTensor({input[1],expected[1]})
+   -- image.display{image=img_merge,win=WINDOW}
+   -- io.read()
+
 
    -- create closure to evaluate f(X) and df/dX
    local feval = function(x)
@@ -140,7 +145,7 @@ ALL_SEQ = precompute_all_seq()
 image_width=IM_LENGTH
 image_height=IM_HEIGHT
 
-require('./models/autoencoder_conv')
+require('./models/autoencoder_conv2')
 model = getModel()
 model=model:cuda()
 

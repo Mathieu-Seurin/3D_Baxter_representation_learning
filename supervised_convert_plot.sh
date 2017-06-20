@@ -1,5 +1,6 @@
 #!/bin/bash
 
+echo 'WARNING, check that model=BASE_TIMNET and NORMALIZE=True'
 
 echo 'Log/save/supervised_res' > lastModel.txt
 echo 'mobile_robot_supervised.t7' >> lastModel.txt
