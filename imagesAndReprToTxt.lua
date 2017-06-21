@@ -9,7 +9,9 @@ require 'functions'
 local imagesFolder = DATA_FOLDER
 local path, modelString
 
-path, modelString = get_last_used_model_folder_and_name()
+folder_and_name = get_last_used_model_folder_and_name()
+path = folder_and_name[1]
+modelString = folder_and_name[2]
 local  model = torch.load(path..'/'..modelString)
 if USE_CUDA then
    model = model:cuda()
