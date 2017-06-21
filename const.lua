@@ -129,10 +129,10 @@ function addLeadingZero(number)
 end
 
 --function to be avoided, only for create_all_reward and create_plotStates_file_for_all_seq to call it
-function set_minimum_hyperparams_for_dataset(images_folder)
-    DATA_FOLDER = images_folder
-    set_hyperparams()
-end
+-- function set_minimum_hyperparams_for_dataset(images_folder)
+--     DATA_FOLDER = images_folder
+--     set_hyperparams()
+-- end
 
 function set_hyperparams(params)
     if params then
@@ -142,10 +142,10 @@ function set_hyperparams(params)
         MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = params.mcd
         DATA_FOLDER = params.data_folder
     else
-        print('************ WARNING: NOT USING_CUDA by default for helper scripts create_all_reward and create_plotStates_file_for_all_seq')
-        USE_CUDA = false
-        USE_SECOND_GPU = true
+        print('************ WARNING: USING_CUDA by default for helper scripts create_all_reward and create_plotStates_file_for_all_seq')
+        USE_CUDA = true
     end
+    USE_SECOND_GPU = true
     --===========================================================
     -- CUDA CONSTANTS
     --===========================================================
@@ -157,6 +157,11 @@ function set_hyperparams(params)
         require 'cunn'
         require 'cudnn'  --If trouble, installing, follow step 6 in https://github.com/jcjohnson/neural-style/blob/master/INSTALL.md
     end
+
+    set_dataset_specific_hyperparams(DATA_FOLDER)
+end
+
+function set_dataset_specific_hyperparams(DATA_FOLDER)
     --======================================================
     --Continuous actions SETTINGS
     --======================================================
