@@ -39,14 +39,14 @@ function represent_all_images(imagesFolder, model)
                if USE_CUDA then
                   img = img:cuda()
                end
+               print ('img dimensions and model')
+               print (#img)
+               print(model)
 
                repr = model:forward(img)
-               print ('img and repr')
-               print (#img)
+               print ('repr')
                print(repr)
-               print('DIFFERENT_FORMAT and STD_MODEL')
-               print(DIFFERENT_FORMAT)
-               print(STD_MODEL)
+
                for i=1,repr:size(2) do
                   reprStr = reprStr..repr[{1,i}]..' '
                   --print (reprStr)
