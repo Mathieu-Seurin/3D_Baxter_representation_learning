@@ -4,6 +4,14 @@ require 'Get_Images_Set'
 tnt = require 'torchnet'
 vision = require 'torchnet-vision'  -- Install via https://github.com/Cadene/torchnet-vision
 
+
+---------------------------------------------------------------------------------------
+-- Function :get_last_used_model_name()-- LAST_MODEL_FILE is a file where the name of the last model computed is saved
+-- this way, you just have to launch the programm without specifying anything,
+-- and it will load the good model
+-- Input ():
+-- Output ():
+---------------------------------------------------------------------------------------
 function get_last_used_model_name()
     if file_exists(LAST_MODEL_FILE) then
        f = io.open(LAST_MODEL_FILE,'r')
