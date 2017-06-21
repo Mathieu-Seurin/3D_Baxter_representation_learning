@@ -1,7 +1,11 @@
 require 'functions'
 
-images_folder = DATA_FOLDER --MOBILE_ROBOT
-print("Creating all rewards for plot. DATA_FOLDER: "..images_folder)
+
+images_folder = get_data_folder_from_model_name(get_last_used_model_name())
+--local images_folder = DATA_FOLDER --does not work if we set DATA_FOLDER only on script taking from command line and thus we extract it from the last model trained
+--However, I do not know why the constant in const is set for imagesAndReprToTxt (even if I require 'const' here as well, but is is nil when it comes to run this script)
+
+print("\n\ncreate_all_rewards.lua: Creating all rewards for plot. DATA_FOLDER: "..images_folder)
 list_folders_images, list_txt_action,list_txt_button, list_txt_state= Get_HeadCamera_View_Files(images_folder)
 
 all_button = {}

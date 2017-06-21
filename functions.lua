@@ -4,6 +4,34 @@ require 'Get_Images_Set'
 tnt = require 'torchnet'
 vision = require 'torchnet-vision'  -- Install via https://github.com/Cadene/torchnet-vision
 
+function get_last_used_model_name()
+    if file_exists(LAST_MODEL_FILE) then
+       f = io.open(LAST_MODEL_FILE,'r')
+       path = f:read()
+       modelString = f:read()
+       print('MODEL USED (last model logged in '..LAST_MODEL_FILE..') : '..modelString)
+       f:close()
+       return modelString
+    else
+       error(LAST_MODEL_FILE.." should exist")
+    end
+end
+
+function get_data_folder_from_model_name(model_name)
+    if string.find(model_name, BABBLING) then
+        return BABBLING
+    elseif string.find(model_name, MOBILE_ROBOT)  then
+        return MOBILE_ROBOT
+    elseif string.find(model_name, SIMPLEDATA3D)  then
+        return SIMPLEDATA3D
+    elseif string.find(model_name, PUSHING_BUTTON_AUGMENTED)  then
+        return PUSHING_BUTTON_AUGMENTED
+    elseif string.find(model_name, STATIC_BUTTON_SIMPLEST)  then
+        return STATIC_BUTTON_SIMPLEST
+    else
+        print "Unsupported dataset!"
+    end
+end
 
 ---------------------------------------------------------------------------------------
 -- Function :save_model(model,path)
