@@ -11,9 +11,6 @@
 -- Hyperparameters are located in a different file (hyperparameters.lua)
 --=============================================================
 require 'lfs'
-if USE_CUDA then
-  require 'cutorch'
-end
 require 'hyperparams'
 --torch.manualSeed(100)
 
@@ -146,16 +143,16 @@ function set_cuda_hyperparams(USE_CUDA)
     --===========================================================
     -- CUDA CONSTANTS
     --===========================================================
-    USE_SECOND_GPU = true
-    if USE_CUDA and USE_SECOND_GPU then
-       cutorch.setDevice(2)
-    end
-
     if USE_CUDA then
         require 'cunn'
+        require 'cutorch'
         require 'cudnn'  --If trouble, installing, follow step 6 in https://github.com/jcjohnson/neural-style/blob/master/INSTALL.md
         tnt = require 'torchnet'
         vision = require 'torchnet-vision'  -- Install via https://github.com/Cadene/torchnet-vision
+    end
+    USE_SECOND_GPU = true
+    if USE_CUDA and USE_SECOND_GPU then
+       cutorch.setDevice(2)
     end
 end
 

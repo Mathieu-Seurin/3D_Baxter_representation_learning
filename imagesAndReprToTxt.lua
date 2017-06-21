@@ -7,7 +7,7 @@ require 'const'
 require 'functions'
 
 --returns the representation of the image (a tensor of size {1xDIM})
-function represent_all_images(imagesFolder)
+function represent_all_images(imagesFolder, model)
    local augmentation = tnt.transform.compose{
       vision.image.transformimage.colorNormalize{
          mean = MEAN_MODEL, std  = STD_MODEL
@@ -75,7 +75,7 @@ local function main(params)
 
     outStr = ''
     tempSeq = {}
-    tempSeq = represent_all_images(imagesFolder)
+    tempSeq = represent_all_images(images_folder, model)
 
     table.sort(tempSeq, function (a,b) return a[1] < b[1] end)
     tempSeqStr = ''
