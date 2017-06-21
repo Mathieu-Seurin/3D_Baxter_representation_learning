@@ -118,9 +118,6 @@ function Get_HeadCamera_View_Files(Path)
    list_txt_state={}
    for i=1, #Paths do
       list_folder = Get_Folders(Paths[i],SUB_DIR_IMAGE,'txt',list_folder)
-      -- print(get_path_to_text_files(Paths[i],FILENAME_FOR_REWARD))
-      -- print(Paths[i])
-      -- print(FILENAME_FOR_REWARD)
       table.insert(list_txt_button, get_path_to_text_files(Paths[i],FILENAME_FOR_REWARD))
       table.insert(list_txt_action, get_path_to_text_files(Paths[i],FILENAME_FOR_ACTION))
       table.insert(list_txt_state, get_path_to_text_files(Paths[i],FILENAME_FOR_STATE))
@@ -129,11 +126,12 @@ function Get_HeadCamera_View_Files(Path)
    table.sort(list_txt_action) --file recorded_robot_limb_left_endpoint_action.txt
    table.sort(list_txt_state)--recroded_robot_libm_left_endpoint_state  -- for the hand position
    table.sort(list_folder) --recorded_cameras_head_camera_2_image_compressed
+   --print(FILENAME_FOR_REWARD,FILENAME_FOR_ACTION,FILENAME_FOR_STATE)
    return list_folder, list_txt_action,list_txt_button, list_txt_state
 end
 
 ---------------------------------------------------------------------------------------
--- Function :
+-- Function : Finds .txt files within the records folders including the pattern including and '.txt'
 -- Input ():
 -- Output ():
 ---------------------------------------------------------------------------------------
@@ -141,14 +139,15 @@ function get_path_to_text_files(Path, including, excluding)
    local incl=including or ""
    local excl=excluding or "uyfouhjbhytfoughl" -- random motif
    local txt=nil
-  --  print('get_path_to_text_files Path: ')
-  --  print (Path)
+   -- print('get_path_to_text_files Path: ')   -- print (Path)
+
    for file in paths.files(Path) do
-    --  print(file)
       -- We only load files that match the 'including' pattern because we know that there are the folder we are interested in
-      if file:find(incl..'.txt'.. '$') and (not file:find(excl)) then --file:find(incl..'.txt' .. '$') then
-         --print('found path...'..paths.concat(Path,file))
-         txt=paths.concat(Path,file) ---TODO: return as soon as we find one, or return a list of all files that match the search criteria
+      -- super confusing function: file.find and its parameters including
+      --if file:find(incl) and (not file:find(excl)) then--if file:find(incl.. '$') and (not file:find(excl)) then --file:find(incl..'.txt' .. '$') then
+      if string.find(file, incl) then -- and string.find(file, '.txt')  if file:find(including..'.txt' .. '$') then  --original that weirdly works being incl  nil: if file:find(including..'.txt' .. '$') then
+          --print('found path...'..paths.concat(Path,file))
+          txt=paths.concat(Path,file) ---TODO: return as soon as we find one, or return a list of all files that match the search criteria
       end
    end
    return txt

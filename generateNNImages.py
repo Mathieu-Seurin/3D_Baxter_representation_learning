@@ -13,8 +13,6 @@ import unittest
 test = unittest.TestCase('__init__')
 
 
-subprocess.call(['th','create_plotStates_file_for_all_seq.lua'])  # COOL trick!!;)
-subprocess.call(['th','create_all_reward.lua'])
 
 
 """
@@ -41,13 +39,20 @@ nbr_images = -1
 
 
 if len(sys.argv) >= 3:
-        nbr_images=int(sys.argv[2])
+    nbr_images=int(sys.argv[2])
 
 if len(sys.argv) == 4:
-        path_to_model = sys.argv[3]
+    path_to_model = sys.argv[3]
 else:
     lastModelFile = open(LAST_MODEL_FILE)
     path_to_model = lastModelFile.readline()[:-1]
+data_folder = get_data_folder_from_model_name(path_to_model)
+
+
+#subprocess.call(['th','create_plotStates_file_for_all_seq.lua'])  
+#subprocess.call(['th','create_all_reward.lua'])
+subprocess.call(['th','create_plotStates_file_for_all_seq.lua'])  
+subprocess.call(['th','create_all_reward.lua'])
 
 file_representation_string=path_to_model+"/"+LEARNED_REPRESENTATIONS_FILE
 
