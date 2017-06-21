@@ -1,7 +1,7 @@
 require 'functions'
 
 
-images_folder = get_data_folder_from_model_name(get_last_used_model_name())
+images_folder = get_data_folder_from_model_name(get_last_used_model_folder_and_name()[2])
 --local images_folder = DATA_FOLDER --does not work if we set DATA_FOLDER only on script taking from command line and thus we extract it from the last model trained
 --However, I do not know why the constant in const is set for imagesAndReprToTxt (even if I require 'const' here as well, but is is nil when it comes to run this script)
 set_minimum_hyperparams_for_dataset(images_folder)

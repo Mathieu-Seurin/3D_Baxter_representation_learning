@@ -10,16 +10,16 @@ vision = require 'torchnet-vision'  -- Install via https://github.com/Cadene/tor
 -- this way, you just have to launch the programm without specifying anything,
 -- and it will load the good model
 -- Input ():
--- Output ():
+-- Output (): The path to the folder containing last model used and the string name of such model
 ---------------------------------------------------------------------------------------
-function get_last_used_model_name()
+function get_last_used_model_folder_and_name()
     if file_exists(LAST_MODEL_FILE) then
        f = io.open(LAST_MODEL_FILE,'r')
        path = f:read()
        modelString = f:read()
        print('MODEL USED (last model logged in '..LAST_MODEL_FILE..') : '..modelString)
        f:close()
-       return modelString
+       return {path, modelString}
     else
        error(LAST_MODEL_FILE.." should exist")
     end
