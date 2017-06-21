@@ -8,7 +8,7 @@
 # -data_folder options: DATA_FOLDER (Dataset to use):
 #          staticButtonSimplest, mobileRobot, simpleData3D, pushingButton3DAugmented, babbling')
 th script.lua -use_continuous -use_cuda  -mcd 0.8  -data_folder staticButtonSimplest
-th imagesAndReprToTxt.lua
+th imagesAndReprToTxt.lua -use_continuous -use_cuda
 python generateNNImages.py 10 25
 #   ----- includes the call to:
 #                th create_all_reward.lua

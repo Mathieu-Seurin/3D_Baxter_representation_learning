@@ -8,7 +8,7 @@ import sys
 import pandas as pd
 import os, os.path
 import subprocess
-from Utils import ALL_STATE_FILE, LEARNED_REPRESENTATIONS_FILE, LAST_MODEL_FILE, GLOBAL_SCORE_LOG_FILE
+from Utils import ALL_STATE_FILE, LEARNED_REPRESENTATIONS_FILE, LAST_MODEL_FILE, GLOBAL_SCORE_LOG_FILE, get_data_folder_from_model_name
 import unittest 
 test = unittest.TestCase('__init__')
 

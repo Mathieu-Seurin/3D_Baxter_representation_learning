@@ -39,9 +39,9 @@ else:
     reward_file_str = sys.argv[2]
 
 if not os.path.isfile(state_file_str):
-    subprocess.call(['th','create_plotStates_file_for_all_seq.lua'])  
+    subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_continuous','-use_cuda']) ##subprocess.call(['th','create_plotStates_file_for_all_seq.lua']) 
 if not os.path.isfile(reward_file_str):
-    subprocess.call(['th','create_all_reward.lua'])
+    subprocess.call(['th','create_all_reward.lua','-use_continuous','-use_cuda'])#subprocess.call(['th','create_all_reward.lua'])
 total_rewards = 0 
 total_states = 0 
 states_l=[]
@@ -86,7 +86,7 @@ if data_folder == MOBILE_ROBOT:
     rewards_l = rewards_l[1:]
     total_states -= 1
     total_rewards -= 1
-        
+
 rewards=rewards_l
 toplot=states
 print "Ploting total states and total rewards: ",total_states, " ", total_rewards," in files: ",state_file_str," and ", reward_file_str
