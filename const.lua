@@ -128,27 +128,33 @@ function addLeadingZero(number)
     end
 end
 
+--function to be avoided, only for create_all_reward and create_plotStates_file_for_all_seq to call it
+function set_minimum_hyperparams_for_dataset(images_folder)
+    DATA_FOLDER = images_folder
+    set_hyperparams()
+end
+
 function set_hyperparams(params)
-    USE_CUDA = params.use_cuda
-    USE_CONTINUOUS = params.use_continuous
-    CONTINUOUS_ACTION_SIGMA = params.sigma
-    MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = params.mcd
-    DATA_FOLDER = params.data_folder
+    if params then
+        USE_CUDA = params.use_cuda
+        USE_CONTINUOUS = params.use_continuous
+        CONTINUOUS_ACTION_SIGMA = params.sigma
+        MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = params.mcd
+        DATA_FOLDER = params.data_folder
+        --===========================================================
+        -- CUDA CONSTANTS
+        --===========================================================
+        USE_SECOND_GPU = true
 
-    --===========================================================
-    -- CUDA CONSTANTS
-    --===========================================================
-    USE_SECOND_GPU = true
+        if USE_CUDA and USE_SECOND_GPU then
+           cutorch.setDevice(2)
+        end
 
-    if USE_CUDA and USE_SECOND_GPU then
-       cutorch.setDevice(2)
+        if USE_CUDA then
+            require 'cunn'
+            require 'cudnn'  --If trouble, installing, follow step 6 in https://github.com/jcjohnson/neural-style/blob/master/INSTALL.md
+        end
     end
-
-    if USE_CUDA then
-        require 'cunn'
-        require 'cudnn'  --If trouble, installing, follow step 6 in https://github.com/jcjohnson/neural-style/blob/master/INSTALL.md
-    end
-
     --======================================================
     --Continuous actions SETTINGS
     --======================================================
@@ -293,9 +299,9 @@ function set_hyperparams(params)
         INDEX_TABLE = {2,3,4} --column index for coordinates in state file, respectively (x,y,z)
 
         DEFAULT_PRECISION = 0.05 -- for 'arrondit' function
-        FILENAME_FOR_REWARD = "recorded_button1_is_pressed.txt"--"is_pressed"
-        FILENAME_FOR_ACTION = "recorded_robot_limb_left_endpoint_action.txt"--endpoint_action"  -- Never written, always computed on the fly
-        FILENAME_FOR_STATE = "recorded_robot_limb_left_endpoint_state.txt"--endpoint_state"
+        FILENAME_FOR_REWARD = "recorded_button1_is_pressed.txt"
+        FILENAME_FOR_ACTION = "recorded_robot_limb_left_endpoint_action.txt" -- Never written, always computed on the fly
+        FILENAME_FOR_STATE = "recorded_robot_limb_left_endpoint_state.txt"
 
         SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
         AVG_FRAMES_PER_RECORD = 90
@@ -304,7 +310,9 @@ function set_hyperparams(params)
       print("No supported data folder provided, please add either of the data folders defined in hyperparams: "..BABBLING..", "..MOBILE_ROBOT.." "..SIMPLEDATA3D..' or others in const.lua' )
       os.exit()
     end
-    print_hyperparameters()
+    if params then
+        print_hyperparameters()
+    end
 end
 
 function print_hyperparameters()
@@ -314,6 +322,11 @@ function print_hyperparameters()
                     DATA_FOLDER,
       "\n================================")
 end
+
+FILE_PATTERN_TO_EXCLUDE = 'deltas'
+
+CAN_HOLD_ALL_SEQ_IN_RAM = true
+
 
 
 -- if DATA_FOLDER == SIMPLEDATA3D then
@@ -442,7 +455,3 @@ end
 --   print("No supported data folder provided, please add either of the data folders defined in hyperparams: "..BABBLING..", "..MOBILE_ROBOT.." "..SIMPLEDATA3D..' or others in const.lua' )
 --   os.exit()
 -- end
-
-FILE_PATTERN_TO_EXCLUDE = 'deltas'
-
-CAN_HOLD_ALL_SEQ_IN_RAM = true
