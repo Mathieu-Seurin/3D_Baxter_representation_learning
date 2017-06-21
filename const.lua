@@ -141,19 +141,21 @@ function set_hyperparams(params)
         CONTINUOUS_ACTION_SIGMA = params.sigma
         MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = params.mcd
         DATA_FOLDER = params.data_folder
-        --===========================================================
-        -- CUDA CONSTANTS
-        --===========================================================
+    else
+        print('************ WARNING: NOT USING_CUDA by default for helper scripts create_all_reward and create_plotStates_file_for_all_seq')
+        USE_CUDA = false
         USE_SECOND_GPU = true
+    end
+    --===========================================================
+    -- CUDA CONSTANTS
+    --===========================================================
+    if USE_CUDA and USE_SECOND_GPU then
+       cutorch.setDevice(2)
+    end
 
-        if USE_CUDA and USE_SECOND_GPU then
-           cutorch.setDevice(2)
-        end
-
-        if USE_CUDA then
-            require 'cunn'
-            require 'cudnn'  --If trouble, installing, follow step 6 in https://github.com/jcjohnson/neural-style/blob/master/INSTALL.md
-        end
+    if USE_CUDA then
+        require 'cunn'
+        require 'cudnn'  --If trouble, installing, follow step 6 in https://github.com/jcjohnson/neural-style/blob/master/INSTALL.md
     end
     --======================================================
     --Continuous actions SETTINGS

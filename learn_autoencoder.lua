@@ -131,7 +131,10 @@ end
 -- Command-line options
 local cmd = torch.CmdLine()
 cmd:option('-optimiser', 'adam', 'Optimiser : adam|sgd|rmsprop')
-cmd:option('-model', 'DAE', 'model : AE|DAE')
+cmd:option('-model', 'DAE', 'model : AE|DAE') --TODO ADD
+-- cmd:option('-use_cuda', false, 'true to use GPU, false (default) for CPU only mode')
+-- cmd:option('-use_continuous', false, 'true to use a continuous action space, false (default) for discrete one (0.5 range actions)')
+
 opt = cmd:parse(arg)
 
 local list_folders_images, list_txt=Get_HeadCamera_View_Files(DATA_FOLDER)
