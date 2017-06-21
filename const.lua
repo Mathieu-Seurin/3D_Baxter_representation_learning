@@ -128,13 +128,34 @@ function addLeadingZero(number)
 end
 
 function set_hyperparams(params)
-    if params then
+    --defaults: NOTE: APPARENTLY THE DEFAULTS PROVIDED TO THE COMMAND LINE
+    -- DEFINITION IN THIS PROGRAM, ARE NOT TAKEN NITO ACCOUNT, WE SET THEM HERE
+    if params.use_cuda then
         USE_CUDA = params.use_cuda
-        USE_CONTINUOUS = params.use_continuous
-        CONTINUOUS_ACTION_SIGMA = params.sigma
-        MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = params.mcd
-        DATA_FOLDER = params.data_folder
+    else
+        USE_CUDA = true
     end
+    if params.use_continuous then
+        USE_CONTINUOUS = params.use_continuous
+    else
+        USE_CONTINUOUS = true
+    end
+    if params.mcd then
+        MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = params.mcd
+    else
+        MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.4
+    end
+    if params.sigma then
+        CONTINUOUS_ACTION_SIGMA = params.sigma
+    else
+        CONTINUOUS_ACTION_SIGMA = 0.6
+    end
+    if params.data_folder then
+        DATA_FOLDER = params.data_folder
+    else
+        DATA_FOLDER = MOBILE_ROBOT --works best!
+    end
+
     set_cuda_hyperparams(USE_CUDA)
     set_dataset_specific_hyperparams(DATA_FOLDER)
 end
