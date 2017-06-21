@@ -118,6 +118,9 @@ function Get_HeadCamera_View_Files(Path)
    list_txt_state={}
    for i=1, #Paths do
       list_folder = Get_Folders(Paths[i],SUB_DIR_IMAGE,'txt',list_folder)
+      -- print(get_path_to_text_files(Paths[i],FILENAME_FOR_REWARD))
+      -- print(Paths[i])
+      -- print(FILENAME_FOR_REWARD)
       table.insert(list_txt_button, get_path_to_text_files(Paths[i],FILENAME_FOR_REWARD))
       table.insert(list_txt_action, get_path_to_text_files(Paths[i],FILENAME_FOR_ACTION))
       table.insert(list_txt_state, get_path_to_text_files(Paths[i],FILENAME_FOR_STATE))
@@ -138,11 +141,12 @@ function get_path_to_text_files(Path, including, excluding)
    local incl=including or ""
    local excl=excluding or "uyfouhjbhytfoughl" -- random motif
    local txt=nil
-   --print('get_path_to_text_files Path: ')
-   --print (Path)
+  --  print('get_path_to_text_files Path: ')
+  --  print (Path)
    for file in paths.files(Path) do
+    --  print(file)
       -- We only load files that match the 'including' pattern because we know that there are the folder we are interested in
-      if file:find(incl.. '$') and (not file:find(excl)) then --file:find(incl..'.txt' .. '$') then
+      if file:find(incl..'.txt'.. '$') and (not file:find(excl)) then --file:find(incl..'.txt' .. '$') then
          --print('found path...'..paths.concat(Path,file))
          txt=paths.concat(Path,file) ---TODO: return as soon as we find one, or return a list of all files that match the search criteria
       end

@@ -1,8 +1,10 @@
 require 'const'
 require 'image'
 require 'Get_Images_Set'
-tnt = require 'torchnet'
-vision = require 'torchnet-vision'  -- Install via https://github.com/Cadene/torchnet-vision
+if USE_CUDA then
+  tnt = require 'torchnet'
+  vision = require 'torchnet-vision'  -- Install via https://github.com/Cadene/torchnet-vision
+end
 
 
 ---------------------------------------------------------------------------------------
@@ -250,6 +252,7 @@ function load_Part_list(list, txt, txt_reward, txt_state)
    assert(txt_reward, "Txt reward not found")
 
    local all_images={}
+   print(DATA_FOLDER)
    local Infos = getInfos(txt,txt_reward,txt_state)
    -- print('list size: '..#list)
    -- print('Infos[1] size: '..#Infos[1])
