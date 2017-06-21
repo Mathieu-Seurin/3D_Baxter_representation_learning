@@ -73,38 +73,49 @@ VISUALIZE_IMAGE_CROP = false
 VISUALIZE_MEAN_STD = false
 VISUALIZE_AE = false
 
-
-if VISUALIZE_IMAGES_TAKEN or VISUALIZE_CAUS_IMAGE or VISUALIZE_IMAGE_CROP or VISUALIZE_MEAN_STD or VISUALIZE_AE then
-   --Creepy, but need a placeholder, to prevent many window to pop
-   WINDOW = image.display(image.lena())
-end
-
-LOGGING_ACTIONS = false
-
-IS_INCEPTION = string.find(MODEL_ARCHITECTURE_FILE, 'inception')
--- since the model require images to be a 3x299x299, and normalize differently, we need to adapt
-IS_RESNET = string.find(MODEL_ARCHITECTURE_FILE, 'resnet')
-
-DIFFERENT_FORMAT = IS_INCEPTION or IS_RESNET
-
-if IS_INCEPTION then
-   IM_LENGTH = 299
-   IM_HEIGHT = 299
-   MEAN_MODEL = torch.ones(3):double()*0.5
-   STD_MODEL = torch.ones(3):double()*0.5
-
-elseif IS_RESNET then
-   IM_LENGTH = 224
-   IM_HEIGHT = 224
-   MEAN_MODEL = torch.DoubleTensor({ 0.485, 0.456, 0.406 })
-   STD_MODEL = torch.DoubleTensor({ 0.229, 0.224, 0.225 })
-
-else
-   IM_LENGTH = 200
-   IM_HEIGHT = 200
-end
+--
+-- if VISUALIZE_IMAGES_TAKEN or VISUALIZE_CAUS_IMAGE or VISUALIZE_IMAGE_CROP or VISUALIZE_MEAN_STD or VISUALIZE_AE then
+--    --Creepy, but need a placeholder, to prevent many window to pop
+--    WINDOW = image.display(image.lena())
+-- end
+--
+-- LOGGING_ACTIONS = false
+--
+-- IS_INCEPTION = string.find(MODEL_ARCHITECTURE_FILE, 'inception')
+-- -- since the model require images to be a 3x299x299, and normalize differently, we need to adapt
+-- IS_RESNET = string.find(MODEL_ARCHITECTURE_FILE, 'resnet')
+--
+-- DIFFERENT_FORMAT = IS_INCEPTION or IS_RESNET
+--
+--
+-- if IS_INCEPTION then
+--    IM_LENGTH = 299
+--    IM_HEIGHT = 299
+--    MEAN_MODEL = torch.ones(3):double()*0.5
+--    STD_MODEL = torch.ones(3):double()*0.5
+--
+-- elseif IS_RESNET then
+--    IM_LENGTH = 224
+--    IM_HEIGHT = 224
+--    MEAN_MODEL = torch.DoubleTensor({ 0.485, 0.456, 0.406 })
+--    STD_MODEL = torch.DoubleTensor({ 0.229, 0.224, 0.225 })
+--
+-- else
+--    IM_LENGTH = 200
+--    IM_HEIGHT = 200
+-- end
+--
+-- print ("DIFFERENT_FORMAT")
+-- print(DIFFERENT_FORMAT)
+-- print ("STD_MODEL")
+-- print(STD_MODEL)
+-- print(IS_INCEPTION)
+-- print(IS_RESNET)
+-- print(MODEL_ARCHITECTURE_FILE)
+--
 
 IM_CHANNEL = 3 --image channels (RGB)
+ACTION_AMPLITUDE = 0.01
 --================================================
 -- dataFolder specific constants : filename, dim_in, indexes in state file etc...
 --================================================
@@ -133,6 +144,21 @@ PRIORS_CONFIGS_TO_APPLY ={{"Prop","Temp","Caus","Rep"}}
 FILE_PATTERN_TO_EXCLUDE = 'deltas'
 CAN_HOLD_ALL_SEQ_IN_RAM = true
 -- ====================================================
+--DATASET DEPENDENT settings to be set below
+STRING_MEAN_AND_STD_FILE =''
+NAME_SAVE= ''
+SAVED_MODEL_PATH = ''
+WINDOW = image.display(image.lena())
+LOGGING_ACTIONS = false
+IS_INCEPTION = false
+IS_RESNET = false
+DIFFERENT_FORMAT = IS_INCEPTION or IS_RESNET
+MEAN_MODEL = torch.ones(3):double()*0.5
+STD_MODEL = torch.ones(3):double()*0.5
+MEAN_MODEL = torch.DoubleTensor({ 0.485, 0.456, 0.406 })
+STD_MODEL = torch.DoubleTensor({ 0.229, 0.224, 0.225 })
+IM_LENGTH = 200
+IM_HEIGHT = 200
 
 function addLeadingZero(number)
     -- Returns a string with a leading zero of the number if the number has only one digit (for model logging and sorting purposes)
@@ -197,7 +223,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
     --Continuous actions SETTINGS
     --======================================================
     --USE_CONTINUOUS = true --A switch between discrete and continuous actions (translates into calling getRandomBatchFromSeparateListContinuous instead of getRandomBatchFromSeparateList
-    ACTION_AMPLITUDE = 0.01
+    --ACTION_AMPLITUDE = 0.01
     -- The following parameter eliminates the need of finding close enough actions for assessing all priors except for the temporal.one.
     -- If the actions are too far away, they will make the gradient 0 and will not be considered for the update rule
     --CONTINUOUS_ACTION_SIGMA = 0.4
@@ -348,6 +374,49 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
       print("No supported data folder provided, please add either of the data folders defined in hyperparams: "..BABBLING..", "..MOBILE_ROBOT.." "..SIMPLEDATA3D..' or others in const.lua' )
       os.exit()
     end
+
+
+    if VISUALIZE_IMAGES_TAKEN or VISUALIZE_CAUS_IMAGE or VISUALIZE_IMAGE_CROP or VISUALIZE_MEAN_STD or VISUALIZE_AE then
+       --Creepy, but need a placeholder, to prevent many window to pop
+       WINDOW = image.display(image.lena())
+    end
+
+    LOGGING_ACTIONS = false
+
+    IS_INCEPTION = string.find(MODEL_ARCHITECTURE_FILE, 'inception')
+    -- since the model require images to be a 3x299x299, and normalize differently, we need to adapt
+    IS_RESNET = string.find(MODEL_ARCHITECTURE_FILE, 'resnet')
+
+    DIFFERENT_FORMAT = IS_INCEPTION or IS_RESNET
+
+
+    if IS_INCEPTION then
+       IM_LENGTH = 299
+       IM_HEIGHT = 299
+       MEAN_MODEL = torch.ones(3):double()*0.5
+       STD_MODEL = torch.ones(3):double()*0.5
+
+    elseif IS_RESNET then
+       IM_LENGTH = 224
+       IM_HEIGHT = 224
+       MEAN_MODEL = torch.DoubleTensor({ 0.485, 0.456, 0.406 })
+       STD_MODEL = torch.DoubleTensor({ 0.229, 0.224, 0.225 })
+
+    else
+       IM_LENGTH = 200
+       IM_HEIGHT = 200
+    end
+
+    print ("DIFFERENT_FORMAT")
+    print(DIFFERENT_FORMAT)
+    print ("STD_MODEL")
+    print(STD_MODEL)
+    print(IS_INCEPTION)
+    print(IS_RESNET)
+    print(MODEL_ARCHITECTURE_FILE)
+
+
+
     if params then
         print_hyperparameters()
     end
