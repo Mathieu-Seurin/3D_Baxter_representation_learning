@@ -12,6 +12,14 @@
 --=============================================================
 require 'lfs'
 require 'hyperparams'
+
+------DEFAULTS (IF NOT COMMAND LINE ARGS ARE PASSED)
+USE_CUDA = true
+USE_CONTINUOUS = true
+MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.4
+CONTINUOUS_ACTION_SIGMA = 0.6
+DATA_FOLDER = MOBILE_ROBOT --works best!
+
 --torch.manualSeed(100)
 
 -- --===========================================================
@@ -132,28 +140,28 @@ function set_hyperparams(params)
     -- DEFINITION IN THIS PROGRAM, ARE NOT TAKEN NITO ACCOUNT, WE SET THEM HERE
     if params.use_cuda then
         USE_CUDA = params.use_cuda
-    else
-        USE_CUDA = true
+    -- else
+    --     USE_CUDA = true
     end
     if params.use_continuous then
         USE_CONTINUOUS = params.use_continuous
-    else
-        USE_CONTINUOUS = true
+    -- else
+    --     USE_CONTINUOUS = true
     end
     if params.mcd then
         MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = params.mcd
-    else
-        MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.4
+    -- else
+    --     MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.4
     end
     if params.sigma then
         CONTINUOUS_ACTION_SIGMA = params.sigma
-    else
-        CONTINUOUS_ACTION_SIGMA = 0.6
+    -- else
+    --     CONTINUOUS_ACTION_SIGMA = 0.6
     end
     if params.data_folder then
         DATA_FOLDER = params.data_folder
-    else
-        DATA_FOLDER = MOBILE_ROBOT --works best!
+    -- else
+    --     DATA_FOLDER = MOBILE_ROBOT --works best!
     end
 
     set_cuda_hyperparams(USE_CUDA)
