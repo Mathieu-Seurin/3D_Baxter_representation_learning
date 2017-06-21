@@ -36,9 +36,9 @@ LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
 LAST_MODEL_FILE = 'lastModel.txt'
 GLOBAL_SCORE_LOG_FILE = 'globalScoreLog.csv'
 MODELS_CONFIG_LOG_FILE  = 'modelsConfigLog.csv'
-
-now = os.date("*t")
-_, architecture_name = MODEL_ARCHITECTURE_FILE:match("(.+)/(.+)") --architecture_name, _ = split(architecture_name, ".")
+--
+-- now = os.date("*t")
+-- _, architecture_name = MODEL_ARCHITECTURE_FILE:match("(.+)/(.+)") --architecture_name, _ = split(architecture_name, ".")
 --print('Architecture name: '..architecture_name)
 
 -- function addLeadingZero(number)
@@ -148,7 +148,7 @@ CAN_HOLD_ALL_SEQ_IN_RAM = true
 STRING_MEAN_AND_STD_FILE =''
 NAME_SAVE= ''
 SAVED_MODEL_PATH = ''
-WINDOW = image.display(image.lena())
+WINDOW = nil--image.display(image.lena())
 LOGGING_ACTIONS = false
 IS_INCEPTION = false
 IS_RESNET = false
@@ -236,6 +236,8 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
     --If so, What is a good proxy  parameter to set it?
 
     STRING_MEAN_AND_STD_FILE = PRELOAD_FOLDER..'meanStdImages_'..DATA_FOLDER..'.t7'
+    now = os.date("*t")
+    _, architecture_name = MODEL_ARCHITECTURE_FILE:match("(.+)/(.+)") --architecture_name, _ = split(architecture_name, ".")
 
     if USE_CONTINUOUS then
         --DAY = 'Y'..now.year..'_D'..now.day..'_M'..now.month..'_H'..now.hour..'M'..now.min..'S'..now.sec..'_'..DATA_FOLDER..'_'..architecture_name..'_cont'..'_MCD0_'..(MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD*10)..'_S0_'..(CONTINUOUS_ACTION_SIGMA*10)
