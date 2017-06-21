@@ -153,7 +153,7 @@ WINDOW = nil--image.display(image.lena())
 LOGGING_ACTIONS = false
 IS_INCEPTION = false
 IS_RESNET = false
-DIFFERENT_FORMAT = IS_INCEPTION or IS_RESNET
+DIFFERENT_FORMAT = false--IS_INCEPTION or IS_RESNET
 MEAN_MODEL = torch.ones(3):double()*0.5
 STD_MODEL = torch.ones(3):double()*0.5
 MEAN_MODEL = torch.DoubleTensor({ 0.485, 0.456, 0.406 })
@@ -238,6 +238,9 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
 
     STRING_MEAN_AND_STD_FILE = PRELOAD_FOLDER..'meanStdImages_'..DATA_FOLDER..'.t7'
     now = os.date("*t")
+    print('MODEL_ARCHITECTURE_FILE')
+    print(MODEL_ARCHITECTURE_FILE) --./models/minimalNetModel
+    print(MODEL_ARCHITECTURE_FILE:match("(.+)/(.+)")) -- returns  ./models	minimalNetModel
     _, architecture_name = MODEL_ARCHITECTURE_FILE:match("(.+)/(.+)") --architecture_name, _ = split(architecture_name, ".")
 
     if USE_CONTINUOUS then
@@ -391,7 +394,11 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
     IS_RESNET = string.find(MODEL_ARCHITECTURE_FILE, 'resnet')
 
     DIFFERENT_FORMAT = IS_INCEPTION or IS_RESNET
-
+    print ("DIFFERENT_FORMAT, INCEPTION OR RESNET, MODEL_ARCHITECTURE_FILE")
+    print(DIFFERENT_FORMAT)
+    print(IS_INCEPTION)
+    print(IS_RESNET)
+    print(MODEL_ARCHITECTURE_FILE)
 
     if IS_INCEPTION then
        IM_LENGTH = 299
@@ -409,16 +416,6 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
        IM_LENGTH = 200
        IM_HEIGHT = 200
     end
-
-    print ("DIFFERENT_FORMAT")
-    print(DIFFERENT_FORMAT)
-    print ("STD_MODEL")
-    print(STD_MODEL)
-    print(IS_INCEPTION)
-    print(IS_RESNET)
-    print(MODEL_ARCHITECTURE_FILE)
-
-
 
     if params then
         print_hyperparameters()

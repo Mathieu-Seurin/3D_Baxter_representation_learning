@@ -15,7 +15,6 @@ STATIC_BUTTON_SIMPLEST = 'staticButtonSimplest'
 --=================================================
 INCEPTIONV4 = './models/inceptionFineTunning' --finetuned trained model
 
--- RESNET = './models/resnet'
 RESNET = './models/resnet'
 RESNET_VERSION = 18 --34 or 50 maybe
 FROZEN_LAYER = 3 --the number of layers that don't learn at all (i.e., their learning_rate=0)
@@ -24,7 +23,9 @@ BASE_TIMNET = './models/topUniqueSimplerWOTanh'
 
 --MODEL_ARCHITECTURE_FILE = INCEPTIONV4 --Too big
 --MODEL_ARCHITECTURE_FILE = BASE_TIMNET--without last layer as Tanh
-MODEL_ARCHITECTURE_FILE = './models/minimalNetModel'
+--MODEL_ARCHITECTURE_FILE = './models/minimalNetModel'  --Not supported for now  --/home/gpu_center/torch/install/bin/lua: imagesAndReprToTxt.lua:53: bad argument #1 to 'size' (out of range)
+--stack traceback: 	[C]: in function 'size' 	imagesAndReprToTxt.lua:53: in function 'represent_all_images'
+
 
 -- --======================================================
 -- --Continuous actions SETTINGS

@@ -28,8 +28,10 @@ function represent_all_images(imagesFolder, model)
                if DIFFERENT_FORMAT then
                   img = image.scale(image.load(fullImagesPath,3,'float'), IM_LENGTH, IM_HEIGHT)
                   img = augmentation(img)
+                  print('DIFFERENT_FORMAT.. Doing augmentation...')
                else
                   img = getImageFormated(fullImagesPath)
+                  print('DIFFERENT_FORMAT is false: Formatting image only..')
                end
 
                img = img:double():reshape(1,IM_CHANNEL,IM_LENGTH,IM_HEIGHT)
@@ -42,13 +44,8 @@ function represent_all_images(imagesFolder, model)
                print ('img and repr')
                print (#img)
                print(repr)
-               print('USE CUDA and DIMS')
-               print(USE_CUDA)
-               print(IM_CHANNEL)
-               print(IM_LENGTH)
-               print(IM_HEIGHT)
+               print('DIFFERENT_FORMAT and STD_MODEL')
                print(DIFFERENT_FORMAT)
-               print(SUB_DIR_IMAGE)
                print(STD_MODEL)
                for i=1,repr:size(2) do
                   reprStr = reprStr..repr[{1,i}]..' '
@@ -71,7 +68,6 @@ local function main(params)
     local images_folder = DATA_FOLDER
     local path, modelString
     print('>>imagesAndReprToTxt.lua  Running for DATA_FOLDER: '..DATA_FOLDER.. ' USE_CUDA ')
-    print(USE_CUDA)
     folder_and_name = get_last_used_model_folder_and_name()
     path = folder_and_name[1]
     modelString = folder_and_name[2]
