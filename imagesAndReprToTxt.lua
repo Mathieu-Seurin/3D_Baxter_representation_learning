@@ -39,9 +39,11 @@ function represent_all_images(imagesFolder, model)
                end
 
                repr = model:forward(img)
-               -- print ('img and repr')
-               -- print (#img)
-               -- print(repr)
+            --    print ('img and repr')
+            --    print (#img)
+            --    print(repr)
+            --    print('USE CUDA and DIMS')
+            --    print(USE_CUDA)
                for i=1,repr:size(2) do
                   reprStr = reprStr..repr[{1,i}]..' '
                   --print (reprStr)
@@ -62,7 +64,7 @@ local function main(params)
 
     local images_folder = DATA_FOLDER
     local path, modelString
-
+    print('>>imagesAndReprToTxt.lua  Running for DATA_FOLDER: '..DATA_FOLDER.. ' USE_CUDA '..USE_CUDA)
     folder_and_name = get_last_used_model_folder_and_name()
     path = folder_and_name[1]
     modelString = folder_and_name[2]

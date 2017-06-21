@@ -15,28 +15,13 @@ require 'hyperparams'
 
 ------DEFAULTS (IF NOT COMMAND LINE ARGS ARE PASSED)
 USE_CUDA = true
+USE_SECOND_GPU = true
 USE_CONTINUOUS = true
 MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.4
 CONTINUOUS_ACTION_SIGMA = 0.6
 DATA_FOLDER = MOBILE_ROBOT --works best!
 
 --torch.manualSeed(100)
-
--- --===========================================================
--- -- CUDA CONSTANTS
--- --===========================================================
--- USE_CUDA = false--true
--- USE_SECOND_GPU = true
---
--- if USE_CUDA then
---     require 'cunn'
---     require 'cudnn'  --If trouble, installing, follow step 6 in https://github.com/jcjohnson/neural-style/blob/master/INSTALL.md
--- end
---
--- if USE_CUDA and USE_SECOND_GPU then
---    cutorch.setDevice(2)
--- end
-
 --=====================================
 --DATA AND LOG FOLDER NAME etc..
 --====================================
@@ -122,9 +107,32 @@ end
 IM_CHANNEL = 3 --image channels (RGB)
 --================================================
 -- dataFolder specific constants : filename, dim_in, indexes in state file etc...
+--================================================
+CLAMP_CAUSALITY = false--cant add to functions because it creates an import loop
+
+MIN_TABLE = {-10000,-10000} -- for x,y
+MAX_TABLE = {10000,10000} -- for x,y
+
+DIMENSION_IN = 2
+DIMENSION_OUT = 2  --worked just as well as 4 output dimensions
+REWARD_INDEX = 1  --3 reward values: -1, 0, 10
+INDEX_TABLE = {1,2} --column index for coordinate in state file (respectively x,y)
+
+DEFAULT_PRECISION = 0.1
+FILENAME_FOR_ACTION = "recorded_robot_action.txt" --not used at all, we use state file, and compute the action with it (contains dx, dy)
+FILENAME_FOR_STATE = "recorded_robot_state.txt"
+FILENAME_FOR_REWARD = "recorded_robot_reward.txt"
+
+-- WARNING : If you change the folder (top, pano, front)
+-- do rm preload_folder/* because the images won't be good
+SUB_DIR_IMAGE = 'recorded_camera_top'
+AVG_FRAMES_PER_RECORD = 90
+
 --===============================================
 PRIORS_CONFIGS_TO_APPLY ={{"Prop","Temp","Caus","Rep"}}
-
+FILE_PATTERN_TO_EXCLUDE = 'deltas'
+CAN_HOLD_ALL_SEQ_IN_RAM = true
+-- ====================================================
 
 function addLeadingZero(number)
     -- Returns a string with a leading zero of the number if the number has only one digit (for model logging and sorting purposes)
@@ -245,28 +253,28 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
        AVG_FRAMES_PER_RECORD = 100
 
     elseif DATA_FOLDER == MOBILE_ROBOT then
-
-       CLAMP_CAUSALITY = false--cant add to functions because it creates an import loop
-
-       MIN_TABLE = {-10000,-10000} -- for x,y
-       MAX_TABLE = {10000,10000} -- for x,y
-
-       DIMENSION_IN = 2
-       DIMENSION_OUT = 2  --worked just as well as 4 output dimensions
-       REWARD_INDEX = 1  --3 reward values: -1, 0, 10
-       INDEX_TABLE = {1,2} --column index for coordinate in state file (respectively x,y)
-
-       DEFAULT_PRECISION = 0.1
-       FILENAME_FOR_ACTION = "recorded_robot_action.txt" --not used at all, we use state file, and compute the action with it (contains dx, dy)
-       FILENAME_FOR_STATE = "recorded_robot_state.txt"
-       FILENAME_FOR_REWARD = "recorded_robot_reward.txt"
-
-       -- WARNING : If you change the folder (top, pano, front)
-       -- do rm preload_folder/* because the images won't be good
-       SUB_DIR_IMAGE = 'recorded_camera_top'
-       -- ====================================================
-
-       AVG_FRAMES_PER_RECORD = 90
+        print('Setting default hyperparams for MOBILE_ROBOT')
+       --NOTE: DEFAULT PARAMETERS FOR OUR BASELINE DATABASE SET AT THE BEGINNING OF THE FILE (NEED TO BE DECLARED AS CONSTANTS)
+    --    CLAMP_CAUSALITY = false--cant add to functions because it creates an import loop
+       --
+    --    MIN_TABLE = {-10000,-10000} -- for x,y
+    --    MAX_TABLE = {10000,10000} -- for x,y
+       --
+    --    DIMENSION_IN = 2
+    --    DIMENSION_OUT = 2  --worked just as well as 4 output dimensions
+    --    REWARD_INDEX = 1  --3 reward values: -1, 0, 10
+    --    INDEX_TABLE = {1,2} --column index for coordinate in state file (respectively x,y)
+       --
+    --    DEFAULT_PRECISION = 0.1
+    --    FILENAME_FOR_ACTION = "recorded_robot_action.txt" --not used at all, we use state file, and compute the action with it (contains dx, dy)
+    --    FILENAME_FOR_STATE = "recorded_robot_state.txt"
+    --    FILENAME_FOR_REWARD = "recorded_robot_reward.txt"
+       --
+    --    -- WARNING : If you change the folder (top, pano, front)
+    --    -- do rm preload_folder/* because the images won't be good
+    --    SUB_DIR_IMAGE = 'recorded_camera_top'
+    --    -- ====================================================
+    --    AVG_FRAMES_PER_RECORD = 90
 
     elseif DATA_FOLDER == BABBLING then
       -- Leni's real Baxter data on  ISIR dataserver. It is named "data_archive_sim_1".
@@ -353,9 +361,6 @@ function print_hyperparameters()
       "\n================================")
 end
 
-FILE_PATTERN_TO_EXCLUDE = 'deltas'
-
-CAN_HOLD_ALL_SEQ_IN_RAM = true
 
 
 
