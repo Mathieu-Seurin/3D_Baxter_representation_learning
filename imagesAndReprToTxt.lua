@@ -58,7 +58,7 @@ end  --TODO call predict and add predict to script?
 
 
 local function main(params)
-    set_basic_hyperparams(params)
+    set_hyperparams(params)
 
     local images_folder = DATA_FOLDER
     local path, modelString
@@ -96,6 +96,10 @@ end
 local cmd = torch.CmdLine()
 cmd:option('-use_cuda', false, 'true to use GPU, false (default) for CPU only mode')
 cmd:option('-use_continuous', false, 'true to use a continuous action space, false (default) for discrete one (0.5 range actions)')
+cmd:option('-data_folder', MOBILE_ROBOT, 'Possible Datasets to use: staticButtonSimplest, mobileRobot, staticButtonSimplest, simpleData3D, pushingButton3DAugmented, babbling')
+cmd:option('-mcd', 0.4, 'Max. cosine distance allowed among actions for priors loss function evaluation (MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD)')
+cmd:option('-sigma', 0.6, "Sigma: denominator in continuous actions' extra factor (CONTINUOUS_ACTION_SIGMA)")
+
 local params = cmd:parse(arg)
 
 main(params)

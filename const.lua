@@ -163,7 +163,6 @@ function set_hyperparams(params)
     -- else
     --     DATA_FOLDER = MOBILE_ROBOT --works best!
     end
-
     set_cuda_hyperparams(USE_CUDA)
     set_dataset_specific_hyperparams(DATA_FOLDER)
 end
