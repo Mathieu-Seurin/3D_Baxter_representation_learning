@@ -11,7 +11,9 @@
 -- Hyperparameters are located in a different file (hyperparameters.lua)
 --=============================================================
 require 'lfs'
-require 'cutorch'
+if USE_CUDA then
+  require 'cutorch'
+end
 require 'hyperparams'
 --torch.manualSeed(100)
 
@@ -200,7 +202,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
        DIMENSION_IN = 3
 
        REWARD_INDICE = 2
-       INDICE_TABLE = {2,3,4} --column indice for coordinate in state file (respectively x,y,z)
+       INDEX_TABLE = {2,3,4} --column indice for coordinate in state file (respectively x,y,z)
 
        DEFAULT_PRECISION = 0.05 -- for 'arrondit' function
        FILENAME_FOR_REWARD = "is_pressed"
