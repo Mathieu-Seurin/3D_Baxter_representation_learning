@@ -189,6 +189,5 @@ local function main(params)
     end
 end
 
-
 local params = cmd:parse(arg)
 main(params)

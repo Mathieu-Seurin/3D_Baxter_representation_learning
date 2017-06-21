@@ -6,30 +6,6 @@ require 'nngraph'
 require 'const'
 require 'functions'
 
-if DATA_FOLDER then
-    local imagesFolder = DATA_FOLDER
-else --when not using command line to set hyperparameters and calling this script in a pipeline
-    local images_folder = get_data_folder_from_model_name(get_last_used_model_folder_and_name()[2])
-    --images_folder = MOBILE_ROBOT --DATA_FOLDER --does not work if we set DATA_FOLDER only on script taking from command line and thus we extract it from the last model trained
-    --However, I do not know why the constant in const is set for imagesAndReprToTxt (even if I require 'const' here as well, but is is nil when it comes to run this script)
-    set_minimum_hyperparams_for_dataset(images_folder)
-end
-
-local path, modelString
-
-folder_and_name = get_last_used_model_folder_and_name()
-path = folder_and_name[1]
-modelString = folder_and_name[2]
-local  model = torch.load(path..'/'..modelString)
-if USE_CUDA then
-   model = model:cuda()
-else
-   model = model:double()
-end
-
-outStr = ''
-tempSeq = {}
-
 --returns the representation of the image (a tensor of size {1xDIM})
 function represent_all_images(imagesFolder)
    local augmentation = tnt.transform.compose{
@@ -80,16 +56,46 @@ function represent_all_images(imagesFolder)
    return tempSeq
 end  --TODO call predict and add predict to script?
 
-tempSeq = represent_all_images(imagesFolder)
 
-table.sort(tempSeq, function (a,b) return a[1] < b[1] end)
-tempSeqStr = ''
-for key in pairs(tempSeq) do
-   tempSeqStr = tempSeqStr..tempSeq[key][2]..'\n'
+local function main(params)
+    set_basic_hyperparams(params)
+
+    local images_folder = DATA_FOLDER
+    local path, modelString
+
+    folder_and_name = get_last_used_model_folder_and_name()
+    path = folder_and_name[1]
+    modelString = folder_and_name[2]
+    local  model = torch.load(path..'/'..modelString)
+    if USE_CUDA then
+       model = model:cuda()
+    else
+       model = model:double()
+    end
+
+    outStr = ''
+    tempSeq = {}
+    tempSeq = represent_all_images(imagesFolder)
+
+    table.sort(tempSeq, function (a,b) return a[1] < b[1] end)
+    tempSeqStr = ''
+    for key in pairs(tempSeq) do
+       tempSeqStr = tempSeqStr..tempSeq[key][2]..'\n'
+    end
+    path_to_output_file = path..'/'..LEARNED_REPRESENTATIONS_FILE
+
+    print('Saving images and their learnt representations to file '..path_to_output_file)
+    file = io.open(path_to_output_file, 'w')
+    file:write(tempSeqStr)
+    file:close()
 end
-path_to_output_file = path..'/'..LEARNED_REPRESENTATIONS_FILE
 
-print('Saving images and their learnt representations to file '..path_to_output_file)
-file = io.open(path_to_output_file, 'w')
-file:write(tempSeqStr)
-file:close()
+
+
+-- Command-line options
+local cmd = torch.CmdLine()
+cmd:option('-use_cuda', false, 'true to use GPU, false (default) for CPU only mode')
+cmd:option('-use_continuous', false, 'true to use a continuous action space, false (default) for discrete one (0.5 range actions)')
+local params = cmd:parse(arg)
+
+main(params)

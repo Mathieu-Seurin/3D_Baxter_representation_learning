@@ -1,12 +1,22 @@
 require 'const'
 require 'image'
 require 'Get_Images_Set'
-if USE_CUDA then
-  tnt = require 'torchnet'
-  vision = require 'torchnet-vision'  -- Install via https://github.com/Cadene/torchnet-vision
+
+
+function set_basic_hyperparams(params)
+    USE_CUDA = params.use_cuda
+    USE_CONTINUOUS = params.use_continuous  --DATA_FOLDER = params.data_folder
+    if DATA_FOLDER then
+        images_folder = DATA_FOLDER
+    else --when not using command line to set hyperparameters and calling this script in a pipeline
+        images_folder = get_data_folder_from_model_name(get_last_used_model_folder_and_name()[2])
+        --images_folder = MOBILE_ROBOT --DATA_FOLDER --does not work if we set DATA_FOLDER only on script taking from command line and thus we extract it from the last model trained
+        --However, I do not know why the constant in const is set for imagesAndReprToTxt (even if I require 'const' here as well, but is is nil when it comes to run this script)
+    end
+    DATA_FOLDER = images_folder --set_minimum_hyperparams_for_dataset(images_folder)
+    set_cuda_hyperparams(USE_CUDA)
+    set_dataset_specific_hyperparams(DATA_FOLDER)
 end
-
-
 ---------------------------------------------------------------------------------------
 -- Function :get_last_used_model_name()-- LAST_MODEL_FILE is a file where the name of the last model computed is saved
 -- this way, you just have to launch the programm without specifying anything,
