@@ -21,8 +21,7 @@ if len(sys.argv) != 3:
     lastModelFile = open('lastModel.txt')
     path = lastModelFile.readline()[:-1]+'/'
     model_name = path.split('/')[1]     
-    # FOR FAST TESTING:  
-    model_name = MOBILE_ROBOT#STATIC_BUTTON_SIMPLEST#'pushingButton3DAugmented' #TODO REMOVE-testing  model_name = MOBILE_ROBOT
+    # ONLY FOR FAST TESTING !!:   model_name = MOBILE_ROBOT#STATIC_BUTTON_SIMPLEST#'pushingButton3DAugmented' #TODO REMOVE-testing  model_name = MOBILE_ROBOT
     data_folder = get_data_folder_from_model_name(model_name) 
     reward_file_str = 'allRewards_'+data_folder+'.txt'
     if plotGroundTruthStates:
@@ -38,13 +37,11 @@ else:
     state_file_str = sys.argv[1]
     reward_file_str = sys.argv[2]
 
-print" Using states and rewards files: ", state_file_str, "\n", reward_file_str 
-if not os.path.isfile(state_file_str):
-    print('Calling subprocess create_plotStates_file_for_all_seq with ',data_folder)
-    subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_continuous', '-use_cuda', '-data_folder', data_folder])  # TODO: READ CMD LINE ARGS FROM FILE INSTEAD (and set accordingly here) TO NOT HAVING TO MODIFY INSTEAD train_predict_plotStates and the python files  
-if not os.path.isfile(reward_file_str):
-    print('Calling subprocess create_all_reward with ',data_folder)
-    subprocess.call(['th','create_all_reward.lua','-use_continuous', '-use_cuda', '-data_folder', data_folder])
+if not os.path.isfile(state_file_str): # print('Calling subprocess create_plotStates_file_for_all_seq with ',data_folder)
+    subprocess.call(['th','create_plotStates_file_for_all_seq.lua', '-use_cuda', '-data_folder', data_folder])  # TODO: READ CMD LINE ARGS FROM FILE INSTEAD (and set accordingly here) TO NOT HAVING TO MODIFY INSTEAD train_predict_plotStates and the python files  
+if not os.path.isfile(reward_file_str): #print('Calling subprocess create_all_reward with ',data_folder)
+    subprocess.call(['th','create_all_reward.lua', '-use_cuda', '-data_folder', data_folder])
+    # TODO: ADD '-use_continuous',
 total_rewards = 0 
 total_states = 0 
 states_l=[]
@@ -97,7 +94,7 @@ elif REPRESENTATIONS_DIMENSIONS ==2:
     PLOT_DIMENSIONS = 2 #    print "[PCA not applied since learnt representations' dimensions are not larger than 2]"
 else:
     PLOT_DIMENSIONS = 3  # Default, if mobileData used, we plot just 2
-print "\n #REPRESENTATIONS_DIMENSIONS =", REPRESENTATIONS_DIMENSIONS
+#print "\n REPRESENTATIONS_DIMENSIONS =", REPRESENTATIONS_DIMENSIONS
 
 
 if PLOT_DIMENSIONS == 2:

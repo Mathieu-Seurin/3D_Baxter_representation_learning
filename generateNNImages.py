@@ -45,11 +45,10 @@ else:
     path_to_model = lastModelFile.readline()[:-1]
 data_folder = get_data_folder_from_model_name(path_to_model)
 
-# THE FOLLOWING ONLY WILL RUN IN USE_CUDA false way
-print('Calling lua subprocesses with ',data_folder)
-subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_continuous', '-use_cuda', '-data_folder', data_folder])  # TODO: READ CMD LINE ARGS FROM FILE INSTEAD (and set accordingly here) TO NOT HAVING TO MODIFY INSTEAD train_predict_plotStates and the python files  
-subprocess.call(['th','create_all_reward.lua','-use_continuous', '-use_cuda', '-data_folder', data_folder])
-
+# THE FOLLOWING ONLY WILL RUN IN USE_CUDA false way  #print('Calling lua subprocesses with ',data_folder)
+subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_cuda', '-data_folder', data_folder])  # TODO: READ CMD LINE ARGS FROM FILE INSTEAD (and set accordingly here) TO NOT HAVING TO MODIFY INSTEAD train_predict_plotStates and the python files  
+subprocess.call(['th','create_all_reward.lua', '-use_cuda', '-data_folder', data_folder])
+# TODO: ADD ,'-use_continuous'
 file_representation_string=path_to_model+"/"+LEARNED_REPRESENTATIONS_FILE
 
 
@@ -167,5 +166,5 @@ if not os.path.isfile(GLOBAL_SCORE_LOG_FILE):
 else: # it exists so append without writing the header
     global_scores_df.to_csv(GLOBAL_SCORE_LOG_FILE, mode ='a', header=False) 
     
-print 'Saved mean KNN MSE score entry from model \n++++++++ ', last_model_name, ' ++++++++\n to ', GLOBAL_SCORE_LOG_FILE, '. Last score is in: ',score_file 
+print 'Saved mean KNN MSE score entry from model \n++ ', last_model_name, ' ++\n to ', GLOBAL_SCORE_LOG_FILE, '. Last score is in: ',score_file 
 print global_scores_df.head()
