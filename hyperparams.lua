@@ -23,7 +23,8 @@ BASE_TIMNET = './models/topUniqueSimplerWOTanh'
 
 --MODEL_ARCHITECTURE_FILE = INCEPTIONV4 --Too big
 --MODEL_ARCHITECTURE_FILE = BASE_TIMNET--without last layer as Tanh
-MODEL_ARCHITECTURE_FILE = RESNET --'./models/minimalNetModel'Not supported for now  --/home/gpu_center/torch/install/bin/lua: imagesAndReprToTxt.lua:53: bad argument #1 to 'size' (out of range)
+MODEL_ARCHITECTURE_FILE = RESNET --TODO: fix: './models/minimalNetModel'  is the only model that should be used with learn_autoencoder, not in regular training in script.lua
+--otherwise, we get:  /home/gpu_center/torch/install/bin/lua: imagesAndReprToTxt.lua:53: bad argument #1 to 'size' (out of range)
 print("Model :",MODEL_ARCHITECTURE_FILE)
 --stack traceback: 	[C]: in function 'size' 	imagesAndReprToTxt.lua:53: in function 'represent_all_images'
 

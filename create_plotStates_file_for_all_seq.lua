@@ -26,11 +26,13 @@ require 'functions'
 -- end
 
 local function main(params)
-    set_hyperparams(params)--)set_basic_hyperparams(params)
-
+    print("\n\n>> create_plotStates_file_for_all_seq: Creating all states file for NN-Quantitative Criterion plot. ")
+    set_hyperparams(params)
     local images_folder = DATA_FOLDER
+    print('In DATA_FOLDER: '..images_folder..' params: ')
+    print(params)
 
-    print("\n\n>> create_plotStates_file_for_all_seq: Creating all states file for NN-Quantitative Criterion plot. DATA_FOLDER: "..images_folder)
+
     list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(images_folder)
     print("Reading rewards from file list_txt_button= ",list_txt_button)
     print("list_txt_state: ",list_txt_state)

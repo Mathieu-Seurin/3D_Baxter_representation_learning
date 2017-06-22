@@ -194,6 +194,7 @@ function set_hyperparams(params)
     --     CONTINUOUS_ACTION_SIGMA = 0.6
     end
     if params.data_folder then
+        print('************ setting command line datset to '..params.data_folder)
         DATA_FOLDER = params.data_folder
     -- else
     --     DATA_FOLDER = MOBILE_ROBOT --works best!
@@ -281,7 +282,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
        AVG_FRAMES_PER_RECORD = 100
 
     elseif DATA_FOLDER == MOBILE_ROBOT then
-        print('Setting default hyperparams for MOBILE_ROBOT')
+        print('Setting hyperparams for MOBILE_ROBOT (default)')
        --NOTE: DEFAULT PARAMETERS FOR OUR BASELINE DATABASE SET AT THE BEGINNING OF THE FILE (NEED TO BE DECLARED AS CONSTANTS)
     --    CLAMP_CAUSALITY = false--cant add to functions because it creates an import loop
        --
@@ -395,7 +396,9 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
         -- since the model require images to be a 3x299x299, and normalize differently, we need to adapt
         IS_RESNET = true
     end
-
+    if string.find(MODEL_ARCHITECTURE_FILE, 'minimalNetModel') then --TODO replace by constants
+        error([[minimalNetModel should only be used in learn_autoencoder.lua, not script.lua]])
+    end
     DIFFERENT_FORMAT = IS_INCEPTION or IS_RESNET
 
     if IS_INCEPTION then
@@ -413,15 +416,13 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
        IM_HEIGHT = 200
     end
 
-    if params then
-        print_hyperparameters()
-    end
+    print_hyperparameters()
 end
 
 function print_hyperparameters()
-    print("Model :",MODEL_ARCHITECTURE_FILE)
+    print("Model Architecture :",MODEL_ARCHITECTURE_FILE)
     print("\nUSE_CUDA ",USE_CUDA," \nUSE_CONTINUOUS ACTIONS: ",USE_CONTINUOUS,'\nMAX_COS_DIST_AMONG_ACTIONS_THRESHOLD: ',MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD,' CONTINUOUS_ACTION_SIGMA: ', CONTINUOUS_ACTION_SIGMA)
-    print("============ DATA USED =========\n",
+    print("============ DATA_FOLDER USED =========\n",
                     DATA_FOLDER,
       "\n================================")
 end

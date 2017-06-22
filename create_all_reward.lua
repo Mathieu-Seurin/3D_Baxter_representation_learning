@@ -2,9 +2,11 @@ require 'functions'
 
 
 local function main(params)
-    set_hyperparams(params)--set_basic_hyperparams(params)
-
+    print("\n\n>> create_all_rewards.lua: Creating all rewards for plot")
+    set_hyperparams(params)
     local images_folder = DATA_FOLDER
+    print('In DATA_FOLDER: '..images_folder..' params: ')
+    print(params)
     -- if DATA_FOLDER then
     --     local images_folder = DATA_FOLDER
     -- else --when not using command line to set hyperparameters and calling this script in a pipeline
@@ -14,7 +16,6 @@ local function main(params)
     --     set_minimum_hyperparams_for_dataset(images_folder)
     -- end
 
-    print("\n\n>> create_all_rewards.lua: Creating all rewards for plot. DATA_FOLDER: "..images_folder)
     list_folders_images, list_txt_action,list_txt_button, list_txt_state= Get_HeadCamera_View_Files(images_folder)
     -- print(list_folders_images[1])
     -- print(list_txt_action[1])
