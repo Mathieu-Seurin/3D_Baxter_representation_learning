@@ -61,8 +61,7 @@ end  --TODO call predict and add predict to script?
 
 local function main(params)
     print("\n\n>> imagesAndReprToTxt.lua")
-    set_hyperparams(params)
-    print('In DATA_FOLDER: '..DATA_FOLDER..' params: ')
+    set_hyperparams(params) --    print('In DATA_FOLDER: '..DATA_FOLDER..' params: ')
     print(params)
 
     local images_folder = DATA_FOLDER

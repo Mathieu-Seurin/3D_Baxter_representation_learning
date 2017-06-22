@@ -163,11 +163,7 @@ IM_HEIGHT = 200
 
 function addLeadingZero(number)
     -- Returns a string with a leading zero of the number if the number has only one digit (for model logging and sorting purposes)
-    if number >= 0 and number <= 9 then
-        return "0" .. number
-    else
-        return tostring(number)
-    end
+    if number >= 0 and number <= 9 then  return "0" .. number else return tostring(number)    end
 end
 
 function set_hyperparams(params)
