@@ -38,6 +38,10 @@ Note: This repo is an extension of https://github.com/Mathieu-Seurin/baxter_repr
 # -data_folder options: DATA_FOLDER (Dataset to use):
 #          staticButtonSimplest, mobileRobot, simpleData3D, pushingButton3DAugmented, babbling')
 ```
+Example:
+
+th script.lua -use_continuous -data_folder staticButtonSimplest
+
 
 ## DEPENDENCIES
 
