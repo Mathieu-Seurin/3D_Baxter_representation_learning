@@ -48,7 +48,7 @@ else:
     path_to_model = lastModelFile.readline()[:-1]
 data_folder = get_data_folder_from_model_name(path_to_model)
 
-
+# THE FOLLOWING ONLY WILL RUN IN USE_CUDA false way
 #subprocess.call(['th','create_plotStates_file_for_all_seq.lua'])  
 #subprocess.call(['th','create_all_reward.lua'])
 subprocess.call(['th','create_plotStates_file_for_all_seq.lua'])  
@@ -160,19 +160,14 @@ f.write(str(mean_error)[:5])
 f.close()
 
 # writing scores to global log for plotting and reporting
-header = ('Model', 'KNN_MSE')
-#if os.path.isfile(GLOBAL_SCORE_LOG_FILE):
-# 	global_scores_df = pd.DataFrame(columns= header)
-# else:
-	#global_scores_df = pd.read_csv(GLOBAL_SCORE_LOG_FILE, columns= header)
+header = ['Model', 'KNN_MSE']
 d = {'Model':[last_model_name], 'KNN_MSE': [mean_error]}	
-global_scores_df = pd.DataFrame(data=d, columns = header)#, columns= header) 
-#global_scores_df.reset_index()
-#global_scores_df.columns = header
-print global_scores_df.head()
+global_scores_df = pd.DataFrame(data=d, columns = header) #global_scores_df.reset_index() 
+
 if not os.path.isfile(GLOBAL_SCORE_LOG_FILE):
-   global_scores_df.to_csv(GLOBAL_SCORE_LOG_FILE, header=True, cols=header)
-else: # else it exists so append without writing the header
+    global_scores_df.to_csv(GLOBAL_SCORE_LOG_FILE, header=True) 
+else: # it exists so append without writing the header
     global_scores_df.to_csv(GLOBAL_SCORE_LOG_FILE, mode ='a', header=False) 
     
-print 'Saved mean KNN MSE score entry from model +++ ', last_model_name, ' +++ to ', GLOBAL_SCORE_LOG_FILE, '. Last score is in: ',score_file 
+print 'Saved mean KNN MSE score entry from model \n++++++++ ', last_model_name, ' ++++++++\n to ', GLOBAL_SCORE_LOG_FILE, '. Last score is in: ',score_file 
+print global_scores_df.head()

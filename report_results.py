@@ -28,12 +28,12 @@ def print_leader_board(df, datasets):
     for dataset in datasets:  
         #sub_dataframe = df[df['KNN_MSE'].notnull() & df[df['DATA_FOLDER'].notnull() & (df['DATA_FOLDER']== dataset)] #df.loc[df['DATA_FOLDER'] == dataset]  #df[['DATA_FOLDER'] == dataset]
         sub_dataframe = df[df['DATA_FOLDER'].notnull() & (df['DATA_FOLDER']== dataset)] 
-
-        if len(sub_dataframe)>0:
-            best_KNN_MSE = np.nanmin(sub_dataframe.KNN_MSE.values) # min of the array ignoring any NaNs
-            #best_model_name = sub_dataframe.loc[sub_dataframe['KNN_MSE'] == best_KNN_MSE].Model.values[0]
-            best_model_name = sub_dataframe[sub_dataframe['KNN_MSE'] == best_KNN_MSE].Model.values[0]
-            print "DATASET ", dataset, " Min KNN_MSE: ", best_KNN_MSE, ": ", best_model_name
+        best_KNN_MSE = sub_dataframe['KNN_MSE'].min()
+        if not pd.isnull(best_KNN_MSE):
+            best_model_name = sub_dataframe[sub_dataframe['KNN_MSE'] == best_KNN_MSE].Model[0]
+            print "\nDATASET ", dataset, " Min KNN_MSE: ", best_KNN_MSE, ": ", best_model_name
+        else:
+            print '[No data available, or file corrupted for dataset: ',dataset,' all KNN_MSE were nan, delete old file and run train_predict_plotStates.sh again]'
 
 # writing scores to global log for plotting and reporting
 #header = ['Model', 'KNN_MSE']#MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD','CONTINUOUS_ACTION_SIGMA'] # TODO: JOIN
