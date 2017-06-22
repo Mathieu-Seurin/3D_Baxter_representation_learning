@@ -307,7 +307,7 @@ end
 ----------------- run ----------
 -- cross_validation(1)
 
-verbose = false
+verbose = true
 test_run(verbose)
 
 --------- load model test---------

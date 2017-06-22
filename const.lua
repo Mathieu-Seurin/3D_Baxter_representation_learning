@@ -19,7 +19,7 @@ USE_SECOND_GPU = true
 USE_CONTINUOUS = true
 MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.4
 CONTINUOUS_ACTION_SIGMA = 0.6
-DATA_FOLDER = MOBILE_ROBOT --works best!
+DATA_FOLDER = SIMPLEDATA3D --works best!
 
 --torch.manualSeed(100)
 --=====================================
@@ -215,7 +215,7 @@ function set_cuda_hyperparams(USE_CUDA)
     end
     USE_SECOND_GPU = true
     if USE_CUDA and USE_SECOND_GPU then
-       cutorch.setDevice(2)
+      --  cutorch.setDevice(2)
     end
 end
 
