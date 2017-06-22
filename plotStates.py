@@ -1,43 +1,44 @@
 # coding: utf-8
 from Utils import library_versions_tests, get_data_folder_from_model_name, plotStates
-from Utils import BABBLING, MOBILE_ROBOT, SIMPLEDATA3D, PUSHING_BUTTON_AUGMENTED, STATIC_BUTTON_SIMPLEST, LEARNED_REPRESENTATIONS_FILE
+from Utils import BABBLING, MOBILE_ROBOT, SIMPLEDATA3D, PUSHING_BUTTON_AUGMENTED, STATIC_BUTTON_SIMPLEST, LEARNED_REPRESENTATIONS_FILE, SKIP_RENDERING
 import numpy as np 
 import sys
 import os.path
 import subprocess
 import unittest 
 test = unittest.TestCase('__init__')
-# True if we plot ground truth observed states, and false to plot the learned state representations
-#plotGroundTruthStates = True 
-plotGroundTruthStates = False
-
 
 # PLOTTING GROUND TRUTH OR LEARNED STATES 
 #####################
+# True if we plot ground truth observed states, and false to plot the learned state representations
+plotGroundTruthStates = False
 
 library_versions_tests()
+print"\n\n >> Running plotStates.py....plotGroundTruthStates: ",plotGroundTruthStates
 
 model_name = ''
 if len(sys.argv) != 3:
     lastModelFile = open('lastModel.txt')
     path = lastModelFile.readline()[:-1]+'/'
     model_name = path.split('/')[1]     
-    # FOR FAST TESTING:  model_name = STATIC_BUTTON_SIMPLEST#'pushingButton3DAugmented' #TODO REMOVE-testing  model_name = MOBILE_ROBOT
+    # FOR FAST TESTING:  
+    model_name = MOBILE_ROBOT#STATIC_BUTTON_SIMPLEST#'pushingButton3DAugmented' #TODO REMOVE-testing  model_name = MOBILE_ROBOT
     data_folder = get_data_folder_from_model_name(model_name) 
     reward_file_str = 'allRewards_'+data_folder+'.txt'
     if plotGroundTruthStates:
         state_file_str = 'allStates_'+data_folder+'.txt'
-        print "*********************\nPLOTTING GROUND TRUTH (OBSERVED) STATES from ", state_file_str#, ' for model: ', model_name#(Baxter left wrist position for 3D PUSHING_BUTTON_AUGMENTED dataset, or grid 2D position for MOBILE_ROBOT dataset)
+        print "*********************\nPLOTTING GROUND TRUTH (OBSERVED) STATES  " #, ' for model: ', model_name#(Baxter left wrist position for 3D PUSHING_BUTTON_AUGMENTED dataset, or grid 2D position for MOBILE_ROBOT dataset)
         plot_path = path+'GroundTruthStatesPlot_'+model_name+'.png'
     else:
         state_file_str = path+ LEARNED_REPRESENTATIONS_FILE
-        print "*********************\nPLOTTING LEARNT STATES from ", state_file_str#, ' for model: ', model_name #(3D for Baxter PUSHING_BUTTON_AUGMENTED dataset, or 2D position for MOBILE_ROBOT dataset): ", state_file_str
+        print "*********************\nPLOTTING LEARNT STATES  "#, ' for model: ', model_name #(3D for Baxter PUSHING_BUTTON_AUGMENTED dataset, or 2D position for MOBILE_ROBOT dataset): ", state_file_str
         plot_path = path+'LearnedStatesPlot_'+model_name+'.png'
     lastModelFile.close()
 else:
     state_file_str = sys.argv[1]
     reward_file_str = sys.argv[2]
 
+print" Using states and rewards files: ", state_file_str, "\n", reward_file_str 
 if not os.path.isfile(state_file_str):
     subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_continuous','-use_cuda']) ##subprocess.call(['th','create_plotStates_file_for_all_seq.lua']) 
 if not os.path.isfile(reward_file_str):
@@ -54,7 +55,7 @@ if 'recorded_robot' in state_file_str :
                 words=line.split(' ')
                 states_l.append([ float(words[0]),float(words[1])] )
     states=np.asarray(states_l)
-else:
+else: # general case
     with open(state_file_str) as f:
         for line in f:
             if line[0]!='#':
@@ -78,16 +79,7 @@ with open(reward_file_str) as f:
             rewards_l.append(words[0])
             total_rewards+= 1
 
-# Adjustment needed to align rewards (given at t+1) with actions and states at time t
-if data_folder == MOBILE_ROBOT:
-    # Adjustment for mobileRobot dataset, which logs for a given line in the files, 
-    # s_t, a_t and r_(t+1) instead of s_t, a_t and r_t  (This might explain some of the scattered plots for mobile robot data)
-    states = states[0:len(states)-1, :]
-    rewards_l = rewards_l[1:]
-    total_states -= 1
-    total_rewards -= 1
-
-rewards=rewards_l
+rewards=rewards_l 
 toplot=states
 print "Ploting total states and total rewards: ",total_states, " ", total_rewards," in files: ",state_file_str," and ", reward_file_str
 test.assertEqual(total_rewards, total_states, "Datapoints size discordance! Length of rewards and state files should be equal, and it is "+str(len(rewards))+" and "+str(len(toplot))+" Run first create_all_reward.lua and create_plotStates_file_for_all_seq.lua")
@@ -116,3 +108,25 @@ else:
     print " PLOT_DIMENSIONS undefined"
 
 
+
+
+
+# def parse_arguments(): # TODO in future
+#     skipRendering = False
+#     import argparse
+
+#     parser = argparse.ArgumentParser(description='Process some integers.')
+#     parser.add_argument('integers', metavar='N', type=int, nargs='+',
+#                        help='an integer for the accumulator')
+#     parser.add_argument('--sum', dest='accumulate', action='store_const',
+#                        const=sum, default=max,
+#                        help='sum the integers (default: find the max)')
+
+#     args = parser.parse_args()
+#     print(args.accumulate(args.integers))
+#     print "This is the name of the script: ", sys.argv[0]
+#     print "Number of arguments: ", len(sys.argv)
+#     print "The arguments are: " , str(sys.argv)
+#     print "\n\n >> RUNNING plotStates.py  -skipRendering: ", skipRendering
+#     print parser.parse_args()
+#     return skipRendering

@@ -194,7 +194,7 @@ function set_hyperparams(params)
     --     CONTINUOUS_ACTION_SIGMA = 0.6
     end
     if params.data_folder then
-        print('************ setting command line datset to '..params.data_folder)
+        print('[Log: Setting command line dataset to '..params.data_folder..']')
         DATA_FOLDER = params.data_folder
     -- else
     --     DATA_FOLDER = MOBILE_ROBOT --works best!

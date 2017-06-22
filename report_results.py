@@ -16,6 +16,8 @@ from Utils import GLOBAL_SCORE_LOG_FILE, MODELS_CONFIG_LOG_FILE, ALL_STATS_FILE
 ####   MAIN program
 
 ############ PLOT ALL EXPERIMENTS SCORES
+print"\n\n >> Running report_results.py...."
+
 all_datasets = [BABBLING, MOBILE_ROBOT, SIMPLEDATA3D, PUSHING_BUTTON_AUGMENTED, STATIC_BUTTON_SIMPLEST]
 header = ['Model','KNN_MSE','DATA_FOLDER','MODEL_ARCHITECTURE_FILE','MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD','CONTINUOUS_ACTION_SIGMA']
 
@@ -33,7 +35,7 @@ def print_leader_board(df, datasets):
             best_model_name = sub_dataframe[sub_dataframe['KNN_MSE'] == best_KNN_MSE].Model[0]
             print "\nDATASET ", dataset, " Min KNN_MSE: ", best_KNN_MSE, ": ", best_model_name
         else:
-            print '[No data available, or file corrupted for dataset: ',dataset,' all KNN_MSE were nan, delete old file and run train_predict_plotStates.sh again]'
+            print '[No data available/file corrupted for dataset: ',dataset,' all KNN_MSE were nan, delete old file and run train_predict_plotStates.sh again]'
 
 # writing scores to global log for plotting and reporting
 #header = ['Model', 'KNN_MSE']#MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD','CONTINUOUS_ACTION_SIGMA'] # TODO: JOIN

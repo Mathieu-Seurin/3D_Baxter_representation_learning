@@ -9,6 +9,8 @@ import numpy as np
 import os, os.path
 import matplotlib
 
+SKIP_RENDERING = True  # Make False only when running remotely via ssh for plots and KNN figures to be saved
+
 #DATASETS AVAILABLE:
 BABBLING = 'babbling'
 MOBILE_ROBOT = 'mobileRobot'
@@ -23,8 +25,8 @@ MODELS_CONFIG_LOG_FILE  = 'modelsConfigLog.csv'
 ALL_STATE_FILE = 'allStates.txt'
 LAST_MODEL_FILE = 'lastModel.txt'
 ALL_STATS_FILE ='allStats.csv'
+LUA2PYTHON_COMMUNICATION_FILE = 'lua2pythonCommunication.txt'
 
-VISUALIZE_PLOTS = True  # Make False when running remotely via ssh for plots and KNN figures to be saved
 
 def library_versions_tests():
     if not matplotlib.__version__.startswith('2.'):
@@ -69,11 +71,10 @@ def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension
     cmap = colors.ListedColormap(['green', 'blue', 'red'])  # TODO: adjust for different cardi$
     bounds=[-1,0,9,15] 
     norm = colors.BoundaryNorm(bounds, cmap.N)
-    #plt.scatter(toplot[:,0],toplot[:,1],c=rewards,cmap=cmap, norm=norm,marker="o")
 
     fig = plt.figure()
     if mode =='2D':
-        ax = fig.add_subplot(111)#, projection = '2d')
+        ax = fig.add_subplot(111)
         # colors_markers = [('r', 'o', -10, 0.5), ('b', '^', 0.5, 10)]
         # for c, m, zlow, zhigh in colors_markers:
         #     ax.scatter(toplot[:,0], toplot[:,1], c=c, marker=m)
@@ -94,7 +95,8 @@ def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension
         ax.set_title(title.replace('Learned Representations','Ground Truth')+dataset) 
     else:
         ax.set_title(title+dataset) 
-    plt.show()
+    if not SKIP_RENDERING:
+        plt.show()
     plt.savefig(plot_path)
     print('\nSaved plot to '+plot_path)
 
@@ -113,6 +115,35 @@ def plot_3D(x =[1,2,3,4,5,6,7,8,9,10], y =[5,6,2,3,13,4,1,2,4,8], z =[2,3,3,3,5,
     ax.set_ylabel(axes_labels[1])
     ax.set_zlabel(axes_labels[2])
     ax.set_title(title+dataset)
+
+
+# def file2dict(file): # DO SAME FUNCTIONS IN LUA and call at the end of set_hyperparams() method SKIP_VISUALIZATIOn, USE_CUDA and all the other params to used them in the subprocess subroutine.
+#     d = {}
+#     with open(file) as f:
+#         for line in f:
+#            (key, val) = line.split()
+#            d[key] = val
+#     print 'file2dict returned: '.d
+#     # TODO use json
+#     # Also you can load from a JSON file:
+#     # >>> d2 = json.load(open("text.txt"))
+#     # >>> print d2
+#     # {u'two': 2, u'one': 1}
+#     return d
+
+# def dict2file(d):
+#     # with open(LUA2PYTHON_COMMUNICATION_FILE) as f:
+#     #     for key, val in d:
+#            # write   (key, val) = line.split()
+#            # TODOL use json
+#             #            import json
+#             #  d = {"one":1, "two":2}
+#             # json.dump(d, open("text.txt",'w'))
+#             # This code dumps to a text file
+
+#             # $ cat text.txt 
+#             # {"two": 2, "one": 1}
+#     print 'dict2file wrote dict: ',d
 
 
 
