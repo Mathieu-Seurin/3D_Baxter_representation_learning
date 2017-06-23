@@ -19,7 +19,7 @@ USE_SECOND_GPU = true
 USE_CONTINUOUS = true
 MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.4
 CONTINUOUS_ACTION_SIGMA = 0.6
-DATA_FOLDER = SIMPLEDATA3D --works best!
+DATA_FOLDER = mobileRobot --works best!
 
 --torch.manualSeed(100)
 --=====================================
@@ -142,7 +142,7 @@ AVG_FRAMES_PER_RECORD = 90
 --===============================================
 PRIORS_CONFIGS_TO_APPLY ={{"Prop","Temp","Caus","Rep"}}
 FILE_PATTERN_TO_EXCLUDE = 'deltas'
-CAN_HOLD_ALL_SEQ_IN_RAM = true
+CAN_HOLD_ALL_SEQ_IN_RAM = false
 -- ====================================================
 --DATASET DEPENDENT settings to be set below
 STRING_MEAN_AND_STD_FILE =''

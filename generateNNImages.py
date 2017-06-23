@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import numpy as np
+from PIL import Image
 from sklearn.neighbors import NearestNeighbors
 import shutil
 import random
@@ -9,7 +10,7 @@ import pandas as pd
 import os, os.path
 import subprocess
 from Utils import ALL_STATE_FILE, LEARNED_REPRESENTATIONS_FILE, LAST_MODEL_FILE, GLOBAL_SCORE_LOG_FILE, get_data_folder_from_model_name
-import unittest 
+import unittest
 test = unittest.TestCase('__init__')
 
 
@@ -17,18 +18,18 @@ test = unittest.TestCase('__init__')
 
 """
 NOTE, if sklearn.neighbours import fails, remove  and install:
-Either use conda (in which case all your installed packages would be in ~/miniconda/ or pip install --user don't mix the two. Removing either 
+Either use conda (in which case all your installed packages would be in ~/miniconda/ or pip install --user don't mix the two. Removing either
 rm -rf ~/.local/lib/python2.7/site-packages/sklearn or your ~/miniconda folder and reinstalling it cleanly should fix this.
 sudo rm -rf scikit_learn-0.18.1.egg-info/
 pip uninstall sklearn
 and
 1)  pip install -U scikit-learn
 or 2) conda install -c anaconda scikit-learn=0.18.1
-If needed, also do 
+If needed, also do
 pip install -U numpy
 pip install -U scipy
 
-""" 
+"""
 
 if len(sys.argv) <= 1:
     sys.exit("Give number of neighbors to produce, followed by number of input images (and model dir if you don't want to use the last model created)")
@@ -49,9 +50,9 @@ else:
 data_folder = get_data_folder_from_model_name(path_to_model)
 
 
-#subprocess.call(['th','create_plotStates_file_for_all_seq.lua'])  
+#subprocess.call(['th','create_plotStates_file_for_all_seq.lua'])
 #subprocess.call(['th','create_all_reward.lua'])
-subprocess.call(['th','create_plotStates_file_for_all_seq.lua'])  
+subprocess.call(['th','create_plotStates_file_for_all_seq.lua'])
 subprocess.call(['th','create_all_reward.lua'])
 
 file_representation_string=path_to_model+"/"+LEARNED_REPRESENTATIONS_FILE
@@ -89,7 +90,7 @@ distances, indexes = nbrs.kneighbors(representations)
 #Generate mosaics
 path_to_neighbour = path_to_model + '/NearestNeighbors/'
 last_model_name = path_to_model.split('/')[-1]
-print "path_to_model: ",path_to_model 
+print "path_to_model: ",path_to_model
 print "path_to_neighbour: ",path_to_neighbour
 #shutil.rmtree('NearestNeighbors', 1)
 if not os.path.exists(path_to_neighbour):
@@ -105,7 +106,7 @@ else:
 # the k-nearest neighbour in the REPRESENTATION SPACE (the first argv parameter)
 
 #As a quantitative measure, for the k nearest neighbour
-#you compute the distance between the state of the original image and 
+#you compute the distance between the state of the original image and
 #the images retrieved using knn on representation space
 
 total_error = 0 # to assess the quality of repr
@@ -119,7 +120,9 @@ for img_name,id,dist,state in data:
 	fig.set_size_inches(6*(nbr_neighbors+1), 6)
 	a=fig.add_subplot(1,nbr_neighbors+1,1)
 	a.axis('off')
-	img = mpimg.imread(img_name)
+	print(img_name)
+	# img = mpimg.imread(img_name)
+        img = Image.open(img_name)
 	imgplot = plt.imshow(img)
 	state_str='[' + ",".join(['{:.3f}'.format(float(x)) for x in state]) + "]"
 	a.set_title(seq_name + "/" + base_name + ": \n" + state_str)
@@ -129,7 +132,8 @@ for img_name,id,dist,state in data:
 	for i in range(0,nbr_neighbors):
 		a=fig.add_subplot(1,nbr_neighbors+1,i+2)
 		img_name=images[id[i+1]]
-		img = mpimg.imread(img_name)
+		# img = mpimg.imread(img_name)
+		img = Image.open(img_name)
 		imgplot = plt.imshow(img)
 
 		base_name_n= os.path.splitext(os.path.basename(img_name))[0]
@@ -148,7 +152,7 @@ for img_name,id,dist,state in data:
 
 	plt.tight_layout()
 	output_file = path_to_neighbour + seq_name + "_" + base_name
-        
+
 	plt.savefig(output_file, bbox_inches='tight')
 	plt.close() # efficiency: avoids keeping all images into RAM
 
@@ -165,14 +169,14 @@ header = ('Model', 'KNN_MSE')
 # 	global_scores_df = pd.DataFrame(columns= header)
 # else:
 	#global_scores_df = pd.read_csv(GLOBAL_SCORE_LOG_FILE, columns= header)
-d = {'Model':[last_model_name], 'KNN_MSE': [mean_error]}	
-global_scores_df = pd.DataFrame(data=d, columns = header)#, columns= header) 
+d = {'Model':[last_model_name], 'KNN_MSE': [mean_error]}
+global_scores_df = pd.DataFrame(data=d, columns = header)#, columns= header)
 #global_scores_df.reset_index()
 #global_scores_df.columns = header
 print global_scores_df.head()
 if not os.path.isfile(GLOBAL_SCORE_LOG_FILE):
    global_scores_df.to_csv(GLOBAL_SCORE_LOG_FILE, header=True, cols=header)
 else: # else it exists so append without writing the header
-    global_scores_df.to_csv(GLOBAL_SCORE_LOG_FILE, mode ='a', header=False) 
-    
-print 'Saved mean KNN MSE score entry from model +++ ', last_model_name, ' +++ to ', GLOBAL_SCORE_LOG_FILE, '. Last score is in: ',score_file 
+    global_scores_df.to_csv(GLOBAL_SCORE_LOG_FILE, mode ='a', header=False)
+
+print 'Saved mean KNN MSE score entry from model +++ ', last_model_name, ' +++ to ', GLOBAL_SCORE_LOG_FILE, '. Last score is in: ',score_file

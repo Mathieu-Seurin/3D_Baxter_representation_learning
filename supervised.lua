@@ -26,7 +26,7 @@ local cmd = torch.CmdLine()
 -- Basic options
 cmd:option('-use_cuda', false, 'true to use GPU version, false (default) for CPU only mode')
 cmd:option('-use_continuous', false, 'true to use a continuous action space, false (default) for discrete one (0.5 range actions)')
-cmd:option('-data_folder', SIMPLEDATA3D, 'Possible Datasets to use: staticButtonSimplest, mobileRobot, staticButtonSimplest, simpleData3D, pushingButton3DAugmented, babbling')
+cmd:option('-data_folder', STATIC_BUTTON_SIMPLEST, 'Possible Datasets to use: staticButtonSimplest, mobileRobot, staticButtonSimplest, simpleData3D, pushingButton3DAugmented, babbling')
 cmd:option('-mcd', 0.4, 'Max. cosine distance allowed among actions for priors loss function evaluation (MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD)')
 cmd:option('-sigma', 0.6, "Sigma: denominator in continuous actions' extra factor (CONTINUOUS_ACTION_SIGMA)")
 
@@ -85,9 +85,9 @@ function getLabel(data, index)
   for i = 1, DIMENSION_IN do
     label[i] = data.Infos[i][index]
   end
-  if RELATIVE then
-    label = label - data.posButton-- TODO change data's sturecture to include posB
-  end
+  -- if RELATIVE then
+    -- label = label - data.posButton-- TODO change data's sturecture to include posB
+  -- end
   return label
 end
 
