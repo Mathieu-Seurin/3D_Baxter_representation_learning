@@ -43,7 +43,12 @@ function AE_Training(model,batch)
    if NOISE then
       noise=torch.rand(batch:size())
       noise = noise/3
-      noise=noise:cuda()
+
+      if USE_CUDA then
+         noise=noise:cuda()
+    --   else
+    --      noise=noise:double()
+      end
       input=input+noise
    end
 
@@ -71,7 +76,7 @@ function AE_Training(model,batch)
       return loss,gradParameters
    end
    optimState={learningRate=LR}
-   parameters, loss=optimizer(feval, parameters, optimState) 
+   parameters, loss=optimizer(feval, parameters, optimState)
 
    return loss[1]
 end
@@ -115,7 +120,7 @@ function train_Epoch(list_folders_images,list_txt,Log_Folder)
       for iter=1, nbIter do
          batch=getRandomBatchFromSeparateList(BATCH_SIZE, 'regular') --just taking random images from all sequences
          batch=batch:cuda()
-         
+
          loss_iter=AE_Training(model,batch)
          loss = loss + loss_iter
          xlua.progress(iter, nbIter)
@@ -132,11 +137,14 @@ end
 -- Command-line options
 local cmd = torch.CmdLine()
 cmd:option('-optimiser', 'adam', 'Optimiser : adam|sgd|rmsprop')
-cmd:option('-model', 'DAE', 'model : AE|DAE')
+cmd:option('-model', 'DAE', 'model : AE|DAE') --TODO ADD
+-- cmd:option('-use_cuda', false, 'true to use GPU, false (default) for CPU only mode')
+-- cmd:option('-use_continuous', false, 'true to use a continuous action space, false (default) for discrete one (0.5 range actions)')
+
 opt = cmd:parse(arg)
 
 local list_folders_images, list_txt=Get_HeadCamera_View_Files(DATA_FOLDER)
- 
+
 NB_TEST = 3
 NB_SEQUENCES = #list_folders_images-NB_TEST --That way, the last X sequences are used as test
 

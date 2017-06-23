@@ -27,6 +27,25 @@ Note: This repo is an extension of https://github.com/Mathieu-Seurin/baxter_repr
 
 
 
+## RUNNING: script.lua or the shell pipeline scripts:
+
+```
+# CONFIG OPTIONS:
+# -use_cuda
+# -use_continuous
+# -params.sigma  is CONTINUOUS_ACTION_SIGMA
+# -params.mcd is MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD
+# -data_folder options: DATA_FOLDER (Dataset to use):
+#          staticButtonSimplest, mobileRobot, simpleData3D, pushingButton3DAugmented, babbling')
+```
+Example:
+
+th script.lua -use_continuous -data_folder staticButtonSimplest
+
+IMPORTANT:
+-If you want to run grid search, ssh or batch processing pipelines such as learn_predict_plotStates.sh, make SKIP_RENDERING = true in Utils.py for the KNN images and plots to be saved properly and later copy them with scp for visualization, e.g. using [2].
+
+
 
 ## DEPENDENCIES
 
@@ -118,7 +137,35 @@ pip install -U scipy
 3. Matplotlib: If plots are not showing properly reward colours, or datapoints too small, your version of matplotlib may be too old, it needs to be at least 2.0. Run test in Utils.py library_versions_tests().
 
 
+4. 'luaJIT not enough memory' is a known problem of luaJIT that allow a maximum size for table of 2GB (in RAM, it's not related to GPU memory). There seems to be no way to avoid or change this limitation, and since the new database is bigger than that. 2 solutions:
+
+- Either you delete some part of the database until you don't have the limitations (hotfix)
+- Or you change the core of torch to Lua52 instead of luaJIT (what i did, but you need to re-install everything, torch cudnn etc...)
+
+```
+git clone https://github.com/torch/distro.git ~/torch --recursive
+cd ~/torch
+
+# clean old torch installation
+./clean.sh
+# optional clean command (for older torch versions)
+# curl -s https://raw.githubusercontent.com/torch/ezinstall/master/clean-old.sh | bash
+
+# https://github.com/torch/distro : set env to use lua
+TORCH_LUA_VERSION=LUA52 ./install.sh
+```
+
+Switching to lua52 worked
+
 
 ## REFERENCES
 [1] Learning state representations with robotic priors. Rico Jonschkowski, Oliver Brock, 2015.
 http://www.robotics.tu-berlin.de/fileadmin/fg170/Publikationen_pdf/Jonschkowski-15-AURO.pdf
+
+[2]
+```
+mkdir ./Log/modelY2017_D22_M06_H14M36S26_staticButtonSimplest_resnet_cont_MCD0_4_S0_6  ; scp -r gpu_center@uei18:~/baxter_representation_learning_3D/Log/modelY2017_D22_M06_H14M36S26_staticButtonSimplest_resnet_cont_MCD0_4_S0_6/*.* ./Log/modelY2017_D22_M06_H14M36S26_staticButtonSimplest_resnet_cont_MCD0_4_S0_6
+;
+: mkdir ./Log/modelY2017_D22_M06_H14M36S26_staticButtonSimplest_resnet_cont_MCD0_4_S0_6/NearestNeighbors
+
+```

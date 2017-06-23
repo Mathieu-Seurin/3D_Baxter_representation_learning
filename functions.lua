@@ -1,16 +1,58 @@
 require 'const'
 require 'image'
 require 'Get_Images_Set'
-tnt = require 'torchnet'
-vision = require 'torchnet-vision'  -- Install via https://github.com/Cadene/torchnet-vision
 
-function print_hyperparameters()
-    print("Model :",MODEL_ARCHITECTURE_FILE)
-    print("\nUSE_CUDA ",USE_CUDA," \nUSE_CONTINUOUS ACTIONS: ",USE_CONTINUOUS)
-    print("============ DATA USED =========\n",
-                    DATA_FOLDER,
-      "\n================================")
+
+-- function set_basic_hyperparams(params)
+--     USE_CUDA = params.use_cuda
+--     USE_CONTINUOUS = params.use_continuous  --DATA_FOLDER = params.data_folder
+--     if DATA_FOLDER then
+--         images_folder = DATA_FOLDER
+--     else --when not using command line to set hyperparameters and calling this script in a pipeline
+--         images_folder = get_data_folder_from_model_name(get_last_used_model_folder_and_name()[2])
+--         --images_folder = MOBILE_ROBOT --DATA_FOLDER --does not work if we set DATA_FOLDER only on script taking from command line and thus we extract it from the last model trained
+--         --However, I do not know why the constant in const is set for imagesAndReprToTxt (even if I require 'const' here as well, but is is nil when it comes to run this script)
+--     end
+--     DATA_FOLDER = images_folder --set_minimum_hyperparams_for_dataset(images_folder)
+--     set_cuda_hyperparams(USE_CUDA)
+--     set_dataset_specific_hyperparams(DATA_FOLDER)
+-- end
+---------------------------------------------------------------------------------------
+-- Function :get_last_used_model_name()-- LAST_MODEL_FILE is a file where the name of the last model computed is saved
+-- this way, you just have to launch the programm without specifying anything,
+-- and it will load the good model
+-- Input ():
+-- Output (): The path to the folder containing last model used and the string name of such model
+---------------------------------------------------------------------------------------
+function get_last_used_model_folder_and_name()
+    if file_exists(LAST_MODEL_FILE) then
+       f = io.open(LAST_MODEL_FILE,'r')
+       path = f:read()
+       modelString = f:read()
+       print('MODEL USED (last model logged in '..LAST_MODEL_FILE..') : '..modelString)
+       f:close()
+       return {path, modelString}
+    else
+       error(LAST_MODEL_FILE.." should exist")
+    end
 end
+
+function get_data_folder_from_model_name(model_name)
+    if string.find(model_name, BABBLING) then
+        return BABBLING
+    elseif string.find(model_name, MOBILE_ROBOT)  then
+        return MOBILE_ROBOT
+    elseif string.find(model_name, SIMPLEDATA3D)  then
+        return SIMPLEDATA3D
+    elseif string.find(model_name, PUSHING_BUTTON_AUGMENTED)  then
+        return PUSHING_BUTTON_AUGMENTED
+    elseif string.find(model_name, STATIC_BUTTON_SIMPLEST)  then
+        return STATIC_BUTTON_SIMPLEST
+    else
+        print "Unsupported dataset!"
+    end
+end
+
 ---------------------------------------------------------------------------------------
 -- Function :save_model(model,path)
 -- Input ():
@@ -244,6 +286,7 @@ function load_Part_list(list, txt, txt_reward, txt_state)
    assert(txt_reward, "Txt reward not found")
 
    local all_images={}
+   print(DATA_FOLDER)
    local Infos = getInfos(txt,txt_reward,txt_state)
    -- print('list size: '..#list)
    -- print('Infos[1] size: '..#Infos[1])
@@ -487,7 +530,7 @@ function calculate_mean_and_std()
 
    mean[1] = mean[1] / totImg
    mean[2] = mean[2] / totImg
-   mean[3] = mean[3] / totImglog_mod
+   mean[3] = mean[3] / totImg
 
    for seqStr in lfs.dir(imagesFolder) do
       if string.find(seqStr,'record') then

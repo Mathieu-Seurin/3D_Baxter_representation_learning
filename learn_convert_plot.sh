@@ -11,7 +11,7 @@ function has_command_finish_correctly {
 
 th script.lua -use_cuda
 has_command_finish_correctly
-th imagesAndReprToTxt.lua
+th imagesAndReprToTxt.lua -use_cuda
 has_command_finish_correctly
 python generateNNImages.py 10 25
 python plotStates.py
