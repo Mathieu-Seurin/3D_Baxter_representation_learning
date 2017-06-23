@@ -396,7 +396,10 @@ end
 
 function print_hyperparameters()
     print("Model Architecture :",MODEL_ARCHITECTURE_FILE)
-    print("\nUSE_CUDA ",USE_CUDA," \nUSE_CONTINUOUS ACTIONS: ",USE_CONTINUOUS,'\nMAX_COS_DIST_AMONG_ACTIONS_THRESHOLD: ',MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD,' CONTINUOUS_ACTION_SIGMA: ', CONTINUOUS_ACTION_SIGMA)
+    print("\nUSE_CUDA ",USE_CUDA," \nUSE_CONTINUOUS ACTIONS: ",USE_CONTINUOUS)
+    if USE_CONTINUOUS then  --otherwise, it is not used
+        print ('MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD: ',MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD,' CONTINUOUS_ACTION_SIGMA: ', CONTINUOUS_ACTION_SIGMA)
+    end
     print("============ DATA_FOLDER USED =========\n",
                     DATA_FOLDER,
       "\n================================")
