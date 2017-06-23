@@ -259,7 +259,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
         FILENAME_FOR_STATE = "recorded_robot_limb_left_endpoint_state.txt"
 
         SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
-        AVG_FRAMES_PER_RECORD = 90
+        AVG_FRAMES_PER_RECORD = 90  --HINT: reduce for fast full epoch testing in CPU mode
 
     else
       print("No supported data folder provided, please add either of the data folders defined in hyperparams: "..BABBLING..", "..MOBILE_ROBOT.." "..SIMPLEDATA3D..' or others in const.lua' )

@@ -66,11 +66,11 @@ function save_autoencoder(model)
 
    saved = model.modules[1]:clone():float()
    torch.save(file_string, model.modules[1]) --saving only encoding module
-   print("Saved model at : "..path)
 
    f = io.open(LAST_MODEL_FILE,'w')
    f:write(path..'\n'..NAME_SAVE..'.t7')
    f:close()
+   print("Saved AE model at : "..path..' and model name NAME_SAVE: '.. NAME_SAVE)
 end
 
 function save_model(model)

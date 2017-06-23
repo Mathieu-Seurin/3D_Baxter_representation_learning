@@ -129,7 +129,7 @@ local function main(params)
     end
 
     NAME_SAVE = 'AE_'..NUM_HIDDEN..DATA_FOLDER
-
+    print('NAME SAVE IN set_AE_hyp:  '..NAME_SAVE)
     local list_folders_images, list_txt=Get_HeadCamera_View_Files(DATA_FOLDER)
 
     NB_TEST = 3

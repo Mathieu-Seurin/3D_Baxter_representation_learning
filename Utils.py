@@ -3,14 +3,17 @@
 from sklearn.decomposition import PCA  # with some version of sklearn fails with ImportError: undefined symbol: PyFPE_jbuf
 import matplotlib.pyplot as plt
 from matplotlib import colors
+from matplotlib.colors import ListedColormap
 from mpl_toolkits.mplot3d import Axes3D
 import sys
 import numpy as np
 import os, os.path
 import matplotlib
 import seaborn as sns
-sns.set_palette('colorblind')  #http://seaborn.pydata.org/introduction.html
-sns.color_palette()
+
+"""
+Documentation for colorblind-supported plots: #http://seaborn.pydata.org/introduction.html
+"""
 
 
 SKIP_RENDERING = True  # Make False only when running remotely via ssh for plots and KNN figures to be saved
@@ -29,7 +32,7 @@ MODELS_CONFIG_LOG_FILE  = 'modelsConfigLog.csv'
 ALL_STATE_FILE = 'allStates.txt'
 LAST_MODEL_FILE = 'lastModel.txt'
 ALL_STATS_FILE ='allStats.csv'
-LUA2PYTHON_COMMUNICATION_FILE = 'lua2pythonCommunication.txt'
+LUA2PYTHON_COMMUNICATION_FILE = 'lua2pythonCommunication.txt' # not used yet, TODO
 
 
 def library_versions_tests():
@@ -61,23 +64,35 @@ def get_data_folder_from_model_name(model_name):
     else:
         print "Unsupported dataset!"
 
-
-
-
 """
 Use this function if rewards need to be visualized, use plot_3D otherwise
 """
 def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension 1','State Dimension 2','State Dimension 3'], title='Learned Representations-Rewards Distribution\n', dataset=''): 
     # Plots states either learned or the ground truth
     # Useful documentation: https://matplotlib.org/examples/mplot3d/scatter3d_demo.html
+    # Against colourblindness: https://chrisalbon.com/python/seaborn_color_palettes.html
     # TODO: add vertical color bar for representing reward values  https://matplotlib.org/examples/api/colorbar_only.html
     reward_values = set(rewards)
     rewards_cardinal = len(reward_values)
     rewards = map(float, rewards)
     print'plotStates ',mode,' for rewards cardinal: ',rewards_cardinal,' (', reward_values,')'
-    cmap = colors.ListedColormap(['green', 'blue', 'red'])  # TODO: adjust for different cardi$
+    cmap = colors.ListedColormap(['gray', 'blue', 'red'])     # print "cmap: ",type(cmap)
+
+
+    colorblind_palette = sns.color_palette("colorblind", rewards_cardinal)  # 3 is the number of different colours to use
+    #print(type(colorblind_palette))
+    #cubehelix_pal_cmap = sns.cubehelix_palette(as_cmap=True)
+    #print(type(cubehelix_pal_cmap))
+
+    #sns.palplot(sns.color_palette("colorblind", 10))
+    # sns.color_palette()
+    #sns.set_palette('colorblind') 
+
+    colorblind_cmap  = ListedColormap(colorblind_palette)
+    colormap = cmap
     bounds=[-1,0,9,15] 
-    norm = colors.BoundaryNorm(bounds, cmap.N)
+    norm = colors.BoundaryNorm(bounds, colormap.N)  
+    # TODO: for some reason, no matther if I use cmap=cmap or make cmap=colorblind_palette work, it prints just 2 colors too similar for a colorblind person
 
     fig = plt.figure()
     if mode =='2D':
@@ -90,7 +105,7 @@ def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension
         ax = fig.add_subplot(111, projection='3d')
         # for c, m, zlow, zhigh in colors_markers:
         #     ax.scatter(toplot[:,0], toplot[:,1], toplot[:,2], c=c, marker=m)
-        ax.scatter(toplot[:,0], toplot[:,1], toplot[:,2], c=rewards, cmap=cmap, marker=".")#,fillstyle=None)
+        ax.scatter(toplot[:,0], toplot[:,1], toplot[:,2], c=rewards, cmap=colormap, marker=".")#,fillstyle=None)
         ax.set_zlabel(axes_labels[2])
     else:
         sys.exit("only mode '2D' and '3D' plot supported")
@@ -101,7 +116,9 @@ def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension
         ax.set_title(title.replace('Learned Representations','Ground Truth')+dataset) 
     else:
         ax.set_title(title+dataset) 
+
     plt.savefig(plot_path)
+    #plt.colorbar()  #TODO WHY IT DOES NOT SHOW AND SHOWS A PALETTE INSTEAD?
     if not SKIP_RENDERING:  # IMPORTANT TO SAVE BEFORE SHOWING SO THAT IMAGES DO NOT BECOME BLANK!
         plt.show()
     print('\nSaved plot to '+plot_path)
