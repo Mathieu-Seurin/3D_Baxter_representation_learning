@@ -18,14 +18,18 @@ function AE_Training(model, batch, optimizer)
 
    if NOISE then
       noise=torch.rand(batch:size())
-      noise=(noise-noise:mean())/(noise:std())
-      --if USE_CUDA then
-      noise=noise:cuda()
-    --   else
-    --      noise=noise:double()
-    --   end
+      noise = noise/3
+
+      if USE_CUDA then
+         noise=noise:cuda()
+      end
       input=input+noise
    end
+
+   -- local img_merge = image.toDisplayTensor({input[1],expected[1]})
+   -- image.display{image=img_merge,win=WINDOW}
+   -- io.read()
+
 
    -- create closure to evaluate f(X) and df/dX
    local feval = function(x)
@@ -149,7 +153,6 @@ local function main(params)
 
     imgs={} --memory is free!!!!!
 end
-
 
 
 -- Command-line options

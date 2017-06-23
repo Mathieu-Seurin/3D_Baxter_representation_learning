@@ -14,7 +14,9 @@ STATIC_BUTTON_SIMPLEST = 'staticButtonSimplest'
 --================ MODEL USED =====================
 --=================================================
 INCEPTIONV4 = './models/inceptionFineTunning' --finetuned trained model
-RESNET = './models/resnet'
+
+RESNET = './models/resnet'  --finetuned trained model
+
 RESNET_VERSION = 18 --34 or 50 maybe
 FROZEN_LAYER = 3 --the number of layers that don't learn at all (i.e., their learning_rate=0)
 
@@ -34,14 +36,19 @@ MODEL_ARCHITECTURE_FILE = RESNET
 -- by randomly sampling states (begin point and end point). CLAMP_CAUSALITY,
 -- on the contrary, takes the next consecutive action
 -- Cannot be applied in every scenario !!!!
-EXTRAPOLATE_ACTION = false  --TODO shall it be true for continuous actions too always?
+
+EXTRAPOLATE_ACTION = false
+EXTRAPOLATE_ACTION_CAUS = false
+--TODO shall it be true for continuous actions too always?
+-- Always : i don't think so, but trying to see if it works better with it, why not
+
 
 LR=0.0001
-LR_DECAY = 1e-6
+LR_DECAY = 3*1e-6
 
 SGD_METHOD = 'adam' -- Can be adam or adagrad
-BATCH_SIZE = 5
-NB_EPOCHS=20
+BATCH_SIZE = 10
+NB_EPOCHS=1
 
 DATA_AUGMENTATION = 0.01
 NORMALIZE_IMAGE = true
@@ -50,4 +57,4 @@ COEF_TEMP=1
 COEF_PROP=1
 COEF_REP=1
 COEF_CAUS=1
-DIMENSION_OUT=2
+DIMENSION_OUT=3

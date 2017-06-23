@@ -14,6 +14,7 @@ require 'lfs'
 require 'hyperparams'
 
 ------DEFAULTS (IF NOT COMMAND LINE ARGS ARE PASSED)
+
 USE_CUDA = true
 USE_SECOND_GPU = true
 USE_CONTINUOUS = true
@@ -21,7 +22,17 @@ MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.4
 CONTINUOUS_ACTION_SIGMA = 0.6
 DATA_FOLDER = MOBILE_ROBOT --works best!
 
+if USE_CUDA then
+    require 'cunn'
+    require 'cudnn' --If trouble, installing, follow step 6 in https://github.com/jcjohnson/neural-style/blob/master/INSTALL.md
+end
+
+if USE_CUDA and USE_SECOND_GPU then
+   cutorch.setDevice(2)
+end
+
 --torch.manualSeed(100)
+
 --=====================================
 --DATA AND LOG FOLDER NAME etc..
 --====================================
@@ -267,6 +278,8 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
     end
 
 
+    MIN_TABLE = {0.42,-0.09,-10} -- for x,y,z
+    MAX_TABLE = {0.74,0.59,10} -- for x,y,z
     if VISUALIZE_IMAGES_TAKEN or VISUALIZE_CAUS_IMAGE or VISUALIZE_IMAGE_CROP or VISUALIZE_MEAN_STD or VISUALIZE_AE then
        --Creepy, but need a placeholder, to prevent many window to pop
        WINDOW = image.display(image.lena())

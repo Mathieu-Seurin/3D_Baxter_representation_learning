@@ -94,8 +94,6 @@ local function main(params)
     file:close()
 end
 
-
-
 -- Command-line options
 local cmd = torch.CmdLine()
 cmd:option('-use_cuda', false, 'true to use GPU, false (default) for CPU only mode')

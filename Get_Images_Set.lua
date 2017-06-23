@@ -213,6 +213,7 @@ function get_two_Prop_Pair(Infos1, Infos2)
          if EXTRAPOLATE_ACTION then --Look at const.lua for more details about extrapolate
             for id_second_action_end in ipairs(torch.totable(torch.randperm(size2))) do
                action2 = action_amplitude(Infos2, id_second_action_begin, id_second_action_end)
+               
                if is_same_action(action1, action2) then
                   return {im1=id_ref_action_begin,im2=id_ref_action_end,im3=id_second_action_begin,im4=id_second_action_end, act1=action1, act2=action2}
                end
@@ -253,21 +254,25 @@ function get_one_random_Caus_Set(Infos1, Infos2)
    local size2=#Infos2[1]
    local watchDog=0
 
-   while watchDog<100 do
+   while watchDog<50 do
 
-      --Sample an action, whatever the reward is
-      id_ref_action_begin= torch.random(1,size2-1)
-      if EXTRAPOLATE_ACTION then --Look at const.lua for more details about extrapolate
-         id_ref_action_end  = torch.random(1,size2)
-      else
-         id_ref_action_end  = id_ref_action_begin+1
-      end
+      repeat
+         --Sample an action, whose reward is not 0
+         id_ref_action_begin= torch.random(1,size2-1)
 
-      reward1 = Infos2.reward[id_ref_action_end]
+         if EXTRAPOLATE_ACTION_CAUS then --Look at const.lua for more details about extrapolate
+            repeat id_ref_action_end=torch.random(1,size2) until (id_ref_action_begin ~= id_ref_action_end)
+         else
+            id_ref_action_end  = id_ref_action_begin+1
+         end
+
+         reward1 = Infos2.reward[id_ref_action_end]
+      until (reward1~=0)
+
       action1 = action_amplitude(Infos2, id_ref_action_begin, id_ref_action_end)
 
       -- Force the action amplitude to be the same, dirty...
-      if CLAMP_CAUSALITY and not EXTRAPOLATE_ACTION then
+      if CLAMP_CAUSALITY and not EXTRAPOLATE_ACTION_CAUS then
          -- WARNING, THIS IS DIRTY, need to do continous prior
          for dim=1,DIMENSION_IN do
             action1[dim]=clamp_causality_prior_value(action1[dim])
@@ -282,11 +287,11 @@ function get_one_random_Caus_Set(Infos1, Infos2)
          io.read()
       end
 
-      for i=1, size1-1 do
+      for i=1, size1 do
          id_second_action_begin=torch.random(1,size1-1)
 
-         if EXTRAPOLATE_ACTION then --Look at const.lua for more details about extrapolate
-            id_second_action_end=torch.random(1,size1)
+         if EXTRAPOLATE_ACTION_CAUS then --Look at const.lua for more details about extrapolate
+            repeat id_second_action_end=torch.random(1,size1) until (id_second_action_begin ~= id_second_action_end)
          else
             id_second_action_end=id_second_action_begin+1
          end
@@ -302,10 +307,12 @@ function get_one_random_Caus_Set(Infos1, Infos2)
                print(is_same_action(action1, action2))
                io.read()
             end
+
             if USE_CONTINUOUS then
                if action_vectors_are_similar_enough(action1, action2) then
                    return {im1=id_second_action_begin,im2=id_ref_action_begin, im3=id_second_action_end, im4=id_ref_action_end, act1=action1, act2=action2}
                end
+
             elseif is_same_action(action1, action2) then
                return {im1=id_second_action_begin,im2=id_ref_action_begin, im3=id_second_action_end, im4=id_ref_action_end}
             end

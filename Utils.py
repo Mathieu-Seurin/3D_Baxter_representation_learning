@@ -122,6 +122,7 @@ def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension
     if not SKIP_RENDERING:  # IMPORTANT TO SAVE BEFORE SHOWING SO THAT IMAGES DO NOT BECOME BLANK!
         plt.show()
     print('\nSaved plot to '+plot_path)
+    plt.show()
 
 
 """

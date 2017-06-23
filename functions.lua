@@ -73,6 +73,24 @@ function save_autoencoder(model)
    print("Saved AE model at : "..path..' and model name NAME_SAVE: '.. NAME_SAVE)
 end
 
+function patch(m)
+   if torch.type(m) == 'nn.Padding' and m.nInputDim == 3 then
+      m.dim = m.dim+1
+      m.nInputDim = 4
+   end
+   if torch.type(m) == 'nn.View' and #m.size == 1 then
+      newsize = torch.LongStorage(2)
+      newsize[1] = 1
+      newsize[2] = m.size[1]
+      m.size = newsize
+   end
+   if m.modules then
+      for i =1,#m.modules do
+         patch(m.modules[i])
+      end
+   end
+end
+
 function save_model(model)
 
    path = LOG_FOLDER..NAME_SAVE
@@ -81,7 +99,13 @@ function save_model(model)
 
    os.execute("cp hyperparams.lua "..path)
 
-   torch.save(file_string, model)
+   model_to_save = model:clone():float()
+   torch.save(file_string, model_to_save) --Saving model to analyze the results afterward (imagesAndRepr.lua etc...)
+
+   patch(cudnn.convert(model_to_save,nn))
+   --convert model to nn instead of cunn (for pytorch too) and patch it (convert view function)
+   torch.save(file_string..'-pytorch', model_to_save)
+   
    print("Saved model at : "..path)
 
    f = io.open(LAST_MODEL_FILE,'w')
@@ -321,15 +345,12 @@ function getInfos(txt,txt_reward,txt_state)
       local reward = tensor_reward[i][reward_index]
       if reward ~=0 then
          there_is_reward=true
-         table.insert(Infos.reward, reward)
-      elseif is_out_of_bound(last_pos) then
-         there_is_reward=true
-         table.insert(Infos.reward,-1)
-      else
-         table.insert(Infos.reward,0)
       end
+      table.insert(Infos.reward, reward)
+
       --print(tensor_reward[i][reward_index])
    end
+
    --THIS IS ALWAYS THE CASE IF WE WANT TO USE CAUSALITY PRIORS. TODO: create synthetic second value reward or do notn apply causality prior (see PRIORS_TO_APPLY in const.lua)
    if DATA_FOLDER ~= BABBLING then
       assert(there_is_reward,"Reward different than 0 (i.e. min 2 different values of reward) are needed in a sequence...")
