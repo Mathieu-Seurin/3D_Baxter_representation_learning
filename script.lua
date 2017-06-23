@@ -122,6 +122,7 @@ local function main(params)
     print("\n\n>> script.lua: main model builder")
     set_hyperparams(params)--    print('In DATA_FOLDER: '..DATA_FOLDER..' params: ')
     print(params)
+    print_hyperparameters()
 
 
     local records_paths = Get_Folders(DATA_FOLDER, 'record') --local list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(DATA_FOLDER)

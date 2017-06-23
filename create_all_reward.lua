@@ -4,6 +4,8 @@ require 'functions'
 local function main(params)
     print("\n\n>> create_all_rewards.lua: Creating all rewards for plot")
     set_hyperparams(params)
+    print_hyperparameters()
+
     local images_folder = DATA_FOLDER
     print('In DATA_FOLDER: '..images_folder..' params: ')
     print(params)

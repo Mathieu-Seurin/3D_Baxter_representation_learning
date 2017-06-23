@@ -14,18 +14,16 @@ STATIC_BUTTON_SIMPLEST = 'staticButtonSimplest'
 --================ MODEL USED =====================
 --=================================================
 INCEPTIONV4 = './models/inceptionFineTunning' --finetuned trained model
-
 RESNET = './models/resnet'
 RESNET_VERSION = 18 --34 or 50 maybe
 FROZEN_LAYER = 3 --the number of layers that don't learn at all (i.e., their learning_rate=0)
 
-BASE_TIMNET = './models/topUniqueSimplerWOTanh'
+BASE_TIMNET = './models/topUniqueSimplerWOTanh'--ImageNet-inspired Convolutional network with ReLu. This is the only model that should be used with learn_autoencoder, not in regular training in script.lua
+--otherwise, we get:  /home/gpu_center/torch/install/bin/lua: imagesAndReprToTxt.lua:53: bad argument #1 to 'size' (out of range)
 
 --MODEL_ARCHITECTURE_FILE = INCEPTIONV4 --Too big
 --MODEL_ARCHITECTURE_FILE = BASE_TIMNET--without last layer as Tanh
-MODEL_ARCHITECTURE_FILE = RESNET --TODO: fix: './models/minimalNetModel'  is the only model that should be used with learn_autoencoder, not in regular training in script.lua
---otherwise, we get:  /home/gpu_center/torch/install/bin/lua: imagesAndReprToTxt.lua:53: bad argument #1 to 'size' (out of range)
-print("Model :",MODEL_ARCHITECTURE_FILE)
+MODEL_ARCHITECTURE_FILE = RESNET
 
 
 --==================================================

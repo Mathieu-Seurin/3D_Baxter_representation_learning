@@ -241,7 +241,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
         SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
         AVG_FRAMES_PER_RECORD = 100
 
-    elseif DATA_FOLDER == STATIC_BUTTON_SIMPLEST then  -- TODO if nothing changes, add OR to previous case
+    elseif DATA_FOLDER == STATIC_BUTTON_SIMPLEST then
         CLAMP_CAUSALITY = true --TODO: make false when continuous works
 
         MIN_TABLE = {0.42,-0.2,-10} -- for x,y,z
@@ -300,11 +300,10 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
        IM_LENGTH = 200
        IM_HEIGHT = 200
     end
-
-    print_hyperparameters()
 end
 
 function print_hyperparameters()
+    print("================================")
     print("Model Architecture :",MODEL_ARCHITECTURE_FILE)
     print("\nUSE_CUDA ",USE_CUDA," \nUSE_CONTINUOUS ACTIONS: ",USE_CONTINUOUS)
     if USE_CONTINUOUS then  --otherwise, it is not used

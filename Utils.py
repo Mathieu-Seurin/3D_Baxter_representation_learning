@@ -8,6 +8,10 @@ import sys
 import numpy as np
 import os, os.path
 import matplotlib
+import seaborn as sns
+sns.set_palette('colorblind')  #http://seaborn.pydata.org/introduction.html
+sns.color_palette()
+
 
 SKIP_RENDERING = True  # Make False only when running remotely via ssh for plots and KNN figures to be saved
 
@@ -56,6 +60,9 @@ def get_data_folder_from_model_name(model_name):
         return STATIC_BUTTON_SIMPLEST
     else:
         print "Unsupported dataset!"
+
+
+
 
 """
 Use this function if rewards need to be visualized, use plot_3D otherwise
