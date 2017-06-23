@@ -10,7 +10,7 @@
 th script.lua -use_continuous -use_cuda
 #  -data_folder staticButtonSimplest
 th imagesAndReprToTxt.lua -use_continuous -use_cuda
-python generateNNImages.py 10 50
+python generateNNImages.py 10
 #   ----- includes the call to:
 #                th create_all_reward.lua
 #                th create_plotStates_file_for_all_seq.lua

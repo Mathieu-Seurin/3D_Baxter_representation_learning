@@ -8,8 +8,8 @@ import sys
 import pandas as pd
 import os, os.path
 import subprocess
-from Utils import ALL_STATE_FILE, LEARNED_REPRESENTATIONS_FILE, LAST_MODEL_FILE, GLOBAL_SCORE_LOG_FILE
-from Utils import get_data_folder_from_model_name
+from Utils import ALL_STATE_FILE, LEARNED_REPRESENTATIONS_FILE, LAST_MODEL_FILE, GLOBAL_SCORE_LOG_FILE, IMG_TEST_SET
+from Utils import get_data_folder_from_model_name, file2dict
 import unittest 
 test = unittest.TestCase('__init__')
 
@@ -27,6 +27,7 @@ pip install -U numpy
 pip install -U scipy
 
 """ 
+
 print"\n\n >> Running generateNNImages.py...."
 if len(sys.argv) <= 1:
     sys.exit("Give number of neighbors to produce, followed by number of input images (and model dir if you don't want to use the last model created)")
@@ -34,18 +35,21 @@ if len(sys.argv) <= 1:
 # Some parameters
 nbr_neighbors= int(sys.argv[1])
 nbr_images = -1
+use_test_set = False
 
-#if len(sys.argv) ==2:
-	# We use fixed test set for fair comparison reasons
-	#nbr_images = len(IMG_TEST_SET[STAT])
+lastModelFile = open(LAST_MODEL_FILE)
+path_to_model = lastModelFile.readline()[:-1]
+
 if len(sys.argv) >= 3:
     nbr_images=int(sys.argv[2])
 
 if len(sys.argv) == 4:
     path_to_model = sys.argv[3]
-else:
-    lastModelFile = open(LAST_MODEL_FILE)
-    path_to_model = lastModelFile.readline()[:-1]
+if len(sys.argv) ==2:
+	# We use fixed test set for fair comparison reasons
+	nbr_images = len(IMG_TEST_SET) # TODO: create for each dataset and add to Utils.py instead
+	use_test_set = True
+
 data_folder = get_data_folder_from_model_name(path_to_model)
 
 # THE FOLLOWING ONLY WILL RUN IN USE_CUDA false way  #print('Calling lua subprocesses with ',data_folder)
@@ -58,17 +62,22 @@ file_representation_string=path_to_model+"/"+LEARNED_REPRESENTATIONS_FILE
 #Parsing representation file
 #===================
 
-#reading data
-file_representation  = open(file_representation_string, "r")
-
-#parsing
 images=[]
 representations=[]
-for line in file_representation:
-    if line[0]!='#':
-        words = line.split()
-        images.append(words[0])
-        representations.append(words[1:])
+if use_test_set:
+	img2repr = file2dict(file_representation_string)
+	#print 'All images and their representations learnt: \n', img2repr
+	for test_image in IMG_TEST_SET: #WARNING: TODO: only works for STATIC_BUTTON_SIMPLEST for now!
+		images.append(test_image)
+		representations.append(img2repr[test_image])
+else:
+	#reading data
+	file_representation  = open(file_representation_string, "r")
+	for line in file_representation:
+	    if line[0]!='#':
+	        words = line.split()
+	        images.append(words[0])
+	        representations.append(words[1:])
 
 #Parsing true state file
 #===================
@@ -80,7 +89,7 @@ for line in file_state:
         words = line.split()
         true_states[words[0]] = np.array(map(float,words[1:]))
 
-#Compute nearest neighbors
+# Compute nearest neighbors
 nbrs = NearestNeighbors(n_neighbors=(nbr_neighbors+1), algorithm='ball_tree').fit(representations)
 distances, indexes = nbrs.kneighbors(representations)
 
@@ -88,7 +97,7 @@ distances, indexes = nbrs.kneighbors(representations)
 path_to_neighbour = path_to_model + '/NearestNeighbors/'
 last_model_name = path_to_model.split('/')[-1]
 print "path_to_model: ",path_to_model 
-print "path_to_neighbour: ",path_to_neighbour
+print "path_to_neighbours: ",path_to_neighbour
 #shutil.rmtree('NearestNeighbors', 1)
 if not os.path.exists(path_to_neighbour):
 	os.mkdir(path_to_neighbour)
@@ -112,7 +121,7 @@ nb_tot_img = 0
 for img_name,id,dist,state in data:
 	base_name= os.path.splitext(os.path.basename(img_name))[0]
 	seq_name= img_name.split("/")[1]
-	print('Processing ' + seq_name + "/" + base_name + ' ...')
+	print('Processing ' + seq_name + "/" + base_name + ' ...'+base_name)
 	fig = plt.figure()
 	fig.set_size_inches(6*(nbr_neighbors+1), 6)
 	a=fig.add_subplot(1,nbr_neighbors+1,1)

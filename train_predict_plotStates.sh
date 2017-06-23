@@ -12,7 +12,7 @@ th script.lua  -use_cuda -data_folder staticButtonSimplest
 # -data_folder staticButtonSimplest
 # -data_folder mobileRobot
 th imagesAndReprToTxt.lua -use_cuda -data_folder staticButtonSimplest
-python generateNNImages.py 10 50
+python generateNNImages.py 10
 #   ----- includes the call to:
 #                th create_all_reward.lua
 #                th create_pl8otStates_file_for_all_seq.lua
