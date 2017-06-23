@@ -7,7 +7,7 @@
 # -params.mcd is MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD
 # -data_folder options: DATA_FOLDER (Dataset to use):
 #          staticButtonSimplest, mobileRobot, simpleData3D, pushingButton3DAugmented, babbling')
-th script.lua  -use_cuda -data_folder staticButtonSimplest
+th script.lua  -use_cuda -data_folder staticButtonSimplest  # TODO:  TRY FIRST DISCRETE< COMPARE AND SWITCH TO CONTINUOUS
 #-mcd 0.8 -sigma 0.8
 # -data_folder staticButtonSimplest
 # -data_folder mobileRobot

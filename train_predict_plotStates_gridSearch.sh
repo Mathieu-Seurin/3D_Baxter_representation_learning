@@ -13,9 +13,9 @@ do
     for s in 0.1 0.2 0.4 0.5 0.8
     do
         echo "\n ********** Running pipeline for finetuning mcd: $max_cos_dis and sigma: $s *************"
-        th script.lua -use_continuous -use_cuda -mcd $max_cos_dis -sigma $s -data_folder staticButtonSimplest
+        th script.lua -use_cuda -use_continuous, -mcd $max_cos_dis -sigma $s -data_folder staticButtonSimplest
         #  -data_folder staticButtonSimplest
-        th imagesAndReprToTxt.lua -use_continuous -use_cuda -data_folder staticButtonSimplest
+        th imagesAndReprToTxt.lua -use_cuda -use_continuous, -data_folder staticButtonSimplest
         python generateNNImages.py 10
         #   ----- includes the call to:
         #                th create_all_reward.lua
