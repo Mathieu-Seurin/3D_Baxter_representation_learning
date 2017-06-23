@@ -14,7 +14,7 @@ test = unittest.TestCase('__init__')
 plotGroundTruthStates = False
 
 library_versions_tests()
-print"\n\n >> Running plotStates.py....plotGroundTruthStates: ",plotGroundTruthStates
+print"\n\n >> Running plotStates.py....plotGroundTruthStates: ",plotGroundTruthStates, " SKIP_RENDERING = ", SKIP_RENDERING
 
 model_name = ''
 if len(sys.argv) != 3:
@@ -104,7 +104,7 @@ elif PLOT_DIMENSIONS ==3:
 # elif PLOT_DIMENSIONS == 1:  #TODO  extend plotStates('1D') or allow cmap to run without gray -1 error
 #     plt.scatter(toplot, rewards, c=rewards, cmap=cmap, norm=norm, marker="o")
 else:
-    print " PLOT_DIMENSIONS undefined"
+    print " PLOT_DIMENSIONS other than 2 or 3 not supported"
 
 
 

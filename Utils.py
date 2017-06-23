@@ -86,8 +86,7 @@ def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension
         ax.scatter(toplot[:,0], toplot[:,1], toplot[:,2], c=rewards, cmap=cmap, marker=".")#,fillstyle=None)
         ax.set_zlabel(axes_labels[2])
     else:
-        print "only mode '2D' and '3D' plot supported"
-        sys.exit(-1)
+        sys.exit("only mode '2D' and '3D' plot supported")
 
     ax.set_xlabel(axes_labels[0])
     ax.set_ylabel(axes_labels[1])
@@ -95,9 +94,9 @@ def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension
         ax.set_title(title.replace('Learned Representations','Ground Truth')+dataset) 
     else:
         ax.set_title(title+dataset) 
-    if not SKIP_RENDERING:
-        plt.show()
     plt.savefig(plot_path)
+    if not SKIP_RENDERING:  # IMPORTANT TO SAVE BEFORE SHOWING SO THAT IMAGES DO NOT BECOME BLANK!
+        plt.show()
     print('\nSaved plot to '+plot_path)
 
 

@@ -9,7 +9,7 @@ import pandas as pd
 import os, os.path
 import subprocess
 from Utils import ALL_STATE_FILE, LEARNED_REPRESENTATIONS_FILE, LAST_MODEL_FILE, GLOBAL_SCORE_LOG_FILE
-from Utils import SKIP_RENDERING, get_data_folder_from_model_name
+from Utils import get_data_folder_from_model_name
 import unittest 
 test = unittest.TestCase('__init__')
 
@@ -35,6 +35,9 @@ if len(sys.argv) <= 1:
 nbr_neighbors= int(sys.argv[1])
 nbr_images = -1
 
+#if len(sys.argv) ==2:
+	# We use fixed test set for fair comparison reasons
+	#nbr_images = len(IMG_TEST_SET[STAT])
 if len(sys.argv) >= 3:
     nbr_images=int(sys.argv[2])
 
@@ -115,8 +118,7 @@ for img_name,id,dist,state in data:
 	a=fig.add_subplot(1,nbr_neighbors+1,1)
 	a.axis('off')
 	img = mpimg.imread(img_name)
-	if not SKIP_RENDERING:
-		imgplot = plt.imshow(img)
+	imgplot = plt.imshow(img)
 	state_str='[' + ",".join(['{:.3f}'.format(float(x)) for x in state]) + "]"
 	a.set_title(seq_name + "/" + base_name + ": \n" + state_str)
 
@@ -126,8 +128,7 @@ for img_name,id,dist,state in data:
 		a=fig.add_subplot(1,nbr_neighbors+1,i+2)
 		img_name=images[id[i+1]]
 		img = mpimg.imread(img_name)
-		if not SKIP_RENDERING:
-			imgplot = plt.imshow(img)
+		imgplot = plt.imshow(img)
 
 		base_name_n= os.path.splitext(os.path.basename(img_name))[0]
 		seq_name_n= img_name.split("/")[1]
@@ -141,7 +142,6 @@ for img_name,id,dist,state in data:
         neighbour_coord = true_states[img_name]
         total_error += np.linalg.norm(neighbour_coord-original_coord)
         nb_tot_img += 1
-
 
 	plt.tight_layout()
 	output_file = path_to_neighbour + seq_name + "_" + base_name
