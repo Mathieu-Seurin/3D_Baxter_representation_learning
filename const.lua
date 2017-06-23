@@ -18,12 +18,12 @@ require 'hyperparams'
 --===========================================================
 -- CUDA CONSTANTS
 --===========================================================
-USE_CUDA = false--true
+USE_CUDA = true
 USE_SECOND_GPU = true
 
 if USE_CUDA then
     require 'cunn'
-    require 'cudnn'  --If trouble, installing, follow step 6 in https://github.com/jcjohnson/neural-style/blob/master/INSTALL.md
+    require 'cudnn' --If trouble, installing, follow step 6 in https://github.com/jcjohnson/neural-style/blob/master/INSTALL.md
 end
 
 if USE_CUDA and USE_SECOND_GPU then
@@ -79,7 +79,7 @@ VISUALIZE_IMAGES_TAKEN = false
 VISUALIZE_CAUS_IMAGE = false
 VISUALIZE_IMAGE_CROP = false
 VISUALIZE_MEAN_STD = false
-VISUALIZE_AE = true
+VISUALIZE_AE = false
 
 
 if VISUALIZE_IMAGES_TAKEN or VISUALIZE_CAUS_IMAGE or VISUALIZE_IMAGE_CROP or VISUALIZE_MEAN_STD or VISUALIZE_AE then
@@ -224,8 +224,8 @@ elseif DATA_FOLDER == PUSHING_BUTTON_AUGMENTED then
 elseif DATA_FOLDER == STATIC_BUTTON_SIMPLEST then  -- TODO if nothing changes, add OR to previous case
     CLAMP_CAUSALITY = true --TODO: make false when continuous works
 
-    MIN_TABLE = {0.42,-0.2,-10} -- for x,y,z
-    MAX_TABLE = {0.8,0.7,10} -- for x,y,z
+    MIN_TABLE = {0.42,-0.09,-10} -- for x,y,z
+    MAX_TABLE = {0.74,0.59,10} -- for x,y,z
 
     DIMENSION_IN = 3
     DIMENSION_OUT = 3

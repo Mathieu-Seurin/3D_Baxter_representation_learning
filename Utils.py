@@ -92,9 +92,9 @@ def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension
         ax.set_title(title.replace('Learned Representations','Ground Truth')+dataset) 
     else:
         ax.set_title(title+dataset) 
-    plt.show()
     plt.savefig(plot_path)
     print('\nSaved plot to '+plot_path)
+    plt.show()
 
 
 """

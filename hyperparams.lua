@@ -15,7 +15,7 @@ DATA_FOLDER = STATIC_BUTTON_SIMPLEST --PUSHING_BUTTON_AUGMENTED
 --=================================================
 INCEPTIONV4 = './models/inceptionFineTunning' --finetuned trained model
 
-RESNET = './models/resnet'
+RESNET = './models/resnet'  --finetuned trained model
 RESNET_VERSION = 18 --34 or 50 maybe
 FROZEN_LAYER = 3 --the number of layers that don't learn at all (i.e., their learning_rate=0)
 
@@ -51,13 +51,14 @@ MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.6
 -- on the contrary, takes the next consecutive action
 -- Cannot be applied in every scenario !!!!
 EXTRAPOLATE_ACTION = false
+EXTRAPOLATE_ACTION_CAUS = false
 
 LR=0.0001
-LR_DECAY = 1e-6
+LR_DECAY = 3*1e-6
 
 SGD_METHOD = 'adam' -- Can be adam or adagrad
-BATCH_SIZE = 5
-NB_EPOCHS=20
+BATCH_SIZE = 10
+NB_EPOCHS=30
 
 DATA_AUGMENTATION = 0.01
 NORMALIZE_IMAGE = true
@@ -66,4 +67,4 @@ COEF_TEMP=1
 COEF_PROP=1
 COEF_REP=1
 COEF_CAUS=1
-DIMENSION_OUT=2
+DIMENSION_OUT=3

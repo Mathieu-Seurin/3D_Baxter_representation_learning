@@ -22,12 +22,14 @@ else
    error(LAST_MODEL_FILE.." should exist")
 end
 
-local  model = torch.load(path..'/'..modelString)
+local model = torch.load(path..'/'..modelString)
+
 if USE_CUDA then
    model = model:cuda()
 else
    model = model:double()
 end
+print("model",model)
 
 outStr = ''
 tempSeq = {}
@@ -89,6 +91,8 @@ tempSeqStr = ''
 for key in pairs(tempSeq) do
    tempSeqStr = tempSeqStr..tempSeq[key][2]..'\n'
 end
+
+
 path_to_output_file = path..'/'..LEARNED_REPRESENTATIONS_FILE
 
 print('Saving images and their learnt representations to file '..path_to_output_file)
