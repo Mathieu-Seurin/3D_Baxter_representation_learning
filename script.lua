@@ -130,6 +130,7 @@ local function main(params)
     print("\n\n>> script.lua: main model builder")
     set_hyperparams(params)--    print('In DATA_FOLDER: '..DATA_FOLDER..' params: ')
     print(params)
+    print_hyperparameters()
 
 
     if USE_CUDA then

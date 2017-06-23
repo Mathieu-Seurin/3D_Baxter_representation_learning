@@ -63,6 +63,7 @@ local function main(params)
     print("\n\n>> imagesAndReprToTxt.lua")
     set_hyperparams(params) --    print('In DATA_FOLDER: '..DATA_FOLDER..' params: ')
     print(params)
+    print_hyperparameters()
 
     local images_folder = DATA_FOLDER
     local path, modelString
