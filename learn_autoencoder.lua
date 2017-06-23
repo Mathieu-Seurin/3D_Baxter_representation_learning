@@ -13,6 +13,16 @@ require 'Get_Images_Set'
 require 'functions'
 
 require 'const'
+-- Command-line options
+local cmd = torch.CmdLine()
+cmd:option('-optimiser', 'adam', 'Optimiser : adam|sgd|rmsprop')
+cmd:option('-model', 'DAE', 'model : AE|DAE') --TODO ADD
+cmd:option('-data_folder', MOBILE_ROBOT, 'Possible Datasets to use: staticButtonSimplest, mobileRobot, staticButtonSimplest, simpleData3D, pushingButton3DAugmented, babbling')
+-- cmd:option('-use_cuda', false, 'true to use GPU, false (default) for CPU only mode')
+-- cmd:option('-use_continuous', false, 'true to use a continuous action space, false (default) for discrete one (0.5 range actions)')
+
+opt = cmd:parse(arg)
+set_hyperparams(opt)
 
 print("============ DATA USED =========\n",
                     DATA_FOLDER,
@@ -128,14 +138,6 @@ function train_Epoch(list_folders_images,list_txt,Log_Folder)
    end
 end
 
--- Command-line options
-local cmd = torch.CmdLine()
-cmd:option('-optimiser', 'adam', 'Optimiser : adam|sgd|rmsprop')
-cmd:option('-model', 'DAE', 'model : AE|DAE') --TODO ADD
--- cmd:option('-use_cuda', false, 'true to use GPU, false (default) for CPU only mode')
--- cmd:option('-use_continuous', false, 'true to use a continuous action space, false (default) for discrete one (0.5 range actions)')
-
-opt = cmd:parse(arg)
 
 local list_folders_images, list_txt=Get_HeadCamera_View_Files(DATA_FOLDER)
 
@@ -150,6 +152,7 @@ image_height=IM_HEIGHT
 require('./models/autoencoder_conv')
 model = getModel()
 model=model:cuda()
+print(model)
 
 parameters,gradParameters = model:getParameters()
 train_Epoch(list_folders_images,list_txt,Log_Folder)

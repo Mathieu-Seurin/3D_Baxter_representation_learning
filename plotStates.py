@@ -1,19 +1,21 @@
 # coding: utf-8
 from Utils import library_versions_tests, get_data_folder_from_model_name, plotStates
 from Utils import BABBLING, MOBILE_ROBOT, SIMPLEDATA3D, PUSHING_BUTTON_AUGMENTED, STATIC_BUTTON_SIMPLEST, LEARNED_REPRESENTATIONS_FILE
-import numpy as np 
+import numpy as np
 import sys
 import os.path
 import subprocess
-import unittest 
+import unittest
+from sklearn.decomposition import PCA
 test = unittest.TestCase('__init__')
 # True if we plot ground truth observed states, and false to plot the learned state representations
-#plotGroundTruthStates = True 
+#plotGroundTruthStates = True
 plotGroundTruthStates = False
 
 
-# PLOTTING GROUND TRUTH OR LEARNED STATES 
+# PLOTTING GROUND TRUTH OR LEARNED STATES
 #####################
+PLOT_DIMENSIONS=2
 
 library_versions_tests()
 
@@ -21,9 +23,10 @@ model_name = ''
 if len(sys.argv) != 3:
     lastModelFile = open('lastModel.txt')
     path = lastModelFile.readline()[:-1]+'/'
-    model_name = path.split('/')[1]     
+    model_name = path.split('/')[1
+
     # FOR FAST TESTING:  model_name = STATIC_BUTTON_SIMPLEST#'pushingButton3DAugmented' #TODO REMOVE-testing  model_name = MOBILE_ROBOT
-    data_folder = get_data_folder_from_model_name(model_name) 
+    data_folder = get_data_folder_from_model_name(model_name)
     reward_file_str = 'allRewards_'+data_folder+'.txt'
     if plotGroundTruthStates:
         state_file_str = 'allStates_'+data_folder+'.txt'
@@ -39,11 +42,11 @@ else:
     reward_file_str = sys.argv[2]
 
 if not os.path.isfile(state_file_str):
-    subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_continuous','-use_cuda']) ##subprocess.call(['th','create_plotStates_file_for_all_seq.lua']) 
+    subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_continuous','-use_cuda']) ##subprocess.call(['th','create_plotStates_file_for_all_seq.lua'])
 if not os.path.isfile(reward_file_str):
     subprocess.call(['th','create_all_reward.lua','-use_continuous','-use_cuda'])#subprocess.call(['th','create_all_reward.lua'])
-total_rewards = 0 
-total_states = 0 
+total_rewards = 0
+total_states = 0
 states_l=[]
 rewards_l=[]
 
@@ -70,7 +73,7 @@ else:
         states[i] = np.array(states_l[i][1])
 
 
-# Reading rewards 
+# Reading rewards
 with open(reward_file_str) as f:
     for line in f:
         if line[0]!='#':
@@ -80,7 +83,7 @@ with open(reward_file_str) as f:
 
 # Adjustment needed to align rewards (given at t+1) with actions and states at time t
 if data_folder == MOBILE_ROBOT:
-    # Adjustment for mobileRobot dataset, which logs for a given line in the files, 
+    # Adjustment for mobileRobot dataset, which logs for a given line in the files,
     # s_t, a_t and r_(t+1) instead of s_t, a_t and r_t  (This might explain some of the scattered plots for mobile robot data)
     states = states[0:len(states)-1, :]
     rewards_l = rewards_l[1:]
@@ -94,7 +97,7 @@ test.assertEqual(total_rewards, total_states, "Datapoints size discordance! Leng
 
 REPRESENTATIONS_DIMENSIONS = len(states[0])
 
-if REPRESENTATIONS_DIMENSIONS >3: 
+if REPRESENTATIONS_DIMENSIONS >3:
     print "[Applying PCA to visualize the ",REPRESENTATIONS_DIMENSIONS,"D learnt representations space (PLOT_DIMENSIONS = ", PLOT_DIMENSIONS,")"
     pca = PCA(n_components=PLOT_DIMENSIONS) # default to 3
     pca.fit(states)
@@ -107,12 +110,10 @@ print "\n #REPRESENTATIONS_DIMENSIONS =", REPRESENTATIONS_DIMENSIONS
 
 
 if PLOT_DIMENSIONS == 2:
-    plotStates('2D', rewards, toplot, plot_path, dataset=model_name) 
+    plotStates('2D', rewards, toplot, plot_path, dataset=model_name)
 elif PLOT_DIMENSIONS ==3:
-    plotStates('3D', rewards, toplot, plot_path, dataset=model_name)    
+    plotStates('3D', rewards, toplot, plot_path, dataset=model_name)
 # elif PLOT_DIMENSIONS == 1:  #TODO  extend plotStates('1D') or allow cmap to run without gray -1 error
 #     plt.scatter(toplot, rewards, c=rewards, cmap=cmap, norm=norm, marker="o")
 else:
     print " PLOT_DIMENSIONS undefined"
-
-

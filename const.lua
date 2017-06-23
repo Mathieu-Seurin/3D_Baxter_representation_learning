@@ -19,7 +19,7 @@ USE_SECOND_GPU = true
 USE_CONTINUOUS = true
 MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.4
 CONTINUOUS_ACTION_SIGMA = 0.6
-DATA_FOLDER = mobileRobot --works best!
+DATA_FOLDER = STATIC_BUTTON_SIMPLES --works best!
 
 --torch.manualSeed(100)
 --=====================================
