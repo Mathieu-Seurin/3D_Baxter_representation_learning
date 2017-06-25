@@ -31,8 +31,9 @@ def print_leader_board(df, datasets):
         #sub_dataframe = df[df['KNN_MSE'].notnull() & df[df['DATA_FOLDER'].notnull() & (df['DATA_FOLDER']== dataset)] #df.loc[df['DATA_FOLDER'] == dataset]  #df[['DATA_FOLDER'] == dataset]
         sub_dataframe = df[df['DATA_FOLDER'].notnull() & (df['DATA_FOLDER']== dataset)] 
         best_KNN_MSE = sub_dataframe['KNN_MSE'].min()
-        if not pd.isnull(best_KNN_MSE):
-            best_model_name = sub_dataframe[sub_dataframe['KNN_MSE'] == best_KNN_MSE].Model[0]
+        print '   best_KNN_MSE: ',best_KNN_MSE
+	if not pd.isnull(best_KNN_MSE):
+            best_model_name = sub_dataframe[sub_dataframe['KNN_MSE'] == best_KNN_MSE].Model.values[0]
             print "\nDATASET ", dataset, " Min KNN_MSE: ", best_KNN_MSE, ": ", best_model_name
         else:
             print "\nDATASET ", dataset, '[No data available yet/all KNN_MSE were nan, delete old files, and run train_predict_plotStates.sh again]'
