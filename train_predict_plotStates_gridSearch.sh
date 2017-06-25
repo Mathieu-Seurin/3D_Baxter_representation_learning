@@ -8,6 +8,7 @@
 # -data_folder options: DATA_FOLDER (Dataset to use):
 #          staticButtonSimplest, mobileRobot, simpleData3D, pushingButton3DAugmented, babbling')
 
+
 function has_command_finish_correctly {
     if [ "$?" -ne "0" ]
     then

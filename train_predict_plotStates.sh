@@ -24,12 +24,15 @@ has_command_finish_correctly
 # -data_folder mobileRobot
 th imagesAndReprToTxt.lua -use_cuda -data_folder staticButtonSimplest
 has_command_finish_correctly
+
 python generateNNImages.py 10
 has_command_finish_correctly
+
 #   ----- includes the call to:
 #                th create_all_reward.lua
 #                th create_plotStates_file_for_all_seq.lua
 python plotStates.py
 has_command_finish_correctly
+
 python report_results.py
 has_command_finish_correctly
