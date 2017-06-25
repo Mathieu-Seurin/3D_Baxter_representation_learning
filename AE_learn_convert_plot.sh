@@ -1,6 +1,6 @@
 #!/bin/bash
 
-<<<<<<< HEAD
+
 function has_command_finish_correctly {
     if [ "$?" -ne "0" ]
     then

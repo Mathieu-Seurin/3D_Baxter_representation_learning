@@ -10,23 +10,23 @@ import os, os.path
 import subprocess
 from Utils import ALL_STATE_FILE, LEARNED_REPRESENTATIONS_FILE, LAST_MODEL_FILE, GLOBAL_SCORE_LOG_FILE, IMG_TEST_SET
 from Utils import get_data_folder_from_model_name, file2dict
-import unittest 
+import unittest
 test = unittest.TestCase('__init__')
 
 """
 NOTE, if sklearn.neighbours import fails, remove  and install:
-Either use conda (in which case all your installed packages would be in ~/miniconda/ or pip install --user don't mix the two. Removing either 
+Either use conda (in which case all your installed packages would be in ~/miniconda/ or pip install --user don't mix the two. Removing either
 rm -rf ~/.local/lib/python2.7/site-packages/sklearn or your ~/miniconda folder and reinstalling it cleanly should fix this.
 sudo rm -rf scikit_learn-0.18.1.egg-info/
 pip uninstall sklearn
 and
 1)  pip install -U scikit-learn
 or 2) conda install -c anaconda scikit-learn=0.18.1
-If needed, also do 
+If needed, also do
 pip install -U numpy
 pip install -U scipy
 
-""" 
+"""
 
 print"\n\n >> Running generateNNImages.py...."
 if len(sys.argv) <= 1:
@@ -35,7 +35,7 @@ if len(sys.argv) <= 1:
 # Some parameters
 nbr_neighbors= int(sys.argv[1])
 nbr_images = -1
-use_test_set = False
+use_test_set = False  # default
 
 lastModelFile = open(LAST_MODEL_FILE)
 path_to_model = lastModelFile.readline()[:-1]
@@ -53,7 +53,7 @@ if len(sys.argv) ==2:
 data_folder = get_data_folder_from_model_name(path_to_model)
 
 # THE FOLLOWING ONLY WILL RUN IN USE_CUDA false way  #print('Calling lua subprocesses with ',data_folder)
-subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_cuda','-use_continuous','-data_folder', data_folder])  # TODO: READ CMD LINE ARGS FROM FILE INSTEAD (and set accordingly here) TO NOT HAVING TO MODIFY INSTEAD train_predict_plotStates and the python files  
+subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_cuda','-use_continuous','-data_folder', data_folder])  # TODO: READ CMD LINE ARGS FROM FILE INSTEAD (and set accordingly here) TO NOT HAVING TO MODIFY INSTEAD train_predict_plotStates and the python files
 subprocess.call(['th','create_all_reward.lua','-use_cuda','-use_continuous','-data_folder',data_folder])
 # TODO: ADD ,'-use_continuous'
 file_representation_string=path_to_model+"/"+LEARNED_REPRESENTATIONS_FILE
@@ -96,7 +96,7 @@ distances, indexes = nbrs.kneighbors(representations)
 #Generate mosaics
 path_to_neighbour = path_to_model + '/NearestNeighbors/'
 last_model_name = path_to_model.split('/')[-1]
-print "path_to_model: ",path_to_model 
+print "path_to_model: ",path_to_model
 print "path_to_neighbours: ",path_to_neighbour
 #shutil.rmtree('NearestNeighbors', 1)
 if not os.path.exists(path_to_neighbour):
@@ -112,7 +112,7 @@ else:
 # the k-nearest neighbour in the REPRESENTATION SPACE (the first argv parameter)
 
 #As a quantitative measure, for the k nearest neighbour
-#you compute the distance between the state of the original image and 
+#you compute the distance between the state of the original image and
 #the images retrieved using knn on representation space
 
 total_error = 0 # to assess the quality of repr
@@ -154,7 +154,7 @@ for img_name,id,dist,state in data:
 
 	plt.tight_layout()
 	output_file = path_to_neighbour + seq_name + "_" + base_name
-        
+
 	plt.savefig(output_file, bbox_inches='tight')
 	plt.close() # efficiency: avoids keeping all images into RAM
 
@@ -167,13 +167,13 @@ f.close()
 
 # writing scores to global log for plotting and reporting
 header = ['Model', 'KNN_MSE']
-d = {'Model':[last_model_name], 'KNN_MSE': [mean_error]}	
-global_scores_df = pd.DataFrame(data=d, columns = header) #global_scores_df.reset_index() 
+d = {'Model':[last_model_name], 'KNN_MSE': [mean_error]}
+global_scores_df = pd.DataFrame(data=d, columns = header) #global_scores_df.reset_index()
 
 if not os.path.isfile(GLOBAL_SCORE_LOG_FILE):
-    global_scores_df.to_csv(GLOBAL_SCORE_LOG_FILE, header=True) 
+    global_scores_df.to_csv(GLOBAL_SCORE_LOG_FILE, header=True)
 else: # it exists so append without writing the header
-    global_scores_df.to_csv(GLOBAL_SCORE_LOG_FILE, mode ='a', header=False) 
-    
-print 'Saved mean KNN MSE score entry from model \n++ ', last_model_name, ' ++\n to ', GLOBAL_SCORE_LOG_FILE, '. Last score is in: ',score_file 
-print global_scores_df.head()
+    global_scores_df.to_csv(GLOBAL_SCORE_LOG_FILE, mode ='a', header=False)
+
+print 'Saved mean KNN MSE score entry from model \n++ ', last_model_name, ' ++\n to ', GLOBAL_SCORE_LOG_FILE, '. Last score is in: ',score_file ,' Latest 20 most recent scores computed:\n'
+print global_scores_df.tail(20)
