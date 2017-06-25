@@ -42,3 +42,5 @@ do
 
     done
 done
+
+# best so far in a 49 images dataset: modelY2017_D24_M06_H02M02S49_staticButtonSimplest_resnet_cont_MCD0_5_S0_1,0.222667244673

@@ -25,7 +25,11 @@ or 2) conda install -c anaconda scikit-learn=0.18.1
 If needed, also do
 pip install -U numpy
 pip install -U scipy
+"""
 
+"""
+Example to run this program for a given trained model:
+python generateNNImages.py 5 5 Log/modelY2017_D24_M06_H06M19S10_staticButtonSimplest_resnet_cont_MCD0_8_S0_4
 """
 
 print"\n\n >> Running generateNNImages.py...."
@@ -46,7 +50,7 @@ if len(sys.argv) >= 3:
 
 if len(sys.argv) == 4:
     path_to_model = sys.argv[3]
-if len(sys.argv) ==2:
+if len(sys.argv) == 2:
 	# We use fixed test set for fair comparison reasons
 	nbr_images = len(IMG_TEST_SET) # TODO: create for each dataset and add to Utils.py instead
 	use_test_set = True

@@ -46,6 +46,19 @@ IMPORTANT:
 -If you want to run grid search, ssh or batch processing pipelines such as learn_predict_plotStates.sh, make SKIP_RENDERING = true in Utils.py for the KNN images and plots to be saved properly and later copy them with scp for visualization, e.g. using [2].
 
 
+## RUNNING: plotStates.py
+To get a glimpse of how the ground truth states look like, run `plotStates.py` and set there the constant: plotGroundTruthStates = True
+
+## RUNNING: generateNNImages.py
+Example to run this program for a given trained model:
+
+```
+python generateNNImages.py 5 5 Log/modelY2017_D24_M06_H06M19S10_staticButtonSimplest_resnet_cont_MCD0_8_S0_4
+```
+
+## RUNNING: python report_results.py
+Will plot the current winning leaderboard of models' KNN MSE for each dataset trained.
+
 
 ## DEPENDENCIES
 
@@ -156,6 +169,32 @@ TORCH_LUA_VERSION=LUA52 ./install.sh
 ```
 
 Switching to lua52 worked
+
+## KNOWN ERRORS:
+
+* plot.figure() will fail when running the program ssh outside your proxy network (ENSTA with a Mac), but not when running the program on ssh within ensta with both machines being ubuntu:
+```
+Traceback (most recent call last):
+  File "generateNNImages.py", line 128, in <module>
+    fig = plt.figure()
+  File "/home/gpu_center/anaconda2/lib/python2.7/site-packages/matplotlib/pyplot.py", line 535, in figure
+    **kwargs)
+  File "/home/gpu_center/anaconda2/lib/python2.7/site-packages/matplotlib/backends/backend_qt5agg.py", line 44, in new_figure_manager
+    return new_figure_manager_given_figure(num, thisFig)
+  File "/home/gpu_center/anaconda2/lib/python2.7/site-packages/matplotlib/backends/backend_qt5agg.py", line 51, in new_figure_manager_given_figure
+    canvas = FigureCanvasQTAgg(figure)
+  File "/home/gpu_center/anaconda2/lib/python2.7/site-packages/matplotlib/backends/backend_qt5agg.py", line 242, in __init__
+    super(FigureCanvasQTAgg, self).__init__(figure=figure)
+  File "/home/gpu_center/anaconda2/lib/python2.7/site-packages/matplotlib/backends/backend_qt5agg.py", line 66, in __init__
+    super(FigureCanvasQTAggBase, self).__init__(figure=figure)
+  File "/home/gpu_center/anaconda2/lib/python2.7/site-packages/matplotlib/backends/backend_qt5.py", line 236, in __init__
+    _create_qApp()
+  File "/home/gpu_center/anaconda2/lib/python2.7/site-packages/matplotlib/backends/backend_qt5.py", line 144, in _create_qApp
+    raise RuntimeError('Invalid DISPLAY variable')
+RuntimeError: Invalid DISPLAY variable
+```
+
+I have not found other solution than running within the proxy network (run locally within ensta or from another Ubuntu machine?)
 
 
 ## REFERENCES

@@ -22,6 +22,7 @@ has_command_finish_correctly
 python generateNNImages.py 10 -use_cuda
 has_command_finish_correctly
 
+# TODO: add flag -skip_rendering for the plotStates and generateNNImages to work on grid search remotely via ssh
 python plotStates.py
 has_command_finish_correctly
 
