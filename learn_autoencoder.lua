@@ -19,10 +19,7 @@ function AE_Training(model, batch, optimizer)
    if NOISE then
       noise=torch.rand(batch:size())
       noise = noise/3
-
-      --if USE_CUDA then
-         noise=noise:cuda()
-      --end
+      noise=noise:cuda() --this step is always needed when running in either CPU/GPU mode
       input=input+noise
    end
 
