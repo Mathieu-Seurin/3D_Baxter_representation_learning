@@ -155,8 +155,8 @@ end
 local cmd = torch.CmdLine()
 cmd:option('-optimiser', 'adam', 'Optimiser : adam|sgd|rmsprop')
 cmd:option('-model', 'DAE', 'model : AE|DAE')
-cmd:option('-use_cuda', false, 'true to use GPU, false (default) for CPU only mode')
-cmd:option('-use_continuous', false, 'true to use a continuous action space, false (default) for discrete one (0.5 range actions)')
+cmd:option('-use_cuda', true, 'true to use GPU, false (default) for CPU only mode')
+cmd:option('-use_continuous', true, 'true to use a continuous action space, false (default) for discrete one (0.5 range actions)')
 cmd:option('-data_folder', STATIC_BUTTON_SIMPLEST, 'Possible Datasets to use: staticButtonSimplest, mobileRobot, staticButtonSimplest, simpleData3D, pushingButton3DAugmented, babbling')
 
 local params = cmd:parse(arg)
