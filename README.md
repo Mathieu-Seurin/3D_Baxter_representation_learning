@@ -55,6 +55,9 @@ Example to run this program for a given trained model:
 ```
 python generateNNImages.py 5 5 Log/modelY2017_D24_M06_H06M19S10_staticButtonSimplest_resnet_cont_MCD0_8_S0_4
 ```
+IMPORTANT: In order to run it with a non random fixed test set of images,
+call it with only one argument (the number of neigbors to generate for each 
+image in the test set and it will assess the test set of 50 images defined in Const.lua and Utils.py)
 
 ## RUNNING: python report_results.py
 Will plot the current winning leaderboard of models' KNN MSE for each dataset trained.
@@ -195,6 +198,10 @@ RuntimeError: Invalid DISPLAY variable
 ```
 
 I have not found other solution than running within the proxy network (run locally within ensta or from another Ubuntu machine?)
+
+* Running shell scripts:
+
+The method has_command_finish_correctly for tracing errors better in console (break program and show error without continuing next program in the script) sometimes does not work. Remove it from your script if your bash command sh does not recognize functions and if running ./script.sh (without sh before) gives you permission errors when running remotely via ssh.
 
 
 ## REFERENCES

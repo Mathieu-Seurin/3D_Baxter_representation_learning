@@ -61,6 +61,7 @@ end  --TODO call predict and add predict to script?
 
 local function main(params)
     print("\n\n>> imagesAndReprToTxt.lua")
+
     set_hyperparams(params) --    print('In DATA_FOLDER: '..DATA_FOLDER..' params: ')
     print(params)
     print_hyperparameters()
@@ -70,6 +71,13 @@ local function main(params)
     folder_and_name = get_last_used_model_folder_and_name()
     path = folder_and_name[1]
     modelString = folder_and_name[2]
+
+    print('Last model used: '..modelString)
+    if get_last_architecture_used(modelString) == 'AE' then
+      print 'Overriding MODEL_ARCHITECTURE_FILE with BASE_TIMNET (only valid model for AE)'
+      MODEL_ARCHITECTURE_FILE = BASE_TIMNET
+    end
+
     local  model = torch.load(path..'/'..modelString)
     if USE_CUDA then
        model = model:cuda()

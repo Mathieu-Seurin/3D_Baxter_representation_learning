@@ -27,7 +27,6 @@ function AE_Training(model, batch, optimizer)
    -- image.display{image=img_merge,win=WINDOW}
    -- io.read()
 
-
    -- create closure to evaluate f(X) and df/dX
    local feval = function(x)
       -- just in case:
@@ -76,7 +75,7 @@ end
 function train_Epoch(optimizer, list_folders_images,list_txt,Log_Folder)
    local totImg=AVG_FRAMES_PER_RECORD*NB_SEQUENCES
 
-   print("totImg",totImg)
+   print("total Imges: ",totImg)
    local nbIter=math.floor(totImg/BATCH_SIZE)
 
    local list_loss={}

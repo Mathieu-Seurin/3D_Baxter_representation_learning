@@ -53,6 +53,16 @@ function get_data_folder_from_model_name(model_name)
     end
 end
 
+function get_last_architecture_used(model_name)
+  if string.find(model_name, 'AE_') then
+    return 'AE'
+  -- elseif string.find(model_name, 'Supervised') then
+  --   return 'Supervised'   #TODO: Xinrui: specify naming convention
+  else
+    return 'SiameseNetwork'
+  end
+end
+
 ---------------------------------------------------------------------------------------
 -- Function :save_model(model,path)
 -- Input ():
@@ -105,7 +115,7 @@ function save_model(model)
    patch(cudnn.convert(model_to_save,nn))
    --convert model to nn instead of cunn (for pytorch too) and patch it (convert view function)
    torch.save(file_string..'-pytorch', model_to_save)
-   
+
    print("Saved model at : "..path)
 
    f = io.open(LAST_MODEL_FILE,'w')

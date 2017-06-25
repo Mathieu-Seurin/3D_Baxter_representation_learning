@@ -30,6 +30,10 @@ pip install -U scipy
 """
 Example to run this program for a given trained model:
 python generateNNImages.py 5 5 Log/modelY2017_D24_M06_H06M19S10_staticButtonSimplest_resnet_cont_MCD0_8_S0_4
+IMPORTANT: In order to run it with a non random fixed test set of images, 
+call it with only one argument (the number of neigbours to generate for each
+image in the test set and it will assess the test set of 50 images defined in Const.lua and Utils.py)
+
 """
 
 print"\n\n >> Running generateNNImages.py...."
