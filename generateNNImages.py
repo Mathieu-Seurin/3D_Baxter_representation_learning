@@ -35,7 +35,7 @@ if len(sys.argv) <= 1:
 # Some parameters
 nbr_neighbors= int(sys.argv[1])
 nbr_images = -1
-use_test_set = False
+use_test_set = True
 
 lastModelFile = open(LAST_MODEL_FILE)
 path_to_model = lastModelFile.readline()[:-1]
@@ -70,6 +70,8 @@ if use_test_set:
 	for test_image in IMG_TEST_SET: #WARNING: TODO: only works for STATIC_BUTTON_SIMPLEST for now!
 		images.append(test_image)
 		representations.append(img2repr[test_image])
+
+        print "len IMAGES", len(IMG_TEST_SET) 
 else:
 	#reading data
 	file_representation  = open(file_representation_string, "r")
@@ -102,10 +104,12 @@ print "path_to_neighbours: ",path_to_neighbour
 if not os.path.exists(path_to_neighbour):
 	os.mkdir(path_to_neighbour)
 
-if nbr_images == -1:
-	data= zip(images,indexes,distances,representations)
+if use_test_set :
+    data = zip(images,indexes,distances,representations)
+elif nbr_images == -1:
+    data = zip(images,indexes,distances,representations)
 else:
-	data= random.sample(zip(images,indexes,distances,representations),nbr_images)
+    data = random.sample(zip(images,indexes,distances,representations),nbr_images)
 
 
 # For each random selected images (or all images in nbr_images==-1), you take
