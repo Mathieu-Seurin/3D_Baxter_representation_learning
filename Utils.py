@@ -3,11 +3,18 @@
 from sklearn.decomposition import PCA  # with some version of sklearn fails with ImportError: undefined symbol: PyFPE_jbuf
 import matplotlib.pyplot as plt
 from matplotlib import colors
+from matplotlib.colors import ListedColormap
 from mpl_toolkits.mplot3d import Axes3D
 import sys
 import numpy as np
 import os, os.path
 import matplotlib
+import seaborn as sns
+
+"""
+Documentation for colorblind-supported plots: #http://seaborn.pydata.org/introduction.html
+"""
+
 
 SKIP_RENDERING = True  # Make False only when running remotely via ssh for plots and KNN figures to be saved
 
@@ -25,7 +32,7 @@ MODELS_CONFIG_LOG_FILE  = 'modelsConfigLog.csv'
 ALL_STATE_FILE = 'allStates.txt'
 LAST_MODEL_FILE = 'lastModel.txt'
 ALL_STATS_FILE ='allStats.csv'
-LUA2PYTHON_COMMUNICATION_FILE = 'lua2pythonCommunication.txt'
+LUA2PYTHON_COMMUNICATION_FILE = 'lua2pythonCommunication.txt' # not used yet, TODO
 
 
 def library_versions_tests():
@@ -37,7 +44,7 @@ def library_versions_tests():
         sys.exit(-1)
 
     numpy_versions_installed = np.__path__
-    #print "numpy_versions_installed: ", numpy_versions_installed 
+    #print "numpy_versions_installed: ", numpy_versions_installed
     if len(numpy_versions_installed)>1:
         print "Probably you have installed numpy with and without Anaconda, so there is a conflict because two numpy versions can be used."
         print "Remove non-Anaconda numpy:\n 1) pip uninstall numpy \n and if needed, install 2.1) pip install -U numpy  \n "
@@ -60,17 +67,32 @@ def get_data_folder_from_model_name(model_name):
 """
 Use this function if rewards need to be visualized, use plot_3D otherwise
 """
-def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension 1','State Dimension 2','State Dimension 3'], title='Learned Representations-Rewards Distribution\n', dataset=''): 
+def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension 1','State Dimension 2','State Dimension 3'], title='Learned Representations-Rewards Distribution\n', dataset=''):
     # Plots states either learned or the ground truth
     # Useful documentation: https://matplotlib.org/examples/mplot3d/scatter3d_demo.html
+    # Against colourblindness: https://chrisalbon.com/python/seaborn_color_palettes.html
     # TODO: add vertical color bar for representing reward values  https://matplotlib.org/examples/api/colorbar_only.html
     reward_values = set(rewards)
     rewards_cardinal = len(reward_values)
     rewards = map(float, rewards)
     print'plotStates ',mode,' for rewards cardinal: ',rewards_cardinal,' (', reward_values,')'
-    cmap = colors.ListedColormap(['green', 'blue', 'red'])  # TODO: adjust for different cardi$
-    bounds=[-1,0,9,15] 
-    norm = colors.BoundaryNorm(bounds, cmap.N)
+    cmap = colors.ListedColormap(['gray', 'blue', 'red'])     # print "cmap: ",type(cmap)
+
+
+    colorblind_palette = sns.color_palette("colorblind", rewards_cardinal)  # 3 is the number of different colours to use
+    #print(type(colorblind_palette))
+    #cubehelix_pal_cmap = sns.cubehelix_palette(as_cmap=True)
+    #print(type(cubehelix_pal_cmap))
+
+    #sns.palplot(sns.color_palette("colorblind", 10))
+    # sns.color_palette()
+    #sns.set_palette('colorblind')
+
+    colorblind_cmap  = ListedColormap(colorblind_palette)
+    colormap = cmap
+    bounds=[-1,0,9,15]
+    norm = colors.BoundaryNorm(bounds, colormap.N)
+    # TODO: for some reason, no matther if I use cmap=cmap or make cmap=colorblind_palette work, it prints just 2 colors too similar for a colorblind person
 
     fig = plt.figure()
     if mode =='2D':
@@ -83,7 +105,7 @@ def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension
         ax = fig.add_subplot(111, projection='3d')
         # for c, m, zlow, zhigh in colors_markers:
         #     ax.scatter(toplot[:,0], toplot[:,1], toplot[:,2], c=c, marker=m)
-        ax.scatter(toplot[:,0], toplot[:,1], toplot[:,2], c=rewards, cmap=cmap, marker=".")#,fillstyle=None)
+        ax.scatter(toplot[:,0], toplot[:,1], toplot[:,2], c=rewards, cmap=colormap, marker=".")#,fillstyle=None)
         ax.set_zlabel(axes_labels[2])
     else:
         sys.exit("only mode '2D' and '3D' plot supported")
@@ -91,13 +113,16 @@ def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension
     ax.set_xlabel(axes_labels[0])
     ax.set_ylabel(axes_labels[1])
     if 'GroundTruth' in plot_path:
-        ax.set_title(title.replace('Learned Representations','Ground Truth')+dataset) 
+        ax.set_title(title.replace('Learned Representations','Ground Truth')+dataset)
     else:
-        ax.set_title(title+dataset) 
+        ax.set_title(title+dataset)
+
     plt.savefig(plot_path)
+    #plt.colorbar()  #TODO WHY IT DOES NOT SHOW AND SHOWS A PALETTE INSTEAD?
     if not SKIP_RENDERING:  # IMPORTANT TO SAVE BEFORE SHOWING SO THAT IMAGES DO NOT BECOME BLANK!
         plt.show()
     print('\nSaved plot to '+plot_path)
+    plt.show()
 
 
 """
@@ -128,7 +153,8 @@ def file2dict(file): # DO SAME FUNCTIONS IN LUA and call at the end of set_hyper
 
 
 # TODO : extend for other datasets for comparison
-IMG_TEST_SET = ['staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00000.jpg',
+IMG_TEST_SET = [
+'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00000.jpg',
 'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00012.jpg',
 'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00015.jpg',
 'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00042.jpg',
@@ -139,34 +165,43 @@ IMG_TEST_SET = ['staticButtonSimplest/record_000/recorded_cameras_head_camera_2_
 'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00004.jpg',
 'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00078.jpg',
 
-'staticButtonSimplest/record_011/recorded_cameras_head_camera_2_image_compressed/frame00003.jpg',
-'staticButtonSimplest/record_011/recorded_cameras_head_camera_2_image_compressed/frame00056.jpg',
-'staticButtonSimplest/record_011/recorded_cameras_head_camera_2_image_compressed/frame00063.jpg',
-'staticButtonSimplest/record_011/recorded_cameras_head_camera_2_image_compressed/frame00035.jpg',
-'staticButtonSimplest/record_011/recorded_cameras_head_camera_2_image_compressed/frame00015.jpg',
 'staticButtonSimplest/record_008/recorded_cameras_head_camera_2_image_compressed/frame00056.jpg',
 'staticButtonSimplest/record_008/recorded_cameras_head_camera_2_image_compressed/frame00047.jpg',
 'staticButtonSimplest/record_008/recorded_cameras_head_camera_2_image_compressed/frame00033.jpg',
 'staticButtonSimplest/record_008/recorded_cameras_head_camera_2_image_compressed/frame00005.jpg',
 'staticButtonSimplest/record_008/recorded_cameras_head_camera_2_image_compressed/frame00026.jpg',
-
 'staticButtonSimplest/record_008/recorded_cameras_head_camera_2_image_compressed/frame00056.jpg',
+
+'staticButtonSimplest/record_011/recorded_cameras_head_camera_2_image_compressed/frame00003.jpg',
+'staticButtonSimplest/record_011/recorded_cameras_head_camera_2_image_compressed/frame00056.jpg',
+'staticButtonSimplest/record_011/recorded_cameras_head_camera_2_image_compressed/frame00063.jpg',
+'staticButtonSimplest/record_011/recorded_cameras_head_camera_2_image_compressed/frame00035.jpg',
+'staticButtonSimplest/record_011/recorded_cameras_head_camera_2_image_compressed/frame00015.jpg',
+
 'staticButtonSimplest/record_019/recorded_cameras_head_camera_2_image_compressed/frame00009.jpg',
 'staticButtonSimplest/record_019/recorded_cameras_head_camera_2_image_compressed/frame00074.jpg',
 'staticButtonSimplest/record_019/recorded_cameras_head_camera_2_image_compressed/frame00049.jpg',
+
 'staticButtonSimplest/record_022/recorded_cameras_head_camera_2_image_compressed/frame00039.jpg',
 'staticButtonSimplest/record_022/recorded_cameras_head_camera_2_image_compressed/frame00085.jpg',
 'staticButtonSimplest/record_022/recorded_cameras_head_camera_2_image_compressed/frame00000.jpg',
+
 'staticButtonSimplest/record_031/recorded_cameras_head_camera_2_image_compressed/frame00000.jpg',
 'staticButtonSimplest/record_031/recorded_cameras_head_camera_2_image_compressed/frame00007.jpg',
 'staticButtonSimplest/record_031/recorded_cameras_head_camera_2_image_compressed/frame00070.jpg',
 
+'staticButtonSimplest/record_036/recorded_cameras_head_camera_2_image_compressed/frame00085.jpg',
+'staticButtonSimplest/record_036/recorded_cameras_head_camera_2_image_compressed/frame00023.jpg',
+'staticButtonSimplest/record_036/recorded_cameras_head_camera_2_image_compressed/frame00036.jpg',
+
 'staticButtonSimplest/record_037/recorded_cameras_head_camera_2_image_compressed/frame00053.jpg',
 'staticButtonSimplest/record_037/recorded_cameras_head_camera_2_image_compressed/frame00083.jpg',
 'staticButtonSimplest/record_037/recorded_cameras_head_camera_2_image_compressed/frame00032.jpg',
+
 'staticButtonSimplest/record_040/recorded_cameras_head_camera_2_image_compressed/frame00045.jpg',
 'staticButtonSimplest/record_040/recorded_cameras_head_camera_2_image_compressed/frame00003.jpg',
 'staticButtonSimplest/record_040/recorded_cameras_head_camera_2_image_compressed/frame00080.jpg',
+
 'staticButtonSimplest/record_048/recorded_cameras_head_camera_2_image_compressed/frame00034.jpg',
 'staticButtonSimplest/record_048/recorded_cameras_head_camera_2_image_compressed/frame00059.jpg',
 'staticButtonSimplest/record_048/recorded_cameras_head_camera_2_image_compressed/frame00089.jpg',
@@ -175,13 +210,11 @@ IMG_TEST_SET = ['staticButtonSimplest/record_000/recorded_cameras_head_camera_2_
 'staticButtonSimplest/record_050/recorded_cameras_head_camera_2_image_compressed/frame00064.jpg',
 'staticButtonSimplest/record_050/recorded_cameras_head_camera_2_image_compressed/frame00019.jpg',
 'staticButtonSimplest/record_050/recorded_cameras_head_camera_2_image_compressed/frame00008.jpg',
+
 'staticButtonSimplest/record_052/recorded_cameras_head_camera_2_image_compressed/frame00000.jpg',
 'staticButtonSimplest/record_052/recorded_cameras_head_camera_2_image_compressed/frame00008.jpg',
 'staticButtonSimplest/record_052/recorded_cameras_head_camera_2_image_compressed/frame00068.jpg',
-'staticButtonSimplest/record_052/recorded_cameras_head_camera_2_image_compressed/frame00025.jpg',
-'staticButtonSimplest/record_036/recorded_cameras_head_camera_2_image_compressed/frame00085.jpg',
-'staticButtonSimplest/record_036/recorded_cameras_head_camera_2_image_compressed/frame00023.jpg',
-'staticButtonSimplest/record_036/recorded_cameras_head_camera_2_image_compressed/frame00036.jpg']
+'staticButtonSimplest/record_052/recorded_cameras_head_camera_2_image_compressed/frame00025.jpg']
 
 
 #library_versions_tests()

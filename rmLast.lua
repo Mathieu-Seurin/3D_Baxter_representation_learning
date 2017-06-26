@@ -11,5 +11,11 @@ else
    error(LAST_MODEL_FILE.." should exist")
 end
 
-os.execute("rm -r "..path)
-print("Deleted last model successfully")
+if file_exists(path) then
+   os.execute("rm -r "..path)
+else
+   error(path.." should exist")
+end
+
+--os.execute("rm -r "..path)
+print("Deleted last model successfully ("..path..")")
