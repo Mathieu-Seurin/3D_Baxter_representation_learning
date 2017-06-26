@@ -58,29 +58,23 @@ subprocess.call(['th','create_all_reward.lua','-use_cuda','-use_continuous','-da
 # TODO: ADD ,'-use_continuous'
 file_representation_string=path_to_model+"/"+LEARNED_REPRESENTATIONS_FILE
 
-
 #Parsing representation file
 #===================
 
 images=[]
 representations=[]
+
+#reading data
+file_representation  = open(file_representation_string, "r")
+for line in file_representation:
+    if line[0]!='#':
+        words = line.split()
+        images.append(words[0])
+        representations.append(words[1:])
+
 if use_test_set:
-	img2repr = file2dict(file_representation_string)
-	#print 'All images and their representations learnt: \n', img2repr
-	for test_image in IMG_TEST_SET: #WARNING: TODO: only works for STATIC_BUTTON_SIMPLEST for now!
-		images.append(test_image)
-		representations.append(img2repr[test_image])
-
-        print "len IMAGES", len(IMG_TEST_SET) 
-else:
-	#reading data
-	file_representation  = open(file_representation_string, "r")
-	for line in file_representation:
-	    if line[0]!='#':
-	        words = line.split()
-	        images.append(words[0])
-	        representations.append(words[1:])
-
+    print "Number of images in test set :", len(IMG_TEST_SET)
+    
 #Parsing true state file
 #===================
 true_states = {}
@@ -104,9 +98,7 @@ print "path_to_neighbours: ",path_to_neighbour
 if not os.path.exists(path_to_neighbour):
 	os.mkdir(path_to_neighbour)
 
-if use_test_set :
-    data = zip(images,indexes,distances,representations)
-elif nbr_images == -1:
+if nbr_images == -1 or use_test_set:
     data = zip(images,indexes,distances,representations)
 else:
     data = random.sample(zip(images,indexes,distances,representations),nbr_images)
@@ -123,44 +115,49 @@ total_error = 0 # to assess the quality of repr
 nb_tot_img = 0
 
 for img_name,id,dist,state in data:
-	base_name= os.path.splitext(os.path.basename(img_name))[0]
-	seq_name= img_name.split("/")[1]
-	print('Processing ' + seq_name + "/" + base_name + ' ...'+base_name)
-	fig = plt.figure()
-	fig.set_size_inches(6*(nbr_neighbors+1), 6)
-	a=fig.add_subplot(1,nbr_neighbors+1,1)
-	a.axis('off')
-	img = mpimg.imread(img_name)
-	imgplot = plt.imshow(img)
-	state_str='[' + ",".join(['{:.3f}'.format(float(x)) for x in state]) + "]"
-	a.set_title(seq_name + "/" + base_name + ": \n" + state_str)
 
-	original_coord = true_states[img_name]
+    if use_test_set:
+        if not(img_name in IMG_TEST_SET):
+            continue
+    
+    base_name= os.path.splitext(os.path.basename(img_name))[0]
+    seq_name= img_name.split("/")[1]
+    print('Processing ' + seq_name + "/" + base_name + ' ...'+base_name)
+    fig = plt.figure()
+    fig.set_size_inches(6*(nbr_neighbors+1), 6)
+    a=fig.add_subplot(1,nbr_neighbors+1,1)
+    a.axis('off')
+    img = mpimg.imread(img_name)
+    imgplot = plt.imshow(img)
+    state_str='[' + ",".join(['{:.3f}'.format(float(x)) for x in state]) + "]"
+    a.set_title(seq_name + "/" + base_name + ": \n" + state_str)
 
-	for i in range(0,nbr_neighbors):
-		a=fig.add_subplot(1,nbr_neighbors+1,i+2)
-		img_name=images[id[i+1]]
-		img = mpimg.imread(img_name)
-		imgplot = plt.imshow(img)
+    original_coord = true_states[img_name]
 
-		base_name_n= os.path.splitext(os.path.basename(img_name))[0]
-		seq_name_n= img_name.split("/")[1]
+    for i in range(0,nbr_neighbors):
+            a=fig.add_subplot(1,nbr_neighbors+1,i+2)
+            img_name=images[id[i+1]]
+            img = mpimg.imread(img_name)
+            imgplot = plt.imshow(img)
 
-		dist_str = ' d=' + '{:.4f}'.format(dist[i+1])
+            base_name_n= os.path.splitext(os.path.basename(img_name))[0]
+            seq_name_n= img_name.split("/")[1]
 
-		state_str='[' + ",".join(['{:.3f}'.format(float(x)) for x in representations[id[i+1]]]) + "]"
-		a.set_title(seq_name_n + "/" + base_name_n + ": \n" + state_str +dist_str)
-		a.axis('off')
+            dist_str = ' d=' + '{:.4f}'.format(dist[i+1])
 
-        neighbour_coord = true_states[img_name]
-        total_error += np.linalg.norm(neighbour_coord-original_coord)
-        nb_tot_img += 1
+            state_str='[' + ",".join(['{:.3f}'.format(float(x)) for x in representations[id[i+1]]]) + "]"
+            a.set_title(seq_name_n + "/" + base_name_n + ": \n" + state_str +dist_str)
+            a.axis('off')
 
-	plt.tight_layout()
-	output_file = path_to_neighbour + seq_name + "_" + base_name
-        
-	plt.savefig(output_file, bbox_inches='tight')
-	plt.close() # efficiency: avoids keeping all images into RAM
+    neighbour_coord = true_states[img_name]
+    total_error += np.linalg.norm(neighbour_coord-original_coord)
+    nb_tot_img += 1
+
+    plt.tight_layout()
+    output_file = path_to_neighbour + seq_name + "_" + base_name
+
+    plt.savefig(output_file, bbox_inches='tight')
+    plt.close() # efficiency: avoids keeping all images into RAM
 
 mean_error = total_error/nb_tot_img  #print "MEAN MSE ERROR : ", str(mean_error)[:5]
 
