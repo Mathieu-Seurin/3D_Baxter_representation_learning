@@ -18,4 +18,4 @@ else
 end
 
 --os.execute("rm -r "..path)
-print("Deleted last model successfully")
+print("Deleted last model successfully ("..path..")")

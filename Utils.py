@@ -43,7 +43,7 @@ def library_versions_tests():
         sys.exit(-1)
 
     numpy_versions_installed = np.__path__
-    #print "numpy_versions_installed: ", numpy_versions_installed 
+    #print "numpy_versions_installed: ", numpy_versions_installed
     if len(numpy_versions_installed)>1:
         print "Probably you have installed numpy with and without Anaconda, so there is a conflict because two numpy versions can be used."
         print "Remove non-Anaconda numpy:\n 1) pip uninstall numpy \n and if needed, install 2.1) pip install -U numpy  \n "
@@ -66,7 +66,7 @@ def get_data_folder_from_model_name(model_name):
 """
 Use this function if rewards need to be visualized, use plot_3D otherwise
 """
-def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension 1','State Dimension 2','State Dimension 3'], title='Learned Representations-Rewards Distribution\n', dataset=''): 
+def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension 1','State Dimension 2','State Dimension 3'], title='Learned Representations-Rewards Distribution\n', dataset=''):
     # Plots states either learned or the ground truth
     # Useful documentation: https://matplotlib.org/examples/mplot3d/scatter3d_demo.html
     # Against colourblindness: https://chrisalbon.com/python/seaborn_color_palettes.html
@@ -85,12 +85,12 @@ def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension
 
     #sns.palplot(sns.color_palette("colorblind", 10))
     # sns.color_palette()
-    #sns.set_palette('colorblind') 
+    #sns.set_palette('colorblind')
 
     colorblind_cmap  = ListedColormap(colorblind_palette)
     colormap = cmap
-    bounds=[-1,0,9,15] 
-    norm = colors.BoundaryNorm(bounds, colormap.N)  
+    bounds=[-1,0,9,15]
+    norm = colors.BoundaryNorm(bounds, colormap.N)
     # TODO: for some reason, no matther if I use cmap=cmap or make cmap=colorblind_palette work, it prints just 2 colors too similar for a colorblind person
 
     fig = plt.figure()
@@ -112,9 +112,9 @@ def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension
     ax.set_xlabel(axes_labels[0])
     ax.set_ylabel(axes_labels[1])
     if 'GroundTruth' in plot_path:
-        ax.set_title(title.replace('Learned Representations','Ground Truth')+dataset) 
+        ax.set_title(title.replace('Learned Representations','Ground Truth')+dataset)
     else:
-        ax.set_title(title+dataset) 
+        ax.set_title(title+dataset)
 
     plt.savefig(plot_path)
     #plt.colorbar()  #TODO WHY IT DOES NOT SHOW AND SHOWS A PALETTE INSTEAD?
@@ -192,7 +192,7 @@ IMG_TEST_SET = {
 'staticButtonSimplest/record_036/recorded_cameras_head_camera_2_image_compressed/frame00085.jpg',
 'staticButtonSimplest/record_036/recorded_cameras_head_camera_2_image_compressed/frame00023.jpg',
 'staticButtonSimplest/record_036/recorded_cameras_head_camera_2_image_compressed/frame00036.jpg',
-                
+
 'staticButtonSimplest/record_037/recorded_cameras_head_camera_2_image_compressed/frame00053.jpg',
 'staticButtonSimplest/record_037/recorded_cameras_head_camera_2_image_compressed/frame00083.jpg',
 'staticButtonSimplest/record_037/recorded_cameras_head_camera_2_image_compressed/frame00032.jpg',

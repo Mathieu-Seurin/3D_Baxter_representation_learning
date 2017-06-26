@@ -19,17 +19,13 @@ function AE_Training(model, batch, optimizer)
    if NOISE then
       noise=torch.rand(batch:size())
       noise = noise/3
-
-      if USE_CUDA then
-         noise=noise:cuda()
-      end
+      noise=noise:cuda() --this step is always needed when running in either CPU/GPU mode
       input=input+noise
    end
 
    -- local img_merge = image.toDisplayTensor({input[1],expected[1]})
    -- image.display{image=img_merge,win=WINDOW}
    -- io.read()
-
 
    -- create closure to evaluate f(X) and df/dX
    local feval = function(x)
@@ -79,7 +75,7 @@ end
 function train_Epoch(optimizer, list_folders_images,list_txt,Log_Folder)
    local totImg=AVG_FRAMES_PER_RECORD*NB_SEQUENCES
 
-   print("totImg",totImg)
+   print("total Imges: ",totImg)
    local nbIter=math.floor(totImg/BATCH_SIZE)
 
    local list_loss={}
@@ -159,8 +155,8 @@ end
 local cmd = torch.CmdLine()
 cmd:option('-optimiser', 'adam', 'Optimiser : adam|sgd|rmsprop')
 cmd:option('-model', 'DAE', 'model : AE|DAE')
-cmd:option('-use_cuda', false, 'true to use GPU, false (default) for CPU only mode')
-cmd:option('-use_continuous', false, 'true to use a continuous action space, false (default) for discrete one (0.5 range actions)')
+cmd:option('-use_cuda', true, 'true to use GPU, false (default) for CPU only mode')
+cmd:option('-use_continuous', true, 'true to use a continuous action space, false (default) for discrete one (0.5 range actions)')
 cmd:option('-data_folder', STATIC_BUTTON_SIMPLEST, 'Possible Datasets to use: staticButtonSimplest, mobileRobot, staticButtonSimplest, simpleData3D, pushingButton3DAugmented, babbling')
 
 local params = cmd:parse(arg)
