@@ -35,6 +35,7 @@ RELATIVE = false
 
 local params = cmd:parse(arg)
 set_hyperparams(params)
+
 print("testing DATA_FOLDER", DATA_FOLDER)
 local list_folders_images, list_txt_action,list_txt_button, list_txt_state, list_txt_posButton=Get_HeadCamera_View_Files(DATA_FOLDER)
 NB_SEQUENCES = #list_folders_images
@@ -308,6 +309,7 @@ end
 ----------------- run ----------
 -- cross_validation(1)
 
+ALL_SEQ = precompute_all_seq()
 verbose = true
 test_run(verbose)
 

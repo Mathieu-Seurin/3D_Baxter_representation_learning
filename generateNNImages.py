@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+from PIL import Image
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
 import shutil
@@ -33,7 +34,7 @@ pip install -U scipy
 """
 Example to run this program for a given trained model:
 python generateNNImages.py 5 5 Log/modelY2017_D24_M06_H06M19S10_staticButtonSimplest_resnet_cont_MCD0_8_S0_4
-IMPORTANT: In order to run it with a non random fixed test set of images, 
+IMPORTANT: In order to run it with a non random fixed test set of images,
 call it with only one argument (the number of neigbours to generate for each
 image in the test set and it will assess the test set of 50 images defined in Const.lua and Utils.py)
 
@@ -144,7 +145,8 @@ for img_name,id,dist,state in data:
 	fig.set_size_inches(6*(nbr_neighbors+1), 6)
 	a=fig.add_subplot(1,nbr_neighbors+1,1)
 	a.axis('off')
-	img = mpimg.imread(img_name)
+	# img = mpimg.imread(img_name)
+	img = np.asarray(Image.open(img_name))
 	imgplot = plt.imshow(img)
 	state_str='[' + ",".join(['{:.3f}'.format(float(x)) for x in state]) + "]"
 	a.set_title(seq_name + "/" + base_name + ": \n" + state_str)
@@ -154,9 +156,9 @@ for img_name,id,dist,state in data:
 	for i in range(0,nbr_neighbors):
 		a=fig.add_subplot(1,nbr_neighbors+1,i+2)
 		img_name=images[id[i+1]]
-		img = mpimg.imread(img_name)
+		# img = mpimg.imread(img_name)
+		img = np.asarray(Image.open(img_name))
 		imgplot = plt.imshow(img)
-
 		base_name_n= os.path.splitext(os.path.basename(img_name))[0]
 		seq_name_n= img_name.split("/")[1]
 

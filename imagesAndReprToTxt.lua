@@ -73,10 +73,10 @@ local function main(params)
     modelString = folder_and_name[2]
 
     print('Last model used: '..path..'/'..modelString)
-    if get_last_architecture_used(modelString) == 'AE' then
-      print 'Overriding MODEL_ARCHITECTURE_FILE with BASE_TIMNET (only valid model for AE)'
-      MODEL_ARCHITECTURE_FILE = BASE_TIMNET
-    end
+    -- if get_last_architecture_used(modelString) == 'AE' then
+    --   print 'Overriding MODEL_ARCHITECTURE_FILE with BASE_TIMNET (only valid model for AE)'
+    --   MODEL_ARCHITECTURE_FILE = BASE_TIMNET
+    -- end
 
     local  model = torch.load(path..'/'..modelString)
     if USE_CUDA then

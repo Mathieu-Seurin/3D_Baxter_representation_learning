@@ -16,10 +16,10 @@ require 'hyperparams'
 ------DEFAULTS (IF NOT COMMAND LINE ARGS ARE PASSED)
 
 USE_CUDA = true
-USE_SECOND_GPU = true
+USE_SECOND_GPU = false
 USE_CONTINUOUS = true
 MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.5
-CONTINUOUS_ACTION_SIGMA = 0.1 
+CONTINUOUS_ACTION_SIGMA = 0.1
 DATA_FOLDER = MOBILE_ROBOT --works best!
 
 if USE_CUDA then
@@ -149,7 +149,7 @@ function set_cuda_hyperparams(USE_CUDA)
         tnt = require 'torchnet'
         vision = require 'torchnet-vision'  -- Install via https://github.com/Cadene/torchnet-vision
     end
-    USE_SECOND_GPU = true
+    USE_SECOND_GPU = false
     if USE_CUDA and USE_SECOND_GPU then
        cutorch.setDevice(2)
     end

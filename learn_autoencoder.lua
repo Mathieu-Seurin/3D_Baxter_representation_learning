@@ -107,10 +107,11 @@ end
 
 function set_AE_hyperparams(params)
     -- OVERRIDING hyperparameters since it's not for auto-encoders :  ** MAIN DIFFERENCES:
-    MODEL_ARCHITECTURE_FILE = BASE_TIMNET -- important to call in this order, as DIFFERENT_FORMAT is defined based on this setting. TODO idea: Pass MODEL_ARCHITECTURE_FILE as default cmd param in which is different in each script?
+    MODEL_ARCHITECTURE_FILE = AENET -- important to call in this order, as DIFFERENT_FORMAT is defined based on this setting. TODO idea: Pass MODEL_ARCHITECTURE_FILE as default cmd param in which is different in each script?
     set_hyperparams(params)
     LR = 0.0001
     BATCH_SIZE=20
+    NB_EPOCHS = 20
     NUM_HIDDEN = 20
     NOISE = true
     if params.optimiser=="sgd" then  optimizer = optim.sgd end
@@ -144,6 +145,7 @@ local function main(params)
 
     require('./models/autoencoder_conv')
     model = getModel()
+    print(model)
     model=model:cuda()
 
     parameters,gradParameters = model:getParameters()
@@ -160,6 +162,8 @@ cmd:option('-model', 'DAE', 'model : AE|DAE')
 cmd:option('-use_cuda', true, 'true to use GPU, false (default) for CPU only mode')
 cmd:option('-use_continuous', true, 'true to use a continuous action space, false (default) for discrete one (0.5 range actions)')
 cmd:option('-data_folder', STATIC_BUTTON_SIMPLEST, 'Possible Datasets to use: staticButtonSimplest, mobileRobot, staticButtonSimplest, simpleData3D, pushingButton3DAugmented, babbling')
+cmd:option('-mcd', 0.5, 'Max cosine distance')
+cmd:option('-sigma', 0.1, 'Max cosine distance')
 
 local params = cmd:parse(arg)
 main(params)

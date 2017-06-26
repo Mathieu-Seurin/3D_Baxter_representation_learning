@@ -1,7 +1,7 @@
 require 'nn'
 -- network-------------------------------------------------------
 local M = {}
-local function getModel(Dimension)
+function getModel(Dimension)
 
    nbFilter=32
 
