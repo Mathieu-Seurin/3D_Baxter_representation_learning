@@ -16,16 +16,15 @@ STATIC_BUTTON_SIMPLEST = 'staticButtonSimplest'
 INCEPTIONV4 = './models/inceptionFineTunning' --finetuned trained model
 
 RESNET = './models/resnet'
-RESNET_VERSION = 34 --34 or 50 maybe
+RESNET_VERSION = 18 --34 or 50 maybe
 FROZEN_LAYER = 3 --the number of layers that don't learn at all (i.e., their learning_rate=0)
 
 BASE_TIMNET = './models/topUniqueSimplerWOTanh'
-MINIAL = './models/minimalNetModel'
 
 --MODEL_ARCHITECTURE_FILE = INCEPTIONV4 --Too big
--- MODEL_ARCHITECTURE_FILE = BASE_TIMNET--without last layer as Tanh
--- MODEL_ARCHITECTURE_FILE = MINIAL
-MODEL_ARCHITECTURE_FILE = RESNET --'./models/minimalNetModel'Not supported for now  --/home/gpu_center/torch/install/bin/lua: imagesAndReprToTxt.lua:53: bad argument #1 to 'size' (out of range)
+--MODEL_ARCHITECTURE_FILE = BASE_TIMNET--without last layer as Tanh
+MODEL_ARCHITECTURE_FILE = RESNET --TODO: fix: './models/minimalNetModel'  is the only model that should be used with learn_autoencoder, not in regular training in script.lua
+--otherwise, we get:  /home/gpu_center/torch/install/bin/lua: imagesAndReprToTxt.lua:53: bad argument #1 to 'size' (out of range)
 print("Model :",MODEL_ARCHITECTURE_FILE)
 --stack traceback: 	[C]: in function 'size' 	imagesAndReprToTxt.lua:53: in function 'represent_all_images'
 
@@ -54,14 +53,14 @@ print("Model :",MODEL_ARCHITECTURE_FILE)
 -- by randomly sampling states (begin point and end point). CLAMP_CAUSALITY,
 -- on the contrary, takes the next consecutive action
 -- Cannot be applied in every scenario !!!!
-EXTRAPOLATE_ACTION = false
+EXTRAPOLATE_ACTION = false  --TODO shall it be true for continuous actions too always?
 
 LR=0.0001
 LR_DECAY = 1e-6
 
 SGD_METHOD = 'adam' -- Can be adam or adagrad
 BATCH_SIZE = 5
-NB_EPOCHS= 2
+NB_EPOCHS=20
 
 DATA_AUGMENTATION = 0.01
 NORMALIZE_IMAGE = true

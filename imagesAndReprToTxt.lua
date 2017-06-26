@@ -28,10 +28,10 @@ function represent_all_images(imagesFolder, model)
                if DIFFERENT_FORMAT then
                   img = image.scale(image.load(fullImagesPath,3,'float'), IM_LENGTH, IM_HEIGHT)
                   img = augmentation(img)
-                  print('DIFFERENT_FORMAT.. Doing augmentation...')
+                  --print('DIFFERENT_FORMAT.. Doing augmentation...')
                else
                   img = getImageFormated(fullImagesPath)
-                  print('DIFFERENT_FORMAT is false: Formatting image only..')
+                  --print('DIFFERENT_FORMAT is false: Formatting image only..') TODO Warn and check below that the autoencoder model minimalNetModel is not used together with priors training
                end
 
                img = img:double():reshape(1,IM_CHANNEL,IM_LENGTH,IM_HEIGHT)
@@ -39,14 +39,11 @@ function represent_all_images(imagesFolder, model)
                if USE_CUDA then
                   img = img:cuda()
                end
-               print ('img dimensions and model')
-               print (#img)
-               print(model)
+               --print ('img dimensions and model')     print (#img)                print(model)
 
                repr = model:forward(img)
-               print ('repr')
-               print(repr)
-
+            --    print ('repr')
+            --    print(repr)
                for i=1,repr:size(2) do
                   reprStr = reprStr..repr[{1,i}]..' '
                   --print (reprStr)
@@ -63,11 +60,12 @@ end  --TODO call predict and add predict to script?
 
 
 local function main(params)
-    set_hyperparams(params)
+    print("\n\n>> imagesAndReprToTxt.lua")
+    set_hyperparams(params) --    print('In DATA_FOLDER: '..DATA_FOLDER..' params: ')
+    print(params)
 
     local images_folder = DATA_FOLDER
     local path, modelString
-    print('>>imagesAndReprToTxt.lua  Running for DATA_FOLDER: '..DATA_FOLDER.. ' USE_CUDA ')
     folder_and_name = get_last_used_model_folder_and_name()
     path = folder_and_name[1]
     modelString = folder_and_name[2]
@@ -101,7 +99,7 @@ end
 local cmd = torch.CmdLine()
 cmd:option('-use_cuda', false, 'true to use GPU, false (default) for CPU only mode')
 cmd:option('-use_continuous', false, 'true to use a continuous action space, false (default) for discrete one (0.5 range actions)')
-cmd:option('-data_folder', MOBILE_ROBOT, 'Possible Datasets to use: staticButtonSimplest, mobileRobot, staticButtonSimplest, simpleData3D, pushingButton3DAugmented, babbling')
+cmd:option('-data_folder', STATIC_BUTTON_SIMPLEST, 'Possible Datasets to use: staticButtonSimplest, mobileRobot, staticButtonSimplest, simpleData3D, pushingButton3DAugmented, babbling')
 cmd:option('-mcd', 0.4, 'Max. cosine distance allowed among actions for priors loss function evaluation (MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD)')
 cmd:option('-sigma', 0.6, "Sigma: denominator in continuous actions' extra factor (CONTINUOUS_ACTION_SIGMA)")
 

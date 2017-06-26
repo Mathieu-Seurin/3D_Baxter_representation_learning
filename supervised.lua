@@ -17,6 +17,7 @@ require 'gnuplot'
 require 'os'
 require 'paths'
 
+require(MODEL_ARCHITECTURE_FILE)
 -- THIS IS WHERE ALL THE CONSTANTS SHOULD COME FROM
 -- See const.lua file for more details
 require 'const'
@@ -288,7 +289,7 @@ function test_run(verbose)
   -- local indice_val = NB_SEQUENCES
   local indice_val = NB_SEQUENCES
   print("Using Model", MODEL_ARCHITECTURE_FILE)
-  local Model = getModel(DIMENSION_IN)
+  local Model = getModel(DIMENSION_OUT)
   if USE_CUDA then
     Model = Model:cuda()
   end

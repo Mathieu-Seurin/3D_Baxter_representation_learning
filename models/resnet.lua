@@ -18,7 +18,7 @@ local function patch(nn_module)
    end
 end
 
-local function getModel(Dimension)
+function getModel(Dimension)
 
    local whole_net, pretrain_net
 
