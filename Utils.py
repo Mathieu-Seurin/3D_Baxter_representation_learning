@@ -15,7 +15,6 @@ import seaborn as sns
 Documentation for colorblind-supported plots: #http://seaborn.pydata.org/introduction.html
 """
 
-
 SKIP_RENDERING = True  # Make False only when running remotely via ssh for plots and KNN figures to be saved
 
 #DATASETS AVAILABLE:
@@ -153,7 +152,7 @@ def file2dict(file): # DO SAME FUNCTIONS IN LUA and call at the end of set_hyper
 
 
 # TODO : extend for other datasets for comparison
-IMG_TEST_SET = [
+IMG_TEST_SET = {
 'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00000.jpg',
 'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00012.jpg',
 'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00015.jpg',
@@ -214,7 +213,7 @@ IMG_TEST_SET = [
 'staticButtonSimplest/record_052/recorded_cameras_head_camera_2_image_compressed/frame00000.jpg',
 'staticButtonSimplest/record_052/recorded_cameras_head_camera_2_image_compressed/frame00008.jpg',
 'staticButtonSimplest/record_052/recorded_cameras_head_camera_2_image_compressed/frame00068.jpg',
-'staticButtonSimplest/record_052/recorded_cameras_head_camera_2_image_compressed/frame00025.jpg']
+'staticButtonSimplest/record_052/recorded_cameras_head_camera_2_image_compressed/frame00025.jpg'}
 
 
 #library_versions_tests()

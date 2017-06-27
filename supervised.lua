@@ -6,7 +6,7 @@ require 'torch'
 require 'xlua'
 require 'math'
 require 'string'
---require 'cunn'
+require 'cunn'
 require 'nngraph'
 require 'functions'
 require 'printing'
@@ -42,7 +42,7 @@ NB_SEQUENCES = #list_folders_images
 
 -- function for testing
 -- indice: data sequnce
--- number: how many samples
+-- number: of samples
 function printSamples(Model, indice, number)
   data = load_seq_by_id(indice)
   for i = 1,number do
@@ -265,11 +265,6 @@ function cross_validation(K)
       end
     end
   end
-  -- print errors
-  -- for i = 2, performances:size(2) do
-  --   print("MSE", performances[i], configs[i])
-  -- end
-  -- pick the best model, apply on test set
   min, index = torch.min(performances, 1)
   print("best-model", configs[index[1]])
   local Model = getModel(DIMENSION_IN)
@@ -283,11 +278,7 @@ end
 
 ---------------- single run -----------------
 function test_run(verbose)
-  -- local LR = 0.001 --(hyper)parameters for training
-  -- local nb_epochs = 50
-  -- local batchSize = 16
   local err = torch.Tensor(NB_EPOCHS)
-  -- local indice_val = NB_SEQUENCES
   local indice_val = NB_SEQUENCES
   print("Using Model", MODEL_ARCHITECTURE_FILE)
   local Model = getModel(DIMENSION_OUT)
@@ -296,8 +287,8 @@ function test_run(verbose)
   end
   _, err = train(Model, indice_val, verbose, true, false)
   print(evaluate(Model, load_seq_by_id(indice_val)))
-  -- print("results from data seq "..indice_val.."with parameters (epoch, batch, lr)"..nb_epochs.." "..batchSize.." "..LR.." is")
   printSamples(Model, indice_val, 3)
+  NAME_SAVE = 'Supervised'..DATA_FOLDER
   save_model(Model)
   ------ test if reinitiation works --------
   -- print(parameters:sum())

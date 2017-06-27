@@ -49,7 +49,7 @@ LR_DECAY = 3*1e-6
 
 SGD_METHOD = 'adam' -- Can be adam or adagrad
 BATCH_SIZE = 16
-NB_EPOCHS= 20
+NB_EPOCHS= 2
 
 DATA_AUGMENTATION = 0.01
 NORMALIZE_IMAGE = true

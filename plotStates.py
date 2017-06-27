@@ -37,11 +37,12 @@ else:
     state_file_str = sys.argv[1]
     reward_file_str = sys.argv[2]
 
-# if not os.path.isfile(state_file_str): # print('Calling subprocess create_plotStates_file_for_all_seq with ',data_folder)
-    subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_cuda','-use_continuous','-data_folder', data_folder])  # TODO: READ CMD LINE ARGS FROM FILE INSTEAD (and set accordingly here) TO NOT HAVING TO MODIFY INSTEAD train_predict_plotStates and the python files
-# if not os.path.isfile(reward_file_str): #print('Calling subprocess create_all_reward with ',data_folder)
+    # if not os.path.isfile(state_file_str): # print('Calling subprocess create_plotStates_file_for_all_seq with ',data_folder)
+    subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_cuda','-use_continuous','-data_folder', data_folder])  # TODO: READ CMD LINE ARGS FROM FILE INSTEAD (and set accordingly here) TO NOT HAVING TO MODIFY INSTEAD train_predict_plotStates and the python files  
+    # if not os.path.isfile(reward_file_str): #print('Calling subprocess create_all_reward with ',data_folder)
     subprocess.call(['th','create_all_reward.lua', '-use_cuda','-use_continuous','-data_folder', data_folder])
-    # TODO: Keep  -use_continuous false (not passing it) until we get coherent representations visually and quantitatively '-use_continuous',
+
+
 total_rewards = 0
 total_states = 0
 states_l=[]
@@ -55,6 +56,7 @@ if 'recorded_robot' in state_file_str :
                 states_l.append([ float(words[0]),float(words[1])] )
     states=np.asarray(states_l)
 else: # general case
+    print 'NAME_SAVE', state_file_str
     with open(state_file_str) as f:
         for line in f:
             if line[0]!='#':
