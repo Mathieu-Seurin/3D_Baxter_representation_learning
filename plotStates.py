@@ -38,7 +38,7 @@ else:
     reward_file_str = sys.argv[2]
 
     # if not os.path.isfile(state_file_str): # print('Calling subprocess create_plotStates_file_for_all_seq with ',data_folder)
-    subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_cuda','-use_continuous','-data_folder', data_folder])  # TODO: READ CMD LINE ARGS FROM FILE INSTEAD (and set accordingly here) TO NOT HAVING TO MODIFY INSTEAD train_predict_plotStates and the python files  
+    subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_cuda','-use_continuous','-data_folder', data_folder])  # TODO: READ CMD LINE ARGS FROM FILE INSTEAD (and set accordingly here) TO NOT HAVING TO MODIFY INSTEAD train_predict_plotStates and the python files
     # if not os.path.isfile(reward_file_str): #print('Calling subprocess create_all_reward with ',data_folder)
     subprocess.call(['th','create_all_reward.lua', '-use_cuda','-use_continuous','-data_folder', data_folder])
 
