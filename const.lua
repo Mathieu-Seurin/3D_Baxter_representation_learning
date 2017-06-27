@@ -16,8 +16,8 @@ require 'hyperparams'
 ------DEFAULTS (IF NOT COMMAND LINE ARGS ARE PASSED)
 
 USE_CUDA = true
-USE_SECOND_GPU = true
-USE_CONTINUOUS = true
+USE_SECOND_GPU = false
+USE_CONTINUOUS = false
 MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.5
 CONTINUOUS_ACTION_SIGMA = 0.1 
 DATA_FOLDER = MOBILE_ROBOT --works best!
@@ -259,7 +259,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
         MAX_TABLE = {0.8,0.7,10} -- for x,y,z
 
         DIMENSION_IN = 3
-        DIMENSION_OUT = 3
+        --DIMENSION_OUT = 3
 
         REWARD_INDEX = 2 --2 reward values: -0, 1 ?
         INDEX_TABLE = {2,3,4} --column index for coordinates in state file, respectively (x,y,z)
@@ -271,6 +271,11 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
 
         SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
         AVG_FRAMES_PER_RECORD = 90  --HINT: reduce for fast full epoch testing in CPU mode
+
+        if BRING_CLOSER_REWARD then
+           PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","make_reward_closer"}}
+        end
+
 
     else
       print("No supported data folder provided, please add either of the data folders defined in hyperparams: "..BABBLING..", "..MOBILE_ROBOT.." "..SIMPLEDATA3D..' or others in const.lua' )

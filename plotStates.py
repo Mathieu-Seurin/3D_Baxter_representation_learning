@@ -86,6 +86,7 @@ print "Ploting total states and total rewards: ",total_states, " ", total_reward
 test.assertEqual(total_rewards, total_states, "Datapoints size discordance! Length of rewards and state files should be equal, and it is "+str(len(rewards))+" and "+str(len(toplot))+" Run first create_all_reward.lua and create_plotStates_file_for_all_seq.lua")
 
 REPRESENTATIONS_DIMENSIONS = len(states[0])
+PLOT_DIMENSIONS = 3
 
 if REPRESENTATIONS_DIMENSIONS >3:
     print "[Applying PCA to visualize the ",REPRESENTATIONS_DIMENSIONS,"D learnt representations space (PLOT_DIMENSIONS = ", PLOT_DIMENSIONS,")"

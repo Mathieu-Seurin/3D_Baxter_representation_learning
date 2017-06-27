@@ -66,8 +66,6 @@ local function main(params)
     print(params)
     print_hyperparameters()
 
-    assert(not(DIFFERENT_FORMAT), "For auto-encoder, need to be the same format as timNet")
-
     local images_folder = DATA_FOLDER
     local path, modelString
     folder_and_name = get_last_used_model_folder_and_name()

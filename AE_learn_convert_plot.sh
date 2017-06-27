@@ -13,9 +13,6 @@ th learn_autoencoder.lua -use_cuda
 has_command_finish_correctly
 th imagesAndReprToTxt.lua -use_cuda
 has_command_finish_correctly
-<<<<<<< HEAD
-python generateNNImages.py 10 -use_cuda
-has_command_finish_correctly
 
 python generateNNImages.py 10
 has_command_finish_correctly

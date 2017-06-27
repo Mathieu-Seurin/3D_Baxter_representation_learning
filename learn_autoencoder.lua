@@ -109,7 +109,7 @@ function set_AE_hyperparams(params)
     set_hyperparams(params)
     LR = 0.0001
     BATCH_SIZE=20
-    NUM_HIDDEN = 20
+    NUM_HIDDEN = 3
     NOISE = true
     if params.optimiser=="sgd" then  optimizer = optim.sgd end
     if params.optimiser=="rmsprop" then  optimizer = optim.rmsprop end
@@ -128,7 +128,7 @@ local function main(params)
     Because the images' format is the same for auto-encoder]])
     end
 
-    NAME_SAVE = 'AE_'..NUM_HIDDEN..DATA_FOLDER
+    NAME_SAVE = 'AE_'..NUM_HIDDEN..NAME_SAVE
     print('NAME SAVE IN set_AE_hyp:  '..NAME_SAVE)
     local list_folders_images, list_txt=Get_HeadCamera_View_Files(DATA_FOLDER)
 
@@ -156,7 +156,7 @@ local cmd = torch.CmdLine()
 cmd:option('-optimiser', 'adam', 'Optimiser : adam|sgd|rmsprop')
 cmd:option('-model', 'DAE', 'model : AE|DAE')
 cmd:option('-use_cuda', true, 'true to use GPU, false (default) for CPU only mode')
-cmd:option('-use_continuous', true, 'true to use a continuous action space, false (default) for discrete one (0.5 range actions)')
+cmd:option('-use_continuous', false, 'true to use a continuous action space, false (default) for discrete one (0.5 range actions)')
 cmd:option('-data_folder', STATIC_BUTTON_SIMPLEST, 'Possible Datasets to use: staticButtonSimplest, mobileRobot, staticButtonSimplest, simpleData3D, pushingButton3DAugmented, babbling')
 
 local params = cmd:parse(arg)

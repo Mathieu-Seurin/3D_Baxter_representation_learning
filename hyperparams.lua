@@ -24,9 +24,8 @@ BASE_TIMNET = './models/topUniqueSimplerWOTanh'--ImageNet-inspired Convolutional
 --otherwise, we get:  /home/gpu_center/torch/install/bin/lua: imagesAndReprToTxt.lua:53: bad argument #1 to 'size' (out of range)
 
 --MODEL_ARCHITECTURE_FILE = INCEPTIONV4 --Too big
-MODEL_ARCHITECTURE_FILE = BASE_TIMNET--without last layer as Tanh
---MODEL_ARCHITECTURE_FILE = RESNET
-
+--MODEL_ARCHITECTURE_FILE = BASE_TIMNET--without last layer as Tanh
+MODEL_ARCHITECTURE_FILE = RESNET
 
 --==================================================
 -- Hyperparams : Learning rate, batchsize, USE_CUDA etc...
@@ -36,19 +35,19 @@ MODEL_ARCHITECTURE_FILE = BASE_TIMNET--without last layer as Tanh
 -- by randomly sampling states (begin point and end point). CLAMP_CAUSALITY,
 -- on the contrary, takes the next consecutive action
 -- Cannot be applied in every scenario !!!!
-
 EXTRAPOLATE_ACTION = false
 EXTRAPOLATE_ACTION_CAUS = false
 --TODO shall it be true for continuous actions too always?
 -- Always : i don't think so, but trying to see if it works better with it, why not
 
+BRING_CLOSER_REWARD = false
 
 LR=0.0001
 LR_DECAY = 3*1e-6
 
 SGD_METHOD = 'adam' -- Can be adam or adagrad
-BATCH_SIZE = 10
-NB_EPOCHS=1
+BATCH_SIZE = 2
+NB_EPOCHS=15
 
 DATA_AUGMENTATION = 0.01
 NORMALIZE_IMAGE = true
@@ -57,4 +56,5 @@ COEF_TEMP=1
 COEF_PROP=1
 COEF_REP=1
 COEF_CAUS=1
-DIMENSION_OUT=3
+COEF_CLOSE=0.1
+DIMENSION_OUT=10

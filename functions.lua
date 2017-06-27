@@ -148,7 +148,7 @@ function getRandomBatchFromSeparateList(batch_size, mode)
 
    if mode=="Prop" or mode=="Rep" then
       batch=torch.Tensor(4, batch_size, IM_CHANNEL, IM_LENGTH, IM_HEIGHT)
-   elseif mode=='Caus' or mode=='Temp' then
+   elseif mode=='Caus' or mode=='Temp' or mode=='make_reward_closer' then
       batch=torch.Tensor(2, batch_size, IM_CHANNEL, IM_LENGTH, IM_HEIGHT)
    else
       batch=torch.Tensor(batch_size, IM_CHANNEL, IM_LENGTH, IM_HEIGHT)
@@ -191,14 +191,21 @@ function getRandomBatchFromSeparateList(batch_size, mode)
       elseif mode=="Caus" then
          set=get_one_random_Caus_Set(data1.Infos, data2.Infos)
          im1,im2,im3,im4 = data1.images[set.im1], data2.images[set.im2], data1.images[set.im3], data2.images[set.im4]
-
          --The last two are for viz purpose only
+
          batch[1][i]=im1
          batch[2][i]=im2
 
          im2,im3 = im3,im2 --I switch them for a better viz, that's all
 
-      else
+      elseif mode=='make_reward_closer' then
+         set=get_one_random_reward_close_set(data1.Infos, data2.Infos)
+         im1,im2 = data1.images[set.im1], data2.images[set.im2]
+         batch[1][i]=im1
+         batch[2][i]=im2
+         
+
+      else --for auto-encoder, getting images that's all
          set = {} --dummy placeholder, not needed for auto-encoder
          set.act1 = nil
          set.act2 = nil
