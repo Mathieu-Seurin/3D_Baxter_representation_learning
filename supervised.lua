@@ -288,7 +288,7 @@ function test_run(verbose)
   _, err = train(Model, indice_val, verbose, true, false)
   print(evaluate(Model, load_seq_by_id(indice_val)))
   printSamples(Model, indice_val, 3)
-  NAME_SAVE = 'Supervised'..DATA_FOLDER
+  NAME_SAVE = 'Supervised_'..DATA_FOLDER
   save_model(Model)
   ------ test if reinitiation works --------
   -- print(parameters:sum())

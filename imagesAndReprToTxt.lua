@@ -66,7 +66,7 @@ local function main(params)
     print(params)
     print_hyperparameters()
 
-    -- assert(not(DIFFERENT_FORMAT), "For auto-encoder, need to be the same format as timNet")
+    --assert(not(DIFFERENT_FORMAT), "For auto-encoder, need to be the same format as BASE_TIMNET")
 
     local images_folder = DATA_FOLDER
     local path, modelString
@@ -75,10 +75,11 @@ local function main(params)
     modelString = folder_and_name[2]
 
     print('Last model used: '..path..'/'..modelString)
-    -- if get_last_architecture_used(modelString) == 'AE' then
-    --   print 'Overriding MODEL_ARCHITECTURE_FILE with BASE_TIMNET (only valid model for AE)'
-    --   MODEL_ARCHITECTURE_FILE = BASE_TIMNET
-    -- end
+    if get_last_architecture_used(modelString) == 'AE' then
+      assert(not(DIFFERENT_FORMAT), "For training the auto-encoder, the model architecture needs to be in the same format as BASE_TIMNET. Change in hyperparams.lua")
+      print 'Overriding MODEL_ARCHITECTURE_FILE with BASE_TIMNET (only valid model for AE)'
+      MODEL_ARCHITECTURE_FILE = BASE_TIMNET
+    end
 
     local  model = torch.load(path..'/'..modelString)
     if USE_CUDA then

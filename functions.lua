@@ -56,8 +56,8 @@ end
 function get_last_architecture_used(model_name)
   if string.find(model_name, 'AE_') then
     return 'AE'
-  -- elseif string.find(model_name, 'Supervised') then
-  --   return 'Supervised'   #TODO: Xinrui: specify naming convention
+  elseif string.find(model_name, 'Supervised') then
+    return 'Supervised'
   else
     return 'SiameseNetwork'
   end

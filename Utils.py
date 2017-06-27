@@ -97,7 +97,7 @@ def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension
     colorblind_cmap  = ListedColormap(colorblind_palette)
     colormap = cmap
     bounds=[-1,0,9,15]
-    # norm = colors.BoundaryNorm(bounds, colormap.N)
+    norm = colors.BoundaryNorm(bounds, colormap.N)
     # TODO: for some reason, no matther if I use cmap=cmap or make cmap=colorblind_palette work, it prints just 2 colors too similar for a colorblind person
 
     fig = plt.figure()
