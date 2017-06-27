@@ -24,8 +24,8 @@ BASE_TIMNET = './models/topUniqueSimplerWOTanh'--ImageNet-inspired Convolutional
 --otherwise, we get:  /home/gpu_center/torch/install/bin/lua: imagesAndReprToTxt.lua:53: bad argument #1 to 'size' (out of range)
 
 --MODEL_ARCHITECTURE_FILE = INCEPTIONV4 --Too big
-MODEL_ARCHITECTURE_FILE = BASE_TIMNET--without last layer as Tanh
---MODEL_ARCHITECTURE_FILE = RESNET
+--MODEL_ARCHITECTURE_FILE = BASE_TIMNET--without last layer as Tanh, use it for AE
+MODEL_ARCHITECTURE_FILE = RESNET
 
 
 --==================================================

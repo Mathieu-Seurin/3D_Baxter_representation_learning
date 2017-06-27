@@ -20,7 +20,7 @@ function has_command_finish_correctly {
 
 for max_cos_dis in 0.1 0.2 0.4 0.5 0.8
 do
-    for s in 0.1 0.2 0.4 0.5 0.8
+    for s in 0.01 0.1 0.2 0.4 0.5 0.8
     do
         echo "\n ********** Running pipeline for finetuning mcd: $max_cos_dis and sigma: $s *************"
         th script.lua -use_cuda -use_continuous -mcd $max_cos_dis -sigma $s -data_folder staticButtonSimplest

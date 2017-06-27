@@ -201,7 +201,7 @@ I have not found other solution than running within the proxy network (run local
 
 * Running shell scripts:
 
-The method has_command_finish_correctly for tracing errors better in console (break program and show error without continuing next program in the script) sometimes does not work. Remove it from your script if your bash command sh does not recognize functions and if running ./script.sh (without sh before) gives you permission errors when running remotely via ssh.
+The method has_command_finish_correctly for tracing errors better in console (break program and show error without continuing next program in the script) sometimes does not work. Solution: Run ./script.sh (without sh before). (If you get permission errors when running remotely via ssh, chmod u+x  script.sh)
 
 * Lua/Torch allow only default boolean cmd line parameters of false. Add the flag to set them to True, leave them out to set them to False.
 
