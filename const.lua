@@ -17,6 +17,7 @@ require 'hyperparams'
 
 USE_CUDA = true
 USE_SECOND_GPU = false
+
 USE_CONTINUOUS = false
 MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.5
 CONTINUOUS_ACTION_SIGMA = 0.1 
@@ -28,6 +29,7 @@ if USE_CUDA then
 end
 
 if USE_CUDA and USE_SECOND_GPU then
+   print("here")
    cutorch.setDevice(2)
 end
 
@@ -71,7 +73,7 @@ MIN_TABLE = {-10000,-10000} -- for x,y
 MAX_TABLE = {10000,10000} -- for x,y
 
 DIMENSION_IN = 2
-DIMENSION_OUT = 2  --worked just as well as 4 output dimensions
+
 REWARD_INDEX = 1  --3 reward values: -1, 0, 10
 INDEX_TABLE = {1,2} --column index for coordinate in state file (respectively x,y)
 
@@ -395,3 +397,4 @@ IMG_TEST_SET = {
 'staticButtonSimplest/record_052/recorded_cameras_head_camera_2_image_compressed/frame00008.jpg',
 'staticButtonSimplest/record_052/recorded_cameras_head_camera_2_image_compressed/frame00068.jpg',
 'staticButtonSimplest/record_052/recorded_cameras_head_camera_2_image_compressed/frame00025.jpg'}
+

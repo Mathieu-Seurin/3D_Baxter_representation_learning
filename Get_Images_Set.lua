@@ -333,7 +333,11 @@ function get_one_random_reward_close_set(Infos1, Infos2)
       repeat
          id_ref_state= torch.random(1,size1)
          reward1 = Infos1.reward[id_ref_state]
-      until (reward1~=0)
+      until (reward1~=2)
+      -- Since all rewards are different from 2
+      -- it means that you take the first action you got
+      -- I did this because it's easier if you want to group only certain reward
+      -- But yea, if you want to group every reward, this code look silly
 
       for i=1, size2 do
          id_second_state=torch.random(1,size2)

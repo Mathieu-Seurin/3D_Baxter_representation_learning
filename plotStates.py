@@ -12,11 +12,13 @@ test = unittest.TestCase('__init__')
 #####################
 # True if we plot ground truth observed states, and false to plot the learned state representations
 plotGroundTruthStates = False
+with_title = False #do you want the title on your plots or nop ? Not implemented at the moment
 
 library_versions_tests()
 print"\n\n >> Running plotStates.py....plotGroundTruthStates: ",plotGroundTruthStates, " SKIP_RENDERING = ", SKIP_RENDERING
 
 model_name = ''
+
 if len(sys.argv) != 3:
     lastModelFile = open('lastModel.txt')
     path = lastModelFile.readline()[:-1]+'/'
@@ -33,10 +35,10 @@ if len(sys.argv) != 3:
         print "*********************\nPLOTTING LEARNT STATES for model: ", model_name #(3D for Baxter PUSHING_BUTTON_AUGMENTED dataset, or 2D position for MOBILE_ROBOT dataset): ", state_file_str
         plot_path = path+'LearnedStatesPlot_'+model_name+'.png'
     lastModelFile.close()
+
 else:
     state_file_str = sys.argv[1]
-    reward_file_str = sys.argv[2]
-
+    
     # if not os.path.isfile(state_file_str): # print('Calling subprocess create_plotStates_file_for_all_seq with ',data_folder)
     subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_cuda','-use_continuous','-data_folder', data_folder])  # TODO: READ CMD LINE ARGS FROM FILE INSTEAD (and set accordingly here) TO NOT HAVING TO MODIFY INSTEAD train_predict_plotStates and the python files  
     # if not os.path.isfile(reward_file_str): #print('Calling subprocess create_all_reward with ',data_folder)
@@ -108,8 +110,6 @@ elif PLOT_DIMENSIONS ==3:
 #     plt.scatter(toplot, rewards, c=rewards, cmap=cmap, norm=norm, marker="o")
 else:
     print " PLOT_DIMENSIONS other than 2 or 3 not supported"
-
-
 
 
 
