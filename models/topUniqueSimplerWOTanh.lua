@@ -1,5 +1,6 @@
 require 'nn'
 -- network-------------------------------------------------------
+local M = {}
 function getModel(Dimension)
 
    nbFilter=32
@@ -45,3 +46,5 @@ function getModel(Dimension)
    print('Timnet\n' .. Timnet:__tostring());
    return Timnet
 end
+M.getModel = getModel
+return M

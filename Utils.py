@@ -4,6 +4,8 @@ from sklearn.decomposition import PCA  # with some version of sklearn fails with
 import matplotlib.pyplot as plt
 from matplotlib import colors
 from matplotlib.colors import ListedColormap
+from matplotlib.colors import LinearSegmentedColormap
+from matplotlib import cm
 from mpl_toolkits.mplot3d import Axes3D
 import sys
 import numpy as np
@@ -77,6 +79,11 @@ def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension
     print'plotStates ',mode,' for rewards cardinal: ',rewards_cardinal,' (', reward_values,')'
     cmap = colors.ListedColormap(['gray', 'blue', 'red'])     # print "cmap: ",type(cmap)
 
+    # custom Red Gray Blue colormap
+    colours = [(0,0,1), (0.75,0.75,0.75), (1,0,0)]
+    n_bins = 100
+    cmap_name = 'rgrayb'
+    cm = LinearSegmentedColormap.from_list(cmap_name, colours, n_bins)
 
     colorblind_palette = sns.color_palette("colorblind", rewards_cardinal)  # 3 is the number of different colours to use
     #print(type(colorblind_palette))
@@ -104,7 +111,7 @@ def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension
         ax = fig.add_subplot(111, projection='3d')
         # for c, m, zlow, zhigh in colors_markers:
         #     ax.scatter(toplot[:,0], toplot[:,1], toplot[:,2], c=c, marker=m)
-        ax.scatter(toplot[:,0], toplot[:,1], toplot[:,2], c=rewards, cmap=colormap, marker=".")#,fillstyle=None)
+        cax = ax.scatter(toplot[:,0], toplot[:,1], toplot[:,2], c=rewards, cmap=cm, marker=".")#,fillstyle=None)
         ax.set_zlabel(axes_labels[2])
     else:
         sys.exit("only mode '2D' and '3D' plot supported")
@@ -116,6 +123,9 @@ def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension
     else:
         ax.set_title(title+dataset)
 
+    # adding color bar
+    cbar = fig.colorbar(cax, ticks=[-1, 0, 1])
+    cbar.ax.set_yticklabels(['-1', '0', '1'])  # vertically oriented colorbar
     plt.savefig(plot_path)
     #plt.colorbar()  #TODO WHY IT DOES NOT SHOW AND SHOWS A PALETTE INSTEAD?
     if not SKIP_RENDERING:  # IMPORTANT TO SAVE BEFORE SHOWING SO THAT IMAGES DO NOT BECOME BLANK!

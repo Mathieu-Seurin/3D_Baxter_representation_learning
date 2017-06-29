@@ -1,6 +1,7 @@
 tnt = require 'torchnet'
 vision = require 'torchnet-vision'
 
+local M = {}
 function file_exists(name)
    --tests whether the file can be opened for reading
    local f=io.open(name,"r")
@@ -20,7 +21,7 @@ end
 function getModel(Dimension)
 
    local whole_net, pretrain_net
-   
+
    whole_net = nn.Sequential()
 
    local model = "resnet-"..RESNET_VERSION..".t7"
@@ -39,8 +40,8 @@ Ex : resnet-18.t7
 
    pretrain_net:evaluate()
 
-   if RESNET_VERSION == 18 or RESNET_VERSION == 34 then 
-      pretrain_net.modules[11] = nil --nn.Linear(512 -> 1000)      
+   if RESNET_VERSION == 18 or RESNET_VERSION == 34 then
+      pretrain_net.modules[11] = nil --nn.Linear(512 -> 1000)
       --pretrain_net.modules[10] is a View(512)
 
    else
@@ -52,10 +53,13 @@ Ex : resnet-18.t7
       nn_module = pretrain_net:get(i)
       patch(nn_module)
    end
-   
+
    whole_net:add(pretrain_net)
    whole_net:add(nn.Linear(512,Dimension))
-   
+
    return whole_net
 end
 
+M.getModel = getModel
+
+return M

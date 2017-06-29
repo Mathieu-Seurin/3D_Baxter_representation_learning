@@ -19,7 +19,7 @@ RESNET = './models/resnet'  --finetuned trained model
 
 RESNET_VERSION = 18 --34 or 50 maybe
 FROZEN_LAYER = 3 --the number of layers that don't learn at all (i.e., their learning_rate=0)
-
+AENET = './models/autoencoder_conv'
 BASE_TIMNET = './models/topUniqueSimplerWOTanh'--ImageNet-inspired Convolutional network with ReLu. This is the only model that should be used with learn_autoencoder, not in regular training in script.lua
 --otherwise, we get:  /home/gpu_center/torch/install/bin/lua: imagesAndReprToTxt.lua:53: bad argument #1 to 'size' (out of range)
 

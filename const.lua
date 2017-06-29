@@ -17,10 +17,10 @@ require 'hyperparams'
 
 USE_CUDA = true
 USE_SECOND_GPU = false
-
 USE_CONTINUOUS = false
+
 MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.5
-CONTINUOUS_ACTION_SIGMA = 0.1 
+CONTINUOUS_ACTION_SIGMA = 0.1
 DATA_FOLDER = MOBILE_ROBOT --works best!
 
 if USE_CUDA then
@@ -34,7 +34,6 @@ if USE_CUDA and USE_SECOND_GPU then
 end
 
 --torch.manualSeed(100)
-
 --=====================================
 --DATA AND LOG FOLDER NAME etc..
 --====================================
@@ -60,7 +59,7 @@ VISUALIZE_IMAGES_TAKEN = false
 VISUALIZE_CAUS_IMAGE = false
 VISUALIZE_IMAGE_CROP = false
 VISUALIZE_MEAN_STD = false
-VISUALIZE_AE = false
+-- VISUALIZE_AE = true
 
 IM_CHANNEL = 3 --image channels (RGB)
 ACTION_AMPLITUDE = 0.01
@@ -152,7 +151,7 @@ function set_cuda_hyperparams(USE_CUDA)
         tnt = require 'torchnet'
         vision = require 'torchnet-vision'  -- Install via https://github.com/Cadene/torchnet-vision
     end
-    USE_SECOND_GPU = true
+    USE_SECOND_GPU = false
     if USE_CUDA and USE_SECOND_GPU then
        cutorch.setDevice(2)
     end
@@ -320,6 +319,8 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
        IM_LENGTH = 200
        IM_HEIGHT = 200
     end
+
+    print_hyperparameters()
 end
 
 function print_hyperparameters()

@@ -6,7 +6,7 @@ require 'torch'
 require 'xlua'
 require 'math'
 require 'string'
---require 'cunn'
+require 'cunn'
 require 'nngraph'
 require 'functions'
 require 'printing'
@@ -17,6 +17,7 @@ require 'gnuplot'
 require 'os'
 require 'paths'
 
+require(MODEL_ARCHITECTURE_FILE)
 -- THIS IS WHERE ALL THE CONSTANTS SHOULD COME FROM
 -- See const.lua file for more details
 require 'const'
@@ -26,7 +27,7 @@ local cmd = torch.CmdLine()
 -- Basic options
 cmd:option('-use_cuda', false, 'true to use GPU version, false (default) for CPU only mode')
 cmd:option('-use_continuous', false, 'true to use a continuous action space, false (default) for discrete one (0.5 range actions)')
-cmd:option('-data_folder', SIMPLEDATA3D, 'Possible Datasets to use: staticButtonSimplest, mobileRobot, staticButtonSimplest, simpleData3D, pushingButton3DAugmented, babbling')
+cmd:option('-data_folder', STATIC_BUTTON_SIMPLEST, 'Possible Datasets to use: staticButtonSimplest, mobileRobot, staticButtonSimplest, simpleData3D, pushingButton3DAugmented, babbling')
 cmd:option('-mcd', 0.4, 'Max. cosine distance allowed among actions for priors loss function evaluation (MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD)')
 cmd:option('-sigma', 0.6, "Sigma: denominator in continuous actions' extra factor (CONTINUOUS_ACTION_SIGMA)")
 
@@ -34,13 +35,14 @@ RELATIVE = false
 
 local params = cmd:parse(arg)
 set_hyperparams(params)
+
 print("testing DATA_FOLDER", DATA_FOLDER)
 local list_folders_images, list_txt_action,list_txt_button, list_txt_state, list_txt_posButton=Get_HeadCamera_View_Files(DATA_FOLDER)
 NB_SEQUENCES = #list_folders_images
 
 -- function for testing
 -- indice: data sequnce
--- number: how many samples
+-- number: of samples
 function printSamples(Model, indice, number)
   data = load_seq_by_id(indice)
   for i = 1,number do
@@ -85,9 +87,9 @@ function getLabel(data, index)
   for i = 1, DIMENSION_IN do
     label[i] = data.Infos[i][index]
   end
-  if RELATIVE then
-    label = label - data.posButton-- TODO change data's sturecture to include posB
-  end
+  -- if RELATIVE then
+    -- label = label - data.posButton-- TODO change data's sturecture to include posB
+  -- end
   return label
 end
 
@@ -263,11 +265,6 @@ function cross_validation(K)
       end
     end
   end
-  -- print errors
-  -- for i = 2, performances:size(2) do
-  --   print("MSE", performances[i], configs[i])
-  -- end
-  -- pick the best model, apply on test set
   min, index = torch.min(performances, 1)
   print("best-model", configs[index[1]])
   local Model = getModel(DIMENSION_IN)
@@ -281,21 +278,17 @@ end
 
 ---------------- single run -----------------
 function test_run(verbose)
-  -- local LR = 0.001 --(hyper)parameters for training
-  -- local nb_epochs = 50
-  -- local batchSize = 16
   local err = torch.Tensor(NB_EPOCHS)
-  -- local indice_val = NB_SEQUENCES
   local indice_val = NB_SEQUENCES
   print("Using Model", MODEL_ARCHITECTURE_FILE)
-  local Model = getModel(DIMENSION_IN)
+  local Model = getModel(DIMENSION_OUT)
   if USE_CUDA then
     Model = Model:cuda()
   end
   _, err = train(Model, indice_val, verbose, true, false)
   print(evaluate(Model, load_seq_by_id(indice_val)))
-  -- print("results from data seq "..indice_val.."with parameters (epoch, batch, lr)"..nb_epochs.." "..batchSize.." "..LR.." is")
   printSamples(Model, indice_val, 3)
+  NAME_SAVE = 'Supervised_'..DATA_FOLDER
   save_model(Model)
   ------ test if reinitiation works --------
   -- print(parameters:sum())
@@ -307,7 +300,8 @@ end
 ----------------- run ----------
 -- cross_validation(1)
 
-verbose = false
+ALL_SEQ = precompute_all_seq()
+verbose = true
 test_run(verbose)
 
 --------- load model test---------

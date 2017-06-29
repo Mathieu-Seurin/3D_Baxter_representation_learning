@@ -8,6 +8,7 @@ function has_command_finish_correctly {
         return 0
     fi
 }
+qlua learn_autoencoder -use_cuda
 
 th learn_autoencoder.lua -use_cuda
 has_command_finish_correctly

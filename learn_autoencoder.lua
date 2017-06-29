@@ -8,8 +8,10 @@ require 'string'
 require 'cunn'
 require 'nngraph'
 --local cuda = pcall(require, 'cutorch') -- Use CUDA if available
+
 require 'Get_Images_Set'
 require 'functions'
+
 require 'const'
 
 function AE_Training(model, batch, optimizer)
@@ -56,20 +58,38 @@ function test_model(model, list_folders_images)
    criterion=nn.SmoothL1Criterion()
    criterion:cuda()
 
-   for num_test=0,NB_TEST-1 do
-      local id_test = #list_folders_images - num_test
-      local seq = load_seq_by_id(id_test)
-      for im=1,#seq.images do
-         current_img = seq.images[im]:view(1,3,200,200):cuda()
-         output = model:forward(current_img)
+   -- for num_test=1,NB_TEST-1 do
+   img = getRandomBatchFromSeparateList(1, 'regular'):view(1,3,200,200):cuda()
+   output = model:forward(img)
+   local img_compare = image.toDisplayTensor({img[1], output})
+   -- image.display(img)
+   image.display{image=img_compare,win=w}
 
-         if VISUALIZE_AE and im == 1 then
-            local img_merge = image.toDisplayTensor({current_img[1],output})
-            image.display{image=img_merge,win=WINDOW}
-            io.read()
-         end
-      end
-   end
+   --    local id_test = #list_folders_images - num_test
+   --    local seq = load_seq_by_id(id_test)
+   --    for im=1,#seq.images do
+   --       current_img = seq.images[im]:view(1,3,200,200):cuda()
+   --       output = model:forward(current_img)
+   --       print(#current_img)
+   --       print(#output)
+   --
+   --       if VISUALIZE_AE and im == 1 then
+   --          local img_merge = image.toDisplayTensor({current_img[1], output})
+   --          image.display({image=img_merge,win=WINDOW})
+   --          io.read()
+   --       end
+   --    end
+   -- end
+end
+
+local function save_decoder(model)
+
+   path = LOG_FOLDER..NAME_SAVE
+   lfs.mkdir(path)
+   file_string = path..'/'..NAME_SAVE..'_decoder'..'.t7'
+
+   saved = model.modules[2]:clone():float()
+   torch.save(file_string, model.modules[2]) --saving only encoding module
 end
 
 function train_Epoch(optimizer, list_folders_images,list_txt,Log_Folder)
@@ -81,6 +101,8 @@ function train_Epoch(optimizer, list_folders_images,list_txt,Log_Folder)
    local list_loss={}
    local list_corr={}
    local loss=0
+
+   test_model(model, list_folders_images)
 
    print("Begin Learning...")
    for epoch=1,NB_EPOCHS do
@@ -95,9 +117,12 @@ function train_Epoch(optimizer, list_folders_images,list_txt,Log_Folder)
          xlua.progress(iter, nbIter)
       end
       print("DAE Mean Loss : "..loss/(nbIter*BATCH_SIZE))
-      save_autoencoder(model,name_save)
+      if epoch % 5 == 0 then
+          save_autoencoder(model,name_save)
+          save_decoder(model)
+      end
 
-      if epoch > 15 then
+      if epoch > 0 then
          test_model(model, list_folders_images)
       end
    end
@@ -105,10 +130,11 @@ end
 
 function set_AE_hyperparams(params)
     -- OVERRIDING hyperparameters since it's not for auto-encoders :  ** MAIN DIFFERENCES:
-    MODEL_ARCHITECTURE_FILE = BASE_TIMNET -- important to call in this order, as DIFFERENT_FORMAT is defined based on this setting. TODO idea: Pass MODEL_ARCHITECTURE_FILE as default cmd param in which is different in each script?
+    MODEL_ARCHITECTURE_FILE = AENET -- important to call in this order, as DIFFERENT_FORMAT is defined based on this setting. TODO idea: Pass MODEL_ARCHITECTURE_FILE as default cmd param in which is different in each script?
     set_hyperparams(params)
     LR = 0.0001
     BATCH_SIZE=20
+    NB_EPOCHS = 15
     NUM_HIDDEN = 3
     NOISE = true
     if params.optimiser=="sgd" then  optimizer = optim.sgd end
@@ -122,7 +148,7 @@ local function main(params)
     optimizer = set_AE_hyperparams(params)
     print_hyperparameters()
     print(params)
-
+    w = image.display(torch.Tensor(3,200,400))
     if DIFFERENT_FORMAT then
        error([[Don't forget to switch model to BASE_TIMNET in hyperparameters
     Because the images' format is the same for auto-encoder]])
@@ -142,6 +168,7 @@ local function main(params)
 
     require('./models/autoencoder_conv')
     model = getModel()
+    print(model)
     model=model:cuda()
 
     parameters,gradParameters = model:getParameters()
@@ -158,6 +185,8 @@ cmd:option('-model', 'DAE', 'model : AE|DAE')
 cmd:option('-use_cuda', true, 'true to use GPU, false (default) for CPU only mode')
 cmd:option('-use_continuous', false, 'true to use a continuous action space, false (default) for discrete one (0.5 range actions)')
 cmd:option('-data_folder', STATIC_BUTTON_SIMPLEST, 'Possible Datasets to use: staticButtonSimplest, mobileRobot, staticButtonSimplest, simpleData3D, pushingButton3DAugmented, babbling')
+cmd:option('-mcd', 0.5, 'Max cosine distance')
+cmd:option('-sigma', 0.1, 'Max cosine distance')
 
 local params = cmd:parse(arg)
 main(params)
