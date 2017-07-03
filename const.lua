@@ -16,7 +16,7 @@ require 'hyperparams'
 ------DEFAULTS (IF NOT COMMAND LINE ARGS ARE PASSED)
 
 USE_CUDA = true
-USE_SECOND_GPU = false
+USE_SECOND_GPU = true
 USE_CONTINUOUS = false
 
 MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.5
@@ -286,6 +286,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
 
     MIN_TABLE = {0.42,-0.09,-10} -- for x,y,z
     MAX_TABLE = {0.74,0.59,10} -- for x,y,z
+
     if VISUALIZE_IMAGES_TAKEN or VISUALIZE_CAUS_IMAGE or VISUALIZE_IMAGE_CROP or VISUALIZE_MEAN_STD or VISUALIZE_AE then
        --Creepy, but need a placeholder, to prevent many window to pop
        WINDOW = image.display(image.lena())

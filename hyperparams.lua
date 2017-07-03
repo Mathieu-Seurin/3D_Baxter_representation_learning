@@ -40,14 +40,14 @@ EXTRAPOLATE_ACTION_CAUS = false
 --TODO shall it be true for continuous actions too always?
 -- Always : i don't think so, but trying to see if it works better with it, why not
 
-BRING_CLOSER_REWARD = false
+BRING_CLOSER_REWARD = true
 
 LR=0.0001
-LR_DECAY = 3*1e-6
+LR_DECAY = 1*1e-6
 
 SGD_METHOD = 'adam' -- Can be adam or adagrad
-BATCH_SIZE = 10
-NB_EPOCHS=15
+BATCH_SIZE = 13
+NB_EPOCHS=30
 
 DATA_AUGMENTATION = 0.01
 NORMALIZE_IMAGE = true
@@ -56,5 +56,5 @@ COEF_TEMP=1
 COEF_PROP=1
 COEF_REP=1
 COEF_CAUS=1
-COEF_CLOSE=0.1
+COEF_CLOSE=0.01
 DIMENSION_OUT=3
