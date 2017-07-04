@@ -112,9 +112,10 @@ function save_model(model)
    model_to_save = model:clone():float()
    torch.save(file_string, model_to_save) --Saving model to analyze the results afterward (imagesAndRepr.lua etc...)
 
-   patch(cudnn.convert(model_to_save,nn))
-   --convert model to nn instead of cunn (for pytorch too) and patch it (convert view function)
-   torch.save(file_string..'-pytorch', model_to_save)
+   -- not enough disk space for the PyTorch version!!
+   -- patch(cudnn.convert(model_to_save,nn))
+   -- --convert model to nn instead of cunn (for pytorch too) and patch it (convert view function)
+   -- torch.save(file_string..'-pytorch', model_to_save)
 
    print("Saved model at : "..path)
 

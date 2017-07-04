@@ -25,6 +25,7 @@ MOBILE_ROBOT = 'mobileRobot'
 SIMPLEDATA3D = 'simpleData3D'
 PUSHING_BUTTON_AUGMENTED = 'pushingButton3DAugmented'
 STATIC_BUTTON_SIMPLEST = 'staticButtonSimplest'
+COMPLEXDATA = 'complexData'
 
 # 2 options of plotting:
 LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
@@ -62,6 +63,8 @@ def get_data_folder_from_model_name(model_name):
         return PUSHING_BUTTON_AUGMENTED
     elif STATIC_BUTTON_SIMPLEST in model_name:
         return STATIC_BUTTON_SIMPLEST
+    elif COMPLEXDATA in model_name:
+        return COMPLEXDATA
     else:
         print "Unsupported dataset!"
 
@@ -80,7 +83,7 @@ def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension
     cmap = colors.ListedColormap(['gray', 'blue', 'red'])     # print "cmap: ",type(cmap)
 
     # custom Red Gray Blue colormap
-    colours = [(0,0,1), (0.75,0.75,0.75), (1,0,0)]
+    colours = [(0.3,0.3,0.3), (0.0,0.0,1.0), (1,0,0)]
     n_bins = 100
     cmap_name = 'rgrayb'
     cm = LinearSegmentedColormap.from_list(cmap_name, colours, n_bins)

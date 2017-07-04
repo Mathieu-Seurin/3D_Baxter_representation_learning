@@ -47,6 +47,7 @@ function AE_Training(model, batch, optimizer)
       --print(gradInput:mean())
       return loss,gradParameters
    end
+   -- optimState={learningRate=LR, learningRateDecay=LR_DECAY}
    optimState={learningRate=LR}
    parameters, loss=optimizer(feval, parameters, optimState)
 
@@ -133,8 +134,8 @@ function set_AE_hyperparams(params)
     MODEL_ARCHITECTURE_FILE = AENET -- important to call in this order, as DIFFERENT_FORMAT is defined based on this setting. TODO idea: Pass MODEL_ARCHITECTURE_FILE as default cmd param in which is different in each script?
     set_hyperparams(params)
     LR = 0.0001
-    BATCH_SIZE=20
-    NB_EPOCHS = 15
+    BATCH_SIZE= 20
+    NB_EPOCHS = 20
     NUM_HIDDEN = 3
     NOISE = true
     if params.optimiser=="sgd" then  optimizer = optim.sgd end
@@ -167,7 +168,7 @@ local function main(params)
     image_height=IM_HEIGHT
 
     require('./models/autoencoder_conv')
-    model = getModel()
+    model = getModel(3)
     print(model)
     model=model:cuda()
 

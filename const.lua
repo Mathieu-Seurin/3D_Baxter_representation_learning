@@ -9,7 +9,7 @@
 -- and put it here.
 
 -- Hyperparameters are located in a different file (hyperparameters.lua)
---=============================================================
+-- =============================================================
 require 'lfs'
 require 'hyperparams'
 
@@ -19,8 +19,8 @@ USE_CUDA = true
 USE_SECOND_GPU = false
 USE_CONTINUOUS = true
 MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.5
-CONTINUOUS_ACTION_SIGMA = 0.1
-DATA_FOLDER = MOBILE_ROBOT --works best!
+CONTINUOUS_ACTION_SIGMA = 0.3
+DATA_FOLDER = STATIC_BUTTON_SIMPLEST
 
 if USE_CUDA then
     require 'cunn'
@@ -271,6 +271,25 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
         SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
         AVG_FRAMES_PER_RECORD = 90  --HINT: reduce for fast full epoch testing in CPU mode
 
+    elseif DATA_FOLDER == COMPLEXDATA then
+        CLAMP_CAUSALITY = true --TODO: make false when continuous works
+
+        MIN_TABLE = {0.42,-0.2,-10} -- for x,y,z
+        MAX_TABLE = {0.8,0.7,10} -- for x,y,z
+
+        DIMENSION_IN = 3
+        DIMENSION_OUT = 3
+
+        REWARD_INDEX = 2 --2 reward values: -0, 1 ?
+        INDEX_TABLE = {2,3,4} --column index for coordinates in state file, respectively (x,y,z)
+
+        DEFAULT_PRECISION = 0.05 -- for 'arrondit' function
+        FILENAME_FOR_REWARD = "recorded_button1_is_pressed.txt"
+        FILENAME_FOR_ACTION = "recorded_robot_limb_left_endpoint_action.txt" -- Never written, always computed on the fly
+        FILENAME_FOR_STATE = "recorded_robot_limb_left_endpoint_state.txt"
+
+        SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
+        AVG_FRAMES_PER_RECORD = 200  --HINT: reduce for fast full epoch testing in CPU mode
     else
       print("No supported data folder provided, please add either of the data folders defined in hyperparams: "..BABBLING..", "..MOBILE_ROBOT.." "..SIMPLEDATA3D..' or others in const.lua' )
       os.exit()
