@@ -5,7 +5,6 @@ from sklearn.neighbors import NearestNeighbors
 import shutil
 import random
 import sys
-from PIL import Image
 import pandas as pd
 import os, os.path
 import subprocess
@@ -34,6 +33,7 @@ python generateNNImages.py 5 5 Log/modelY2017_D24_M06_H06M19S10_staticButtonSimp
 IMPORTANT: In order to run it with a non random fixed test set of images,
 call it with only one argument (the number of neigbours to generate for each
 image in the test set and it will assess the test set of 50 images defined in Const.lua and Utils.py)
+
 """
 
 print"\n\n >> Running generateNNImages.py...."
@@ -44,7 +44,7 @@ if len(sys.argv) <= 1:
 nbr_neighbors= int(sys.argv[1])
 nbr_images = -1
 use_test_set = True
-
+with_title = False
 
 lastModelFile = open(LAST_MODEL_FILE)
 path_to_model = lastModelFile.readline()[:-1]
@@ -65,34 +65,15 @@ data_folder = get_data_folder_from_model_name(path_to_model)
 subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_cuda','-use_continuous','-data_folder', data_folder])  # TODO: READ CMD LINE ARGS FROM FILE INSTEAD (and set accordingly here) TO NOT HAVING TO MODIFY INSTEAD train_predict_plotStates and the python files
 subprocess.call(['th','create_all_reward.lua','-use_cuda','-use_continuous','-data_folder',data_folder])
 # TODO: ADD ,'-use_continuous'
-file_representation_string=path_to_model+"/"+LEARNED_REPRESENTATIONS_FILE
 
 #Parsing representation file
 #===================
-
-images=[]
-representations=[]
-
-#reading data
-file_representation  = open(file_representation_string, "r")
-for line in file_representation:
-    if line[0]!='#':
-        words = line.split()
-        images.append(words[0])
-        representations.append(words[1:])
-
-if use_test_set:
-    print "Number of images in test set :", len(IMG_TEST_SET)
+file_representation_string=path_to_model+"/"+LEARNED_REPRESENTATIONS_FILE
+images, representations = parse_repr_file(file_representation_string)
 
 #Parsing true state file
 #===================
-true_states = {}
-file_state = open(ALL_STATE_FILE, "r")
-
-for line in file_state:
-    if line[0]!='#':
-        words = line.split()
-        true_states[words[0]] = np.array(map(float,words[1:]))
+true_states = parse_true_state_file() #No need to send parameters, the const ALL_STATE_FILE is used
 
 # Compute nearest neighbors
 nbrs = NearestNeighbors(n_neighbors=(nbr_neighbors+1), algorithm='ball_tree').fit(representations)
@@ -107,7 +88,7 @@ print "path_to_neighbours: ",path_to_neighbour
 if not os.path.exists(path_to_neighbour):
 	os.mkdir(path_to_neighbour)
 
-if nbr_images == -1 or use_test_set:
+if use_test_set or nbr_images == -1:
     data = zip(images,indexes,distances,representations)
 else:
     print ('Using a random test set of images for KNN MSE evaluation...')
@@ -129,7 +110,6 @@ for img_name,id,dist,state in data:
     if use_test_set:
         if not(img_name in IMG_TEST_SET):
             continue
-
     base_name= os.path.splitext(os.path.basename(img_name))[0]
     seq_name= img_name.split("/")[1]
     print('Processing ' + seq_name + "/" + base_name + ' ...'+base_name)
@@ -137,19 +117,19 @@ for img_name,id,dist,state in data:
     fig.set_size_inches(6*(nbr_neighbors+1), 6)
     a=fig.add_subplot(1,nbr_neighbors+1,1)
     a.axis('off')
-    # img = mpimg.imread(img_name)
-    img = Image.open(img_name)
+    img = mpimg.imread(img_name)
     imgplot = plt.imshow(img)
     state_str='[' + ",".join(['{:.3f}'.format(float(x)) for x in state]) + "]"
-    a.set_title(seq_name + "/" + base_name + ": \n" + state_str)
+
+    if with_title:
+        a.set_title(seq_name + "/" + base_name + ": \n" + state_str)
 
     original_coord = true_states[img_name]
 
     for i in range(0,nbr_neighbors):
             a=fig.add_subplot(1,nbr_neighbors+1,i+2)
             img_name=images[id[i+1]]
-            # img = mpimg.imread(img_name)
-            img = Image.open(img_name)
+            img = mpimg.imread(img_name)
             imgplot = plt.imshow(img)
 
             base_name_n= os.path.splitext(os.path.basename(img_name))[0]
@@ -158,7 +138,8 @@ for img_name,id,dist,state in data:
             dist_str = ' d=' + '{:.4f}'.format(dist[i+1])
 
             state_str='[' + ",".join(['{:.3f}'.format(float(x)) for x in representations[id[i+1]]]) + "]"
-            a.set_title(seq_name_n + "/" + base_name_n + ": \n" + state_str +dist_str)
+            if with_title:
+                a.set_title(seq_name_n + "/" + base_name_n + ": \n" + state_str +dist_str)
             a.axis('off')
 
     neighbour_coord = true_states[img_name]

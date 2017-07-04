@@ -1,6 +1,5 @@
 require 'nn'
 
-require '
 function getModel()
 
    encoder = nn.Sequential()

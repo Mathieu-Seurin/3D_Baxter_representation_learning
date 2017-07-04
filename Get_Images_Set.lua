@@ -323,6 +323,36 @@ function get_one_random_Caus_Set(Infos1, Infos2)
    error("CAUS WATCHDOG ATTACK!!!!!!!!!!!!!!!!!!")
 end
 
+function get_one_random_reward_close_set(Infos1, Infos2)
+
+   local size1=#Infos1[1]
+   local size2=#Infos2[1]
+   local watchDog=0
+   
+   while watchDog<50 do
+      repeat
+         id_ref_state= torch.random(1,size1)
+         reward1 = Infos1.reward[id_ref_state]
+      until (reward1~=2)
+      -- Since all rewards are different from 2
+      -- it means that you take the first action you got
+      -- I did this because it's easier if you want to group only certain reward
+      -- But yea, if you want to group every reward, this code look silly
+
+      for i=1, size2 do
+         id_second_state=torch.random(1,size2)
+
+         if Infos2.reward[id_second_state]==reward1 then
+            return {im1=id_ref_state, im2=id_second_state}
+         end
+      end
+      watchDog=watchDog+1
+   end
+
+   error("CLOSE WATCHDOG ATTACK!!!!!!!!!!!!!!!!!!")
+end
+
+
 ---------------------------------------------------------------------------------------
 -- Function : arrondit(value)
 -- Input (tensor) :

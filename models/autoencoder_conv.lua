@@ -2,7 +2,7 @@ require 'nn'
 local resnet = require("models/resnet")
 
 function getModel(Dimension)
-    local Dimension = 3
+   local Dimension = 3
 
    nbFilter=32
    encoder = nn.Sequential()

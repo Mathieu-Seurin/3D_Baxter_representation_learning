@@ -9,7 +9,7 @@
 -- and put it here.
 
 -- Hyperparameters are located in a different file (hyperparameters.lua)
--- =============================================================
+--=============================================================
 require 'lfs'
 require 'hyperparams'
 
@@ -19,8 +19,8 @@ USE_CUDA = true
 USE_SECOND_GPU = false
 USE_CONTINUOUS = true
 MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.5
-CONTINUOUS_ACTION_SIGMA = 0.3
-DATA_FOLDER = STATIC_BUTTON_SIMPLEST
+CONTINUOUS_ACTION_SIGMA = 0.1
+DATA_FOLDER = MOBILE_ROBOT --works best!
 
 if USE_CUDA then
     require 'cunn'
@@ -70,7 +70,7 @@ MIN_TABLE = {-10000,-10000} -- for x,y
 MAX_TABLE = {10000,10000} -- for x,y
 
 DIMENSION_IN = 2
-DIMENSION_OUT = 2  --worked just as well as 4 output dimensions
+
 REWARD_INDEX = 1  --3 reward values: -1, 0, 10
 INDEX_TABLE = {1,2} --column index for coordinate in state file (respectively x,y)
 
@@ -271,25 +271,11 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
         SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
         AVG_FRAMES_PER_RECORD = 90  --HINT: reduce for fast full epoch testing in CPU mode
 
-    elseif DATA_FOLDER == COMPLEXDATA then
-        CLAMP_CAUSALITY = true --TODO: make false when continuous works
+        if BRING_CLOSER_REWARD then
+           PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","make_reward_closer"}}
+        end
 
-        MIN_TABLE = {0.42,-0.2,-10} -- for x,y,z
-        MAX_TABLE = {0.8,0.7,10} -- for x,y,z
 
-        DIMENSION_IN = 3
-        DIMENSION_OUT = 3
-
-        REWARD_INDEX = 2 --2 reward values: -0, 1 ?
-        INDEX_TABLE = {2,3,4} --column index for coordinates in state file, respectively (x,y,z)
-
-        DEFAULT_PRECISION = 0.05 -- for 'arrondit' function
-        FILENAME_FOR_REWARD = "recorded_button1_is_pressed.txt"
-        FILENAME_FOR_ACTION = "recorded_robot_limb_left_endpoint_action.txt" -- Never written, always computed on the fly
-        FILENAME_FOR_STATE = "recorded_robot_limb_left_endpoint_state.txt"
-
-        SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
-        AVG_FRAMES_PER_RECORD = 200  --HINT: reduce for fast full epoch testing in CPU mode
     else
       print("No supported data folder provided, please add either of the data folders defined in hyperparams: "..BABBLING..", "..MOBILE_ROBOT.." "..SIMPLEDATA3D..' or others in const.lua' )
       os.exit()
@@ -298,6 +284,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
 
     MIN_TABLE = {0.42,-0.09,-10} -- for x,y,z
     MAX_TABLE = {0.74,0.59,10} -- for x,y,z
+
     if VISUALIZE_IMAGES_TAKEN or VISUALIZE_CAUS_IMAGE or VISUALIZE_IMAGE_CROP or VISUALIZE_MEAN_STD or VISUALIZE_AE then
        --Creepy, but need a placeholder, to prevent many window to pop
        WINDOW = image.display(image.lena())
@@ -410,3 +397,4 @@ IMG_TEST_SET = {
 'staticButtonSimplest/record_052/recorded_cameras_head_camera_2_image_compressed/frame00008.jpg',
 'staticButtonSimplest/record_052/recorded_cameras_head_camera_2_image_compressed/frame00068.jpg',
 'staticButtonSimplest/record_052/recorded_cameras_head_camera_2_image_compressed/frame00025.jpg'}
+

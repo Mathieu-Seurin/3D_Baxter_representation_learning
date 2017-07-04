@@ -6,7 +6,6 @@ SIMPLEDATA3D = 'simpleData3D' --  oldest simplest dataset
 PUSHING_BUTTON_AUGMENTED = 'pushingButton3DAugmented'
 BABBLING = 'babbling'
 STATIC_BUTTON_SIMPLEST = 'staticButtonSimplest'
-COMPLEXDATA = 'complexData'
 --!!! AVOID SETTING IT HERE FOR INCONSISTENCIES< SET VIA COMMAND LINE !!!
 --DATA_FOLDER = MOBILE_ROBOT
 --DATA_FOLDER = STATIC_BUTTON_SIMPLEST --PUSHING_BUTTON_AUGMENTED
@@ -26,8 +25,7 @@ BASE_TIMNET = './models/topUniqueSimplerWOTanh'--ImageNet-inspired Convolutional
 
 --MODEL_ARCHITECTURE_FILE = INCEPTIONV4 --Too big
 --MODEL_ARCHITECTURE_FILE = BASE_TIMNET--without last layer as Tanh, use it for AE
--- MODEL_ARCHITECTURE_FILE = RESNET
-MODEL_ARCHITECTURE_FILE = AENET
+MODEL_ARCHITECTURE_FILE = RESNET
 
 
 --==================================================
@@ -44,13 +42,14 @@ EXTRAPOLATE_ACTION_CAUS = false
 --TODO shall it be true for continuous actions too always?
 -- Always : i don't think so, but trying to see if it works better with it, why not
 
+BRING_CLOSER_REWARD = false
 
-LR=0.001
+LR=0.0001
 LR_DECAY = 3*1e-6
 
 SGD_METHOD = 'adam' -- Can be adam or adagrad
-BATCH_SIZE = 20
-NB_EPOCHS= 20
+BATCH_SIZE = 10
+NB_EPOCHS=1
 
 DATA_AUGMENTATION = 0.01
 NORMALIZE_IMAGE = true
@@ -59,4 +58,5 @@ COEF_TEMP=1
 COEF_PROP=1
 COEF_REP=1
 COEF_CAUS=1
+COEF_CLOSE=0.005
 DIMENSION_OUT=3

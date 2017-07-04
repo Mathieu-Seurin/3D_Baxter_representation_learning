@@ -26,11 +26,11 @@ function Rico_Training(Models,priors_used)
 
    -- create closure to evaluate f(X) and df/dX
    local feval = function(x)
-      loss_rep, loss_caus, loss_prop, loss_temp = 0, 0, 0, 0
+      loss_rep, loss_caus, loss_prop, loss_temp, loss_close = 0, 0, 0, 0, 0
       -- just in case:
       collectgarbage()
 
-      local action1, action2, lossTemp,lossProp,lossCaus,lossRep
+      local batch, action1, action2, lossTemp,lossProp,lossCaus,lossRep
       -- get new parameters
       if x ~= parameters then
          parameters:copy(x)
@@ -42,7 +42,7 @@ function Rico_Training(Models,priors_used)
       --===========
       local mode='Temp' --Same for continuous or discrete actions
       if applying_prior(priors_used, mode) then
-          local batch=getRandomBatchFromSeparateList(BATCH_SIZE,mode)
+          batch=getRandomBatchFromSeparateList(BATCH_SIZE,mode)
           loss_temp, grad=doStuff_temp(Models,temp_criterion, batch,COEF_TEMP)
           TOTAL_LOSS_TEMP = loss_temp + TOTAL_LOSS_TEMP
       end
@@ -69,7 +69,18 @@ function Rico_Training(Models,priors_used)
           loss_rep, gradRep=doStuff_Rep(Models,rep_criterion,batch,COEF_REP, action1, action2)
           TOTAL_LOSS_REP = loss_rep + TOTAL_LOSS_REP
       end
+
+      mode='make_reward_closer'
+      if applying_prior(priors_used, mode) then
+          batch = getRandomBatchFromSeparateList(BATCH_SIZE,mode)
+          loss_reward_closer, gradClose=doStuff_temp(Models,temp_criterion,batch,COEF_TEMP) --Just minimizing mse criterion, so we can use temp criterion
+          TOTAL_LOSS_CLOSE = loss_reward_closer + TOTAL_LOSS_CLOSE
+      end
+      
+
       --NOTE: shouldnt gradParameters be here  the sum of all gradRep, gradCaus, etc?
+      --Grad parameters is a tensor containing the internal gradient of the model
+      -- So the sum of gradients is already present in there !
       return loss_rep+loss_caus+loss_prop+loss_temp, gradParameters
     end
 
@@ -97,7 +108,8 @@ function train(Models, priors_used)
 
     for epoch=1, NB_EPOCHS do
        print('--------------Epoch : '..epoch..' ---------------')
-       TOTAL_LOSS_TEMP,TOTAL_LOSS_CAUS,TOTAL_LOSS_PROP, TOTAL_LOSS_REP = 0,0,0,0
+
+       TOTAL_LOSS_TEMP,TOTAL_LOSS_CAUS,TOTAL_LOSS_PROP, TOTAL_LOSS_REP, TOTAL_LOSS_CLOSE = 0,0,0,0,0
 
        xlua.progress(0, NB_BATCHES)
        for numBatch=1, NB_BATCHES do
@@ -109,6 +121,11 @@ function train(Models, priors_used)
        print("Loss Prop", TOTAL_LOSS_PROP/NB_BATCHES/BATCH_SIZE)
        print("Loss Caus", TOTAL_LOSS_CAUS/NB_BATCHES/BATCH_SIZE)
        print("Loss Rep", TOTAL_LOSS_REP/NB_BATCHES/BATCH_SIZE)
+
+       if BRING_CLOSER_REWARD then
+          print("Loss Close", TOTAL_LOSS_CLOSE/NB_BATCHES/BATCH_SIZE)
+       end
+
        save_model(Models.Model1, NAME_SAVE) --TODO Do we need to write NB_EPOCH TIMES? isnt enough the last time to write once and not overwrite NB_EPOCH TIMES?
    end
    log_model_params()
