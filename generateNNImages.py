@@ -36,7 +36,7 @@ image in the test set and it will assess the test set of 50 images defined in Co
 
 """
 
-print"\n\n >> Running generateNNImages.py...."
+print "\n\n >> Running generateNNImages.py...."
 if len(sys.argv) <= 1:
     sys.exit("Give number of neighbors to produce, followed by number of input images (and model dir if you don't want to use the last model created)")
 
@@ -60,37 +60,19 @@ if len(sys.argv) == 2:
 	use_test_set = True
 
 data_folder = get_data_folder_from_model_name(path_to_model)
-data_folder = 'staticButtonSimplest'
 # THE FOLLOWING ONLY WILL RUN IN USE_CUDA false way  #print('Calling lua subprocesses with ',data_folder)
 subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_cuda','-use_continuous','-data_folder', data_folder])  # TODO: READ CMD LINE ARGS FROM FILE INSTEAD (and set accordingly here) TO NOT HAVING TO MODIFY INSTEAD train_predict_plotStates and the python files
 subprocess.call(['th','create_all_reward.lua','-use_cuda','-use_continuous','-data_folder',data_folder])
 # TODO: ADD ,'-use_continuous'
-file_representation_string=path_to_model+"/"+LEARNED_REPRESENTATIONS_FILE
-
 
 #Parsing representation file
 #===================
-
-images=[]
-representations=[]
-
-#reading data
-file_representation  = open(file_representation_string, "r")
-for line in file_representation:
-    if line[0]!='#':
-        words = line.split()
-        images.append(words[0])
-        representations.append(words[1:])
+file_representation_string=path_to_model+"/"+LEARNED_REPRESENTATIONS_FILE
+images, representations = parse_repr_file(file_representation_string)
 
 #Parsing true state file
 #===================
-true_states = {}
-file_state = open(ALL_STATE_FILE, "r")
-
-for line in file_state:
-    if line[0]!='#':
-        words = line.split()
-        true_states[words[0]] = np.array(map(float,words[1:]))
+true_states = parse_true_state_file() #No need to send parameters, the const ALL_STATE_FILE is used
 
 # Compute nearest neighbors
 nbrs = NearestNeighbors(n_neighbors=(nbr_neighbors+1), algorithm='ball_tree').fit(representations)
@@ -111,7 +93,6 @@ if use_test_set or nbr_images == -1:
 else:
     print ('Using a random test set of images for KNN MSE evaluation...')
     data = random.sample(zip(images,indexes,distances,representations),nbr_images)
-
 
 # For each random selected images (or all images in nbr_images==-1), you take
 # the k-nearest neighbour in the REPRESENTATION SPACE (the first argv parameter)

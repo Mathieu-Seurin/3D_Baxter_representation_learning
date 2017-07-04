@@ -159,6 +159,33 @@ def file2dict(file): # DO SAME FUNCTIONS IN LUA and call at the end of set_hyper
                d[key] = map(float, values)
     return d
 
+def parse_true_state_file():
+    true_states = {}
+    file_state = open(ALL_STATE_FILE, "r")
+
+    for line in file_state:
+        if line[0]!='#':
+            words = line.split()
+            true_states[words[0]] = np.array(map(float,words[1:]))
+
+    return true_states
+
+def parse_repr_file(file_representation_string):
+
+    images=[]
+    representations=[]
+
+    #reading data
+    file_representation = open(file_representation_string, "r")
+    for line in file_representation:
+        if line[0]!='#':
+            words = line.split()
+            images.append(words[0])
+            representations.append(words[1:])
+
+    return images, representations
+
+
 
 # TODO : extend for other datasets for comparison
 IMG_TEST_SET = {

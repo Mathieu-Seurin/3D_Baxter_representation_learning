@@ -127,12 +127,16 @@ local function main(params)
    modelString = folder_and_name[2]
 
    print('Last model used: '..path..'/'..modelString)
-   if get_last_architecture_used(modelString) == 'AE' then
-      assert(not(DIFFERENT_FORMAT), "For training the auto-encoder, the model architecture needs to be in the same format as BASE_TIMNET. Change in hyperparams.lua")
-      print 'Overriding MODEL_ARCHITECTURE_FILE with BASE_TIMNET (only valid model for AE)'
-      MODEL_ARCHITECTURE_FILE = BASE_TIMNET
-   end
 
+   -- if get_last_architecture_used(modelString) == 'AE' then
+   --    assert(not(DIFFERENT_FORMAT), "For training the auto-encoder, the model architecture needs to be in the same format as BASE_TIMNET. Change in hyperparams.lua")
+   --    print 'Overriding MODEL_ARCHITECTURE_FILE with BASE_TIMNET (only valid model for AE)'
+   --    MODEL_ARCHITECTURE_FILE = BASE_TIMNET
+   -- end
+
+   -- NOT USEFUL ANYMORE : AE uses resnet now
+
+   
    local  model = torch.load(path..'/'..modelString)
    if USE_CUDA then
       model = model:cuda()

@@ -61,9 +61,12 @@ function test_model(model, list_folders_images)
    -- for num_test=1,NB_TEST-1 do
    img = getRandomBatchFromSeparateList(1, 'regular'):view(1,3,200,200):cuda()
    output = model:forward(img)
-   local img_compare = image.toDisplayTensor({img[1], output})
-   -- image.display(img)
-   image.display{image=img_compare,win=w}
+
+   if VISUALIZE_AE then
+      local img_compare = image.toDisplayTensor({img[1], output})
+      -- image.display(img)
+      image.display{image=img_compare,win=w}
+   end
 
    --    local id_test = #list_folders_images - num_test
    --    local seq = load_seq_by_id(id_test)
@@ -84,11 +87,11 @@ end
 
 local function save_decoder(model)
 
-   path = LOG_FOLDER..NAME_SAVE
+   local path = LOG_FOLDER..NAME_SAVE
    lfs.mkdir(path)
-   file_string = path..'/'..NAME_SAVE..'_decoder'..'.t7'
+   local file_string = path..'/'..NAME_SAVE..'_decoder'..'.t7'
 
-   saved = model.modules[2]:clone():float()
+   local saved = model.modules[2]:clone():float()
    torch.save(file_string, model.modules[2]) --saving only encoding module
 end
 
@@ -102,9 +105,9 @@ function train_Epoch(optimizer, list_folders_images,list_txt,Log_Folder)
    local list_corr={}
    local loss=0
 
-   test_model(model, list_folders_images)
+   --test_model(model, list_folders_images)
 
-   print("Begin Learning...")
+   print("Begin Learning... "..NB_EPOCHS.." epochs")
    for epoch=1,NB_EPOCHS do
       loss=0
       print('--------------Epoch : '..epoch..' ---------------')
@@ -117,64 +120,69 @@ function train_Epoch(optimizer, list_folders_images,list_txt,Log_Folder)
          xlua.progress(iter, nbIter)
       end
       print("DAE Mean Loss : "..loss/(nbIter*BATCH_SIZE))
-      if epoch % 5 == 0 then
-          save_autoencoder(model,name_save)
-          save_decoder(model)
+      if epoch % 1 == 0 then
+         save_autoencoder(model,name_save)
+         save_decoder(model)
       end
 
-      if epoch > 0 then
-         test_model(model, list_folders_images)
-      end
+      -- if epoch > 0 then
+      --    test_model(model, list_folders_images)
+      -- end
    end
+   test_model(model, list_folders_images)
 end
 
 function set_AE_hyperparams(params)
-    -- OVERRIDING hyperparameters since it's not for auto-encoders :  ** MAIN DIFFERENCES:
-    MODEL_ARCHITECTURE_FILE = AENET -- important to call in this order, as DIFFERENT_FORMAT is defined based on this setting. TODO idea: Pass MODEL_ARCHITECTURE_FILE as default cmd param in which is different in each script?
-    set_hyperparams(params)
-    LR = 0.0001
-    BATCH_SIZE=20
-    NB_EPOCHS = 15
-    NUM_HIDDEN = 3
-    NOISE = true
-    if params.optimiser=="sgd" then  optimizer = optim.sgd end
-    if params.optimiser=="rmsprop" then  optimizer = optim.rmsprop end
-    if params.optimiser=="adam" then optimizer = optim.adam end
-    return optimizer
+   -- OVERRIDING hyperparameters since it's not for auto-encoders :  ** MAIN DIFFERENCES:
+   MODEL_ARCHITECTURE_FILE = AENET -- important to call in this order, as DIFFERENT_FORMAT is defined based on this setting. TODO idea: Pass MODEL_ARCHITECTURE_FILE as default cmd param in which is different in each script?
+   set_hyperparams(params)
+   LR = 0.0005 --0.0001
+   BATCH_SIZE=30 --20
+   NB_EPOCHS = 15 --15
+   NUM_HIDDEN = 3
+   NOISE = true
+   if params.optimiser=="sgd" then  optimizer = optim.sgd end
+   if params.optimiser=="rmsprop" then  optimizer = optim.rmsprop end
+   if params.optimiser=="adam" then optimizer = optim.adam end
+   return optimizer
 end
 
 local function main(params)
-    print("\n\n>> learn_autoencoder.lua")
-    optimizer = set_AE_hyperparams(params)
-    print_hyperparameters()
-    print(params)
-    w = image.display(torch.Tensor(3,200,400))
-    if DIFFERENT_FORMAT then
-       error([[Don't forget to switch model to BASE_TIMNET in hyperparameters
+   print("\n\n>> learn_autoencoder.lua")
+   optimizer = set_AE_hyperparams(params)
+   print_hyperparameters()
+   print(params)
+
+   if VISUALIZE_AE then
+      w = image.display(torch.Tensor(3,200,400))
+   end
+   
+   if DIFFERENT_FORMAT then
+      error([[Don't forget to switch model to BASE_TIMNET in hyperparameters
     Because the images' format is the same for auto-encoder]])
-    end
+   end
 
-    NAME_SAVE = 'AE_'..NUM_HIDDEN..NAME_SAVE
-    print('NAME SAVE IN set_AE_hyp:  '..NAME_SAVE)
-    local list_folders_images, list_txt=Get_HeadCamera_View_Files(DATA_FOLDER)
+   NAME_SAVE = 'AE_'..NUM_HIDDEN..NAME_SAVE
+   print('NAME SAVE IN set_AE_hyp:  '..NAME_SAVE)
+   local list_folders_images, list_txt=Get_HeadCamera_View_Files(DATA_FOLDER)
 
-    NB_TEST = 3
-    NB_SEQUENCES = #list_folders_images-NB_TEST --That way, the last X sequences are used as test
+   NB_TEST = 3
+   NB_SEQUENCES = #list_folders_images-NB_TEST --That way, the last X sequences are used as test
 
-    ALL_SEQ = precompute_all_seq()
+   ALL_SEQ = precompute_all_seq()
 
-    image_width=IM_LENGTH
-    image_height=IM_HEIGHT
+   image_width=IM_LENGTH
+   image_height=IM_HEIGHT
 
-    require('./models/autoencoder_conv')
-    model = getModel()
-    print(model)
-    model=model:cuda()
+   require('./models/autoencoder_conv')
+   model = getModel()
+   print(model)
+   model=model:cuda()
 
-    parameters,gradParameters = model:getParameters()
-    train_Epoch(optimizer, list_folders_images,list_txt,Log_Folder)
+   parameters,gradParameters = model:getParameters()
+   train_Epoch(optimizer, list_folders_images,list_txt,Log_Folder)
 
-    imgs={} --memory is free!!!!!
+   imgs={} --memory is free!!!!!
 end
 
 
