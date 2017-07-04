@@ -16,9 +16,8 @@ require 'hyperparams'
 ------DEFAULTS (IF NOT COMMAND LINE ARGS ARE PASSED)
 
 USE_CUDA = true
-USE_SECOND_GPU = true
-USE_CONTINUOUS = false
-
+USE_SECOND_GPU = false
+USE_CONTINUOUS = true
 MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.5
 CONTINUOUS_ACTION_SIGMA = 0.1
 DATA_FOLDER = MOBILE_ROBOT --works best!
@@ -29,7 +28,6 @@ if USE_CUDA then
 end
 
 if USE_CUDA and USE_SECOND_GPU then
-   print("here")
    cutorch.setDevice(2)
 end
 
@@ -59,7 +57,7 @@ VISUALIZE_IMAGES_TAKEN = false
 VISUALIZE_CAUS_IMAGE = false
 VISUALIZE_IMAGE_CROP = false
 VISUALIZE_MEAN_STD = false
-VISUALIZE_AE = false
+-- VISUALIZE_AE = true
 
 IM_CHANNEL = 3 --image channels (RGB)
 ACTION_AMPLITUDE = 0.01
@@ -263,7 +261,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
         MAX_TABLE = {0.8,0.7,10} -- for x,y,z
 
         DIMENSION_IN = 3
-        --DIMENSION_OUT = 3
+        DIMENSION_OUT = 3
 
         REWARD_INDEX = 2 --2 reward values: -0, 1 ?
         INDEX_TABLE = {2,3,4} --column index for coordinates in state file, respectively (x,y,z)

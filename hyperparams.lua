@@ -27,6 +27,7 @@ BASE_TIMNET = './models/topUniqueSimplerWOTanh'--ImageNet-inspired Convolutional
 --MODEL_ARCHITECTURE_FILE = BASE_TIMNET--without last layer as Tanh, use it for AE
 MODEL_ARCHITECTURE_FILE = RESNET
 
+
 --==================================================
 -- Hyperparams : Learning rate, batchsize, USE_CUDA etc...
 --==================================================
@@ -35,6 +36,7 @@ MODEL_ARCHITECTURE_FILE = RESNET
 -- by randomly sampling states (begin point and end point). CLAMP_CAUSALITY,
 -- on the contrary, takes the next consecutive action
 -- Cannot be applied in every scenario !!!!
+
 EXTRAPOLATE_ACTION = false
 EXTRAPOLATE_ACTION_CAUS = false
 --TODO shall it be true for continuous actions too always?
@@ -45,11 +47,11 @@ BRING_CLOSER_REF_POINT = true
 -- Create a point where the robot wants the state to be very similar. Like a reference point for the robot.
 
 LR=0.0001
-LR_DECAY = 1*1e-6
+LR_DECAY = 3*1e-6
 
 SGD_METHOD = 'adam' -- Can be adam or adagrad
-BATCH_SIZE = 13
-NB_EPOCHS=15
+BATCH_SIZE = 10
+NB_EPOCHS=1
 
 DATA_AUGMENTATION = 0.01
 NORMALIZE_IMAGE = true

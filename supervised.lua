@@ -1,4 +1,3 @@
--- TODO change local var batchsize to global BATCH_SIZE
 require 'nn'
 require 'optim'
 require 'image'
@@ -113,7 +112,7 @@ function evaluate(Model, data)
   return err
 end
 
-function train(Model, indice_val, verbose, final, evalTrain)
+function train(Model, verbose, final)
   -- For simpleData3D at the moment. Training using sequences 1-7, 8 as test.
   -- Given an indice_val, train and return the *errors* on training set as well
   -- as on validation set.
@@ -130,42 +129,38 @@ function train(Model, indice_val, verbose, final, evalTrain)
   local final = final or false
   local verbose = verbose or false
   local evalTrain = evalTrain or false -- output only evaluation on train set, as sanity check
-  local nb_batches = math.ceil(NB_SEQUENCES * 90 / batchSize)
-  local LRhalflife = 10
+  local nb_batches = math.ceil(NB_SEQUENCES * AVG_FRAMES_PER_RECORD / batchSize)
 
   local parameters, gradParameters = Model:getParameters()
   if verbose then
     print("============ Verbose mode =========")
     xlua.progress(0, nb_epochs)
-    logger = optim.Logger('Log/' ..DATA_FOLDER..'Epoch'..nb_epochs..'Batch'..batchSize..'LR'..LR..'val'..indice_val..'.log')
+    logger = optim.Logger('Log/' ..DATA_FOLDER..'Epoch'..nb_epochs..'Batch'..batchSize..'LR'..LR..'TEST'..NB_TEST..'.log')
     logger:setNames{'Validation Accuracy'}
     logger:display(false)
   end
-  local optimState = {LearningRate = LR}
+  local optimState = {learningRate = LR, learningRateDecay = LR_DECAY}
 
   -- Generate index, i = NB_SEQUENCES is the test set
+  print("============ Using a test set of size ", NB_TEST)
+
+  if final then
+      NB_TRAIN = NB_SEQUENCES
+  else
+      NB_TRAIN = NB_SEQUENCES - NB_TEST
+  end
   local index_train = {}
-  for i = 1, NB_SEQUENCES - 1 do
+  local index_test = {}
+  for i = 1, NB_TRAIN do
     index_train[i] = i
   end
-  if final then
-    index_train[NB_SEQUENCES] = NB_SEQUENCES
-    local indice_val = NB_SEQUENCES
-  end
-  table.remove(index_train, indice_val)
-
-  if evalTrain then
-    local indice_val = index_train[1]
+  for i = 1, NB_TEST do
+      index_test[i] = NB_TRAIN + i
   end
 
   local err_val = torch.Tensor(nb_epochs)
   local LRcount = 0
   for epoch = 1, nb_epochs do
-    if LRcount == LRhalflife then
-      lr = lr * 0.5
-      LRcount = 0
-      print("Learning rate reduced by half at epoch ", epoch)
-    end
     LRcount = LRcount + 1
     optimState = {LearningRate = lr}
     for batch = 1, nb_batches do
@@ -204,9 +199,10 @@ function train(Model, indice_val, verbose, final, evalTrain)
           return loss, gradParameters
       end
       -- xlua.progress(batch, nb_batches)
-      optim.adam(feval, parameters, optimState) -- or adam
+      parameters, loss = optim.adam(feval, parameters, optimState) -- or adam
     end
-    err_val[epoch] = evaluate(Model, load_seq_by_id(indice_val))
+    -- err_val[epoch] = evaluate(Model, load_seq_by_id(indice_val))
+    err_val[epoch] = loss[1]
     if verbose then
       logger:add{err_val[epoch]}
       logger:style{'+-'}
@@ -285,11 +281,25 @@ function test_run(verbose)
   if USE_CUDA then
     Model = Model:cuda()
   end
-  _, err = train(Model, indice_val, verbose, true, false)
-  print(evaluate(Model, load_seq_by_id(indice_val)))
-  printSamples(Model, indice_val, 3)
+  NB_TEST = 2
+  NB_TRAIN = NB_SEQUENCES - NB_TEST
+  _, err = train(Model, verbose, false)
   NAME_SAVE = 'Supervised_'..DATA_FOLDER
   save_model(Model)
+
+  local error_train = 0
+  local error_test = 0
+  for i = 1, NB_TEST do
+      error_test = error_test + evaluate(Model, load_seq_by_id(NB_TRAIN + i))
+  end
+  for i = 1, NB_TRAIN do
+      error_train = error_train + evaluate(Model, load_seq_by_id(i))
+  end
+  error_test = error_test / NB_TEST
+  error_train = error_train / NB_TRAIN
+  print("The errors on the training and test set are: ", error_train, error_test)
+
+  -- printSamples(Model, indice_val, 3)
   ------ test if reinitiation works --------
   -- print(parameters:sum())
   -- reinitNet()

@@ -36,14 +36,14 @@ image in the test set and it will assess the test set of 50 images defined in Co
 
 """
 
-print "\n\n >> Running generateNNImages.py...."
+print"\n\n >> Running generateNNImages.py...."
 if len(sys.argv) <= 1:
     sys.exit("Give number of neighbors to produce, followed by number of input images (and model dir if you don't want to use the last model created)")
 
 # Some parameters
 nbr_neighbors= int(sys.argv[1])
 nbr_images = -1
-use_test_set = False
+use_test_set = True
 with_title = False
 
 lastModelFile = open(LAST_MODEL_FILE)
@@ -60,6 +60,7 @@ if len(sys.argv) == 2:
 	use_test_set = True
 
 data_folder = get_data_folder_from_model_name(path_to_model)
+
 # THE FOLLOWING ONLY WILL RUN IN USE_CUDA false way  #print('Calling lua subprocesses with ',data_folder)
 subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_cuda','-use_continuous','-data_folder', data_folder])  # TODO: READ CMD LINE ARGS FROM FILE INSTEAD (and set accordingly here) TO NOT HAVING TO MODIFY INSTEAD train_predict_plotStates and the python files
 subprocess.call(['th','create_all_reward.lua','-use_cuda','-use_continuous','-data_folder',data_folder])
@@ -84,7 +85,6 @@ last_model_name = path_to_model.split('/')[-1]
 print "path_to_model: ",path_to_model
 print "path_to_neighbours: ",path_to_neighbour
 #shutil.rmtree('NearestNeighbors', 1)
-
 if not os.path.exists(path_to_neighbour):
 	os.mkdir(path_to_neighbour)
 
@@ -93,6 +93,7 @@ if use_test_set or nbr_images == -1:
 else:
     print ('Using a random test set of images for KNN MSE evaluation...')
     data = random.sample(zip(images,indexes,distances,representations),nbr_images)
+
 
 # For each random selected images (or all images in nbr_images==-1), you take
 # the k-nearest neighbour in the REPRESENTATION SPACE (the first argv parameter)

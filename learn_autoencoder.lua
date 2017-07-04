@@ -160,29 +160,29 @@ local function main(params)
    if DIFFERENT_FORMAT then
       error([[Don't forget to switch model to BASE_TIMNET in hyperparameters
     Because the images' format is the same for auto-encoder]])
-   end
+    end
 
    NAME_SAVE = 'AE_'..NUM_HIDDEN..NAME_SAVE
    print('NAME SAVE IN set_AE_hyp:  '..NAME_SAVE)
    local list_folders_images, list_txt=Get_HeadCamera_View_Files(DATA_FOLDER)
 
-   NB_TEST = 3
-   NB_SEQUENCES = #list_folders_images-NB_TEST --That way, the last X sequences are used as test
+    NB_TEST = 3
+    NB_SEQUENCES = #list_folders_images-NB_TEST --That way, the last X sequences are used as test
 
-   ALL_SEQ = precompute_all_seq()
+    ALL_SEQ = precompute_all_seq()
 
-   image_width=IM_LENGTH
-   image_height=IM_HEIGHT
+    image_width=IM_LENGTH
+    image_height=IM_HEIGHT
 
-   require('./models/autoencoder_conv')
-   model = getModel()
-   print(model)
-   model=model:cuda()
+    require('./models/autoencoder_conv')
+    model = getModel()
+    print(model)
+    model=model:cuda()
 
-   parameters,gradParameters = model:getParameters()
-   train_Epoch(optimizer, list_folders_images,list_txt,Log_Folder)
+    parameters,gradParameters = model:getParameters()
+    train_Epoch(optimizer, list_folders_images,list_txt,Log_Folder)
 
-   imgs={} --memory is free!!!!!
+    imgs={} --memory is free!!!!!
 end
 
 
@@ -191,7 +191,7 @@ local cmd = torch.CmdLine()
 cmd:option('-optimiser', 'adam', 'Optimiser : adam|sgd|rmsprop')
 cmd:option('-model', 'DAE', 'model : AE|DAE')
 cmd:option('-use_cuda', true, 'true to use GPU, false (default) for CPU only mode')
-cmd:option('-use_continuous', false, 'true to use a continuous action space, false (default) for discrete one (0.5 range actions)')
+cmd:option('-use_continuous', true, 'true to use a continuous action space, false (default) for discrete one (0.5 range actions)')
 cmd:option('-data_folder', STATIC_BUTTON_SIMPLEST, 'Possible Datasets to use: staticButtonSimplest, mobileRobot, staticButtonSimplest, simpleData3D, pushingButton3DAugmented, babbling')
 cmd:option('-mcd', 0.5, 'Max cosine distance')
 cmd:option('-sigma', 0.1, 'Max cosine distance')
