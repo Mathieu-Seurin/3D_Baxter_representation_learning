@@ -150,7 +150,7 @@ function getRandomBatchFromSeparateList(batch_size, mode)
 
    if mode=="Prop" or mode=="Rep" then
       batch=torch.Tensor(4, batch_size, IM_CHANNEL, IM_LENGTH, IM_HEIGHT)
-   elseif mode=='Caus' or mode=='Temp' or mode=='make_reward_closer' then
+   elseif mode=='Caus' or mode=='Temp' or mode=='make_reward_closer' or mode=='fixed_point' then
       batch=torch.Tensor(2, batch_size, IM_CHANNEL, IM_LENGTH, IM_HEIGHT)
    else
       batch=torch.Tensor(batch_size, IM_CHANNEL, IM_LENGTH, IM_HEIGHT)
@@ -202,6 +202,12 @@ function getRandomBatchFromSeparateList(batch_size, mode)
 
       elseif mode=='make_reward_closer' then
          set=get_one_random_reward_close_set(data1.Infos, data2.Infos)
+         im1,im2 = data1.images[set.im1], data2.images[set.im2]
+         batch[1][i]=im1
+         batch[2][i]=im2
+
+      elseif mode=='fixed_point' then
+         set=get_one_fixed_point_set(data1.Infos, data2.Infos)
          im1,im2 = data1.images[set.im1], data2.images[set.im2]
          batch[1][i]=im1
          batch[2][i]=im2

@@ -333,7 +333,7 @@ function get_one_random_reward_close_set(Infos1, Infos2)
       repeat
          id_ref_state= torch.random(1,size1)
          reward1 = Infos1.reward[id_ref_state]
-      until (reward1~=2)
+      until (reward1~=2) --until (reward1==1)
       -- Since all rewards are different from 2
       -- it means that you take the first action you got
       -- I did this because it's easier if you want to group only certain reward
@@ -350,6 +350,53 @@ function get_one_random_reward_close_set(Infos1, Infos2)
    end
 
    error("CLOSE WATCHDOG ATTACK!!!!!!!!!!!!!!!!!!")
+end
+
+
+function get_one_fixed_point_set(Infos1, Infos2)
+
+   local function get_coord(info,id)
+      coord = torch.Tensor(DIMENSION_IN)
+      for dim=1,DIMENSION_IN do
+         coord[dim] = arrondit(infos[dim][id],0.02)
+      end
+      return coord
+   end
+
+   local function is_same(t1,t2)
+      for dim=1,DIMENSION_IN do
+         if t1[dim] ~= t2[dim] then
+            return false
+         end
+      end
+      return true
+   end
+
+   local function look_for_ref(info,fixed_point)
+      local id = 0
+      local size1=#info[1]
+
+      for i=1,size1 do
+         coord1 = get_coord(info,i)
+         if is_same(coord1, fixed_point) then
+            id = i
+            break
+         end
+      end
+      assert(id~=0,"Need at least 1 state being the ref point in seq")
+      return id
+   end
+
+   local fixed_point_round = torch.Tensor(DIMENSION_IN)
+
+   for i=1,DIMENSION_IN do
+      fixed_point_round[i] = arrondit(FIXED_POS[i])
+   end
+
+   id1 = look_for_ref(Infos1,fixed_point_round)
+   id2 = look_for_ref(Infos2,fixed_point_round)
+
+   return {im1=id1, im2=id2}
 end
 
 
