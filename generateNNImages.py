@@ -9,7 +9,7 @@ import pandas as pd
 import os, os.path
 import subprocess
 from Utils import ALL_STATE_FILE, LEARNED_REPRESENTATIONS_FILE, LAST_MODEL_FILE, GLOBAL_SCORE_LOG_FILE, IMG_TEST_SET
-from Utils import get_data_folder_from_model_name, file2dict
+from Utils import get_data_folder_from_model_name, file2dict, parse_repr_file, parse_true_state_file
 import unittest
 test = unittest.TestCase('__init__')
 
