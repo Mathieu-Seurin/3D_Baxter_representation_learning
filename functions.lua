@@ -208,7 +208,20 @@ function getRandomBatchFromSeparateList(batch_size, mode)
          batch[2][i]=im2
 
       elseif mode=='fixed_point' then
-         set=get_one_fixed_point_set(data1.Infos, data2.Infos)
+         local seqThatMatch = false
+         while not seqThatMatch do
+            set=get_one_fixed_point_set(data1.Infos, data2.Infos)
+            if set then
+               seqThatMatch = true
+            else
+               --Since the point doesn't exist in seq, find other seq
+               INDEX1=torch.random(1,NB_SEQUENCES)
+               INDEX2=torch.random(1,NB_SEQUENCES)
+               data1 = ALL_SEQ[INDEX1]
+               data2 = ALL_SEQ[INDEX2]
+            end
+               
+         end
          im1,im2 = data1.images[set.im1], data2.images[set.im2]
          batch[1][i]=im1
          batch[2][i]=im2
