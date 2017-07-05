@@ -25,7 +25,7 @@ MOBILE_ROBOT = 'mobileRobot'
 SIMPLEDATA3D = 'simpleData3D'
 PUSHING_BUTTON_AUGMENTED = 'pushingButton3DAugmented'
 STATIC_BUTTON_SIMPLEST = 'staticButtonSimplest'
-COMPLEXDATA = 'complexData'
+COMPLEX_DATA = 'complexData'
 
 # 2 options of plotting:
 LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
@@ -63,8 +63,8 @@ def get_data_folder_from_model_name(model_name):
         return PUSHING_BUTTON_AUGMENTED
     elif STATIC_BUTTON_SIMPLEST in model_name:
         return STATIC_BUTTON_SIMPLEST
-    elif COMPLEXDATA in model_name:
-        return COMPLEXDATA
+    elif COMPLEX_DATA in model_name:
+        return COMPLEX_DATA
     else:
         print "Unsupported dataset!"
 

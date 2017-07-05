@@ -9,6 +9,8 @@ import sys
 
 from Utils import parse_true_state_file, parse_repr_file, LAST_MODEL_FILE,get_data_folder_from_model_name,LEARNED_REPRESENTATIONS_FILE
 
+from sklearn.metrics.pairwise import euclidean_distances
+
 
 #File should be called after generateNNImages
 
@@ -25,48 +27,44 @@ data_folder = get_data_folder_from_model_name(path_to_model)
 file_representation_string=path_to_model+"/"+LEARNED_REPRESENTATIONS_FILE
 images, representations = parse_repr_file(file_representation_string)
 
-
 true_states = parse_true_state_file()
 
-data=zip(images, representations)
-data1 = random.sample(data,len(images))
-data2 = random.sample(data,len(images))
 
-for a in range(1,500):
-    data1 = data1 + random.sample(data, len(images))
-    data2 = data2 + random.sample(data, len(images))
+# convert learned states to numpy
+learned_states = np.asarray([map(float,x) for x in representations])
 
-print len(data1)
-
-
-min_dist= 1e8
-max_dist=0
-sum_dist=0
-nb_dist=0
-
-for a in zip(data1,data2):
-    i1=a[0][0]
-    i2=a[1][0]
-    r1=np.asarray(map(float,a[0][1]))
-    r2=np.asarray(map(float,a[1][1]))
-
-    s1=true_states[i1]
-    s2=true_states[i2]
-
-    dist_true=np.linalg.norm(s1-s2)
-    dist_repr=np.linalg.norm(r1-r2)
-
-    if (dist_true>0.1) & (dist_repr>0.1):
-        dist = dist_true / dist_repr
-
-        sum_dist = sum_dist + dist
-        nb_dist=nb_dist+1
-        if (dist<min_dist):
-            min_dist=dist
-        if (dist>max_dist):
-            max_dist=dist
+# compute distance matrix for learned states
+learned_distances = euclidean_distances(learned_states)
+learned_non_zero =learned_distances[learned_distances.nonzero()]
+print 'Learned states : min dist ',learned_non_zero.min(), ' max dist : ', learned_non_zero.max(), ' mean dist : ', learned_non_zero.mean()
 
 
-print 'Distorsion :', max_dist/min_dist
+# convert true states to numpy
+ref_states = np.asarray([true_states[x] for x in images])
 
-print 'Mean Distorsion :' , (sum_dist/nb_dist)/min_dist
+# compute distance matrix for ref states
+ref_distances = euclidean_distances(ref_states)
+ref_non_zero =ref_distances[ref_distances.nonzero()]
+print 'True states : min dist ',ref_non_zero.min(), ' max dist : ', ref_non_zero.max(), ' mean dist : ', ref_non_zero.mean()
+
+
+# compute relative distance
+ref_distances[ref_distances==0]=1 # in order avoid division by zero
+coefs = np.triu(np.divide(learned_distances,ref_distances)) # keep only upper triangle
+
+
+# find min/max
+coefs[coefs==0]=np.Inf # remove diagonal
+global_min_coef = coefs.min()  # global minimum
+local_min_coef = coefs[ref_distances <0.1].min() # min for points with true state dis < 0.1
+far_min_coef = coefs[ref_distances >0.1].min() # min for points with true state dis > 0.1
+
+coefs[coefs==np.Inf]=-np.Inf
+global_max_coef = coefs.max()
+local_max_coef = coefs[ref_distances <0.1].max()
+far_max_coef = coefs[ref_distances >0.1].max()
+
+print 'Global Distorsion :', global_max_coef/global_min_coef
+print 'Local Distorsion :', local_max_coef/local_min_coef
+print 'Far Distorsion :', far_max_coef/far_min_coef
+

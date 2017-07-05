@@ -6,6 +6,7 @@ import shutil
 import random
 import sys
 import pandas as pd
+from PIL import Image
 import os, os.path
 import subprocess
 from Utils import ALL_STATE_FILE, LEARNED_REPRESENTATIONS_FILE, LAST_MODEL_FILE, GLOBAL_SCORE_LOG_FILE, IMG_TEST_SET
@@ -43,7 +44,7 @@ if len(sys.argv) <= 1:
 # Some parameters
 nbr_neighbors= int(sys.argv[1])
 nbr_images = -1
-use_test_set = True
+use_test_set = False # TODO: make test set for complexData
 with_title = False
 
 lastModelFile = open(LAST_MODEL_FILE)
@@ -117,7 +118,8 @@ for img_name,id,dist,state in data:
     fig.set_size_inches(6*(nbr_neighbors+1), 6)
     a=fig.add_subplot(1,nbr_neighbors+1,1)
     a.axis('off')
-    img = mpimg.imread(img_name)
+    # img = mpimg.imread(img_name)
+    img = Image.open(img_name)
     imgplot = plt.imshow(img)
     state_str='[' + ",".join(['{:.3f}'.format(float(x)) for x in state]) + "]"
 
@@ -129,7 +131,8 @@ for img_name,id,dist,state in data:
     for i in range(0,nbr_neighbors):
             a=fig.add_subplot(1,nbr_neighbors+1,i+2)
             img_name=images[id[i+1]]
-            img = mpimg.imread(img_name)
+            # img = mpimg.imread(img_name)
+            img = Image.open(img_name)
             imgplot = plt.imshow(img)
 
             base_name_n= os.path.splitext(os.path.basename(img_name))[0]

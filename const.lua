@@ -284,6 +284,36 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
            -- See arrondit for more details
         end
 
+    elseif DATA_FOLDER == COMPLEX_DATA then
+        CLAMP_CAUSALITY = true --TODO: make false when continuous works
+
+        FIXED_POS = {0.587, -0.036, -0.143}
+        -- A point where the robot wants the state to be very similar. Like a reference point for the robot
+
+        MIN_TABLE = {0.42,-0.1,-0.11} -- for x,y,z
+        MAX_TABLE = {0.75,0.60,0.35} -- for x,y,z
+
+        DIMENSION_IN = 3
+        DIMENSION_OUT = 3
+
+        REWARD_INDEX = 2 --2 reward values: -0, 1 ?
+        INDEX_TABLE = {2,3,4} --column index for coordinates in state file, respectively (x,y,z)
+
+        DEFAULT_PRECISION = 0.05 -- for 'arrondit' function
+        FILENAME_FOR_REWARD = "recorded_button1_is_pressed.txt"
+        FILENAME_FOR_ACTION = "recorded_robot_limb_left_endpoint_action.txt" -- Never written, always computed on the fly
+        FILENAME_FOR_STATE = "recorded_robot_limb_left_endpoint_state.txt"
+
+        SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
+        AVG_FRAMES_PER_RECORD = 200  --HINT: reduce for fast full epoch testing in CPU mode
+
+        if BRING_CLOSER_REWARD then
+           PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","make_reward_closer"}}
+        end
+
+        if BRING_CLOSER_REF_POINT then
+           PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","fixed_pos"}}
+        end
 
     else
       print("No supported data folder provided, please add either of the data folders defined in hyperparams: "..BABBLING..", "..MOBILE_ROBOT.." "..SIMPLEDATA3D..' or others in const.lua' )
@@ -406,4 +436,3 @@ IMG_TEST_SET = {
 'staticButtonSimplest/record_052/recorded_cameras_head_camera_2_image_compressed/frame00008.jpg',
 'staticButtonSimplest/record_052/recorded_cameras_head_camera_2_image_compressed/frame00068.jpg',
 'staticButtonSimplest/record_052/recorded_cameras_head_camera_2_image_compressed/frame00025.jpg'}
-
