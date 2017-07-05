@@ -76,11 +76,17 @@ function Rico_Training(Models,priors_used)
           loss_reward_closer, gradClose=doStuff_temp(Models,temp_criterion,batch,COEF_TEMP) --Just minimizing mse criterion, so we can use temp criterion
           TOTAL_LOSS_CLOSE = loss_reward_closer + TOTAL_LOSS_CLOSE
       end
-      
+
+      mode='fixed_point'
+      if applying_prior(priors_used, mode) then
+          batch = getRandomBatchFromSeparateList(BATCH_SIZE,mode)
+          loss_reward_closer, gradClose=doStuff_temp(Models,temp_criterion,batch,COEF_TEMP) --Just minimizing mse criterion, so we can use temp criterion
+          TOTAL_LOSS_CLOSE = loss_reward_closer + TOTAL_LOSS_CLOSE
+      end
 
       --NOTE: shouldnt gradParameters be here  the sum of all gradRep, gradCaus, etc?
-      --Grad parameters is a tensor containing the internal gradient of the model
-      -- So the sum of gradients is already present in there !
+      --Grad parameters is a tensor containing the internal gradient of all model's parameters
+      -- So the sum of gradients is already present in there
       return loss_rep+loss_caus+loss_prop+loss_temp, gradParameters
     end
 

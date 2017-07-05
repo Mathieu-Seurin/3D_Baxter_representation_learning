@@ -43,6 +43,8 @@ EXTRAPOLATE_ACTION_CAUS = false
 -- Always : i don't think so, but trying to see if it works better with it, why not
 
 BRING_CLOSER_REWARD = false
+BRING_CLOSER_REF_POINT = true
+-- Create a point where the robot wants the state to be very similar. Like a reference point for the robot.
 
 LR=0.0001
 LR_DECAY = 3*1e-6

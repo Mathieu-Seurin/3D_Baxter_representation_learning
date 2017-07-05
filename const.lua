@@ -254,6 +254,9 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
     elseif DATA_FOLDER == STATIC_BUTTON_SIMPLEST then
         CLAMP_CAUSALITY = true --TODO: make false when continuous works
 
+        FIXED_POS = {0.587, -0.036, -0.143}
+        -- A point where the robot wants the state to be very similar. Like a reference point for the robot
+
         MIN_TABLE = {0.42,-0.2,-10} -- for x,y,z
         MAX_TABLE = {0.8,0.7,10} -- for x,y,z
 
@@ -273,6 +276,10 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
 
         if BRING_CLOSER_REWARD then
            PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","make_reward_closer"}}
+        end
+
+        if BRING_CLOSER_REF_POINT then
+           PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","fixed_pos"}}
         end
 
 
