@@ -1,6 +1,3 @@
-tnt = require 'torchnet'
-vision = require 'torchnet-vision'
-
 local M = {}
 function file_exists(name)
    --tests whether the file can be opened for reading

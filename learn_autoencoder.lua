@@ -140,7 +140,7 @@ function set_AE_hyperparams(params)
    LR_DECAY = 3*1e-6
 
    BATCH_SIZE= 20
-   NB_EPOCHS = 25
+   NB_EPOCHS = 50
    NUM_HIDDEN = 3
    NOISE = true
    if params.optimiser=="sgd" then  optimizer = optim.sgd end

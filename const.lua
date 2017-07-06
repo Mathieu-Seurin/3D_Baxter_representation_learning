@@ -288,6 +288,16 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
         CLAMP_CAUSALITY = true --TODO: make false when continuous works
 
         FIXED_POS = {0.587, -0.036, -0.143}
+        FIXED_POS = {0.420, 0.158, 0.237}
+
+        FIXED_POS = {0.588, 0.074, 0.142}
+
+        --Rand1
+        FIXED_POS = {0.52, 0.200, 0.200}
+
+        --Rand2
+        FIXED_POS = {0.673, -0.0888, 0.087}
+
         -- A point where the robot wants the state to be very similar. Like a reference point for the robot
 
         MIN_TABLE = {0.42,-0.1,-0.11} -- for x,y,z
@@ -296,7 +306,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
         DIMENSION_IN = 3
         DIMENSION_OUT = 3
 
-        REWARD_INDEX = 2 --2 reward values: -0, 1 ?
+        REWARD_INDEX = 2 -- Which column in the reward file indicates the value of reward ?
         INDEX_TABLE = {2,3,4} --column index for coordinates in state file, respectively (x,y,z)
 
         DEFAULT_PRECISION = 0.05 -- for 'arrondit' function

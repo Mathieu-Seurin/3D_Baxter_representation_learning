@@ -73,14 +73,14 @@ function Rico_Training(Models,priors_used)
       mode='make_reward_closer'
       if applying_prior(priors_used, mode) then
           batch = getRandomBatchFromSeparateList(BATCH_SIZE,mode)
-          loss_reward_closer, gradClose=doStuff_temp(Models,temp_criterion,batch,COEF_TEMP) --Just minimizing mse criterion, so we can use temp criterion
+          loss_reward_closer, gradClose=doStuff_temp(Models,temp_criterion,batch,COEF_CLOSE) --Just minimizing mse criterion, so we can use temp criterion
           TOTAL_LOSS_CLOSE = loss_reward_closer + TOTAL_LOSS_CLOSE
       end
 
       mode='fixed_point'
       if applying_prior(priors_used, mode) then
           batch = getRandomBatchFromSeparateList(BATCH_SIZE,mode)
-          loss_fix, gradClose=doStuff_temp(Models,temp_criterion,batch,COEF_TEMP) --Just minimizing mse criterion, so we can use temp criterion
+          loss_fix, gradClose=doStuff_temp(Models,temp_criterion,batch,COEF_FIX) --Just minimizing mse criterion, so we can use temp criterion
           TOTAL_LOSS_FIX = loss_fix + TOTAL_LOSS_FIX
       end
 
@@ -96,8 +96,10 @@ function Rico_Training(Models,priors_used)
 
     if SGD_METHOD == 'adagrad' then
         parameters,loss = optim.adagrad(feval,parameters,optimState)
-    else
+    elseif SGD_METHOD == 'adam' then
         parameters,loss = optim.adam(feval,parameters,optimState)
+    else
+       parameters,loss = optim.adamax(feval,parameters,optimState)
     end
 
     -- loss[1] table of one value transformed in just a value

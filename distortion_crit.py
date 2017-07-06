@@ -64,7 +64,25 @@ global_max_coef = coefs.max()
 local_max_coef = coefs[ref_distances <0.1].max()
 far_max_coef = coefs[ref_distances >0.1].max()
 
-print 'Global Distorsion :', global_max_coef/global_min_coef
-print 'Local Distorsion :', local_max_coef/local_min_coef
-print 'Far Distorsion :', far_max_coef/far_min_coef
+score_file = open(path_to_model+'/scoreNN.txt','a')
+
+
+global_distortion =  global_max_coef/global_min_coef
+global_str = '\nGlobal Distortion : '+str(global_distortion)
+print global_str
+score_file.write(global_str+'\n')
+
+
+local_distortion = local_max_coef/local_min_coef
+local_str = "local distortion : "+str(local_min_coef)
+print local_str
+score_file.write(local_str+'\n')
+
+far_distortion = far_max_coef/far_min_coef
+far_str = 'Far Distortion : '+str(far_distortion)
+print far_str
+score_file.write(far_str+'\n')
+
+score_file.close()
+
 
