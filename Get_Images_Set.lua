@@ -1,4 +1,4 @@
-require 'const'
+ require 'const'
 --require 'functions' -- for cosineDistance
 
 ---------------------------------------------------------------------------------------
@@ -358,14 +358,14 @@ function get_one_fixed_point_set(Infos1, Infos2)
    local function get_coord(info,id)
       coord = torch.Tensor(DIMENSION_IN)
       for dim=1,DIMENSION_IN do
-         coord[dim] = arrondit(infos[dim][id],0.02)
+         coord[dim] = info[dim][id]
       end
       return coord
    end
 
    local function is_same(t1,t2)
       for dim=1,DIMENSION_IN do
-         if t1[dim] ~= t2[dim] then
+         if t1[dim] < t2[dim]-ROUNDING_VALUE_FIX or t1[dim]>t2[dim]+ROUNDING_VALUE_FIX  then
             return false
          end
       end
@@ -376,27 +376,27 @@ function get_one_fixed_point_set(Infos1, Infos2)
       local id = 0
       local size1=#info[1]
 
-      for i=1,size1 do
+      for _,i in ipairs(torch.totable(torch.randperm(size1))) do
          coord1 = get_coord(info,i)
          if is_same(coord1, fixed_point) then
             id = i
             break
          end
       end
-      assert(id~=0,"Need at least 1 state being the ref point in seq")
       return id
    end
 
-   local fixed_point_round = torch.Tensor(DIMENSION_IN)
-
-   for i=1,DIMENSION_IN do
-      fixed_point_round[i] = arrondit(FIXED_POS[i])
-   end
+   local fixed_point_round = torch.Tensor(FIXED_POS)
 
    id1 = look_for_ref(Infos1,fixed_point_round)
    id2 = look_for_ref(Infos2,fixed_point_round)
 
-   return {im1=id1, im2=id2}
+   if id1~=0 and id2~=0 then
+      return {im1=id1, im2=id2}
+   else
+      return nil
+   end
+   
 end
 
 
@@ -409,7 +409,6 @@ end
 function arrondit(value, prec)
    local prec = prec or DEFAULT_PRECISION
    divFactor = 1/prec
-
    floor=math.floor(value*divFactor)/divFactor
    ceil=math.ceil(value*divFactor)/divFactor
    if math.abs(value-ceil)>math.abs(value-floor) then result=floor

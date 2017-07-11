@@ -47,7 +47,7 @@ function AE_Training(model, batch, optimizer)
       --print(gradInput:mean())
       return loss,gradParameters
    end
-   optimState={learningRate=LR}
+   optimState={learningRate=LR, learningRateDecay=LR_DECAY}
    parameters, loss=optimizer(feval, parameters, optimState)
 
    return loss[1]
@@ -136,9 +136,11 @@ function set_AE_hyperparams(params)
    -- OVERRIDING hyperparameters since it's not for auto-encoders :  ** MAIN DIFFERENCES:
    MODEL_ARCHITECTURE_FILE = AENET -- important to call in this order, as DIFFERENT_FORMAT is defined based on this setting. TODO idea: Pass MODEL_ARCHITECTURE_FILE as default cmd param in which is different in each script?
    set_hyperparams(params)
-   LR = 0.0005 --0.0001
-   BATCH_SIZE=30 --20
-   NB_EPOCHS = 15 --15
+   LR = 0.0001
+   LR_DECAY = 3*1e-6
+
+   BATCH_SIZE= 20
+   NB_EPOCHS = 50
    NUM_HIDDEN = 3
    NOISE = true
    if params.optimiser=="sgd" then  optimizer = optim.sgd end

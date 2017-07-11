@@ -18,7 +18,7 @@ def is_in_bound(coordinate):
             return False
     return True
 
-database_folder =  'staticButtonSimplest/'
+database_folder =  'staticButtonSimplest/' 
 reward_file_name = 'recorded_button1_is_pressed.txt'
 
 for record in os.listdir(database_folder):

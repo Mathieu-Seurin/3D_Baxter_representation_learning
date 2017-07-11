@@ -16,7 +16,7 @@ require 'hyperparams'
 ------DEFAULTS (IF NOT COMMAND LINE ARGS ARE PASSED)
 
 USE_CUDA = true
-USE_SECOND_GPU = false
+USE_SECOND_GPU = true
 USE_CONTINUOUS = true
 MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.5
 CONTINUOUS_ACTION_SIGMA = 0.1
@@ -253,8 +253,6 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
 
     elseif DATA_FOLDER == STATIC_BUTTON_SIMPLEST then
         CLAMP_CAUSALITY = true --TODO: make false when continuous works
-
-        FIXED_POS = {0.587, -0.036, -0.143}
         -- A point where the robot wants the state to be very similar. Like a reference point for the robot
 
         MIN_TABLE = {0.42,-0.2,-10} -- for x,y,z
@@ -279,13 +277,27 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
         end
 
         if BRING_CLOSER_REF_POINT then
-           PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","fixed_pos"}}
+           PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","fixed_point"}}
+           FIXED_POS = {0.587, -0.025, -0.143}
+           ROUNDING_VALUE_FIX = 0.02
+           -- is the position the same as the reference point, for this rounding ?
+           -- See arrondit for more details
         end
 
     elseif DATA_FOLDER == COMPLEX_DATA then
         CLAMP_CAUSALITY = true --TODO: make false when continuous works
 
         FIXED_POS = {0.587, -0.036, -0.143}
+        FIXED_POS = {0.420, 0.158, 0.237}
+
+        FIXED_POS = {0.588, 0.074, 0.142}
+
+        --Rand1
+        FIXED_POS = {0.52, 0.200, 0.200}
+
+        --Rand2
+        FIXED_POS = {0.673, -0.0888, 0.087}
+
         -- A point where the robot wants the state to be very similar. Like a reference point for the robot
 
         MIN_TABLE = {0.42,-0.1,-0.11} -- for x,y,z
@@ -294,7 +306,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
         DIMENSION_IN = 3
         DIMENSION_OUT = 3
 
-        REWARD_INDEX = 2 --2 reward values: -0, 1 ?
+        REWARD_INDEX = 2 -- Which column in the reward file indicates the value of reward ?
         INDEX_TABLE = {2,3,4} --column index for coordinates in state file, respectively (x,y,z)
 
         DEFAULT_PRECISION = 0.05 -- for 'arrondit' function

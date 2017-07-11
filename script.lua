@@ -26,11 +26,11 @@ function Rico_Training(Models,priors_used)
 
    -- create closure to evaluate f(X) and df/dX
    local feval = function(x)
-      loss_rep, loss_caus, loss_prop, loss_temp, loss_close = 0, 0, 0, 0, 0
+      local loss_rep, loss_caus, loss_prop, loss_temp, loss_close, loss_fix = 0, 0, 0, 0, 0, 0
       -- just in case:
       collectgarbage()
 
-      local batch, action1, action2, lossTemp,lossProp,lossCaus,lossRep
+      local batch, action1, action2
       -- get new parameters
       if x ~= parameters then
          parameters:copy(x)
@@ -73,15 +73,15 @@ function Rico_Training(Models,priors_used)
       mode='make_reward_closer'
       if applying_prior(priors_used, mode) then
           batch = getRandomBatchFromSeparateList(BATCH_SIZE,mode)
-          loss_reward_closer, gradClose=doStuff_temp(Models,temp_criterion,batch,COEF_TEMP) --Just minimizing mse criterion, so we can use temp criterion
+          loss_reward_closer, gradClose=doStuff_temp(Models,temp_criterion,batch,COEF_CLOSE) --Just minimizing mse criterion, so we can use temp criterion
           TOTAL_LOSS_CLOSE = loss_reward_closer + TOTAL_LOSS_CLOSE
       end
 
       mode='fixed_point'
       if applying_prior(priors_used, mode) then
           batch = getRandomBatchFromSeparateList(BATCH_SIZE,mode)
-          loss_reward_closer, gradClose=doStuff_temp(Models,temp_criterion,batch,COEF_TEMP) --Just minimizing mse criterion, so we can use temp criterion
-          TOTAL_LOSS_CLOSE = loss_reward_closer + TOTAL_LOSS_CLOSE
+          loss_fix, gradClose=doStuff_temp(Models,temp_criterion,batch,COEF_FIX) --Just minimizing mse criterion, so we can use temp criterion
+          TOTAL_LOSS_FIX = loss_fix + TOTAL_LOSS_FIX
       end
 
       --NOTE: shouldnt gradParameters be here  the sum of all gradRep, gradCaus, etc?
@@ -96,8 +96,10 @@ function Rico_Training(Models,priors_used)
 
     if SGD_METHOD == 'adagrad' then
         parameters,loss = optim.adagrad(feval,parameters,optimState)
-    else
+    elseif SGD_METHOD == 'adam' then
         parameters,loss = optim.adam(feval,parameters,optimState)
+    else
+       parameters,loss = optim.adamax(feval,parameters,optimState)
     end
 
     -- loss[1] table of one value transformed in just a value
@@ -115,7 +117,7 @@ function train(Models, priors_used)
     for epoch=1, NB_EPOCHS do
        print('--------------Epoch : '..epoch..' ---------------')
 
-       TOTAL_LOSS_TEMP,TOTAL_LOSS_CAUS,TOTAL_LOSS_PROP, TOTAL_LOSS_REP, TOTAL_LOSS_CLOSE = 0,0,0,0,0
+       TOTAL_LOSS_TEMP,TOTAL_LOSS_CAUS,TOTAL_LOSS_PROP, TOTAL_LOSS_REP, TOTAL_LOSS_CLOSE, TOTAL_LOSS_FIX = 0,0,0,0,0,0
 
        xlua.progress(0, NB_BATCHES)
        for numBatch=1, NB_BATCHES do
@@ -131,6 +133,11 @@ function train(Models, priors_used)
        if BRING_CLOSER_REWARD then
           print("Loss Close", TOTAL_LOSS_CLOSE/NB_BATCHES/BATCH_SIZE)
        end
+
+       if BRING_CLOSER_REF_POINT then
+          print("Loss Fix", TOTAL_LOSS_FIX/NB_BATCHES/BATCH_SIZE)
+       end
+
 
        save_model(Models.Model1, NAME_SAVE) --TODO Do we need to write NB_EPOCH TIMES? isnt enough the last time to write once and not overwrite NB_EPOCH TIMES?
    end

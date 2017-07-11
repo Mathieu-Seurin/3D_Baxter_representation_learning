@@ -59,7 +59,6 @@ elif data_folder == COMPLEX_DATA:
 
 if len(sys.argv) >= 3:
     nbr_images=int(sys.argv[2])
-
 if len(sys.argv) == 4:
     path_to_model = sys.argv[3]
 if len(sys.argv) == 2:
