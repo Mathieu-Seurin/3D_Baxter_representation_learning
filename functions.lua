@@ -48,6 +48,8 @@ function get_data_folder_from_model_name(model_name)
         return PUSHING_BUTTON_AUGMENTED
     elseif string.find(model_name, STATIC_BUTTON_SIMPLEST)  then
         return STATIC_BUTTON_SIMPLEST
+    elseif string.find(model_name, COMPLEX_DATA) then
+        return COMPLEX_DATA
     else
         print "Unsupported dataset!"
     end
@@ -71,7 +73,7 @@ end
 function save_autoencoder(model)
 
    model:clearState()
-   
+
    local path = LOG_FOLDER..NAME_SAVE
    lfs.mkdir(path)
    local file_string = path..'/'..NAME_SAVE..'.t7'
@@ -212,7 +214,7 @@ function getRandomBatchFromSeparateList(batch_size, mode)
          im1,im2 = data1.images[set.im1], data2.images[set.im2]
          batch[1][i]=im1
          batch[2][i]=im2
-         
+
 
       else --for auto-encoder, getting images that's all
          set = {} --dummy placeholder, not needed for auto-encoder
