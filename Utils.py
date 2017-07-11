@@ -17,7 +17,7 @@ import seaborn as sns
 Documentation for colorblind-supported plots: #http://seaborn.pydata.org/introduction.html
 """
 
-SKIP_RENDERING = False  # Make False only when running remotely via ssh for plots and KNN figures to be saved
+SKIP_RENDERING = True  # Make False only when running remotely via ssh for plots and KNN figures to be saved
 
 #DATASETS AVAILABLE:
 BABBLING = 'babbling'

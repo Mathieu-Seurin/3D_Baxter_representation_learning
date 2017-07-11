@@ -311,7 +311,7 @@ end
 -- cross_validation(1)
 
 ALL_SEQ = precompute_all_seq()
-verbose = true
+verbose = false
 test_run(verbose)
 
 --------- load model test---------
