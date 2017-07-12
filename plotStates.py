@@ -112,7 +112,6 @@ else:
     print " PLOT_DIMENSIONS other than 2 or 3 not supported"
 
 
-
 # def parse_arguments(): # TODO in future
 #     skipRendering = False
 #     import argparse

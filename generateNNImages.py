@@ -9,7 +9,7 @@ import pandas as pd
 from PIL import Image
 import os, os.path
 import subprocess
-from Utils import ALL_STATE_FILE, LEARNED_REPRESENTATIONS_FILE, LAST_MODEL_FILE, GLOBAL_SCORE_LOG_FILE, IMG_TEST_SET
+from Utils import ALL_STATE_FILE, LEARNED_REPRESENTATIONS_FILE, LAST_MODEL_FILE, GLOBAL_SCORE_LOG_FILE, IMG_TEST_SET, COMPLEX_TEST_SET, STATIC_BUTTON_SIMPLEST, COMPLEX_DATA
 from Utils import get_data_folder_from_model_name, file2dict, parse_repr_file, parse_true_state_file
 import unittest
 test = unittest.TestCase('__init__')
@@ -50,6 +50,12 @@ with_title = True
 
 lastModelFile = open(LAST_MODEL_FILE)
 path_to_model = lastModelFile.readline()[:-1]
+data_folder = get_data_folder_from_model_name(path_to_model)
+
+if data_folder == STATIC_BUTTON_SIMPLEST:
+    TEST_SET = IMG_TEST_SET
+elif data_folder == COMPLEX_DATA:
+    TEST_SET = COMPLEX_TEST_SET
 
 if len(sys.argv) >= 3:
     nbr_images=int(sys.argv[2])
@@ -59,9 +65,6 @@ if len(sys.argv) == 2:
     # We use fixed test set for fair comparison reasons
     use_test_set = True
     nbr_images = len(IMG_TEST_SET) # TODO: create for each dataset and add to Utils.py instead
-
-
-data_folder = get_data_folder_from_model_name(path_to_model)
 
 # THE FOLLOWING ONLY WILL RUN IN USE_CUDA false way  #print('Calling lua subprocesses with ',data_folder)
 subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_cuda','-use_continuous','-data_folder', data_folder])  # TODO: READ CMD LINE ARGS FROM FILE INSTEAD (and set accordingly here) TO NOT HAVING TO MODIFY INSTEAD train_predict_plotStates and the python files
@@ -84,6 +87,7 @@ distances, indexes = nbrs.kneighbors(representations)
 #Generate mosaics
 path_to_neighbour = path_to_model + '/NearestNeighbors/'
 last_model_name = path_to_model.split('/')[-1]
+
 print "path_to_model: ",path_to_model
 print "path_to_neighbours: ",path_to_neighbour
 #shutil.rmtree('NearestNeighbors', 1)
@@ -117,7 +121,7 @@ else:
 for img_name,id,dist,state in data:
 
     if use_test_set:
-        if not(img_name in IMG_TEST_SET):
+        if not(img_name in TEST_SET):
             continue
 
     base_name= os.path.splitext(os.path.basename(img_name))[0]

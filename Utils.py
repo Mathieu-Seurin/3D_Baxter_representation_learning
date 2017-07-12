@@ -17,7 +17,7 @@ import seaborn as sns
 Documentation for colorblind-supported plots: #http://seaborn.pydata.org/introduction.html
 """
 
-SKIP_RENDERING = True  # Make False only when running remotely via ssh for plots and KNN figures to be saved
+SKIP_RENDERING = False  # Make False only when running remotely via ssh for plots and KNN figures to be saved
 
 #DATASETS AVAILABLE:
 BABBLING = 'babbling'
@@ -254,5 +254,57 @@ IMG_TEST_SET = {
 'staticButtonSimplest/record_052/recorded_cameras_head_camera_2_image_compressed/frame00068.jpg',
 'staticButtonSimplest/record_052/recorded_cameras_head_camera_2_image_compressed/frame00025.jpg'}
 
+COMPLEX_TEST_SET = {
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00030.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00003.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00021.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00025.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00014.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00027.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00034.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00016.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00001.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00026.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00015.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00011.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00047.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00020.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00012.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00029.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00045.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00049.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00039.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00038.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00032.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00028.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00037.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00005.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00004.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00040.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00017.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00008.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00006.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00031.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00035.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00042.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00000.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00036.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00002.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00044.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00018.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00041.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00013.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00033.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00048.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00009.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00024.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00010.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00022.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00043.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00007.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00023.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00019.jpg',
+'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00046.jpg'
+}
 
 #library_versions_tests()

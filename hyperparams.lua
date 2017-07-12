@@ -46,7 +46,7 @@ BRING_CLOSER_REWARD = false
 BRING_CLOSER_REF_POINT = false
 -- Create a point where the robot wants the state to be very similar. Like a reference point for the robot.
 if BRING_CLOSER_REF_POINT and BRING_CLOSER_REWARD then
-   error("Can't do both at the momemnt")
+   error("Can't do both at the moment")
 end
 
 LR=0.0001
@@ -54,7 +54,7 @@ LR_DECAY = 6*1e-6
 
 SGD_METHOD = 'adam' -- Can be adam or adagrad
 BATCH_SIZE = 10
-NB_EPOCHS= 15
+NB_EPOCHS= 1
 
 DATA_AUGMENTATION = 0.01
 NORMALIZE_IMAGE = true

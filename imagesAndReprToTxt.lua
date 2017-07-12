@@ -135,7 +135,6 @@ local function main(params)
    -- end
 
    -- NOT USEFUL ANYMORE : AE uses resnet now
-
    
    local  model = torch.load(path..'/'..modelString)
    if USE_CUDA then
