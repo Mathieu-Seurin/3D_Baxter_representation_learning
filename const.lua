@@ -162,7 +162,8 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
     _, architecture_name = MODEL_ARCHITECTURE_FILE:match("(.+)/(.+)") --architecture_name, _ = split(architecture_name, ".")
 
     if USE_CONTINUOUS then
-        DAY = 'Y'..now.year..'_D'..addLeadingZero(now.day)..'_M'..addLeadingZero(now.month)..'_H'..addLeadingZero(now.hour)..'M'..addLeadingZero(now.min)..'S'..addLeadingZero(now.sec)..'_'..DATA_FOLDER..'_'..architecture_name..'_cont'..'_MCD0_'..(MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD*10)..'_S0_'..(CONTINUOUS_ACTION_SIGMA*10)
+        DAY = 'Y'..now.year..'_D'..addLeadingZero(now.day)..'_M'..addLeadingZero(now.month)..'_H'..addLeadingZero(now.hour)..'M'..addLeadingZero(now.min)..'S'..addLeadingZero(now.sec)..'_'..DATA_FOLDER..'_'..architecture_name..'_cont'..'_MCD'..MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD..'_S'..CONTINUOUS_ACTION_SIGMA
+        DAY = DAY:gsub("%.", "_")  -- replace decimal points by '_' for folder naming
     else
         DAY = 'Y'..now.year..'_D'..addLeadingZero(now.day)..'_M'..addLeadingZero(now.month)..'_H'..addLeadingZero(now.hour)..'M'..addLeadingZero(now.min)..'S'..addLeadingZero(now.sec)..'_'..DATA_FOLDER..'_'..architecture_name
     end
@@ -383,7 +384,7 @@ function print_hyperparameters()
       "\n================================")
 end
 
-
+-- 50 IMAGES TEST SET HANDPICKED TO SHOW VISUAL VARIABILITY
 IMG_TEST_SET = {
 'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00000.jpg',
 'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00012.jpg',

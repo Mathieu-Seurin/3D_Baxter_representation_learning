@@ -34,7 +34,7 @@ MODELS_CONFIG_LOG_FILE  = 'modelsConfigLog.csv'
 ALL_STATE_FILE = 'allStates.txt'
 LAST_MODEL_FILE = 'lastModel.txt'
 ALL_STATS_FILE ='allStats.csv'
-LUA2PYTHON_COMMUNICATION_FILE = 'lua2pythonCommunication.txt' # not used yet, TODO
+CONFIG = 'config.json' # not used yet, TODO
 
 
 def library_versions_tests():
@@ -189,8 +189,17 @@ def parse_repr_file(file_representation_string):
     return images, representations
 
 
+def get_list_of_test_imgs_for_dataset(dataset):
+    # TODO : extend for other datasets for comparison
+    if dataset == STATIC_BUTTON_SIMPLEST:
+        return IMG_TEST_SET
+    elif dataset == COMPLEX_DATA:
+        return COMPLEX_TEST_SET
+    else:
+        sys.exit('get_list_of_test_imgs_for_dataset: Dataset has not a defined test set: ',dataset)
 
-# TODO : extend for other datasets for comparison
+
+# 49 (1 repeated by error) IMAGES TEST SET HANDPICKED TO SHOW VISUAL VARIABILITY
 IMG_TEST_SET = {
 'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00000.jpg',
 'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00012.jpg',
