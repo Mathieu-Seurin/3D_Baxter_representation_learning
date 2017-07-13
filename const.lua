@@ -13,11 +13,10 @@
 require 'lfs'
 require 'hyperparams'
 
-------DEFAULTS (IF NOT COMMAND LINE ARGS ARE PASSED)
-
+---NOTE: THESE ARE DEFAULTS (IF NOT COMMAND LINE ARGS ARE PASSED), AND ARE OVERRIDEN BY DATA_FOLDER SPECIFIC CASES BELOW :
+----------------------------------------------------------------------------------------------------------------------------
 USE_CUDA = true
 USE_SECOND_GPU = false
-
 USE_CONTINUOUS = true
 MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.5
 CONTINUOUS_ACTION_SIGMA = 0.5

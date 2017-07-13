@@ -34,7 +34,7 @@ ALL_STATE_FILE = 'allStates.txt'
 LAST_MODEL_FILE = 'lastModel.txt'
 ALL_STATS_FILE ='allStats.csv'
 CONFIG = 'config.json' # not used yet, TODO
-
+PATH_TO_LINEAR_MODEL = 'disentanglementLinearModels/'
 
 def library_versions_tests():
     if not matplotlib.__version__.startswith('2.'):
