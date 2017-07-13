@@ -70,9 +70,8 @@ global_str = '\nGlobal Distortion : '+str(global_distortion)
 print global_str
 score_file.write(global_str+'\n')
 
-
 local_distortion = local_max_coef/local_min_coef
-local_str = "local distortion : "+str(local_min_coef)
+local_str = "local distortion : "+str(local_distortion)
 print local_str
 score_file.write(local_str+'\n')
 

@@ -44,9 +44,9 @@ if len(sys.argv) <= 1:
 # Some parameters
 nbr_neighbors= int(sys.argv[1])
 nbr_images = -1
+
 use_test_set = True # TODO: make test set for complexData
-with_title = False
-TEST_SET = " "
+with_title = True
 
 lastModelFile = open(LAST_MODEL_FILE)
 path_to_model = lastModelFile.readline()[:-1]
@@ -59,10 +59,9 @@ if len(sys.argv) >= 3:
 if len(sys.argv) == 4:
     path_to_model = sys.argv[3]
 if len(sys.argv) == 2:
-	# We use fixed test set for fair comparison reasons
-	nbr_images = len(TEST_SET) # TODO: create for each dataset and add to Utils.py instead
-	use_test_set = True
-
+    # We use fixed test set for fair comparison reasons
+    use_test_set = True
+    nbr_images = len(IMG_TEST_SET) # TODO: create for each dataset and add to Utils.py instead
 
 # THE FOLLOWING ONLY WILL RUN IN USE_CUDA false way  #print('Calling lua subprocesses with ',data_folder)
 subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_cuda','-use_continuous','-data_folder', data_folder])  # TODO: READ CMD LINE ARGS FROM FILE INSTEAD (and set accordingly here) TO NOT HAVING TO MODIFY INSTEAD train_predict_plotStates and the python files
@@ -85,6 +84,7 @@ distances, indexes = nbrs.kneighbors(representations)
 #Generate mosaics
 path_to_neighbour = path_to_model + '/NearestNeighbors/'
 last_model_name = path_to_model.split('/')[-1]
+
 print "path_to_model: ",path_to_model
 print "path_to_neighbours: ",path_to_neighbour
 #shutil.rmtree('NearestNeighbors', 1)
@@ -108,30 +108,38 @@ else:
 total_error = 0 # to assess the quality of repr
 nb_tot_img = 0
 
+if nbr_neighbors<=5:
+    numline = 1
+elif nbr_neighbors<=10:
+    numline = 2
+else:
+    numline = 3
+
 for img_name,id,dist,state in data:
 
     if use_test_set:
         if not(img_name in TEST_SET):
             continue
+
     base_name= os.path.splitext(os.path.basename(img_name))[0]
     seq_name= img_name.split("/")[1]
     print('Processing ' + seq_name + "/" + base_name + ' ...'+base_name)
     fig = plt.figure()
-    fig.set_size_inches(6*(nbr_neighbors+1), 6)
-    a=fig.add_subplot(1,nbr_neighbors+1,1)
+    fig.set_size_inches(60,35)
+    a=fig.add_subplot(numline+1,5,3)
     a.axis('off')
     # img = mpimg.imread(img_name)
     img = Image.open(img_name)
     imgplot = plt.imshow(img)
     state_str='[' + ",".join(['{:.3f}'.format(float(x)) for x in state]) + "]"
 
-    if with_title:
-        a.set_title(seq_name + "/" + base_name + ": \n" + state_str)
-
     original_coord = true_states[img_name]
 
+    if with_title:
+        a.set_title(seq_name + "/" + base_name + ": \n" + state_str + '\n' + str(original_coord))
+
     for i in range(0,nbr_neighbors):
-            a=fig.add_subplot(1,nbr_neighbors+1,i+2)
+            a=fig.add_subplot(numline+1,5,6+i)
             img_name=images[id[i+1]]
             # img = mpimg.imread(img_name)
             img = Image.open(img_name)
@@ -143,13 +151,14 @@ for img_name,id,dist,state in data:
             dist_str = ' d=' + '{:.4f}'.format(dist[i+1])
 
             state_str='[' + ",".join(['{:.3f}'.format(float(x)) for x in representations[id[i+1]]]) + "]"
+            neighbour_coord = true_states[img_name]
+            total_error += np.linalg.norm(neighbour_coord-original_coord)
+            nb_tot_img += 1
+
             if with_title:
-                a.set_title(seq_name_n + "/" + base_name_n + ": \n" + state_str +dist_str)
+                a.set_title(seq_name_n + "/" + base_name_n + ": \n" + state_str + dist_str + '\n' + str(neighbour_coord))
             a.axis('off')
 
-    neighbour_coord = true_states[img_name]
-    total_error += np.linalg.norm(neighbour_coord-original_coord)
-    nb_tot_img += 1
 
     plt.tight_layout()
     output_file = path_to_neighbour + seq_name + "_" + base_name

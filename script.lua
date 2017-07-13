@@ -159,9 +159,12 @@ local function main(params)
        require 'cudnn'
     end
 
-
     local records_paths = Get_Folders(DATA_FOLDER, 'record') --local list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(DATA_FOLDER)
     NB_SEQUENCES= #records_paths
+
+    if DATA_FOLDER == COMPLEX_DATA then
+       NB_SEQUENCES = NB_SEQUENCES - 1 -- To avoid looking at the test set
+    end
 
     if NB_SEQUENCES ==0  then --or not folder_exists(DATA_FOLDER) then
         error('Error: data was not found in input directory INPUT_DIR= '.. DATA_FOLDER)

@@ -9,10 +9,10 @@ function has_command_finish_correctly {
     fi
 }
 
-qlua learn_autoencoder.lua -use_cuda #-data_folder mobileRobot
+qlua learn_autoencoder.lua -use_cuda -data_folder mobileRobot
 has_command_finish_correctly
 
-th imagesAndReprToTxt.lua -use_cuda
+th imagesAndReprToTxt.lua -use_cuda -data_folder mobileRobot
 has_command_finish_correctly
 
 python generateNNImages.py 10
