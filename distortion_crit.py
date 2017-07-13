@@ -21,8 +21,6 @@ else:
     lastModelFile = open(LAST_MODEL_FILE)
     path_to_model = lastModelFile.readline()[:-1]
 
-nbr_images = 50
-
 data_folder = get_data_folder_from_model_name(path_to_model)
 file_representation_string=path_to_model+"/"+LEARNED_REPRESENTATIONS_FILE
 images, representations = parse_repr_file(file_representation_string)

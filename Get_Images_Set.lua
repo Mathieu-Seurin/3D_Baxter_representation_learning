@@ -213,7 +213,7 @@ function get_two_Prop_Pair(Infos1, Infos2)
          if EXTRAPOLATE_ACTION then --Look at const.lua for more details about extrapolate
             for id_second_action_end in ipairs(torch.totable(torch.randperm(size2))) do
                action2 = action_amplitude(Infos2, id_second_action_begin, id_second_action_end)
-               
+
                if is_same_action(action1, action2) then
                   return {im1=id_ref_action_begin,im2=id_ref_action_end,im3=id_second_action_begin,im4=id_second_action_end, act1=action1, act2=action2}
                end
@@ -271,7 +271,7 @@ function get_one_random_Caus_Set(Infos1, Infos2)
 
       action1 = action_amplitude(Infos2, id_ref_action_begin, id_ref_action_end)
 
-      -- Force the action amplitude to be the same, dirty...
+      -- Overriding action: Force the action amplitude to be the same, dirty...
       if CLAMP_CAUSALITY and not EXTRAPOLATE_ACTION_CAUS then
          -- WARNING, THIS IS DIRTY, need to do continous prior
          for dim=1,DIMENSION_IN do
@@ -288,7 +288,8 @@ function get_one_random_Caus_Set(Infos1, Infos2)
       end
 
       for i=1, size1 do
-         id_second_action_begin=torch.random(1,size1-1)
+         id_second_action_begin=torch.random(1,size1-1) --TODO Shouldnt we check id_second_action_begin != id_ref_action_begin?
+         --TODO: and also add here CLAMP_CAUSALITY check just as above?
 
          if EXTRAPOLATE_ACTION_CAUS then --Look at const.lua for more details about extrapolate
             repeat id_second_action_end=torch.random(1,size1) until (id_second_action_begin ~= id_second_action_end)
@@ -312,8 +313,7 @@ function get_one_random_Caus_Set(Infos1, Infos2)
                if action_vectors_are_similar_enough(action1, action2) then
                    return {im1=id_second_action_begin,im2=id_ref_action_begin, im3=id_second_action_end, im4=id_ref_action_end, act1=action1, act2=action2}
                end
-
-            elseif is_same_action(action1, action2) then
+            elseif is_same_action(action1, action2) then --discrete actions
                return {im1=id_second_action_begin,im2=id_ref_action_begin, im3=id_second_action_end, im4=id_ref_action_end}
             end
          end
@@ -323,12 +323,31 @@ function get_one_random_Caus_Set(Infos1, Infos2)
    error("CAUS WATCHDOG ATTACK!!!!!!!!!!!!!!!!!!")
 end
 
+function clamp_causality_prior_value(value, prec, action_amplitude)
+   -- ======================================================
+   -- Selects the next available consecutive action with a given hard-coded action_amplitude
+   -- WARNING THIS VERY DIRTY, WE SHOULD DO CONTINOUS PRIOR
+   -- INSTEAD OF THIS
+   -- ======================================================
+   prec = prec or 0.01
+   action_amplitude = action_amplitude or 0.05 --An action has an amplitude either of
+   --- 0 or 0.05 in the 'simple3D' database (on each axis), see const.lua
+
+   if math.abs(value) < prec then
+      value = 0
+   else
+      value = sign(value)*action_amplitude
+   end
+
+   return value
+end
+
 function get_one_random_reward_close_set(Infos1, Infos2)
 
    local size1=#Infos1[1]
    local size2=#Infos2[1]
    local watchDog=0
-   
+
    while watchDog<50 do
       repeat
          id_ref_state= torch.random(1,size1)
@@ -349,7 +368,7 @@ function get_one_random_reward_close_set(Infos1, Infos2)
       watchDog=watchDog+1
    end
 
-   error("CLOSE WATCHDOG ATTACK!!!!!!!!!!!!!!!!!!")
+   error("CLOSE REWARD WATCHDOG ATTACK!!!!!!!!!!!!!!!!!!")
 end
 
 
@@ -396,10 +415,7 @@ function get_one_fixed_point_set(Infos1, Infos2)
    else
       return nil
    end
-   
 end
-
-
 ---------------------------------------------------------------------------------------
 -- Function : arrondit(value)
 -- Input (tensor) :
@@ -414,25 +430,6 @@ function arrondit(value, prec)
    if math.abs(value-ceil)>math.abs(value-floor) then result=floor
    else result=ceil end
    return result
-end
-
-function clamp_causality_prior_value(value, prec, action_amplitude)
-   -- ======================================================
-   -- Selects the next available consecutive action with a given hard-coded action_amplitude
-   -- WARNING THIS VERY DIRTY, WE SHOULD DO CONTINOUS PRIOR
-   -- INSTEAD OF THIS
-   -- ======================================================
-   prec = prec or 0.01
-   action_amplitude = action_amplitude or 0.05 --An action has an amplitude either of
-   --- 0 or 0.05 in the 'simple3D' database (on each axis)
-
-   if math.abs(value) < prec then
-      value = 0
-   else
-      value = sign(value)*action_amplitude
-   end
-
-   return value
 end
 
 function sign(value)

@@ -17,8 +17,7 @@ import seaborn as sns
 Documentation for colorblind-supported plots: #http://seaborn.pydata.org/introduction.html
 """
 
-SKIP_RENDERING = False  # Make False only when running remotely via ssh for plots and KNN figures to be saved
-
+SKIP_RENDERING = True  # Make True when running remotely via ssh for the batch/grid_search programs to save the plots and KNN figures folder
 #DATASETS AVAILABLE:
 BABBLING = 'babbling'
 MOBILE_ROBOT = 'mobileRobot'
@@ -189,14 +188,15 @@ def parse_repr_file(file_representation_string):
     return images, representations
 
 
-def get_list_of_test_imgs_for_dataset(dataset):
-    # TODO : extend for other datasets for comparison
-    if dataset == STATIC_BUTTON_SIMPLEST:
+def get_test_set_for_data_folder(data_folder):
+    # Returns a dictionary (notice, with unique keys) of test images
+    # TODO : extend for other datasets for comparison, e.g. babbling
+    if data_folder == STATIC_BUTTON_SIMPLEST:
         return IMG_TEST_SET
-    elif dataset == COMPLEX_DATA:
+    elif data_folder == COMPLEX_DATA:
         return COMPLEX_TEST_SET
     else:
-        sys.exit('get_list_of_test_imgs_for_dataset: Dataset has not a defined test set: ',dataset)
+        sys.exit('get_list_of_test_imgs_for_dataset: Dataset has not a defined test set: ',data_folder)
 
 
 # 49 (1 repeated by error) IMAGES TEST SET HANDPICKED TO SHOW VISUAL VARIABILITY

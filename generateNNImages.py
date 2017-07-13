@@ -10,7 +10,7 @@ from PIL import Image
 import os, os.path
 import subprocess
 from Utils import ALL_STATE_FILE, LEARNED_REPRESENTATIONS_FILE, LAST_MODEL_FILE, GLOBAL_SCORE_LOG_FILE, IMG_TEST_SET, COMPLEX_TEST_SET, STATIC_BUTTON_SIMPLEST, COMPLEX_DATA
-from Utils import get_data_folder_from_model_name, file2dict, parse_repr_file, parse_true_state_file
+from Utils import get_data_folder_from_model_name, file2dict, parse_repr_file, parse_true_state_file, get_test_set_for_data_folder
 import unittest
 test = unittest.TestCase('__init__')
 
@@ -52,10 +52,7 @@ lastModelFile = open(LAST_MODEL_FILE)
 path_to_model = lastModelFile.readline()[:-1]
 data_folder = get_data_folder_from_model_name(path_to_model)
 
-if data_folder == STATIC_BUTTON_SIMPLEST:
-    TEST_SET = IMG_TEST_SET
-elif data_folder == COMPLEX_DATA:
-    TEST_SET = COMPLEX_TEST_SET
+TEST_SET = get_test_set_for_data_folder(data_folder)
 
 if len(sys.argv) >= 3:
     nbr_images=int(sys.argv[2])

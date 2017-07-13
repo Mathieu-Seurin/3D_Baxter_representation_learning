@@ -205,6 +205,14 @@ The method has_command_finish_correctly for tracing errors better in console (br
 
 * Lua/Torch allow only default boolean cmd line parameters of false. Add the flag to set them to True, leave them out to set them to False.
 
+* Visualizing images: init.lua:389: module 'qt' not found:No LuaRocks module found for qt no field package.preload['qt']
+Solution: for using qtlua, start torch in your terminal with:
+
+$ qlua
+
+instead of
+
+$ th
 
 ## REFERENCES
 [1] Learning state representations with robotic priors. Rico Jonschkowski, Oliver Brock, 2015.

@@ -9,6 +9,14 @@ import torch
 import os
 import subprocess
 
+"""
+This program adds synthetic extra negative reward to the images where the robot arm
+is out of the field of view of the image (instead of the original 0s).
+It is done manually by knowning the 3D coordinate space that belongs to the field of view (from ROS): see BOUND_INF and BOUND_SUP.
+TODO: if impossible to do in ROS? apply same procedure to Babbling dataset of Leni (-> Is there a more precise way to get bounds
+other than max and min (x, y, z) of arm position, respectively?)
+"""
+
 def is_in_bound(coordinate):
     BOUND_INF = [0.42,-0.09,-10] #-10 axis because we don't care about z axis at the moment
     BOUND_SUP = [0.74,0.59,10] #10 because we don't care about z axis at the moment
@@ -18,13 +26,13 @@ def is_in_bound(coordinate):
             return False
     return True
 
-database_folder =  'staticButtonSimplest/' 
+database_folder =  'staticButtonSimplest/'
 reward_file_name = 'recorded_button1_is_pressed.txt'
 
 for record in os.listdir(database_folder):
 
     path_to_record = database_folder+record+'/'
-    
+
     reward_file_whole_path = path_to_record+reward_file_name
     reward_file = open(reward_file_whole_path, 'r')
 
@@ -65,7 +73,7 @@ for record in os.listdir(database_folder):
                 new_reward_file_content += line_rew_raw
 
 
-    reward_file.close()            
+    reward_file.close()
     state_file.close()
 
     subprocess.call(["mv",reward_file_whole_path,reward_file_whole_path+'.old'])

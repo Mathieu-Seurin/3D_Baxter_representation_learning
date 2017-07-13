@@ -19,7 +19,7 @@ USE_CUDA = true
 USE_SECOND_GPU = true
 USE_CONTINUOUS = true
 MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.5
-CONTINUOUS_ACTION_SIGMA = 0.1
+CONTINUOUS_ACTION_SIGMA = 0.5
 DATA_FOLDER = MOBILE_ROBOT --works best!
 
 if USE_CUDA then
@@ -64,7 +64,7 @@ ACTION_AMPLITUDE = 0.01
 --================================================
 -- dataFolder specific constants : filename, dim_in, indexes in state file etc...
 --================================================
-CLAMP_CAUSALITY = false--cant add to functions because it creates an import loop
+CLAMP_CAUSALITY = false
 
 MIN_TABLE = {-10000,-10000} -- for x,y
 MAX_TABLE = {10000,10000} -- for x,y
@@ -253,7 +253,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
         AVG_FRAMES_PER_RECORD = 100
 
     elseif DATA_FOLDER == STATIC_BUTTON_SIMPLEST then
-        CLAMP_CAUSALITY = true --TODO: make false when continuous works
+        CLAMP_CAUSALITY = false --TODO: make false when continuous works
         -- A point where the robot wants the state to be very similar. Like a reference point for the robot
 
         MIN_TABLE = {0.42,-0.2,-10} -- for x,y,z
@@ -384,7 +384,7 @@ function print_hyperparameters()
       "\n================================")
 end
 
--- 50 IMAGES TEST SET HANDPICKED TO SHOW VISUAL VARIABILITY
+-- 49 (1 repeated by error) IMAGES TEST SET HANDPICKED TO SHOW VISUAL VARIABILITY
 IMG_TEST_SET = {
 'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00000.jpg',
 'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00012.jpg',
