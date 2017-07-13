@@ -26,7 +26,7 @@ BASE_TIMNET = './models/topUniqueSimplerWOTanh'--ImageNet-inspired Convolutional
 
 --MODEL_ARCHITECTURE_FILE = INCEPTIONV4 --Too big
 --MODEL_ARCHITECTURE_FILE = BASE_TIMNET--without last layer as Tanh, use it for AE
-MODEL_ARCHITECTURE_FILE = RESNET
+MODEL_ARCHITECTURE_FILE = BASE_TIMNET
 
 --==================================================
 -- Hyperparams : Learning rate, batchsize, USE_CUDA etc...
@@ -54,7 +54,7 @@ LR_DECAY = 6*1e-6
 
 SGD_METHOD = 'adam' -- Can be adam or adagrad
 BATCH_SIZE = 10
-NB_EPOCHS= 1
+NB_EPOCHS= 50
 
 DATA_AUGMENTATION = 0.01
 NORMALIZE_IMAGE = true

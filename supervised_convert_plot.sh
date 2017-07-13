@@ -1,5 +1,4 @@
 #!/bin/bash
-
 function has_command_finish_correctly {
     if [ "$?" -ne "0" ]
     then
@@ -10,11 +9,18 @@ function has_command_finish_correctly {
 }
 
 
+if [ "$1" != "" ]; then
+    DATA_FOLDER=$1
+else
+    echo No data folder given
+    exit
+fi
+
 echo 'WARNING, check that model=BASE_TIMNET and NORMALIZE=True'
 
-echo 'Log/save/supervised_res' > lastModel.txt
-echo 'mobile_robot_supervised.t7' >> lastModel.txt
-th imagesAndReprToTxt.lua
+th supervised.lua -use_cuda -data_folder $DATA_FOLDER
+
+th imagesAndReprToTxt.lua -use_cuda -data_folder $DATA_FOLDER
 has_command_finish_correctly
 
 python generateNNImages.py 10

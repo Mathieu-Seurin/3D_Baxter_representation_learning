@@ -18,7 +18,7 @@ require 'hyperparams'
 USE_CUDA = true
 USE_SECOND_GPU = false
 
-USE_CONTINUOUS = true
+USE_CONTINUOUS = false
 MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.5
 CONTINUOUS_ACTION_SIGMA = 0.1
 DATA_FOLDER = MOBILE_ROBOT --works best!
@@ -54,7 +54,7 @@ RELOAD_MODEL = false
 -- VISUALIZATION TOOL
 -- if you want to visualize images, use 'qlua' instead of 'th'
 --===========================================================
-VISUALIZE_IMAGES_TAKEN = true
+VISUALIZE_IMAGES_TAKEN = false
 VISUALIZE_CAUS_IMAGE = false
 VISUALIZE_IMAGE_CROP = false
 VISUALIZE_MEAN_STD = false
@@ -296,6 +296,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
 
     elseif DATA_FOLDER == COMPLEX_DATA then
         CLAMP_CAUSALITY = false --TODO: make false when continuous works
+        AVG_FRAMES_PER_RECORD = 200
 
         FIXED_POS = {0.587, -0.036, -0.143}
         -- A point where the robot wants the state to be very similar. Like a reference point for the robot
@@ -309,13 +310,12 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
         REWARD_INDEX = 2 -- Which column in the reward file indicates the value of reward ?
         INDEX_TABLE = {2,3,4} --column index for coordinates in state file, respectively (x,y,z)
 
-        DEFAULT_PRECISION = 0.05 -- for 'arrondit' function
+        DEFAULT_PRECISION = 0.02 -- for 'arrondit' function
         FILENAME_FOR_REWARD = "recorded_button1_is_pressed.txt"
         FILENAME_FOR_ACTION = "recorded_robot_limb_left_endpoint_action.txt" -- Never written, always computed on the fly
         FILENAME_FOR_STATE = "recorded_robot_limb_left_endpoint_state.txt"
 
         SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
-        AVG_FRAMES_PER_RECORD = 200  --HINT: reduce for fast full epoch testing in CPU mode
 
         if BRING_CLOSER_REWARD then
            PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","make_reward_closer"}}

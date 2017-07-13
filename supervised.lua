@@ -16,11 +16,12 @@ require 'gnuplot'
 require 'os'
 require 'paths'
 
-require(MODEL_ARCHITECTURE_FILE)
 -- THIS IS WHERE ALL THE CONSTANTS SHOULD COME FROM
 -- See const.lua file for more details
 require 'const'
 -- try to avoid global variable as much as possible
+
+require(MODEL_ARCHITECTURE_FILE)
 
 local cmd = torch.CmdLine()
 -- Basic options

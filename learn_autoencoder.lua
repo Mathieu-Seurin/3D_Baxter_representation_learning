@@ -159,10 +159,12 @@ local function main(params)
       w = image.display(torch.Tensor(3,200,400))
    end
    
-   if DIFFERENT_FORMAT then
-      error([[Don't forget to switch model to BASE_TIMNET in hyperparameters
-    Because the images' format is the same for auto-encoder]])
-    end
+   -- if DIFFERENT_FORMAT then
+   --    error([[Don't forget to switch model to BASE_TIMNET in hyperparameters
+   --  Because the images' format is the same for auto-encoder]])
+   --  end
+
+   --Not necessary anymore because ae uses resnet
 
    NAME_SAVE = 'AE_'..NUM_HIDDEN..NAME_SAVE
    print('NAME SAVE IN set_AE_hyp:  '..NAME_SAVE)
