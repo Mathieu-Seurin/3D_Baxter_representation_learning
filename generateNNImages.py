@@ -115,8 +115,9 @@ elif nbr_neighbors<=10:
 else:
     numline = 3
 
+print 'nbr_neighbours: ', nbr_neighbors, ' nbr of images: ', len(data), 'use_test_set ',use_test_set, ' Size: ', len(use_test_set)
 for img_name,id,dist,state in data:
-
+    print img_name
     if use_test_set:
         if not(img_name in TEST_SET):
             continue
