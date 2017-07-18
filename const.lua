@@ -53,7 +53,7 @@ RELOAD_MODEL = false
 -- VISUALIZATION TOOL
 -- if you want to visualize images, use 'qlua' instead of 'th'
 --===========================================================
-VISUALIZE_IMAGES_TAKEN = true
+VISUALIZE_IMAGES_TAKEN = false -- true for visualizing images taken in each prior
 VISUALIZE_CAUS_IMAGE = false
 VISUALIZE_IMAGE_CROP = false
 VISUALIZE_MEAN_STD = false

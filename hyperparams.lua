@@ -28,6 +28,7 @@ BASE_TIMNET = './models/topUniqueSimplerWOTanh'--ImageNet-inspired Convolutional
 --MODEL_ARCHITECTURE_FILE = BASE_TIMNET--without last layer as Tanh, use it for AE
 MODEL_ARCHITECTURE_FILE = RESNET
 
+
 --==================================================
 -- Hyperparams : Learning rate, batchsize, USE_CUDA etc...
 --==================================================
@@ -39,22 +40,19 @@ MODEL_ARCHITECTURE_FILE = RESNET
 
 EXTRAPOLATE_ACTION = false
 EXTRAPOLATE_ACTION_CAUS = false
---TODO shall it be true for continuous actions too always?
+--TODO shall it be true for continuous actions too always? TODO if extrapolate_action_caus is false, same should be for CLAMP_CAUSALITY, otherwise it makes no sense?
 -- Always : i don't think so, but trying to see if it works better with it, why not
 
 BRING_CLOSER_REWARD = false
-BRING_CLOSER_REF_POINT = false
+BRING_CLOSER_REF_POINT = true
 -- Create a point where the robot wants the state to be very similar. Like a reference point for the robot.
-if BRING_CLOSER_REF_POINT and BRING_CLOSER_REWARD then
-   error("Can't do both at the moment")
-end
 
 LR=0.0001
-LR_DECAY = 6*1e-6
+LR_DECAY = 3*1e-6
 
 SGD_METHOD = 'adam' -- Can be adam or adagrad
 BATCH_SIZE = 10
-NB_EPOCHS= 1
+NB_EPOCHS= 15
 
 DATA_AUGMENTATION = 0.01
 NORMALIZE_IMAGE = true

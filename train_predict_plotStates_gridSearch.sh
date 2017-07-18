@@ -7,7 +7,7 @@
 # -params.mcd is MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD
 # -data_folder options: DATA_FOLDER (Dataset to use):
 #          staticButtonSimplest, mobileRobot, simpleData3D, pushingButton3DAugmented, babbling')
-
+#data='staticButtonSimplest' 'complexData'  https://stackoverflow.com/questions/2459286/unable-to-set-variables-in-bash-script  #"$data"='staticButtonSimplest'
 
 function has_command_finish_correctly {
     if [ "$?" -ne "0" ]
@@ -25,10 +25,10 @@ do
     for s in 0.2 0.4 0.5
     do
         echo "\n ********** Running pipeline for finetuning mcd: $max_cos_dis and sigma: $s *************"
-        qlua script.lua -use_cuda -use_continuous -mcd $max_cos_dis -sigma $s -data_folder staticButtonSimplest
+        qlua script.lua -use_cuda -use_continuous -mcd $max_cos_dis -sigma $s -data_folder complexData #staticButtonSimplest
         has_command_finish_correctly
         #  -data_folder staticButtonSimplest
-        th imagesAndReprToTxt.lua -use_cuda -use_continuous -data_folder staticButtonSimplest
+        th imagesAndReprToTxt.lua -use_cuda -use_continuous -data_folder complexData #taticButtonSimplest
         has_command_finish_correctly
 
         python generateNNImages.py 10

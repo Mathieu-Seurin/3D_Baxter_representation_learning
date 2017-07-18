@@ -222,7 +222,7 @@ function getRandomBatchFromSeparateList(batch_size, mode)
                data1 = ALL_SEQ[INDEX1]
                data2 = ALL_SEQ[INDEX2]
             end
-               
+
          end
          im1,im2 = data1.images[set.im1], data2.images[set.im2]
          batch[1][i]=im1
@@ -258,7 +258,7 @@ function getRandomBatchFromSeparateList(batch_size, mode)
 
    --Very useful tool to check if prior are coherent
    if VISUALIZE_IMAGES_TAKEN then
-      print("MODE :",mode)
+      print("PRIOR MODE :",mode)
       visualize_set(im1,im2,im3,im4)
    end
    return batch, set.act1, set.act2
