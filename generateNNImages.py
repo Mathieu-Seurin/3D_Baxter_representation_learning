@@ -9,7 +9,7 @@ import pandas as pd
 from PIL import Image
 import os, os.path
 import subprocess
-from Utils import ALL_STATE_FILE, LEARNED_REPRESENTATIONS_FILE, LAST_MODEL_FILE, GLOBAL_SCORE_LOG_FILE, IMG_TEST_SET, COMPLEX_TEST_SET, STATIC_BUTTON_SIMPLEST, COMPLEX_DATA
+from Utils import ALL_STATE_FILE, LEARNED_REPRESENTATIONS_FILE, LAST_MODEL_FILE, GLOBAL_SCORE_LOG_FILE, STATIC_BUTTON_SIMPLEST, COMPLEX_DATA
 from Utils import get_data_folder_from_model_name, file2dict, parse_repr_file, parse_true_state_file, get_test_set_for_data_folder
 import unittest
 test = unittest.TestCase('__init__')
@@ -52,7 +52,7 @@ lastModelFile = open(LAST_MODEL_FILE)
 path_to_model = lastModelFile.readline()[:-1]
 data_folder = get_data_folder_from_model_name(path_to_model)
 
-TEST_SET = get_test_set_for_data_folder(data_folder)
+test_set = get_test_set_for_data_folder(data_folder)
 
 if len(sys.argv) >= 3:
     nbr_images=int(sys.argv[2])
@@ -61,7 +61,7 @@ if len(sys.argv) == 4:
 if len(sys.argv) == 2:
     # We use fixed test set for fair comparison reasons
     use_test_set = True
-    nbr_images = len(IMG_TEST_SET) # TODO: create for each dataset and add to Utils.py instead
+    nbr_images = len(test_set) # TODO: create for each dataset and add to Utils.py instead
 
 # THE FOLLOWING ONLY WILL RUN IN USE_CUDA false way  #print('Calling lua subprocesses with ',data_folder)
 subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_cuda','-use_continuous','-data_folder', data_folder])  # TODO: READ CMD LINE ARGS FROM FILE INSTEAD (and set accordingly here) TO NOT HAVING TO MODIFY INSTEAD train_predict_plotStates and the python files
@@ -109,16 +109,16 @@ total_error = 0 # to assess the quality of repr
 nb_tot_img = 0
 
 if nbr_neighbors<=5:
-    numline = 1
+    numline = 1  # number of rows to show in the image of neigbours to be saved, for visibility
 elif nbr_neighbors<=10:
     numline = 2
 else:
     numline = 3
 
-for img_name,id,dist,state in data:
-
+print 'nbr_neighbours: ', nbr_neighbors, ' nbr of images: ', len(data), 'use_test_set ',use_test_set, ' Size: ', len(test_set)
+for img_name,id,dist,state in data: 	#print img_name
     if use_test_set:
-        if not(img_name in TEST_SET):
+        if not(img_name in test_set): # TODO: more efficient: for img_name in test_set.keys():
             continue
 
     base_name= os.path.splitext(os.path.basename(img_name))[0]

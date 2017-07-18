@@ -9,7 +9,7 @@
 #          staticButtonSimplest, mobileRobot, simpleData3D, pushingButton3DAugmented, babbling')
 #data='staticButtonSimplest' 'complexData'  https://stackoverflow.com/questions/2459286/unable-to-set-variables-in-bash-script  #"$data"='staticButtonSimplest'
 
-function has_command_finish_correctly {
+function has_command_finished_correctly {
     if [ "$?" -ne "0" ]
     then
         exit
@@ -26,22 +26,22 @@ do
     do
         echo "\n ********** Running pipeline for finetuning mcd: $max_cos_dis and sigma: $s *************"
         qlua script.lua -use_cuda -use_continuous -mcd $max_cos_dis -sigma $s -data_folder complexData #staticButtonSimplest
-        has_command_finish_correctly
+        has_command_finished_correctly
         #  -data_folder staticButtonSimplest
         th imagesAndReprToTxt.lua -use_cuda -use_continuous -data_folder complexData #taticButtonSimplest
-        has_command_finish_correctly
+        has_command_finished_correctly
 
         python generateNNImages.py 10
-        has_command_finish_correctly
+        has_command_finished_correctly
 
         #   ----- includes the call to:
         #                th create_all_reward.lua
         #                th create_plotStates_file_for_all_seq.lua
         python plotStates.py
-        has_command_finish_correctly
+        has_command_finished_correctly
 
         python report_results.py
-        has_command_finish_correctly
+        has_command_finished_correctly
 
     done
 done
