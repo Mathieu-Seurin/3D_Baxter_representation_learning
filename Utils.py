@@ -189,7 +189,7 @@ def parse_repr_file(file_representation_string):
 
 
 def get_test_set_for_data_folder(data_folder):
-    # Returns a dictionary (notice, with unique keys) of test images
+    # Returns a dictionary (notice, that has unique keys) of test images
     # TODO : extend for other datasets for comparison, e.g. babbling
     if data_folder == STATIC_BUTTON_SIMPLEST:
         return IMG_TEST_SET
