@@ -117,9 +117,11 @@ else:
 
 # TODO: more efficient: for img_name in test_set.keys() revising data above
 print 'nbr_neighbours: ', nbr_neighbors, ' nbr of images: ', len(data), 'use_test_set ',use_test_set, ' of size: ', len(test_set)
-for img_name,id,dist,state in data:
+for img_name,neigbour_indexes,dist,state in data:
+	# print "img_name, neigbour_indexes, dist, state: ", img_name,neigbour_indexes,dist,state 
+	# print "test_set: ", test_set
 	if use_test_set:
-		if not(img_name in test_set):
+		if not(img_name in test_set): #			print'skipping image: ' , img_name
 			continue
 
 	base_name= os.path.splitext(os.path.basename(img_name))[0]
@@ -141,7 +143,7 @@ for img_name,id,dist,state in data:
 
 	for i in range(0,nbr_neighbors):
 			a=fig.add_subplot(numline+1,5,6+i)
-			img_name=images[id[i+1]]
+			img_name=images[neigbour_indexes[i+1]]
 			# img = mpimg.imread(img_name)
 			img = Image.open(img_name)
 			imgplot = plt.imshow(img)
@@ -151,7 +153,7 @@ for img_name,id,dist,state in data:
 
 			dist_str = ' d=' + '{:.4f}'.format(dist[i+1])
 
-			state_str='[' + ",".join(['{:.3f}'.format(float(x)) for x in representations[id[i+1]]]) + "]"
+			state_str='[' + ",".join(['{:.3f}'.format(float(x)) for x in representations[neigbour_indexes[i+1]]]) + "]"
 			neighbour_coord = true_states[img_name]
 			total_error += np.linalg.norm(neighbour_coord-original_coord)
 			nb_tot_img += 1

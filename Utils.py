@@ -173,7 +173,9 @@ def parse_true_state_file():
     return true_states
 
 def parse_repr_file(file_representation_string):
-
+    """
+    Returns a list of image paths and its representation arrays
+    """
     images=[]
     representations=[]
 
