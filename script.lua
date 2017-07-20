@@ -163,7 +163,7 @@ local function main(params)
     NB_SEQUENCES= #records_paths
 
     if DATA_FOLDER == COMPLEX_DATA then
-       NB_SEQUENCES = NB_SEQUENCES - 1 -- To avoid looking at the test set
+       NB_SEQUENCES = NB_SEQUENCES - 1 -- Just because it is a dumb looking action without much action, we dont consider it
     end
 
     if NB_SEQUENCES ==0  then --or not folder_exists(DATA_FOLDER) then
