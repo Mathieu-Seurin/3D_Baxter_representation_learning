@@ -25,6 +25,7 @@ SIMPLEDATA3D = 'simpleData3D'
 PUSHING_BUTTON_AUGMENTED = 'pushingButton3DAugmented'
 STATIC_BUTTON_SIMPLEST = 'staticButtonSimplest'
 COMPLEX_DATA = 'complexData'
+ALL_DATASETS = [BABBLING, MOBILE_ROBOT, SIMPLEDATA3D, PUSHING_BUTTON_AUGMENTED, STATIC_BUTTON_SIMPLEST, COMPLEX_DATA]
 
 # 2 options of plotting:
 LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
@@ -35,6 +36,7 @@ LAST_MODEL_FILE = 'lastModel.txt'
 ALL_STATS_FILE ='allStats.csv'
 CONFIG = 'config.json' # not used yet, TODO
 PATH_TO_LINEAR_MODEL = 'disentanglementLinearModels/'
+
 
 def library_versions_tests():
     if not matplotlib.__version__.startswith('2.'):
