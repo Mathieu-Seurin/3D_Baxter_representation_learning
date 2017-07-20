@@ -48,7 +48,7 @@ if os.path.isfile(GLOBAL_SCORE_LOG_FILE):
         final = all_scores_logs[header]
         final.sort_values(by='Model', inplace=True )
         print "Latest scores logged so far: \n", final.tail(10)
-        print_leader_board(final, all_datasets)
+        print_leader_board(final, ALL_DATASETS)
         final.to_csv(ALL_STATS_FILE, header = header)
 
     else:
