@@ -16,7 +16,7 @@ require 'hyperparams'
 ------DEFAULTS (IF NOT COMMAND LINE ARGS ARE PASSED)
 
 USE_CUDA = true
-USE_SECOND_GPU = false
+USE_SECOND_GPU = true
 
 USE_CONTINUOUS = false
 MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.5
@@ -99,6 +99,7 @@ WINDOW = nil--image.display(image.lena())
 LOGGING_ACTIONS = false
 IS_INCEPTION = false
 IS_RESNET = false
+
 DIFFERENT_FORMAT = IS_INCEPTION or IS_RESNET
 MEAN_MODEL = torch.ones(3):double()*0.5
 STD_MODEL = torch.ones(3):double()*0.5
@@ -205,6 +206,30 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
     elseif DATA_FOLDER == MOBILE_ROBOT then
         print('Setting hyperparams for MOBILE_ROBOT (our baseline reproducing Jonchowscki)')
        --NOTE: DEFAULT PARAMETERS FOR OUR BASELINE DATABASE SET AT THE BEGINNING OF THE FILE (NEED TO BE DECLARED AS CONSTANTS
+
+        
+        CLAMP_CAUSALITY = false
+
+        MIN_TABLE = {-10000,-10000} -- for x,y
+        MAX_TABLE = {10000,10000} -- for x,y
+
+        DIMENSION_IN = 2
+        DIMENSION_OUT = 2  --worked just as well as 4 output dimensions
+        REWARD_INDEX = 1  --3 reward values: -1, 0, 10
+        INDEX_TABLE = {1,2} --column index for coordinate in state file (respectively x,y)
+
+        DEFAULT_PRECISION = 0.1
+        FILENAME_FOR_ACTION = "recorded_robot_action.txt" --not used at all, we use state file, and compute the action with it (contains dx, dy)
+        FILENAME_FOR_STATE = "recorded_robot_state.txt"
+        FILENAME_FOR_REWARD = "recorded_robot_reward.txt"
+
+        SUB_DIR_IMAGE = 'recorded_camera_top'
+        AVG_FRAMES_PER_RECORD = 90
+
+        -- Middle of field
+        FIXED_POS = {0.479, -0.085}
+        ROUNDING_VALUE_FIX = 0.1
+
     elseif DATA_FOLDER == BABBLING then
       -- Leni's real Baxter data on  ISIR dataserver. It is named "data_archive_sim_1".
       --(real Baxter Pushing Objects).  If data is not converted into action, state
@@ -298,9 +323,20 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
         CLAMP_CAUSALITY = false --TODO: make false when continuous works
         AVG_FRAMES_PER_RECORD = 200
 
-        FIXED_POS = {0.587, -0.036, -0.143}
-        -- A point where the robot wants the state to be very similar. Like a reference point for the robot
+        -- A point where the robot wants the state to be very similar.
+        --Like a reference point for the robot
 
+        
+        -- just above the button
+        --FIXED_POS = {0.587, -0.036, -0.143}
+        FIXED_POS = { 0.598, 0.300, -0.143}
+        ROUNDING_VALUE_FIX = 0.03
+
+        -- Above and further
+        -- FIXED_POS = {0.639, 0.286, 0.136}
+        -- ROUNDING_VALUE_FIX = 0.04
+
+        
         MIN_TABLE = {0.42,-0.1,-0.11} -- for x,y,z
         MAX_TABLE = {0.75,0.60,0.35} -- for x,y,z
 
@@ -322,7 +358,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
         end
 
         if BRING_CLOSER_REF_POINT then
-           PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","fixed_pos"}}
+           PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","fixed_point"}}
         end
 
     else
