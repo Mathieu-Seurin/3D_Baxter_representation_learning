@@ -1,4 +1,5 @@
 local M = {}
+
 function file_exists(name)
    --tests whether the file can be opened for reading
    local f=io.open(name,"r")
@@ -34,8 +35,6 @@ And put it in models/ as resnet-VERSION.t7
 Ex : resnet-18.t7
 -------------------]])
    end
-
-   pretrain_net:evaluate()
 
    if RESNET_VERSION == 18 or RESNET_VERSION == 34 then
       pretrain_net.modules[11] = nil --nn.Linear(512 -> 1000)

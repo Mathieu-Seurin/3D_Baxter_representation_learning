@@ -109,12 +109,14 @@ end
 
 function train(Models, priors_used)
 
+   LOG_SEQ_USED = {}
+   
     local NB_BATCHES= math.ceil(NB_SEQUENCES*AVG_FRAMES_PER_RECORD/BATCH_SIZE/(4+4+2+2))
     --AVG_FRAMES_PER_RECORD to get an idea of the total number of images
     --div by 12 because the network sees 12 images per iteration (i.e. record)
     -- (4*2 for rep and prop +  2*2 for temp and caus = 12)
     print(NB_SEQUENCES..' : sequences. '..NB_BATCHES..' batches')
-
+    print("Number of epochs : ", NB_EPOCHS)
     for epoch=1, NB_EPOCHS do
        print('--------------Epoch : '..epoch..' ---------------')
 
@@ -124,6 +126,7 @@ function train(Models, priors_used)
        for numBatch=1, NB_BATCHES do
           Loss, Grad = Rico_Training(Models,priors_used)
           xlua.progress(numBatch, NB_BATCHES)
+
        end
 
        print("Loss Temp", TOTAL_LOSS_TEMP/NB_BATCHES/BATCH_SIZE)
@@ -137,6 +140,11 @@ function train(Models, priors_used)
 
        if BRING_CLOSER_REF_POINT then
           print("Loss Fix", TOTAL_LOSS_FIX/NB_BATCHES/BATCH_SIZE)
+          --You don't need to see the log at every time step, the first 3 will do
+          if epoch == 1 or epoch ==2 or epoch==3 then
+             print("Log_Seq",LOG_SEQ_USED)
+          end
+
        end
 
 
@@ -154,7 +162,7 @@ local function main(params)
     print(params)
     print_hyperparameters()
 
-
+        
     if USE_CUDA then
        require 'cunn'
        require 'cudnn'

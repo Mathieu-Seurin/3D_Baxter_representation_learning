@@ -9,7 +9,7 @@ import pandas as pd
 from PIL import Image
 import os, os.path
 import subprocess
-from Utils import ALL_STATE_FILE, LEARNED_REPRESENTATIONS_FILE, LAST_MODEL_FILE, GLOBAL_SCORE_LOG_FILE, IMG_TEST_SET, COMPLEX_TEST_SET, STATIC_BUTTON_SIMPLEST, COMPLEX_DATA
+from Utils import ALL_STATE_FILE, LEARNED_REPRESENTATIONS_FILE, LAST_MODEL_FILE, GLOBAL_SCORE_LOG_FILE, IMG_TEST_SET, COMPLEX_TEST_SET, STATIC_BUTTON_SIMPLEST, COMPLEX_DATA, MOBILE_ROBOT, ROBOT_TEST_SET
 from Utils import get_data_folder_from_model_name, file2dict, parse_repr_file, parse_true_state_file
 import unittest
 test = unittest.TestCase('__init__')
@@ -56,6 +56,8 @@ if data_folder == STATIC_BUTTON_SIMPLEST:
     TEST_SET = IMG_TEST_SET
 elif data_folder == COMPLEX_DATA:
     TEST_SET = COMPLEX_TEST_SET
+elif data_folder == MOBILE_ROBOT:
+    TEST_SET = ROBOT_TEST_SET
 
 if len(sys.argv) >= 3:
     nbr_images=int(sys.argv[2])

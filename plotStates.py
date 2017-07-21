@@ -19,13 +19,12 @@ print"\n\n >> Running plotStates.py....plotGroundTruthStates: ",plotGroundTruthS
 
 model_name = ''
 
-if len(sys.argv) != 3:
+if len(sys.argv) < 2:
     lastModelFile = open('lastModel.txt')
     path = lastModelFile.readline()[:-1]+'/'
     model_name = path.split('/')[1]
     # ONLY FOR FAST TESTING !!:   model_name = MOBILE_ROBOT#STATIC_BUTTON_SIMPLEST#'pushingButton3DAugmented' #TODO REMOVE-testing  model_name = MOBILE_ROBOT
     data_folder = get_data_folder_from_model_name(model_name)
-    reward_file_str = 'allRewards_'+data_folder+'.txt'
     if plotGroundTruthStates:
         state_file_str = 'allStates_'+data_folder+'.txt'
         print "*********************\nPLOTTING GROUND TRUTH (OBSERVED) STATES for model: ", model_name#(Baxter left wrist position for 3D PUSHING_BUTTON_AUGMENTED dataset, or grid 2D position for MOBILE_ROBOT dataset)
@@ -38,12 +37,24 @@ if len(sys.argv) != 3:
 
 else:
     state_file_str = sys.argv[1]
-    
+    path_list = state_file_str.split('/')[-2:]
+
+    print "path_list",path_list 
+
+    if path_list[0][:2] == 'co':
+        data_folder = 'complexData'
+    elif path_list[0][:2].lower() == '3d':
+        data_folder = 'staticButtonSimplest'
+    else:
+        data_folder = 'mobileData'
+
     # if not os.path.isfile(state_file_str): # print('Calling subprocess create_plotStates_file_for_all_seq with ',data_folder)
     subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_cuda','-use_continuous','-data_folder', data_folder])  # TODO: READ CMD LINE ARGS FROM FILE INSTEAD (and set accordingly here) TO NOT HAVING TO MODIFY INSTEAD train_predict_plotStates and the python files
     # if not os.path.isfile(reward_file_str): #print('Calling subprocess create_all_reward with ',data_folder)
     subprocess.call(['th','create_all_reward.lua', '-use_cuda','-use_continuous','-data_folder', data_folder])
 
+
+reward_file_str = 'allRewards_'+data_folder+'.txt'
 
 total_rewards = 0
 total_states = 0

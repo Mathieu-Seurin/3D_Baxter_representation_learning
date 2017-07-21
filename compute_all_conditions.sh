@@ -3,7 +3,7 @@
 if [ "$1" != "" ]; then
     DATA_FOLDER=$1
 else
-    echo No data folder given
+    echo No data folder given as parameter
     exit
 fi
 
@@ -13,6 +13,7 @@ cp hyperparamsVanilla.lua hyperparams.lua
 
 # Prior with fix point above button
 cp hyperparamsFix.lua hyperparams.lua
+cp constDef.lua const.lua
 ./learn_convert_plot.sh $DATA_FOLDER
 
 # Prior with fix point selected randomly

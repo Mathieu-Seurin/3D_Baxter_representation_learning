@@ -21,8 +21,6 @@ require 'paths'
 require 'const'
 -- try to avoid global variable as much as possible
 
-require(MODEL_ARCHITECTURE_FILE)
-
 local cmd = torch.CmdLine()
 -- Basic options
 cmd:option('-use_cuda', false, 'true to use GPU version, false (default) for CPU only mode')
