@@ -50,6 +50,8 @@ function get_data_folder_from_model_name(model_name)
         return STATIC_BUTTON_SIMPLEST
     elseif string.find(model_name, COMPLEX_DATA) then
         return COMPLEX_DATA
+    elseif string.find(model_name, COLORFUL) then
+        return COLORFUL
     else
         print "Unsupported dataset!"
     end
@@ -106,6 +108,7 @@ function patch(m)
 end
 
 function save_model(model)
+    model:clearState() -- assuming that will not continue computation...
 
    path = LOG_FOLDER..NAME_SAVE
    lfs.mkdir(path)
@@ -222,7 +225,7 @@ function getRandomBatchFromSeparateList(batch_size, mode)
                data1 = ALL_SEQ[INDEX1]
                data2 = ALL_SEQ[INDEX2]
             end
-               
+
          end
          im1,im2 = data1.images[set.im1], data2.images[set.im2]
          batch[1][i]=im1

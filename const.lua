@@ -53,7 +53,7 @@ RELOAD_MODEL = false
 -- VISUALIZATION TOOL
 -- if you want to visualize images, use 'qlua' instead of 'th'
 --===========================================================
-VISUALIZE_IMAGES_TAKEN = true
+VISUALIZE_IMAGES_TAKEN = false
 VISUALIZE_CAUS_IMAGE = false
 VISUALIZE_IMAGE_CROP = false
 VISUALIZE_MEAN_STD = false
@@ -323,7 +323,37 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
         if BRING_CLOSER_REF_POINT then
            PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","fixed_pos"}}
         end
+    elseif DATA_FOLDER == COLORFUL then
+        CLAMP_CAUSALITY = false --TODO: make false when continuous works
 
+        FIXED_POS  = {0.6, 0.30, 0.10} -- starting point for every sequence
+        -- FIXED_POS = {0.587, -0.036, -0.143}
+        -- A point where the robot wants the state to be very similar. Like a reference point for the robot
+
+        MIN_TABLE = {0.42,-0.1,-0.11} -- for x,y,z
+        MAX_TABLE = {0.75,0.60,0.35} -- for x,y,z
+
+        DIMENSION_IN = 3
+        DIMENSION_OUT = 3
+
+        REWARD_INDEX = 2 -- Which column in the reward file indicates the value of reward ?
+        INDEX_TABLE = {2,3,4} --column index for coordinates in state file, respectively (x,y,z)
+
+        DEFAULT_PRECISION = 0.05 -- for 'arrondit' function
+        FILENAME_FOR_REWARD = "recorded_button1_is_pressed.txt"
+        FILENAME_FOR_ACTION = "recorded_robot_limb_left_endpoint_action.txt" -- Never written, always computed on the fly
+        FILENAME_FOR_STATE = "recorded_robot_limb_left_endpoint_state.txt"
+
+        SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
+        AVG_FRAMES_PER_RECORD = 250  --HINT: reduce for fast full epoch testing in CPU mode
+
+        if BRING_CLOSER_REWARD then
+           PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","make_reward_closer"}}
+        end
+
+        if BRING_CLOSER_REF_POINT then
+           PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","fixed_pos"}}
+        end
     else
       print("No supported data folder provided, please add either of the data folders defined in hyperparams: "..BABBLING..", "..MOBILE_ROBOT.." "..SIMPLEDATA3D..' or others in const.lua' )
       os.exit()
