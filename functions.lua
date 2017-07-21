@@ -108,7 +108,7 @@ function patch(m)
 end
 
 function save_model(model)
-    model:clearState() -- assuming that will not continue computation...
+    -- model:clearState() -- assuming won't continue computation...
 
    path = LOG_FOLDER..NAME_SAVE
    lfs.mkdir(path)
@@ -261,7 +261,7 @@ function getRandomBatchFromSeparateList(batch_size, mode)
 
    --Very useful tool to check if prior are coherent
    if VISUALIZE_IMAGES_TAKEN then
-      print("MODE :",mode)
+      print("PRIOR MODE :",mode)
       visualize_set(im1,im2,im3,im4)
    end
    return batch, set.act1, set.act2

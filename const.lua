@@ -53,7 +53,7 @@ RELOAD_MODEL = false
 -- VISUALIZATION TOOL
 -- if you want to visualize images, use 'qlua' instead of 'th'
 --===========================================================
-VISUALIZE_IMAGES_TAKEN = false
+VISUALIZE_IMAGES_TAKEN = false -- true for visualizing images taken in each prior
 VISUALIZE_CAUS_IMAGE = false
 VISUALIZE_IMAGE_CROP = false
 VISUALIZE_MEAN_STD = false
@@ -308,7 +308,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
         REWARD_INDEX = 2 -- Which column in the reward file indicates the value of reward ?
         INDEX_TABLE = {2,3,4} --column index for coordinates in state file, respectively (x,y,z)
 
-        DEFAULT_PRECISION = 0.05 -- for 'arrondit' function
+        DEFAULT_PRECISION = 0.01 -- for 'arrondit' function
         FILENAME_FOR_REWARD = "recorded_button1_is_pressed.txt"
         FILENAME_FOR_ACTION = "recorded_robot_limb_left_endpoint_action.txt" -- Never written, always computed on the fly
         FILENAME_FOR_STATE = "recorded_robot_limb_left_endpoint_state.txt"

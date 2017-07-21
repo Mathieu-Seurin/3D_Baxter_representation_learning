@@ -8,7 +8,7 @@ import sys, os, os.path
 # coding: utf-8
 from Utils import library_versions_tests, get_data_folder_from_model_name, plotStates
 from Utils import BABBLING, MOBILE_ROBOT, SIMPLEDATA3D, PUSHING_BUTTON_AUGMENTED, STATIC_BUTTON_SIMPLEST, LEARNED_REPRESENTATIONS_FILE
-from Utils import GLOBAL_SCORE_LOG_FILE, MODELS_CONFIG_LOG_FILE, ALL_STATS_FILE
+from Utils import GLOBAL_SCORE_LOG_FILE, MODELS_CONFIG_LOG_FILE, ALL_STATS_FILE, ALL_DATASETS
 
 
 ################
@@ -18,7 +18,6 @@ from Utils import GLOBAL_SCORE_LOG_FILE, MODELS_CONFIG_LOG_FILE, ALL_STATS_FILE
 ############ PLOT ALL EXPERIMENTS SCORES
 print"\n\n >> Running report_results.py...."
 
-all_datasets = [BABBLING, MOBILE_ROBOT, SIMPLEDATA3D, PUSHING_BUTTON_AUGMENTED, STATIC_BUTTON_SIMPLEST]
 header = ['Model','KNN_MSE','DATA_FOLDER','MODEL_ARCHITECTURE_FILE','MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD','CONTINUOUS_ACTION_SIGMA']
 
 def plot_all_config_performance(df):
@@ -49,7 +48,7 @@ if os.path.isfile(GLOBAL_SCORE_LOG_FILE):
         final = all_scores_logs[header]
         final.sort_values(by='Model', inplace=True )
         print "Latest scores logged so far: \n", final.tail(10)
-        print_leader_board(final, all_datasets)
+        print_leader_board(final, ALL_DATASETS)
         final.to_csv(ALL_STATS_FILE, header = header)
 
     else:
