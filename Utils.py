@@ -68,7 +68,7 @@ def get_data_folder_from_model_name(model_name):
     elif COLORFUL in model_name:
         return COLORFUL
     else:
-        print "Unsupported dataset!"
+        sys.exit("get_data_folder_from_model_name: Unsupported dataset!")
 
 """
 Use this function if rewards need to be visualized, use plot_3D otherwise

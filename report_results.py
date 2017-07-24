@@ -47,7 +47,7 @@ if os.path.isfile(GLOBAL_SCORE_LOG_FILE):
         all_scores_logs = mse_df.fillna(np.nan).dropna().merge(models_df.fillna(np.nan).dropna(),on='Model',how='outer')
         final = all_scores_logs[header]
         final.sort_values(by='Model', inplace=True )
-        print "Latest scores logged so far: \n", final.tail(10)
+        print "Latest scores logged so far: \n", final.tail(5)
         print_leader_board(final, ALL_DATASETS)
         final.to_csv(ALL_STATS_FILE, header = header)
 

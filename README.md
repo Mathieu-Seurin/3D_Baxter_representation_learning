@@ -7,6 +7,7 @@ In this folder the network aims to learn a 3D representation of the robot hand p
 ## DATA:
 
 Place your data (from GDrive folder) in the main folder. The data folder should be named "simpleData3D".
+If you use the 'colorful' dataset, beware that it will take 24GB of RAM.
 
 ## MODEL:
 
@@ -108,6 +109,10 @@ Mac install: cd /etc/   and $ Natalias-MacBook:etc natalia$ sudo nano tsocks.con
 require 'cunn'
 require 'cudnn'  --If trouble, installing, follow step 6 in https://github.com/jcjohnson/neural-style/blob/master/INSTALL.md
 
+
+## OPTIMIZATIONS
+For cudnn memory/speed optimization options, see
+https://github.com/soumith/cudnn.torch
 
 
 ## POTENTIAL ISSUES:

@@ -74,7 +74,7 @@ DIMENSION_IN = 2
 REWARD_INDEX = 1  --3 reward values: -1, 0, 10
 INDEX_TABLE = {1,2} --column index for coordinate in state file (respectively x,y)
 
-DEFAULT_PRECISION = 0.1
+DEFAULT_PRECISION = 0.05
 FILENAME_FOR_ACTION = "recorded_robot_action.txt" --not used at all, we use state file, and compute the action with it (contains dx, dy)
 FILENAME_FOR_STATE = "recorded_robot_state.txt"
 FILENAME_FOR_REWARD = "recorded_robot_reward.txt"
@@ -128,8 +128,7 @@ end
 ---------------------------------------------------------------------------------------
 function set_hyperparams(params)
     --overriding the defaults:
-    USE_CUDA = params.use_cuda
-    --print ('Boolean param: ') -- type is boolean
+    USE_CUDA = params.use_cuda      --print ('Boolean param: ') -- type is boolean
     USE_CONTINUOUS = params.use_continuous
     MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = params.mcd
     CONTINUOUS_ACTION_SIGMA = params.sigma
@@ -146,6 +145,11 @@ function set_cuda_hyperparams(USE_CUDA)
         require 'cunn'
         require 'cutorch'
         require 'cudnn'  --If trouble, installing, follow step 6 in https://github.com/jcjohnson/neural-style/blob/master/INSTALL.md
+        -- and https://github.com/soumith/cudnn.torch
+        cudnn.benchmark = true -- uses the inbuilt cudnn auto-tuner to find the fastest convolution algorithms.
+                       -- If this is set to false, uses some in-built heuristics that might not always be fastest.
+        cudnn.fastest = true -- this is like the :fastest() mode for the Convolution modules,
+                     -- simply picks the fastest convolution algorithm, rather than tuning for workspace size
         tnt = require 'torchnet'
         vision = require 'torchnet-vision'  -- Install via https://github.com/Cadene/torchnet-vision
     end
@@ -172,6 +176,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
     SAVED_MODEL_PATH = LOG_FOLDER..NAME_SAVE
 
     if DATA_FOLDER == SIMPLEDATA3D then
+       DEFAULT_PRECISION = 0.05 -- for 'arrondit' function
        CLAMP_CAUSALITY = true  --TODO: make false when continuous works
 
        MIN_TABLE = {0.42,-0.2,-10} -- for x,y,z doesn't really matter in fact
@@ -182,7 +187,6 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
        REWARD_INDICE = 2
        INDEX_TABLE = {2,3,4} --column indice for coordinate in state file (respectively x,y,z)
 
-       DEFAULT_PRECISION = 0.05 -- for 'arrondit' function
        FILENAME_FOR_REWARD = "is_pressed"
        FILENAME_FOR_ACTION = "endpoint_action"
        FILENAME_FOR_STATE = "endpoint_state"
@@ -308,7 +312,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
         REWARD_INDEX = 2 -- Which column in the reward file indicates the value of reward ?
         INDEX_TABLE = {2,3,4} --column index for coordinates in state file, respectively (x,y,z)
 
-        DEFAULT_PRECISION = 0.01 -- for 'arrondit' function
+        DEFAULT_PRECISION = 0.05 -- for 'arrondit' function
         FILENAME_FOR_REWARD = "recorded_button1_is_pressed.txt"
         FILENAME_FOR_ACTION = "recorded_robot_limb_left_endpoint_action.txt" -- Never written, always computed on the fly
         FILENAME_FOR_STATE = "recorded_robot_limb_left_endpoint_state.txt"
@@ -353,6 +357,10 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
 
         if BRING_CLOSER_REF_POINT then
            PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","fixed_pos"}}
+        end
+
+        if USE_CONTINUOUS then
+            DEFAULT_PRECISION = 0.05 -- for 'arrondit' function
         end
     else
       print("No supported data folder provided, please add either of the data folders defined in hyperparams: "..BABBLING..", "..MOBILE_ROBOT.." "..SIMPLEDATA3D..' or others in const.lua' )
@@ -400,16 +408,18 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
     print_hyperparameters()
 end
 
-function print_hyperparameters()
-    print("================================")
-    print("Model Architecture :",MODEL_ARCHITECTURE_FILE)
-    print("\nUSE_CUDA ",USE_CUDA," \nUSE_CONTINUOUS ACTIONS: ",USE_CONTINUOUS)
+function print_hyperparameters(extra_string_to_print)
+    print(extra_string_to_print)
+    print("============ Experiment: DATA_FOLDER USED =========\n",
+                        DATA_FOLDER,
+												" (LOG_FOLDER ", LOG_FOLDER,
+                        ")\nUSE_CUDA ",USE_CUDA,", USE_CONTINUOUS ACTIONS: ",USE_CONTINUOUS, " MODEL: ",MODEL_ARCHITECTURE_FILE,". PRIORS_CONFIGS_TO_APPLY", PRIORS_CONFIGS_TO_APPLY)
+    print('EXTRAPOLATE_ACTION ','EXTRAPOLATE_ACTION_CAUS ','BRING_CLOSER_REWARD ','BRING_CLOSER_REF_POINT: ')
+    print(EXTRAPOLATE_ACTION,EXTRAPOLATE_ACTION_CAUS,BRING_CLOSER_REWARD,BRING_CLOSER_REF_POINT)
     if USE_CONTINUOUS then  --otherwise, it is not used
         print ('MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD: ',MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD,' CONTINUOUS_ACTION_SIGMA: ', CONTINUOUS_ACTION_SIGMA)
     end
-    print("============ DATA_FOLDER USED =========\n",
-                    DATA_FOLDER,
-      "\n================================")
+    print("\n================================")
 end
 
 -- 49 (1 repeated by error) IMAGES TEST SET HANDPICKED TO SHOW VISUAL VARIABILITY
