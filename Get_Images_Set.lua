@@ -254,6 +254,8 @@ function get_one_random_Caus_Set(Infos1, Infos2)
    local size2=#Infos2[1]
    local watchDog=0
 
+   local reward1, reward2
+
    while watchDog<50 do
 
       repeat
@@ -268,6 +270,7 @@ function get_one_random_Caus_Set(Infos1, Infos2)
 
          reward1 = Infos2.reward[id_ref_action_end]
       until (reward1~=0)
+
 
       action1 = action_amplitude(Infos2, id_ref_action_begin, id_ref_action_end)
 
@@ -288,39 +291,38 @@ function get_one_random_Caus_Set(Infos1, Infos2)
       end
 
       for i=1, size1 do
-         id_second_action_begin=torch.random(1,size1-1)
+         repeat
+            id_second_action_begin=torch.random(1,size1-1)
+            if EXTRAPOLATE_ACTION_CAUS then --Look at const.lua for more details about extrapolate
+               repeat id_second_action_end=torch.random(1,size1) until (id_second_action_begin ~= id_second_action_end)
+            else
+               id_second_action_end=id_second_action_begin+1
+            end
+            reward2 = Infos1.reward[id_second_action_end]
+         until reward2 ~= reward1
 
-         if EXTRAPOLATE_ACTION_CAUS then --Look at const.lua for more details about extrapolate
-            repeat id_second_action_end=torch.random(1,size1) until (id_second_action_begin ~= id_second_action_end)
-         else
-            id_second_action_end=id_second_action_begin+1
+         action2 = action_amplitude(Infos1, id_second_action_begin, id_second_action_end)
+         
+         --Visualize images taken if you want
+         if VISUALIZE_CAUS_IMAGE then
+            print("action2",action2[1],action2[2])--,action[3])
+            visualize_image_from_seq_id(INDEX1,id_second_action_begin,id_second_action_end)
+            print(is_same_action(action1, action2))
+            io.read()
          end
 
-         --if Infos1.reward[id_second_action_begin]==0 and Infos1.reward[id_second_action_end]~=reward1 then
-         if Infos1.reward[id_second_action_end]~=reward1 then -- The constraint is softer
-            action2 = action_amplitude(Infos1, id_second_action_begin, id_second_action_end)
-
-            --Visualize images taken if you want
-            if VISUALIZE_CAUS_IMAGE then
-               print("action2",action2[1],action2[2])--,action[3])
-               visualize_image_from_seq_id(INDEX1,id_second_action_begin,id_second_action_end)
-               print(is_same_action(action1, action2))
-               io.read()
+         if USE_CONTINUOUS then
+            if action_vectors_are_similar_enough(action1, action2) then
+               return {im1=id_second_action_begin,im2=id_ref_action_begin, im3=id_second_action_end, im4=id_ref_action_end, act1=action1, act2=action2}
             end
 
-            if USE_CONTINUOUS then
-               if action_vectors_are_similar_enough(action1, action2) then
-                   return {im1=id_second_action_begin,im2=id_ref_action_begin, im3=id_second_action_end, im4=id_ref_action_end, act1=action1, act2=action2}
-               end
-
-            elseif is_same_action(action1, action2) then
-               return {im1=id_second_action_begin,im2=id_ref_action_begin, im3=id_second_action_end, im4=id_ref_action_end}
-            end
+         elseif is_same_action(action1, action2) then
+            return {im1=id_second_action_begin,im2=id_ref_action_begin, im3=id_second_action_end, im4=id_ref_action_end}
          end
       end
       watchDog=watchDog+1
    end
-   error("CAUS WATCHDOG ATTACK!!!!!!!!!!!!!!!!!!")
+error("CAUS WATCHDOG ATTACK!!!!!!!!!!!!!!!!!!")
 end
 
 function get_one_random_reward_close_set(Infos1, Infos2)

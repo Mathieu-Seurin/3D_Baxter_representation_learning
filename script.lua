@@ -146,8 +146,6 @@ function train(Models, priors_used)
           end
 
        end
-
-
        save_model(Models.Model1, NAME_SAVE) --TODO Do we need to write NB_EPOCH TIMES? isnt enough the last time to write once and not overwrite NB_EPOCH TIMES?
    end
    log_model_params()

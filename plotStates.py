@@ -106,7 +106,7 @@ if REPRESENTATIONS_DIMENSIONS >3:
     pca = PCA(n_components=PLOT_DIMENSIONS) # default to 3
     pca.fit(states)
     toplot = pca.transform(states)
-elif REPRESENTATIONS_DIMENSIONS ==2:
+elif REPRESENTATIONS_DIMENSIONS==2:
     PLOT_DIMENSIONS = 2 #    print "[PCA not applied since learnt representations' dimensions are not larger than 2]"
 else:
     PLOT_DIMENSIONS = 3  # Default, if mobileData used, we plot just 2

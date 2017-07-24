@@ -48,9 +48,20 @@ nbr_images = -1
 use_test_set = True # TODO: make test set for complexData
 with_title = True
 
-lastModelFile = open(LAST_MODEL_FILE)
-path_to_model = lastModelFile.readline()[:-1]
-data_folder = get_data_folder_from_model_name(path_to_model)
+
+if len(sys.argv) >= 3:
+    nbr_images=int(sys.argv[2])
+if len(sys.argv) == 4:
+    path_to_model = sys.argv[3]
+    data_folder = 'mobileRobot'
+else:
+    lastModelFile = open(LAST_MODEL_FILE)
+    path_to_model = lastModelFile.readline()[:-1]
+    data_folder = get_data_folder_from_model_name(path_to_model)
+if len(sys.argv) == 2:
+    # We use fixed test set for fair comparison reasons
+    use_test_set = True
+    nbr_images = len(IMG_TEST_SET) # TODO: create for each dataset and add to Utils.py instead
 
 if data_folder == STATIC_BUTTON_SIMPLEST:
     TEST_SET = IMG_TEST_SET
@@ -59,15 +70,7 @@ elif data_folder == COMPLEX_DATA:
 elif data_folder == MOBILE_ROBOT:
     TEST_SET = ROBOT_TEST_SET
 
-if len(sys.argv) >= 3:
-    nbr_images=int(sys.argv[2])
-if len(sys.argv) == 4:
-    path_to_model = sys.argv[3]
-if len(sys.argv) == 2:
-    # We use fixed test set for fair comparison reasons
-    use_test_set = True
-    nbr_images = len(IMG_TEST_SET) # TODO: create for each dataset and add to Utils.py instead
-
+    
 # THE FOLLOWING ONLY WILL RUN IN USE_CUDA false way  #print('Calling lua subprocesses with ',data_folder)
 subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_cuda','-use_continuous','-data_folder', data_folder])  # TODO: READ CMD LINE ARGS FROM FILE INSTEAD (and set accordingly here) TO NOT HAVING TO MODIFY INSTEAD train_predict_plotStates and the python files
 subprocess.call(['th','create_all_reward.lua','-use_cuda','-use_continuous','-data_folder',data_folder])

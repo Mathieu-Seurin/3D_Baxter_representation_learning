@@ -206,8 +206,6 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
     elseif DATA_FOLDER == MOBILE_ROBOT then
         print('Setting hyperparams for MOBILE_ROBOT (our baseline reproducing Jonchowscki)')
        --NOTE: DEFAULT PARAMETERS FOR OUR BASELINE DATABASE SET AT THE BEGINNING OF THE FILE (NEED TO BE DECLARED AS CONSTANTS
-
-        
         CLAMP_CAUSALITY = false
 
         MIN_TABLE = {-10000,-10000} -- for x,y
@@ -227,7 +225,10 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
         AVG_FRAMES_PER_RECORD = 90
 
         -- Middle of field
-        FIXED_POS = {0.479, -0.085}
+        FIXED_POS = {1.54133736021, 1.71509412704}
+        
+        
+
         ROUNDING_VALUE_FIX = 0.1
 
     elseif DATA_FOLDER == BABBLING then
@@ -299,26 +300,6 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
         SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
         AVG_FRAMES_PER_RECORD = 90  --HINT: reduce for fast full epoch testing in CPU mode
 
-        if BRING_CLOSER_REWARD then
-           PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","make_reward_closer"}}
-        end
-
-        if BRING_CLOSER_REF_POINT then
-           PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","fixed_point"}}
-
-           FIXED_POS = {0.587, -0.025, -0.143}
-           ROUNDING_VALUE_FIX = 0.02
-
-           FIXED_POS = {0.673, -0.0888, 0.087}
-           ROUNDING_VALUE_FIX = 0.02
-
-           FIXED_POS = {0.633, -0.034, 0.138}
-           ROUNDING_VALUE_FIX = 0.02
-
-           -- is the position the same as the reference point, for this rounding ?
-           -- See arrondit for more details
-        end
-
     elseif DATA_FOLDER == COMPLEX_DATA then
         CLAMP_CAUSALITY = false --TODO: make false when continuous works
         AVG_FRAMES_PER_RECORD = 200
@@ -353,22 +334,11 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
 
         SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
 
-        if BRING_CLOSER_REWARD then
-           PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","make_reward_closer"}}
-        end
-
-        if BRING_CLOSER_REF_POINT then
-           PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","fixed_point"}}
-        end
 
     else
       print("No supported data folder provided, please add either of the data folders defined in hyperparams: "..BABBLING..", "..MOBILE_ROBOT.." "..SIMPLEDATA3D..' or others in const.lua' )
       os.exit()
     end
-
-
-    MIN_TABLE = {0.42,-0.09,-10} -- for x,y,z
-    MAX_TABLE = {0.74,0.59,10} -- for x,y,z
 
     if VISUALIZE_IMAGES_TAKEN or VISUALIZE_CAUS_IMAGE or VISUALIZE_IMAGE_CROP or VISUALIZE_MEAN_STD or VISUALIZE_AE then
        --Creepy, but need a placeholder, to prevent many window to pop
@@ -403,6 +373,15 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
        IM_LENGTH = 200
        IM_HEIGHT = 200
     end
+
+    if BRING_CLOSER_REWARD then
+       PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","make_reward_closer"}}
+    end
+
+    if BRING_CLOSER_REF_POINT then
+       PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","fixed_point"}}
+    end
+
 
     print_hyperparameters()
 end

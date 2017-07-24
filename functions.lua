@@ -111,8 +111,10 @@ function save_model(model)
    lfs.mkdir(path)
    file_string = path..'/'..NAME_SAVE..'.t7'
 
-   os.execute("cp hyperparams.lua "..path)
-   os.execute("cp const.lua "..path)
+   if not file_exists(path..'/hyperparameters.lua') then
+      os.execute("cp hyperparams.lua "..path)
+      os.execute("cp const.lua "..path)
+   end
 
    model:clearState()
    model_to_save = model:clone():float()
@@ -500,6 +502,7 @@ end
 function is_out_of_bound(list_positions)
    -- For each dimension you check if the value is inside
    -- barrier fix by MIN_TABLE and MAX_TABLE
+   
    for dim=1,#list_positions do
       if list_positions[dim] < MIN_TABLE[dim] or list_positions[dim] > MAX_TABLE[dim] then
          return true
