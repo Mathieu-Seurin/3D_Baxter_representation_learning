@@ -26,6 +26,8 @@ end
 
 function save_model(model)
 
+   model:clearState()
+   
    path = LOG_FOLDER..NAME_SAVE
    lfs.mkdir(path)
    file_string = path..'/'..NAME_SAVE..'.t7'
