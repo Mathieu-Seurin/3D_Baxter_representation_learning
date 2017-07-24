@@ -22,11 +22,9 @@ BASE_TIMNET = './models/topUniqueSimplerWOTanh'
 
 --MODEL_ARCHITECTURE_FILE = INCEPTIONV4 --Too big
 MODEL_ARCHITECTURE_FILE = BASE_TIMNET--without last layer as Tanh
---MODEL_ARCHITECTURE_FILE = RESNET
+MODEL_ARCHITECTURE_FILE = RESNET
 print("Model :",MODEL_ARCHITECTURE_FILE)
 
---======================================================
---Continuous actions SETTINGS
 --======================================================
 USE_CONTINUOUS = false --A switch between discrete and continuous actions (translates into calling getRandomBatchFromSeparateListContinuous instead of getRandomBatchFromSeparateList
 ACTION_AMPLITUDE = 0.01
@@ -52,10 +50,10 @@ MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.4
 EXTRAPOLATE_ACTION = false
 
 LR=0.0001
-LR_DECAY = 1e-6
+LR_DECAY = 3e-6
 
 SGD_METHOD = 'adam' -- Can be adam or adagrad
-BATCH_SIZE = 5
+BATCH_SIZE = 12
 NB_EPOCHS=20
 
 DATA_AUGMENTATION = 0.01
