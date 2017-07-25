@@ -57,7 +57,6 @@ function Print_performance(Models,Data,txt,txt_reward, name, Log_Folder, truth)
 	return Temp/nb_sample,Prop/nb_sample, Rep/nb_sample, Caus/nb_sample, list_out1, mutual_info, Correlation
 end
 
-
 function print_correlation(truth,output,dimension)
 	Truth=torch.Tensor(dimension,#truth)
 	Output=torch.Tensor(dimension,#output)

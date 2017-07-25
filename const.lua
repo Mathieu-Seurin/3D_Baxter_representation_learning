@@ -410,17 +410,16 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
        IM_LENGTH = 200
        IM_HEIGHT = 200
     end
-
-    print_hyperparameters()
 end
 
 function print_hyperparameters(extra_string_to_print)
+    extra_string_to_print = extra_string_to_print or ''
     print(extra_string_to_print)
     print("============ Experiment: DATA_FOLDER USED =========\n",
                         DATA_FOLDER,
 												" (LOG_FOLDER ", LOG_FOLDER,
                         ")\nUSE_CUDA ",USE_CUDA,", USE_CONTINUOUS ACTIONS: ",USE_CONTINUOUS, " MODEL: ",MODEL_ARCHITECTURE_FILE,". PRIORS_CONFIGS_TO_APPLY", PRIORS_CONFIGS_TO_APPLY)
-    print('EXTRAPOLATE_ACTION ','EXTRAPOLATE_ACTION_CAUS ','BRING_CLOSER_REWARD ','BRING_CLOSER_REF_POINT: ')
+    print('EXTRAPOLATE_ACTION  EXTRAPOLATE_ACTION_CAUS  BRING_CLOSER_REWARD  BRING_CLOSER_REF_POINT: ')
     print(EXTRAPOLATE_ACTION,EXTRAPOLATE_ACTION_CAUS,BRING_CLOSER_REWARD,BRING_CLOSER_REF_POINT)
     if USE_CONTINUOUS then  --otherwise, it is not used
         print ('MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD: ',MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD,' CONTINUOUS_ACTION_SIGMA: ', CONTINUOUS_ACTION_SIGMA)

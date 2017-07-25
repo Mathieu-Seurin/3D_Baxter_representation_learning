@@ -152,6 +152,8 @@ end
 local function main(params)
    print("\n\n>> learn_autoencoder.lua")
    optimizer = set_AE_hyperparams(params)
+   print('cmd default params (overridden by following set_hyperparams): ')
+   print(params)
    print_hyperparameters()
 
    if VISUALIZE_AE then
