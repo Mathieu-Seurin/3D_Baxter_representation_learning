@@ -42,7 +42,7 @@ function Rico_Training(Models,priors_used)
       -- just in case:
       collectgarbage()
 
-      local action1, action2, lossTemp,lossProp,lossCaus,lossRep
+      local action1, action2, lossTemp,lossProp,lossCaus,lossRep, batch
       -- get new parameters
       if x ~= parameters then
          parameters:copy(x)
@@ -54,7 +54,7 @@ function Rico_Training(Models,priors_used)
       --===========
       local mode='Temp' --Same for continuous or discrete actions
       if applying_prior(priors_used, mode) then
-          local batch=getRandomBatchFromSeparateList(BATCH_SIZE,mode)
+          batch=getRandomBatchFromSeparateList(BATCH_SIZE,mode)
           loss_temp, grad=doStuff_temp(Models,temp_criterion, batch,COEF_TEMP)
           TOTAL_LOSS_TEMP = loss_temp + TOTAL_LOSS_TEMP
       end
@@ -145,6 +145,9 @@ end
 
 
 ALL_SEQ = precompute_all_seq()
+
+print("DIFFERENT",DIFFERENT_FORMAT)
+print("IS RES",IS_RESNET)
 
 for nb_test=1, #PRIORS_CONFIGS_TO_APPLY do
    if RELOAD_MODEL then
