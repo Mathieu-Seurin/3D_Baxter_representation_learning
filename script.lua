@@ -24,7 +24,7 @@ function Rico_Training(Models,priors_used)
    local caus_criterion=get_Caus_criterion()
    local temp_criterion=nn.MSDCriterion()
 
-   -- create closure to evaluate f(X) and df/dX
+   -- create closure to evaluate f(X) and df/dX in backprop
    local feval = function(x)
       local loss_rep, loss_caus, loss_prop, loss_temp, loss_close, loss_fix = 0, 0, 0, 0, 0, 0
       -- just in case:
@@ -84,8 +84,8 @@ function Rico_Training(Models,priors_used)
           TOTAL_LOSS_FIX = loss_fix + TOTAL_LOSS_FIX
       end
 
-      --NOTE: shouldnt gradParameters be here  the sum of all gradRep, gradCaus, etc?
-      --Grad parameters is a tensor containing the internal gradient of all model's parameters
+      --NOTE: gradParameters  shouldnt be here  the sum of all gradRep, gradCaus, etc because
+      --GradParameters is a tensor containing the internal gradient of all model's parameters
       -- So the sum of gradients is already present in there
       return loss_rep+loss_caus+loss_prop+loss_temp, gradParameters
     end
@@ -95,11 +95,11 @@ function Rico_Training(Models,priors_used)
     optimState={learningRate=LR, learningRateDecay=LR_DECAY}
 
     if SGD_METHOD == 'adagrad' then
-        parameters,loss = optim.adagrad(feval,parameters,optimState)
+        parameters, loss = optim.adagrad(feval,parameters,optimState)
     elseif SGD_METHOD == 'adam' then
-        parameters,loss = optim.adam(feval,parameters,optimState)
+        parameters, loss = optim.adam(feval,parameters,optimState)
     else
-       parameters,loss = optim.adamax(feval,parameters,optimState)
+       parameters, loss = optim.adamax(feval,parameters,optimState)
     end
 
     -- loss[1] table of one value transformed in just a value
@@ -135,7 +135,7 @@ function train(Models, priors_used)
        print("Loss Rep", TOTAL_LOSS_REP/NB_BATCHES/BATCH_SIZE)
 
        if BRING_CLOSER_REWARD then
-          print("Loss Close", TOTAL_LOSS_CLOSE/NB_BATCHES/BATCH_SIZE)
+          print("Loss BRING_CLOSER_REWARD", TOTAL_LOSS_CLOSE/NB_BATCHES/BATCH_SIZE)
        end
 
        if BRING_CLOSER_REF_POINT then
@@ -146,6 +146,7 @@ function train(Models, priors_used)
           end
 
        end
+
        save_model(Models.Model1, NAME_SAVE) --TODO Do we need to write NB_EPOCH TIMES? isnt enough the last time to write once and not overwrite NB_EPOCH TIMES?
    end
    log_model_params()
@@ -157,10 +158,9 @@ end
 local function main(params)
     print("\n\n>> script.lua: main model builder")
     set_hyperparams(params)--    print('In DATA_FOLDER: '..DATA_FOLDER..' params: ')
-    print(params)
+    print(type(params))
     print_hyperparameters()
 
-        
     if USE_CUDA then
        require 'cunn'
        require 'cudnn'
@@ -170,7 +170,7 @@ local function main(params)
     NB_SEQUENCES= #records_paths
 
     if DATA_FOLDER == COMPLEX_DATA then
-       NB_SEQUENCES = NB_SEQUENCES - 1 -- To avoid looking at the test set
+       NB_SEQUENCES = NB_SEQUENCES - 1 -- Just because it is a dumb looking action without much action, we dont consider it
     end
 
     if NB_SEQUENCES ==0  then --or not folder_exists(DATA_FOLDER) then
@@ -214,9 +214,8 @@ local function main(params)
        local Log_Folder=Get_Folder_Name(LOG_FOLDER, priors_used)
 
        print("Experiment "..nb_test .." (Log_Folder="..Log_Folder.."): Training model using priors: ")
-       print(priors_used)
        train(Models, priors_used)
-       print_experiment_config()
+       print_hyperparameters("Experiment run successfully for hyperparams: ")
     end
 
     if LOGGING_ACTIONS then
@@ -230,6 +229,7 @@ local function main(params)
        end
     end
 end
+
 
 local cmd = torch.CmdLine()
 -- Basic options

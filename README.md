@@ -7,6 +7,7 @@ In this folder the network aims to learn a 3D representation of the robot hand p
 ## DATA:
 
 Place your data (from GDrive folder) in the main folder. The data folder should be named "simpleData3D".
+If you use the 'colorful' dataset, beware that it will take 24GB of RAM.
 
 ## MODEL:
 
@@ -105,9 +106,19 @@ Mac install: cd /etc/   and $ Natalias-MacBook:etc natalia$ sudo nano tsocks.con
 
 
 4. When using ResNet, you
+cd models and Download it remotely via:
+wget https://d2j0dndfm35trm.cloudfront.net/resnet-18.t7
+wget https://d2j0dndfm35trm.cloudfront.net/resnet-34.t7
+wget https://d2j0dndfm35trm.cloudfront.net/resnet-50.t7  
+# NOTE: 101, 152 and 200 also exist!
+and do:
 require 'cunn'
 require 'cudnn'  --If trouble, installing, follow step 6 in https://github.com/jcjohnson/neural-style/blob/master/INSTALL.md
 
+
+## OPTIMIZATIONS
+For cudnn memory/speed optimization options, see
+https://github.com/soumith/cudnn.torch
 
 
 ## POTENTIAL ISSUES:
@@ -204,6 +215,74 @@ I have not found other solution than running within the proxy network (run local
 The method has_command_finish_correctly for tracing errors better in console (break program and show error without continuing next program in the script) sometimes does not work. Solution: Run ./script.sh (without sh before). (If you get permission errors when running remotely via ssh, chmod u+x  script.sh)
 
 * Lua/Torch allow only default boolean cmd line parameters of false. Add the flag to set them to True, leave them out to set them to False.
+
+* Visualizing images: init.lua:389: module 'qt' not found:No LuaRocks module found for qt no field package.preload['qt']
+Solution: for using qtlua, start torch in your terminal with:
+
+$ qlua
+
+instead of
+
+$ th
+
+* qlua: ./const.lua:149: module 'torchnet' not found:
+	no field package.preload['torchnet']
+luarocks install torchnet
+luarocks install qtlua
+
+* torchnet' not found
+The issue can be related to qlua not being properly installed. Install from https://github.com/LuaDist/qtlua
+if luarocks install qtlua fails with
+```
+/tmp/luarocks_qtlua-scm-1-MmsVrW/qtlua/qtlua/qtluautils.cpp: In function ‘const char* pushnexttemplate(lua_State*, const char*)’:
+/tmp/luarocks_qtlua-scm-1-MmsVrW/qtlua/qtlua/qtluautils.cpp:545:20: error: ‘LUA_PATHSEP’ was not declared in this scope
+   while (*path == *LUA_PATHSEP) path++;  /* skip separators */
+                    ^
+/tmp/luarocks_qtlua-scm-1-MmsVrW/qtlua/qtlua/qtluautils.cpp:547:21: error: ‘LUA_PATHSEP’ was not declared in this scope
+   l = strchr(path, *LUA_PATHSEP);  /* find next separator */
+                     ^
+qtlua/CMakeFiles/libqtlua.dir/build.make:72: recipe for target 'qtlua/CMakeFiles/libqtlua.dir/qtluautils.cpp.o' failed
+make[2]: *** [qtlua/CMakeFiles/libqtlua.dir/qtluautils.cpp.o] Error 1
+CMakeFiles/Makefile2:85: recipe for target 'qtlua/CMakeFiles/libqtlua.dir/all' failed
+make[1]: *** [qtlua/CMakeFiles/libqtlua.dir/all] Error 2
+Makefile:127: recipe for target 'all' failed
+make: *** [all] Error 2
+Error: Build error: Failed building.
+```
+Solution:  (as in https://github.com/torch/paths/issues/5):
+Run it with Lua 5.1 instead of 5.2: http://lua-users.org/wiki/LuaRocksConfig
+to switch among these:
+TORCH_LUA_VERSION=LUA52 ./install.sh
+and edit your ./bashrc PATH and LD_LIBRARY_PATH
+
+
+~/torch/install/bin/luarocks install qtlua
+
+Chintala: I STRONGLY recommend that you guys use our packaged self-contained luajit+luarocks when using torch. With this repo:
+https://github.com/soumith/torch-distro
+When there's system lua installed, things get messy with torch global install.
+Or
+1-paths source file should be revised to handle this issue. (first things first, might be the best solution)
+2-configure luarocks, according to this page
+
+
+
+If persists:
+Option a) install CUDA 8 (although all this code is tested in CUDA 7.5), and compiling with GCC 5 instead.
+Option b) Check your cuda version with nvcc --version, which nvcc, or with
+cat /usr/local/cuda/version.txt     #Note: https://stackoverflow.com/questions/41714757/how-to-find-cuda-version-in-ubuntu
+and adjust accordingly with the right version by upgrading your torch, cutorch (and likely nn) packages, they are probably old.
+(as in https://github.com/torch/distro/issues/141 )
+```
+luarocks install torch  # you should be good to go, whenever a package is not recognized after being installed, upgrade torch first with this command and then install package.
+luarocks install cutorch
+luarocks install nn
+luarocks install cunn
+```
+Option c) https://github.com/torch/cutorch/issues/175
+
+~/qtlua/bld$ ../configure --help
+
 
 
 ## REFERENCES

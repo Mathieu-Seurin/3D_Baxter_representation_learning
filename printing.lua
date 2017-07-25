@@ -270,12 +270,16 @@ function Print_Corr(corr,epoch,path)
 	f:close()
 end
 
-function print_experiment_config()
-    print("============ Experiment run successfully: DATA USED =========\n",
-                        DATA_FOLDER,
-												" (LOG_FOLDER ", LOG_FOLDER,
-                        ")\nUSE_CUDA ",USE_CUDA,", USE_CONTINUOUS ACTIONS: ",USE_CONTINUOUS, " MODEL: ",MODEL_ARCHITECTURE_FILE,". USED PRIORS: ")
-    print(PRIORS_CONFIGS_TO_APPLY)
-    print('MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD: ',MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD, ' CONTINUOUS_ACTION_SIGMA: ',CONTINUOUS_ACTION_SIGMA)
-    print("\n================================")
-end
+-- function print_experiment_config(extra_string_to_print)   USE print_hyperparameters instead
+--     print(extra_string_to_print)
+--     print("============ Experiment run successfully: DATA USED =========\n",
+--                         DATA_FOLDER,
+-- 												" (LOG_FOLDER ", LOG_FOLDER,
+--                         ")\nUSE_CUDA ",USE_CUDA,", USE_CONTINUOUS ACTIONS: ",USE_CONTINUOUS, " MODEL: ",MODEL_ARCHITECTURE_FILE,". PRIORS_CONFIGS_TO_APPLY", PRIORS_CONFIGS_TO_APPLY)
+--     print('EXTRAPOLATE_ACTION ','EXTRAPOLATE_ACTION_CAUS ','BRING_CLOSER_REWARD ','BRING_CLOSER_REF_POINT: ')
+--     print(EXTRAPOLATE_ACTION,EXTRAPOLATE_ACTION_CAUS,BRING_CLOSER_REWARD,BRING_CLOSER_REF_POINT)
+--     if USE_CONTINUOUS then  --otherwise, it is not used
+--         print ('MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD: ',MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD,' CONTINUOUS_ACTION_SIGMA: ', CONTINUOUS_ACTION_SIGMA)
+--     end
+--     print("\n================================")
+-- end

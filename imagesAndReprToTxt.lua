@@ -8,6 +8,7 @@ require 'functions'
 tnt = require 'torchnet'
 vision = require 'torchnet-vision'
 
+--This function applies more pixels resolution to the image?
 local augmentation = tnt.transform.compose{
    vision.image.transformimage.colorNormalize{
       mean = MEAN_MODEL, std  = STD_MODEL
@@ -51,7 +52,7 @@ function visualize_images_and_repr(imagesFolder,model)
                end
 
                img = image.scale(image.load(fullImagesPath,3,'float'), IM_LENGTH, IM_HEIGHT)
-               
+
                -- print("",img:size())
                -- image.display(img[1])
                -- io.read()
@@ -59,11 +60,10 @@ function visualize_images_and_repr(imagesFolder,model)
                image.save(save_folder..imageStr,img)
             end
 
-               
+
          end
       end
    end
-
 end
 
 --returns the representation of the image (a tensor of size {1xDIM})
@@ -119,7 +119,7 @@ local function main(params)
    print(params)
    print_hyperparameters()
 
-   
+
    local images_folder = DATA_FOLDER
    local path, modelString
    folder_and_name = get_last_used_model_folder_and_name()
@@ -135,7 +135,7 @@ local function main(params)
    -- end
 
    -- NOT USEFUL ANYMORE : AE uses resnet now
-   
+
    local  model = torch.load(path..'/'..modelString)
    if USE_CUDA then
       model = model:cuda()

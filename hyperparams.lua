@@ -7,6 +7,7 @@ PUSHING_BUTTON_AUGMENTED = 'pushingButton3DAugmented'
 BABBLING = 'babbling'
 STATIC_BUTTON_SIMPLEST = 'staticButtonSimplest'
 COMPLEX_DATA = 'complexData'
+COLORFUL = 'colorful'
 --!!! AVOID SETTING IT HERE FOR INCONSISTENCIES< SET VIA COMMAND LINE !!!
 --DATA_FOLDER = MOBILE_ROBOT
 --DATA_FOLDER = STATIC_BUTTON_SIMPLEST --PUSHING_BUTTON_AUGMENTED
@@ -28,6 +29,7 @@ BASE_TIMNET = './models/topUniqueSimplerWOTanh'--ImageNet-inspired Convolutional
 --MODEL_ARCHITECTURE_FILE = BASE_TIMNET--without last layer as Tanh, use it for AE
 MODEL_ARCHITECTURE_FILE = RESNET
 
+
 --==================================================
 -- Hyperparams : Learning rate, batchsize, USE_CUDA etc...
 --==================================================
@@ -38,22 +40,20 @@ MODEL_ARCHITECTURE_FILE = RESNET
 
 EXTRAPOLATE_ACTION = false
 EXTRAPOLATE_ACTION_CAUS = false
---TODO shall it be true for continuous actions too always?
+--TODO shall it be true for continuous actions too always? TODO if extrapolate_action_caus is false, same should be for CLAMP_CAUSALITY, otherwise it makes no sense?
 -- Always : i don't think so, but trying to see if it works better with it, why not
 
 BRING_CLOSER_REWARD = false
-BRING_CLOSER_REF_POINT = false
+BRING_CLOSER_REF_POINT = true
 -- Create a point where the robot wants the state to be very similar. Like a reference point for the robot.
-if BRING_CLOSER_REF_POINT and BRING_CLOSER_REWARD then
-   error("Can't do both at the moment")
-end
 
 LR=0.0001
-LR_DECAY = 6*1e-6
+LR_DECAY = 3*1e-6
 
 SGD_METHOD = 'adam' -- Can be adam or adagrad
-BATCH_SIZE = 5
-NB_EPOCHS= 10
+
+BATCH_SIZE = 12
+NB_EPOCHS= 20
 
 DATA_AUGMENTATION = 0.01
 NORMALIZE_IMAGE = true

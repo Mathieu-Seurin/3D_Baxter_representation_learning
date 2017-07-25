@@ -283,7 +283,7 @@ function test_run(verbose)
   NB_TEST = 2
   NB_TRAIN = NB_SEQUENCES - NB_TEST
   _, err = train(Model, verbose, false)
-  NAME_SAVE = 'Supervised_'..DATA_FOLDER
+  NAME_SAVE = 'Supervised_'..NAME_SAVE
   save_model(Model)
 
   local error_train = 0
@@ -310,7 +310,7 @@ end
 -- cross_validation(1)
 
 ALL_SEQ = precompute_all_seq()
-verbose = false
+verbose = true
 test_run(verbose)
 
 --------- load model test---------

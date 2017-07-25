@@ -153,7 +153,6 @@ local function main(params)
    print("\n\n>> learn_autoencoder.lua")
    optimizer = set_AE_hyperparams(params)
    print_hyperparameters()
-   print(params)
 
    if VISUALIZE_AE then
       w = image.display(torch.Tensor(3,200,400))
@@ -163,7 +162,6 @@ local function main(params)
    --    error([[Don't forget to switch model to BASE_TIMNET in hyperparameters
    --  Because the images' format is the same for auto-encoder]])
    --  end
-
    --Not necessary anymore because ae uses resnet
 
    NAME_SAVE = 'AE_'..NUM_HIDDEN..NAME_SAVE
@@ -185,7 +183,7 @@ local function main(params)
 
     parameters,gradParameters = model:getParameters()
     train_Epoch(optimizer, list_folders_images,list_txt,Log_Folder)
-
+    print_hyperparameters("Experiment run successfully for hyperparams: ")
     imgs={} --memory is free!!!!!
 end
 
