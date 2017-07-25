@@ -8,7 +8,14 @@ require 'functions'
 tnt = require 'torchnet'
 vision = require 'torchnet-vision'
 
---This function applies more pixels resolution to the image?
+---------------------------------------------------------------------------------------
+--This function uses the Torch module vision which preprocesses images. When
+--calling functions in this way inside another method, we are using a pipeline
+--(see torch pipelines documentation). This method will apply the transform composed
+--necessary step as preprocessing for the image to be able to be fed into the network
+--architecture model. ColorNormalize requires mean and std and so we set it. We finally
+--transform the image from double to float() as it is required for our model in models/ folder.
+---------------------------------------------------------------------------------------
 local augmentation = tnt.transform.compose{
    vision.image.transformimage.colorNormalize{
       mean = MEAN_MODEL, std  = STD_MODEL

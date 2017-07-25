@@ -22,7 +22,7 @@ function Rico_Training(Models,priors_used)
    local rep_criterion=get_Rep_criterion()
    local prop_criterion=get_Prop_criterion()
    local caus_criterion=get_Caus_criterion()
-   local temp_criterion=nn.MSDCriterion()
+   local temp_criterion=nn.MSDCriterion() -- MEAN square distance see https://github.com/torch/nn/blob/master/doc/criterion.md
 
    -- create closure to evaluate f(X) and df/dX in backprop
    local feval = function(x)
@@ -87,7 +87,7 @@ function Rico_Training(Models,priors_used)
       --NOTE: gradParameters  shouldnt be here  the sum of all gradRep, gradCaus, etc because
       --GradParameters is a tensor containing the internal gradient of all model's parameters
       -- So the sum of gradients is already present in there
-      return loss_rep+loss_caus+loss_prop+loss_temp, gradParameters
+      return loss_rep+loss_caus+loss_prop+loss_temp+loss_fix+loss_reward_closer, gradParameters
     end
 
     --sgdState = sgdState or { learningRate = LR, momentum = mom,learningRateDecay = 5e-7,weightDecay=coefL2 }
@@ -129,11 +129,9 @@ function train(Models, priors_used)
        print("Loss Prop", TOTAL_LOSS_PROP/NB_BATCHES/BATCH_SIZE)
        print("Loss Caus", TOTAL_LOSS_CAUS/NB_BATCHES/BATCH_SIZE)
        print("Loss Rep", TOTAL_LOSS_REP/NB_BATCHES/BATCH_SIZE)
-
        if BRING_CLOSER_REWARD then
           print("Loss BRING_CLOSER_REWARD", TOTAL_LOSS_CLOSE/NB_BATCHES/BATCH_SIZE)
        end
-
        if BRING_CLOSER_REF_POINT then
           print("Loss BRING_CLOSER_REF_POINT", TOTAL_LOSS_FIX/NB_BATCHES/BATCH_SIZE)
        end
@@ -190,7 +188,10 @@ local function main(params)
        end
 
        parameters,gradParameters = Model:getParameters()
-
+       -- In siamese networks we need one copy of the network per input (image) we want to compare at the same time, because otherwise,
+       -- we could not compare results if we would otherwise have the same network being applied twice. Since the max number of different images
+       -- we need for all priors is 4 (accounting for states and rewards in total (see priors formulas), therefore, 4 clones of the network are enogh. I.e.
+       -- we dont need one clone per prior, but one per different image we need to get data from to be compared in our priors)
        Model2=Model:clone('weight','bias','gradWeight','gradBias','running_mean','running_std')
        Model3=Model:clone('weight','bias','gradWeight','gradBias','running_mean','running_std')
        Model4=Model:clone('weight','bias','gradWeight','gradBias','running_mean','running_std')

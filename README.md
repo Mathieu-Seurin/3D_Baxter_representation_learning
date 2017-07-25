@@ -96,8 +96,7 @@ matplotlib.use('GTK')  # Or any other X11 back-end
 luarocks install torchnet-vision does not suffice:
 
 * luarocks install torchnet  
-* Install torchnet-vision via https://github.com/Cadene/torchnet-vision
-
+* Install torchnet-vision via https://github.com/Cadene/torchnet-vision  (requires luarocks install argcheck)
 
 3. Pandas for Python results plotting and reporting:
 sudo apt-get pandas  ---see full scipy stack and add to readme
@@ -110,7 +109,7 @@ cd models and Download it remotely via:
 wget https://d2j0dndfm35trm.cloudfront.net/resnet-18.t7
 wget https://d2j0dndfm35trm.cloudfront.net/resnet-34.t7
 wget https://d2j0dndfm35trm.cloudfront.net/resnet-50.t7  
-# NOTE: 101, 152 and 200 also exist!
+# Beware: 101, 152 and 200 also exist!
 and do:
 require 'cunn'
 require 'cudnn'  --If trouble, installing, follow step 6 in https://github.com/jcjohnson/neural-style/blob/master/INSTALL.md
