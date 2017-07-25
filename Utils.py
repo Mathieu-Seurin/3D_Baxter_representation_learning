@@ -200,8 +200,10 @@ def get_test_set_for_data_folder(data_folder):
         return COMPLEX_TEST_SET
     elif data_folder == COLORFUL:
         return COLORFUL_TEST_SET
+    elif data_folder == MOBILE_ROBOT:
+        return ROBOT_TEST_SET
     else:
-        sys.exit('get_list_of_test_imgs_for_dataset: Dataset has not a defined test set: ',data_folder)
+        sys.exit('get_list_of_test_imgs_for_dataset: Dataset has not a defined test set: {}'.format(data_folder))
 
 
 # 49 (1 repeated by error) IMAGES TEST SET HANDPICKED TO SHOW VISUAL VARIABILITY

@@ -44,7 +44,7 @@ EXTRAPOLATE_ACTION_CAUS = false
 -- Always : i don't think so, but trying to see if it works better with it, why not
 
 BRING_CLOSER_REWARD = false
-BRING_CLOSER_REF_POINT = true
+BRING_CLOSER_REF_POINT = false
 -- Create a point where the robot wants the state to be very similar. Like a reference point for the robot.
 
 LR=0.0001
@@ -53,7 +53,7 @@ LR_DECAY = 3*1e-6
 SGD_METHOD = 'adam' -- Can be adam or adagrad
 
 BATCH_SIZE = 12
-NB_EPOCHS= 20
+NB_EPOCHS= 1
 
 DATA_AUGMENTATION = 0.01
 NORMALIZE_IMAGE = true

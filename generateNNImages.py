@@ -43,7 +43,7 @@ image in the test set and it will assess the test set of 50 images defined in Co
 
 print"\n\n >> Running generateNNImages.py...."
 if len(sys.argv) <= 1:
-	sys.exit("Give number of neighbors to produce, followed by number of input images (and model dir if you don't want to use the last model created)")
+        sys.exit("Give number of neighbors to produce, followed by number of input images (and model dir if you don't want to use the last model created)")
 
 # Some parameters
 nbr_neighbors= int(sys.argv[1])
@@ -55,23 +55,22 @@ with_title = True
 if len(sys.argv) >= 3:
 	nbr_images=int(sys.argv[2])
 if len(sys.argv) == 4:
-    path_to_model = sys.argv[3]
-    print """====================================
-    WARNING DATASET IS SET BY HAND HERE : MOBILE ROBOT FOR NOW
-    =============================================""")
-
-    data_folder = 'mobileRobot'
+        path_to_model = sys.argv[3]
+        print """====================================
+        WARNING DATASET IS SET BY HAND HERE : MOBILE ROBOT FOR NOW
+        ============================================="""
+        data_folder = 'mobileRobot'
 else:
-    lastModelFile = open(LAST_MODEL_FILE)
-    path_to_model = lastModelFile.readline()[:-1]
-    data_folder = get_data_folder_from_model_name(path_to_model)
+        lastModelFile = open(LAST_MODEL_FILE)
+        path_to_model = lastModelFile.readline()[:-1]
+        data_folder = get_data_folder_from_model_name(path_to_model)
+
+TEST_SET = get_test_set_for_data_folder(data_folder)
 
 if len(sys.argv) == 2:
 	# We use fixed test set for fair comparison reasons
 	use_test_set = True
-	nbr_images = len(test_set) 
-
-TEST_SET = get_test_set_for_data_folder(data_folder)
+	nbr_images = len(TEST_SET) 
     
 # THE FOLLOWING ONLY WILL RUN IN USE_CUDA false way  #print('Calling lua subprocesses with ',data_folder)
 subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_cuda','-use_continuous','-data_folder', data_folder])  # TODO: READ CMD LINE ARGS FROM FILE INSTEAD (and set accordingly here) TO NOT HAVING TO MODIFY INSTEAD train_predict_plotStates and the python files
@@ -126,7 +125,7 @@ else:
 	numline = 3
 
 # TODO: more efficient: for img_name in test_set.keys() revising data above
-print 'nbr_neighbours: ', nbr_neighbors, ' nbr of images: ', len(data), 'use_test_set ',use_test_set, ' of size: ', len(test_set)
+print 'nbr_neighbours: ', nbr_neighbors, ' nbr of images: ', len(data), 'use_test_set ',use_test_set, ' of size: ', len(TEST_SET)
 for img_name,neigbour_indexes,dist,state in data:
 	if use_test_set:
 		if not(img_name in TEST_SET): 

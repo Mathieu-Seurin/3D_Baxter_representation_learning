@@ -63,11 +63,8 @@ RELOAD_MODEL = false
 -- VISUALIZATION TOOL
 -- if you want to visualize images, use 'qlua' instead of 'th'
 --===========================================================
-<<<<<<< HEAD
-VISUALIZE_IMAGES_TAKEN = false
-=======
+
 VISUALIZE_IMAGES_TAKEN = false -- true for visualizing images taken in each prior
->>>>>>> bcc6f5dd1222186316aa5c5c88735bc71350e2ea
 VISUALIZE_CAUS_IMAGE = false
 VISUALIZE_IMAGE_CROP = false
 VISUALIZE_MEAN_STD = false
@@ -242,8 +239,6 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
 
         -- Middle of field
         FIXED_POS = {1.54133736021, 1.71509412704}
-        
-        
 
         ROUNDING_VALUE_FIX = 0.1
 
@@ -350,11 +345,10 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
 
         SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
 
-<<<<<<< HEAD
-=======
         if BRING_CLOSER_REF_POINT then
            PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","fixed_pos"}}
         end
+
     elseif DATA_FOLDER == COLORFUL then
         CLAMP_CAUSALITY = false --TODO: make false when continuous works
 
@@ -386,7 +380,6 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
         if BRING_CLOSER_REF_POINT then
            PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","fixed_pos"}}
         end
->>>>>>> bcc6f5dd1222186316aa5c5c88735bc71350e2ea
 
         if USE_CONTINUOUS then
             DEFAULT_PRECISION = 0.05 -- for 'arrondit' function
@@ -396,12 +389,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
       os.exit()
     end
 
-<<<<<<< HEAD
-=======
-    MIN_TABLE = {0.42,-0.09,-10} -- for x,y,z
-    MAX_TABLE = {0.74,0.59,10} -- for x,y,z
-
->>>>>>> bcc6f5dd1222186316aa5c5c88735bc71350e2ea
+    
     if VISUALIZE_IMAGES_TAKEN or VISUALIZE_CAUS_IMAGE or VISUALIZE_IMAGE_CROP or VISUALIZE_MEAN_STD or VISUALIZE_AE then
        --Creepy, but need a placeholder, to prevent many window to pop
        WINDOW = image.display(image.lena())
