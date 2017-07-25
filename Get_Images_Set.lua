@@ -250,7 +250,77 @@ end
 -- The variation of the joint position for one pair should be close enough
 -- (< MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD) in continuous actions, to the variation for the positiono in the second frame
 function get_one_random_Caus_Set(Infos1, Infos2)
-   print("lol")
+   local size1=#Infos1[1]
+   local size2=#Infos2[1]
+   local watchDog=0
+
+   while watchDog<50 do
+
+      repeat
+         --Sample an action, whose reward is not 0
+         id_ref_action_begin= torch.random(1,size2-1)
+
+         if EXTRAPOLATE_ACTION_CAUS then --Look at const.lua for more details about extrapolate
+            repeat id_ref_action_end=torch.random(1,size2) until (id_ref_action_begin ~= id_ref_action_end)
+         else
+            id_ref_action_end  = id_ref_action_begin+1
+         end
+
+         reward1 = Infos2.reward[id_ref_action_end]
+      until (reward1~=0)
+
+      action1 = action_amplitude(Infos2, id_ref_action_begin, id_ref_action_end)
+
+      -- Overriding action: Force the action amplitude to be the same, dirty...
+      if CLAMP_CAUSALITY and not EXTRAPOLATE_ACTION_CAUS then
+         -- WARNING, THIS IS DIRTY, need to do continous prior
+         for dim=1,DIMENSION_IN do
+            action1[dim]=clamp_causality_prior_value(action1[dim])
+         end
+      end
+
+      if VISUALIZE_CAUS_IMAGE then
+         print("id1",id_ref_action_begin)
+         print("id2",id_ref_action_end)
+         print("action1",action1[1],action1[2])--,action[3])
+         visualize_image_from_seq_id(INDEX2,id_ref_action_begin,id_ref_action_end,true)
+         io.read()
+      end
+
+      for i=1, size1 do
+         id_second_action_begin=torch.random(1,size1-1) --TODO Shouldnt we check id_second_action_begin != id_ref_action_begin?
+         --TODO: and also add here CLAMP_CAUSALITY check just as above?
+
+         if EXTRAPOLATE_ACTION_CAUS then --Look at const.lua for more details about extrapolate
+            repeat id_second_action_end=torch.random(1,size1) until (id_second_action_begin ~= id_second_action_end)
+         else
+            id_second_action_end=id_second_action_begin+1
+         end
+
+         --if Infos1.reward[id_second_action_begin]==0 and Infos1.reward[id_second_action_end]~=reward1 then
+         if Infos1.reward[id_second_action_end]~=reward1 then -- The constraint is softer
+            action2 = action_amplitude(Infos1, id_second_action_begin, id_second_action_end)
+
+            --Visualize images taken if you want
+            if VISUALIZE_CAUS_IMAGE then
+               print("action2",action2[1],action2[2])--,action[3])
+               visualize_image_from_seq_id(INDEX1,id_second_action_begin,id_second_action_end)
+               print(is_same_action(action1, action2))
+               io.read()
+            end
+
+            if USE_CONTINUOUS then
+               if action_vectors_are_similar_enough(action1, action2) then
+                   return {im1=id_second_action_begin,im2=id_ref_action_begin, im3=id_second_action_end, im4=id_ref_action_end, act1=action1, act2=action2}
+               end
+            elseif is_same_action(action1, action2) then --discrete actions
+               return {im1=id_second_action_begin,im2=id_ref_action_begin, im3=id_second_action_end, im4=id_ref_action_end}
+            end
+         end
+      end
+      watchDog=watchDog+1
+   end
+   error("CAUS WATCHDOG ATTACK!!!!!!!!!!!!!!!!!!")
 end
 
 function clamp_causality_prior_value(value, prec, action_amplitude)
