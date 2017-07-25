@@ -1,4 +1,4 @@
-
+#!/usr/bin/python
 # coding: utf-8
 from sklearn.decomposition import PCA  # with some version of sklearn fails with ImportError: undefined symbol: PyFPE_jbuf
 import matplotlib.pyplot as plt
@@ -111,7 +111,7 @@ def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension
         # colors_markers = [('r', 'o', -10, 0.5), ('b', '^', 0.5, 10)]
         # for c, m, zlow, zhigh in colors_markers:
         #     ax.scatter(toplot[:,0], toplot[:,1], c=c, marker=m)
-        ax.scatter(toplot[:,0], toplot[:,1], c=rewards, cmap=cmap, norm=norm, marker=".")#,fillstyle=None)
+        cax = ax.scatter(toplot[:,0], toplot[:,1], c=rewards, cmap=cmap, norm=norm, marker=".")#,fillstyle=None)
     elif mode == '3D':
         ax = fig.add_subplot(111, projection='3d')
         # for c, m, zlow, zhigh in colors_markers:
@@ -200,8 +200,10 @@ def get_test_set_for_data_folder(data_folder):
         return COMPLEX_TEST_SET
     elif data_folder == COLORFUL:
         return COLORFUL_TEST_SET
+    elif data_folder == MOBILE_ROBOT:
+        return ROBOT_TEST_SET
     else:
-        sys.exit('get_list_of_test_imgs_for_dataset: Dataset has not a defined test set: ',data_folder)
+        sys.exit('get_list_of_test_imgs_for_dataset: Dataset has not a defined test set: {}'.format(data_folder))
 
 
 # 49 (1 repeated by error) IMAGES TEST SET HANDPICKED TO SHOW VISUAL VARIABILITY
@@ -321,6 +323,65 @@ COMPLEX_TEST_SET = {
 'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00046.jpg'
 }
 
+ROBOT_TEST_SET = {
+    'mobileRobot/record_005/recorded_camera_top/frame00001.jpg',
+    'mobileRobot/record_005/recorded_camera_top/frame00002.jpg',
+    'mobileRobot/record_005/recorded_camera_top/frame00003.jpg',
+    'mobileRobot/record_005/recorded_camera_top/frame00004.jpg',
+    'mobileRobot/record_005/recorded_camera_top/frame00005.jpg',
+    'mobileRobot/record_005/recorded_camera_top/frame00006.jpg',
+    'mobileRobot/record_005/recorded_camera_top/frame00007.jpg',
+    'mobileRobot/record_005/recorded_camera_top/frame00008.jpg',
+    'mobileRobot/record_005/recorded_camera_top/frame00009.jpg',
+    'mobileRobot/record_005/recorded_camera_top/frame00010.jpg',
+    'mobileRobot/record_005/recorded_camera_top/frame00011.jpg',
+    'mobileRobot/record_005/recorded_camera_top/frame00012.jpg',
+    'mobileRobot/record_005/recorded_camera_top/frame00013.jpg',
+    'mobileRobot/record_005/recorded_camera_top/frame00014.jpg',
+    'mobileRobot/record_005/recorded_camera_top/frame00015.jpg',
+    'mobileRobot/record_005/recorded_camera_top/frame00016.jpg',
+    'mobileRobot/record_005/recorded_camera_top/frame00017.jpg',
+    'mobileRobot/record_005/recorded_camera_top/frame00018.jpg',
+    'mobileRobot/record_005/recorded_camera_top/frame00019.jpg',
+    'mobileRobot/record_005/recorded_camera_top/frame00020.jpg',
+    'mobileRobot/record_005/recorded_camera_top/frame00021.jpg',
+    'mobileRobot/record_005/recorded_camera_top/frame00022.jpg',
+    'mobileRobot/record_000/recorded_camera_top/frame00048.jpg',
+    'mobileRobot/record_000/recorded_camera_top/frame00049.jpg',
+    'mobileRobot/record_000/recorded_camera_top/frame00050.jpg',
+    'mobileRobot/record_000/recorded_camera_top/frame00051.jpg',
+    'mobileRobot/record_000/recorded_camera_top/frame00052.jpg',
+    'mobileRobot/record_000/recorded_camera_top/frame00053.jpg',
+    'mobileRobot/record_000/recorded_camera_top/frame00054.jpg',
+    'mobileRobot/record_000/recorded_camera_top/frame00055.jpg',
+    'mobileRobot/record_000/recorded_camera_top/frame00056.jpg',
+    'mobileRobot/record_000/recorded_camera_top/frame00057.jpg',
+    'mobileRobot/record_000/recorded_camera_top/frame00058.jpg',
+    'mobileRobot/record_000/recorded_camera_top/frame00059.jpg',
+    'mobileRobot/record_000/recorded_camera_top/frame00060.jpg',
+    'mobileRobot/record_000/recorded_camera_top/frame00061.jpg',
+    'mobileRobot/record_000/recorded_camera_top/frame00062.jpg',
+    'mobileRobot/record_000/recorded_camera_top/frame00063.jpg',
+    'mobileRobot/record_000/recorded_camera_top/frame00064.jpg',
+    'mobileRobot/record_000/recorded_camera_top/frame00065.jpg',
+    'mobileRobot/record_000/recorded_camera_top/frame00066.jpg',
+    'mobileRobot/record_004/recorded_camera_top/frame00010.jpg',
+    'mobileRobot/record_004/recorded_camera_top/frame00011.jpg',
+    'mobileRobot/record_004/recorded_camera_top/frame00012.jpg',
+    'mobileRobot/record_004/recorded_camera_top/frame00013.jpg',
+    'mobileRobot/record_004/recorded_camera_top/frame00014.jpg',
+    'mobileRobot/record_004/recorded_camera_top/frame00015.jpg',
+    'mobileRobot/record_004/recorded_camera_top/frame00016.jpg',
+    'mobileRobot/record_004/recorded_camera_top/frame00017.jpg',
+    'mobileRobot/record_004/recorded_camera_top/frame00018.jpg',
+    'mobileRobot/record_004/recorded_camera_top/frame00019.jpg',
+    'mobileRobot/record_004/recorded_camera_top/frame00020.jpg',
+    'mobileRobot/record_004/recorded_camera_top/frame00021.jpg',
+    'mobileRobot/record_004/recorded_camera_top/frame00022.jpg',
+    'mobileRobot/record_004/recorded_camera_top/frame00023.jpg',
+    'mobileRobot/record_004/recorded_camera_top/frame00024.jpg'
+}
+
 COLORFUL_TEST_SET = {
 'colorful/record_150/recorded_cameras_head_camera_2_image_compressed/frame00030.jpg',
 'colorful/record_150/recorded_cameras_head_camera_2_image_compressed/frame00003.jpg',
@@ -373,5 +434,4 @@ COLORFUL_TEST_SET = {
 'colorful/record_150/recorded_cameras_head_camera_2_image_compressed/frame00019.jpg',
 'colorful/record_150/recorded_cameras_head_camera_2_image_compressed/frame00046.jpg'
 }
-
 #library_versions_tests()

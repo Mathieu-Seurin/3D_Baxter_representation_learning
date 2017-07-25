@@ -16,7 +16,6 @@ require 'gnuplot'
 require 'os'
 require 'paths'
 
-require(MODEL_ARCHITECTURE_FILE)
 -- THIS IS WHERE ALL THE CONSTANTS SHOULD COME FROM
 -- See const.lua file for more details
 require 'const'

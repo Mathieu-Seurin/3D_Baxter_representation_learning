@@ -35,8 +35,7 @@ MODEL_ARCHITECTURE_FILE = RESNET
 --==================================================
 
 -- EXTRAPOLATE_ACTION, if true, selects actions that weren't done by the robot
--- by randomly sampling states (begin point and end point). CLAMP_CAUSALITY,
--- on the contrary, takes the next consecutive action
+-- by randomly sampling states (begin point and end point).
 -- Cannot be applied in every scenario !!!!
 
 EXTRAPOLATE_ACTION = false
@@ -45,14 +44,15 @@ EXTRAPOLATE_ACTION_CAUS = false
 -- Always : i don't think so, but trying to see if it works better with it, why not
 
 BRING_CLOSER_REWARD = false
-BRING_CLOSER_REF_POINT = true
+BRING_CLOSER_REF_POINT = false
 -- Create a point where the robot wants the state to be very similar. Like a reference point for the robot.
 
 LR=0.0001
 LR_DECAY = 3*1e-6
 
 SGD_METHOD = 'adam' -- Can be adam or adagrad
-BATCH_SIZE = 20
+
+BATCH_SIZE = 12
 NB_EPOCHS= 20
 
 DATA_AUGMENTATION = 0.01
@@ -61,9 +61,10 @@ NORMALIZE_IMAGE = true
 COEF_TEMP=1
 COEF_PROP=1
 COEF_REP=1
-COEF_CAUS=1
+COEF_CAUS=0.3
 
 COEF_CLOSE=0.001
 COEF_FIX = 1
 
 DIMENSION_OUT=3
+

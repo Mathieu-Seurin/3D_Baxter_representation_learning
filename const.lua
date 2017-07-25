@@ -16,8 +16,10 @@ require 'hyperparams'
 ---NOTE: THESE ARE DEFAULTS (IF NOT COMMAND LINE ARGS ARE PASSED), AND ARE OVERRIDEN BY DATA_FOLDER SPECIFIC CASES BELOW :
 ----------------------------------------------------------------------------------------------------------------------------
 USE_CUDA = true
-USE_SECOND_GPU = false
-USE_CONTINUOUS = true
+USE_SECOND_GPU = true
+
+USE_CONTINUOUS = false
+
 MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.5
 CONTINUOUS_ACTION_SIGMA = 0.5
 DATA_FOLDER = MOBILE_ROBOT --works best!
@@ -61,6 +63,7 @@ RELOAD_MODEL = false
 -- VISUALIZATION TOOL
 -- if you want to visualize images, use 'qlua' instead of 'th'
 --===========================================================
+
 VISUALIZE_IMAGES_TAKEN = false -- true for visualizing images taken in each prior
 VISUALIZE_CAUS_IMAGE = false
 VISUALIZE_IMAGE_CROP = false
@@ -106,6 +109,7 @@ WINDOW = nil--image.display(image.lena())
 LOGGING_ACTIONS = false
 IS_INCEPTION = false
 IS_RESNET = false
+
 DIFFERENT_FORMAT = IS_INCEPTION or IS_RESNET
 MEAN_MODEL = torch.ones(3):double()*0.5
 STD_MODEL = torch.ones(3):double()*0.5
@@ -215,6 +219,29 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
     elseif DATA_FOLDER == MOBILE_ROBOT then
         print('Setting hyperparams for MOBILE_ROBOT (our baseline reproducing Jonchowscki)')
        --NOTE: DEFAULT PARAMETERS FOR OUR BASELINE DATABASE SET AT THE BEGINNING OF THE FILE (NEED TO BE DECLARED AS CONSTANTS
+        CLAMP_CAUSALITY = false
+
+        MIN_TABLE = {-10000,-10000} -- for x,y
+        MAX_TABLE = {10000,10000} -- for x,y
+
+        DIMENSION_IN = 2
+        DIMENSION_OUT = 2  --worked just as well as 4 output dimensions
+        REWARD_INDEX = 1  --3 reward values: -1, 0, 10
+        INDEX_TABLE = {1,2} --column index for coordinate in state file (respectively x,y)
+
+        DEFAULT_PRECISION = 0.1
+        FILENAME_FOR_ACTION = "recorded_robot_action.txt" --not used at all, we use state file, and compute the action with it (contains dx, dy)
+        FILENAME_FOR_STATE = "recorded_robot_state.txt"
+        FILENAME_FOR_REWARD = "recorded_robot_reward.txt"
+
+        SUB_DIR_IMAGE = 'recorded_camera_top'
+        AVG_FRAMES_PER_RECORD = 90
+
+        -- Middle of field
+        FIXED_POS = {1.54133736021, 1.71509412704}
+
+        ROUNDING_VALUE_FIX = 0.1
+
     elseif DATA_FOLDER == BABBLING then
       -- Leni's real Baxter data on  ISIR dataserver. It is named "data_archive_sim_1".
       --(real Baxter Pushing Objects).  If data is not converted into action, state
@@ -284,31 +311,23 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
         SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
         AVG_FRAMES_PER_RECORD = 90  --HINT: reduce for fast full epoch testing in CPU mode
 
-        if BRING_CLOSER_REWARD then
-           PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","make_reward_closer"}}
-        end
-
-        if BRING_CLOSER_REF_POINT then
-           PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","fixed_point"}}
-
-           FIXED_POS = {0.587, -0.025, -0.143}
-           ROUNDING_VALUE_FIX = 0.02
-
-           FIXED_POS = {0.673, -0.0888, 0.087}
-           ROUNDING_VALUE_FIX = 0.02
-
-           FIXED_POS = {0.633, -0.034, 0.138}
-           ROUNDING_VALUE_FIX = 0.02
-
-           -- is the position the same as the reference point, for this rounding ?
-           -- See arrondit for more details
-        end
-
     elseif DATA_FOLDER == COMPLEX_DATA then
         CLAMP_CAUSALITY = false --TODO: make false when continuous works
+        AVG_FRAMES_PER_RECORD = 200
 
-        FIXED_POS = {0.587, -0.036, -0.143}
-        -- A point where the robot wants the state to be very similar. Like a reference point for the robot
+        -- A point where the robot wants the state to be very similar.
+        --Like a reference point for the robot
+
+
+        -- just above the button
+        --FIXED_POS = {0.587, -0.036, -0.143}
+        FIXED_POS = { 0.598, 0.300, -0.143}
+        ROUNDING_VALUE_FIX = 0.03
+
+        -- Above and further
+        -- FIXED_POS = {0.639, 0.286, 0.136}
+        -- ROUNDING_VALUE_FIX = 0.04
+
 
         MIN_TABLE = {0.42,-0.1,-0.11} -- for x,y,z
         MAX_TABLE = {0.75,0.60,0.35} -- for x,y,z
@@ -319,21 +338,17 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
         REWARD_INDEX = 2 -- Which column in the reward file indicates the value of reward ?
         INDEX_TABLE = {2,3,4} --column index for coordinates in state file, respectively (x,y,z)
 
-        DEFAULT_PRECISION = 0.05 -- for 'arrondit' function
+        DEFAULT_PRECISION = 0.02 -- for 'arrondit' function
         FILENAME_FOR_REWARD = "recorded_button1_is_pressed.txt"
         FILENAME_FOR_ACTION = "recorded_robot_limb_left_endpoint_action.txt" -- Never written, always computed on the fly
         FILENAME_FOR_STATE = "recorded_robot_limb_left_endpoint_state.txt"
 
         SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
-        AVG_FRAMES_PER_RECORD = 200  --HINT: reduce for fast full epoch testing in CPU mode
-
-        if BRING_CLOSER_REWARD then
-           PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","make_reward_closer"}}
-        end
 
         if BRING_CLOSER_REF_POINT then
            PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","fixed_pos"}}
         end
+
     elseif DATA_FOLDER == COLORFUL then
         CLAMP_CAUSALITY = false --TODO: make false when continuous works
 
@@ -357,25 +372,10 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
 
         SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
         AVG_FRAMES_PER_RECORD = 250  --HINT: reduce for fast full epoch testing in CPU mode
-
-        if BRING_CLOSER_REWARD then
-           PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","make_reward_closer"}}
-        end
-
-        if BRING_CLOSER_REF_POINT then
-           PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","fixed_pos"}}
-        end
-
-        if USE_CONTINUOUS then
-            DEFAULT_PRECISION = 0.05 -- for 'arrondit' function
-        end
     else
       print("No supported data folder provided, please add either of the data folders defined in hyperparams: "..BABBLING..", "..MOBILE_ROBOT.." "..SIMPLEDATA3D..' or others in const.lua' )
       os.exit()
     end
-
-    MIN_TABLE = {0.42,-0.09,-10} -- for x,y,z
-    MAX_TABLE = {0.74,0.59,10} -- for x,y,z
 
     if VISUALIZE_IMAGES_TAKEN or VISUALIZE_CAUS_IMAGE or VISUALIZE_IMAGE_CROP or VISUALIZE_MEAN_STD or VISUALIZE_AE then
        --Creepy, but need a placeholder, to prevent many window to pop
@@ -394,6 +394,9 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
     if string.find(MODEL_ARCHITECTURE_FILE, 'minimalNetModel') then --TODO replace by constants
         error([[minimalNetModel should only be used in learn_autoencoder.lua, not script.lua]])
     end
+    if IS_RESNET and DATA_FOLDER == STATIC_BUTTON_SIMPLEST then  --TODO fix is it possible?
+        error([[STATIC_BUTTON_SIMPLEST= staticButtonSimplest dataset is not yet supported by ResNet model architecture, we are working on it? Try for now topUniqueSimplerWOTanh model]])
+    end  --mobileData can on the other hand be run with and vithout resnet
     DIFFERENT_FORMAT = IS_INCEPTION or IS_RESNET
 
     if IS_INCEPTION then
@@ -409,6 +412,18 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
     else
        IM_LENGTH = 200
        IM_HEIGHT = 200
+    end
+
+    -- EXTRA PRIORS:
+    if BRING_CLOSER_REWARD then
+       PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","make_reward_closer"}}
+    end
+    if BRING_CLOSER_REF_POINT then
+       PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","fixed_point"}}
+    end
+    -- DEFAULT_PRECISION for all CONTINUOUS ACTIONS:
+    if USE_CONTINUOUS then  --otherwise, it is not used
+        DEFAULT_PRECISION = 0.01
     end
 end
 

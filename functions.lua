@@ -114,8 +114,12 @@ function save_model(model)
    lfs.mkdir(path)
    file_string = path..'/'..NAME_SAVE..'.t7'
 
-   os.execute("cp hyperparams.lua "..path)
+   if not file_exists(path..'/hyperparameters.lua') then
+      os.execute("cp hyperparams.lua "..path)
+      os.execute("cp const.lua "..path)
+   end
 
+   model:clearState()
    model_to_save = model:clone():float()
    torch.save(file_string, model_to_save) --Saving model to analyze the results afterward (imagesAndRepr.lua etc...)
 
@@ -218,6 +222,19 @@ function getRandomBatchFromSeparateList(batch_size, mode)
             set=get_one_fixed_point_set(data1.Infos, data2.Infos)
             if set then
                seqThatMatch = true
+
+               if LOG_SEQ_USED[INDEX1] then
+                  LOG_SEQ_USED[INDEX1] = LOG_SEQ_USED[INDEX1] + 1
+               else
+                  LOG_SEQ_USED[INDEX1] = 1
+               end
+
+               if LOG_SEQ_USED[INDEX2] then
+                  LOG_SEQ_USED[INDEX2] = LOG_SEQ_USED[INDEX2] + 1
+               else
+                  LOG_SEQ_USED[INDEX2] = 1
+               end
+
             else
                --Since the point doesn't exist in seq, find other seq
                INDEX1=torch.random(1,NB_SEQUENCES)
@@ -360,50 +377,6 @@ function load_Part_list(list, txt, txt_reward, txt_state)
    return {images=all_images, Infos=Infos}
 end
 
-function getInfos(txt,txt_reward,txt_state)
-
-   local Infos={}
-   for dim=1,DIMENSION_IN do
-      Infos[dim] = {}
-   end
-   Infos.reward = {}
-
-   local reward_index= REWARD_INDEX
-
-   local tensor_state, label=tensorFromTxt(txt_state)
-
-   local tensor, label=tensorFromTxt(txt)
-   local tensor_reward, label=tensorFromTxt(txt_reward)
-   local there_is_reward=false
-
-   for i=1,tensor_reward:size(1) do
-
-      local last_pos = {}
-      for dim=1,#INDEX_TABLE do
-         id_of_dim_in_tensor = INDEX_TABLE[dim]
-         local value = tensor_state[i][id_of_dim_in_tensor]
-         table.insert(Infos[dim],value)
-         table.insert(last_pos, value) -- For out_of_bound func
-      end
-
-      local reward = tensor_reward[i][reward_index]
-      if reward ~=0 then
-         there_is_reward=true
-      end
-      table.insert(Infos.reward, reward)
-
-      --print(tensor_reward[i][reward_index])
-   end
-
-   --THIS IS ALWAYS THE CASE IF WE WANT TO USE CAUSALITY PRIORS. TODO: create synthetic second value reward or do notn apply causality prior (see PRIORS_TO_APPLY in const.lua)
-   if DATA_FOLDER ~= BABBLING then
-      assert(there_is_reward,"Reward different than 0 (i.e. min 2 different values of reward) are needed in a sequence...")
-      -- else
-      --     print('Causality prior will be ignored for dataset '..BABBLING)
-   end
-   return Infos
-end
-
 ---------------------------------------------------------------------------------------
 -- Function :	applies_prior(list_prior,prior)
 -- Input ():
@@ -451,6 +424,7 @@ end
 
 function getInfos(txt,txt_reward,txt_state)
 
+   
    local Infos={}
    for dim=1,DIMENSION_IN do
       Infos[dim] = {}
@@ -493,6 +467,9 @@ function getInfos(txt,txt_reward,txt_state)
       -- else
       --     print('Causality prior will be ignored for dataset '..BABBLING)
    end
+
+   Infos.txt = txt
+   
    return Infos
 end
 
@@ -528,6 +505,7 @@ end
 function is_out_of_bound(list_positions)
    -- For each dimension you check if the value is inside
    -- barrier fix by MIN_TABLE and MAX_TABLE
+   
    for dim=1,#list_positions do
       if list_positions[dim] < MIN_TABLE[dim] or list_positions[dim] > MAX_TABLE[dim] then
          return true

@@ -26,7 +26,7 @@ function Rico_Training(Models,priors_used)
 
    -- create closure to evaluate f(X) and df/dX in backprop
    local feval = function(x)
-      local loss_rep, loss_caus, loss_prop, loss_temp, loss_close, loss_fix = 0, 0, 0, 0, 0, 0
+      local loss_rep, loss_caus, loss_prop, loss_temp, loss_reward_closer, loss_fix = 0, 0, 0, 0, 0, 0
       -- just in case:
       collectgarbage()
 
@@ -73,7 +73,11 @@ function Rico_Training(Models,priors_used)
       mode='make_reward_closer'
       if applying_prior(priors_used, mode) then
           batch = getRandomBatchFromSeparateList(BATCH_SIZE,mode)
+          print('loss_reward_closer')
+          print(loss_reward_closer)
           loss_reward_closer, gradClose=doStuff_temp(Models,temp_criterion,batch,COEF_CLOSE) --Just minimizing mse criterion, so we can use temp criterion
+          print('loss_reward_closer')
+          print(loss_reward_closer)
           TOTAL_LOSS_CLOSE = loss_reward_closer + TOTAL_LOSS_CLOSE
       end
 
@@ -108,12 +112,15 @@ function Rico_Training(Models,priors_used)
 end
 
 function train(Models, priors_used)
+
+   LOG_SEQ_USED = {}
+
     local NB_BATCHES= math.ceil(NB_SEQUENCES*AVG_FRAMES_PER_RECORD/BATCH_SIZE/(4+4+2+2))
     --AVG_FRAMES_PER_RECORD to get an idea of the total number of images
     --div by 12 because the network sees 12 images per iteration (i.e. record)
     -- (4*2 for rep and prop +  2*2 for temp and caus = 12)
     print(NB_SEQUENCES..' : sequences. '..NB_BATCHES..' batches')
-
+    print("Number of epochs : ", NB_EPOCHS)
     for epoch=1, NB_EPOCHS do
        print('--------------Epoch : '..epoch..' ---------------')
 
@@ -123,6 +130,7 @@ function train(Models, priors_used)
        for numBatch=1, NB_BATCHES do
           Loss, Grad = Rico_Training(Models,priors_used)
           xlua.progress(numBatch, NB_BATCHES)
+
        end
 
        print("Loss Temp", TOTAL_LOSS_TEMP/NB_BATCHES/BATCH_SIZE)
@@ -133,7 +141,12 @@ function train(Models, priors_used)
           print("Loss BRING_CLOSER_REWARD", TOTAL_LOSS_CLOSE/NB_BATCHES/BATCH_SIZE)
        end
        if BRING_CLOSER_REF_POINT then
-          print("Loss BRING_CLOSER_REF_POINT", TOTAL_LOSS_FIX/NB_BATCHES/BATCH_SIZE)
+          print("Loss Fix", TOTAL_LOSS_FIX/NB_BATCHES/BATCH_SIZE)
+          --You don't need to see the log at every time step, the first 3 will do
+          if epoch == 1 or epoch ==2 or epoch==3 then
+             print("Log_Seq",LOG_SEQ_USED)
+          end
+
        end
 
        save_model(Models.Model1, NAME_SAVE) --TODO Do we need to write NB_EPOCH TIMES? isnt enough the last time to write once and not overwrite NB_EPOCH TIMES?
@@ -150,6 +163,11 @@ local function main(params)
     print('cmd default params (overridden by following set_hyperparams): ')
     print(params)
     print_hyperparameters()
+
+    if USE_CUDA then
+       require 'cunn'
+       require 'cudnn'
+    end
 
     local records_paths = Get_Folders(DATA_FOLDER, 'record') --local list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(DATA_FOLDER)
     NB_SEQUENCES= #records_paths

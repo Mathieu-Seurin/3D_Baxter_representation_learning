@@ -9,12 +9,17 @@ function has_command_finish_correctly {
     fi
 }
 
+if [ "$1" != "" ]; then
+    DATA_FOLDER=$1
+else
+    echo No data folder given
+    exit
+fi
 
-echo 'WARNING, check that model=BASE_TIMNET and NORMALIZE=True'
+th supervised.lua -use_cuda -data_folder $DATA_FOLDER
+has_command_finish_correctly
 
-echo 'Log/save/supervised_res' > lastModel.txt
-echo 'mobile_robot_supervised.t7' >> lastModel.txt
-th imagesAndReprToTxt.lua
+th imagesAndReprToTxt.lua -use_cuda -data_folder $DATA_FOLDER
 has_command_finish_correctly
 
 python generateNNImages.py 10
@@ -22,6 +27,8 @@ has_command_finish_correctly
 
 python plotStates.py
 has_command_finish_correctly
+
+python distortion_crit.py
 
 path=`cat lastModel.txt | grep Log`
 nautilus $path

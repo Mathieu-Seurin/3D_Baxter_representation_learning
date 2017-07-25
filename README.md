@@ -252,8 +252,16 @@ Solution:  (as in https://github.com/torch/paths/issues/5):
 Run it with Lua 5.1 instead of 5.2: http://lua-users.org/wiki/LuaRocksConfig
 to switch among these:
 TORCH_LUA_VERSION=LUA52 ./install.sh
-and edit your ./bashrc PATH and LD_LIBRARY_PATH
-
+and edit your ./bashrc PATH and LD_LIBRARY_PATH. Example of working ~/.bashrc file:
+```
+. /home/gpu_center/torch/install/bin/torch-activate
+export http_proxy=your_proxy_url_and_port
+export https_proxy=your_proxy_url_and_port
+export CUDNN_PATH="/usr/local/cuda/lib64/libcudnn.so.5"
+export CPATH=~/cuda:$CPATH
+export LIBRARY_PATH=~/cuda:$LIBRARY_PATH
+export LD_LIBRARY_PATH=~/cuda:$LD_LIBRARY_PATH
+```
 
 ~/torch/install/bin/luarocks install qtlua
 
