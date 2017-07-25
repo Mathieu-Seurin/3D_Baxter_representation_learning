@@ -114,6 +114,8 @@ function train(Models, priors_used)
     -- (4*2 for rep and prop +  2*2 for temp and caus = 12)
     print(NB_SEQUENCES..' : sequences. '..NB_BATCHES..' batches')
 
+    print("DIMENSION_OUT :",DIMENSION_OUT)
+
     for epoch=1, NB_EPOCHS do
        print('--------------Epoch : '..epoch..' ---------------')
 

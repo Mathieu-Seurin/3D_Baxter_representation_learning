@@ -22,8 +22,8 @@ th script.lua -use_cuda -data_folder $DATA_FOLDER
 has_command_finish_correctly
 th imagesAndReprToTxt.lua -use_cuda -data_folder $DATA_FOLDER
 has_command_finish_correctly
-python generateNNImages.py 10
-has_command_finish_correctly
+#python generateNNImages.py 10
+#has_command_finish_correctly
 python plotStates.py
 has_command_finish_correctly
 python distortion_crit.py

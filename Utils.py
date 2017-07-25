@@ -109,7 +109,7 @@ def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension
         # colors_markers = [('r', 'o', -10, 0.5), ('b', '^', 0.5, 10)]
         # for c, m, zlow, zhigh in colors_markers:
         #     ax.scatter(toplot[:,0], toplot[:,1], c=c, marker=m)
-        ax.scatter(toplot[:,0], toplot[:,1], c=rewards, cmap=cmap, norm=norm, marker=".")#,fillstyle=None)
+        cax = ax.scatter(toplot[:,0], toplot[:,1], c=rewards, cmap=cmap, norm=norm, marker=".")#,fillstyle=None)
     elif mode == '3D':
         ax = fig.add_subplot(111, projection='3d')
         # for c, m, zlow, zhigh in colors_markers:
