@@ -108,7 +108,6 @@ function patch(m)
 end
 
 function save_model(model)
-    -- model:clearState() -- assuming won't continue computation...
 
    path = LOG_FOLDER..NAME_SAVE
    lfs.mkdir(path)
@@ -119,7 +118,7 @@ function save_model(model)
       os.execute("cp const.lua "..path)
    end
 
-   model:clearState()
+   model:clearState() --It doesn't reset the model, just clean the last batch loaded in memory.
    model_to_save = model:clone():float()
    torch.save(file_string, model_to_save) --Saving model to analyze the results afterward (imagesAndRepr.lua etc...)
 
