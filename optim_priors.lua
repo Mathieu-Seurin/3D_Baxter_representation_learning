@@ -58,7 +58,7 @@ function doStuff_Caus(Models,criterion,Batch,coef, action1, action2)
       criterion=criterion:cuda()
    end
    output=criterion:forward({State1, State2})
-   --we backward with a starting gradient initialized at 1
+   --we backward with a starting gradient initialized at 1  # NOTE: WHY?
    GradOutputs=criterion:backward({State1, State2}, torch.ones(1))
 
    -- compute the gradients for the two images
