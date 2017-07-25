@@ -27,12 +27,10 @@ function getModel(Dimension)
    if file_exists(model_full_path) then
       pretrain_net = torch.load(model_full_path)
    else
-      error([[------------------
-You required "..model.." but it doesn't exist, download it here :
-https://github.com/facebook/fb.resnet.torch/tree/master/pretrained
-And put it in models/ as resnet-VERSION.t7
-Ex : resnet-18.t7
--------------------]])
+      print(model_full_path)
+      error([[------------------The above model was required but it doesn't exist,
+      download it here :\n https://github.com/facebook/fb.resnet.torch/tree/master/pretrained \nAnd put it in models/ as resnet-VERSION.t7
+      Ex : resnet-18.t7 -------------------]])
    end
 
    pretrain_net:evaluate()

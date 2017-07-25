@@ -152,11 +152,6 @@ local function main(params)
     print(type(params))
     print_hyperparameters()
 
-    if USE_CUDA then
-       require 'cunn'
-       require 'cudnn'
-    end
-
     local records_paths = Get_Folders(DATA_FOLDER, 'record') --local list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(DATA_FOLDER)
     NB_SEQUENCES= #records_paths
 

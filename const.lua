@@ -1,4 +1,4 @@
---=============================================================
+aar--=============================================================
 -- Constants file
 
 -- All constants should be located here for now, in CAPS_LOCK
@@ -24,7 +24,15 @@ DATA_FOLDER = MOBILE_ROBOT --works best!
 
 if USE_CUDA then
     require 'cunn'
-    require 'cudnn' --If trouble, installing, follow step 6 in https://github.com/jcjohnson/neural-style/blob/master/INSTALL.md
+    require 'cutorch'
+    require 'cudnn'  --If trouble, installing, follow step 6 in https://github.com/jcjohnson/neural-style/blob/master/INSTALL.md
+    -- and https://github.com/soumith/cudnn.torch  --TODO: set to true when speed issues rise
+    -- cudnn.benchmark = true -- uses the inbuilt cudnn auto-tuner to find the fastest convolution algorithms.
+    --                -- If this is set to false, uses some in-built heuristics that might not always be fastest.
+    -- cudnn.fastest = true -- this is like the :fastest() mode for the Convolution modules,
+                 -- simply picks the fastest convolution algorithm, rather than tuning for workspace size
+    tnt = require 'torchnet'
+    vision = require 'torchnet-vision'  -- Install via https://github.com/Cadene/torchnet-vision
 end
 
 if USE_CUDA and USE_SECOND_GPU then
@@ -141,19 +149,18 @@ function set_cuda_hyperparams(USE_CUDA)
     --===========================================================
     -- CUDA CONSTANTS
     --===========================================================
-    if USE_CUDA then
-        require 'cunn'
-        require 'cutorch'
-        require 'cudnn'  --If trouble, installing, follow step 6 in https://github.com/jcjohnson/neural-style/blob/master/INSTALL.md
-        -- and https://github.com/soumith/cudnn.torch
-        cudnn.benchmark = true -- uses the inbuilt cudnn auto-tuner to find the fastest convolution algorithms.
-                       -- If this is set to false, uses some in-built heuristics that might not always be fastest.
-        cudnn.fastest = true -- this is like the :fastest() mode for the Convolution modules,
-                     -- simply picks the fastest convolution algorithm, rather than tuning for workspace size
-        tnt = require 'torchnet'
-        vision = require 'torchnet-vision'  -- Install via https://github.com/Cadene/torchnet-vision
-    end
-    USE_SECOND_GPU = false
+    -- if USE_CUDA then
+    --     require 'cunn'
+    --     require 'cutorch'
+    --     require 'cudnn'  --If trouble, installing, follow step 6 in https://github.com/jcjohnson/neural-style/blob/master/INSTALL.md
+    --     -- and https://github.com/soumith/cudnn.torch
+    --     cudnn.benchmark = true -- uses the inbuilt cudnn auto-tuner to find the fastest convolution algorithms.
+    --                    -- If this is set to false, uses some in-built heuristics that might not always be fastest.
+    --     cudnn.fastest = true -- this is like the :fastest() mode for the Convolution modules,
+    --                  -- simply picks the fastest convolution algorithm, rather than tuning for workspace size
+    --     tnt = require 'torchnet'
+    --     vision = require 'torchnet-vision'  -- Install via https://github.com/Cadene/torchnet-vision
+    -- end
     if USE_CUDA and USE_SECOND_GPU then
        cutorch.setDevice(2)
     end
@@ -366,7 +373,6 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
       print("No supported data folder provided, please add either of the data folders defined in hyperparams: "..BABBLING..", "..MOBILE_ROBOT.." "..SIMPLEDATA3D..' or others in const.lua' )
       os.exit()
     end
-
 
     MIN_TABLE = {0.42,-0.09,-10} -- for x,y,z
     MAX_TABLE = {0.74,0.59,10} -- for x,y,z
