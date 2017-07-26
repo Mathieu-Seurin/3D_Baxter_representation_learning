@@ -221,6 +221,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
        --NOTE: DEFAULT PARAMETERS FOR OUR BASELINE DATABASE SET AT THE BEGINNING OF THE FILE (NEED TO BE DECLARED AS CONSTANTS
         CLAMP_CAUSALITY = false
 
+        DIMENSION_OUT = 2
         -- MIN_TABLE = {-10000,-10000} -- for x,y
         -- MAX_TABLE = {10000,10000} -- for x,y
 
@@ -318,7 +319,6 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
         -- A point where the robot wants the state to be very similar.
         --Like a reference point for the robot
 
-        
         -- just above the button
         --FIXED_POS = {0.587, -0.036, -0.143}
         FIXED_POS = { 0.598, 0.300, -0.143}
@@ -328,7 +328,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
         -- FIXED_POS = {0.639, 0.286, 0.136}
         -- ROUNDING_VALUE_FIX = 0.04
 
-        
+
         MIN_TABLE = {0.42,-0.1,-0.11} -- for x,y,z
         MAX_TABLE = {0.75,0.60,0.35} -- for x,y,z
 
@@ -338,16 +338,13 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
         REWARD_INDEX = 2 -- Which column in the reward file indicates the value of reward ?
         INDEX_TABLE = {2,3,4} --column index for coordinates in state file, respectively (x,y,z)
 
-        DEFAULT_PRECISION = 0.02 -- for 'arrondit' function
+        DEFAULT_PRECISION = 0.05 -- for 'arrondit' function
+        -- During data generation the amplitude of actions is set randomly in the interval of (0.03, 0.07). 
         FILENAME_FOR_REWARD = "recorded_button1_is_pressed.txt"
         FILENAME_FOR_ACTION = "recorded_robot_limb_left_endpoint_action.txt" -- Never written, always computed on the fly
         FILENAME_FOR_STATE = "recorded_robot_limb_left_endpoint_state.txt"
 
         SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
-
-        if BRING_CLOSER_REF_POINT then
-           PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","fixed_pos"}}
-        end
 
     elseif DATA_FOLDER == COLORFUL then
         CLAMP_CAUSALITY = false --TODO: make false when continuous works
@@ -372,24 +369,11 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
 
         SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
         AVG_FRAMES_PER_RECORD = 250  --HINT: reduce for fast full epoch testing in CPU mode
-
-        if BRING_CLOSER_REWARD then
-           PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","make_reward_closer"}}
-        end
-
-        if BRING_CLOSER_REF_POINT then
-           PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","fixed_pos"}}
-        end
-
-        if USE_CONTINUOUS then
-            DEFAULT_PRECISION = 0.05 -- for 'arrondit' function
-        end
     else
       print("No supported data folder provided, please add either of the data folders defined in hyperparams: "..BABBLING..", "..MOBILE_ROBOT.." "..SIMPLEDATA3D..' or others in const.lua' )
       os.exit()
     end
 
-    
     if VISUALIZE_IMAGES_TAKEN or VISUALIZE_CAUS_IMAGE or VISUALIZE_IMAGE_CROP or VISUALIZE_MEAN_STD or VISUALIZE_AE then
        --Creepy, but need a placeholder, to prevent many window to pop
        WINDOW = image.display(image.lena())
@@ -407,6 +391,9 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
     if string.find(MODEL_ARCHITECTURE_FILE, 'minimalNetModel') then --TODO replace by constants
         error([[minimalNetModel should only be used in learn_autoencoder.lua, not script.lua]])
     end
+    if IS_RESNET and DATA_FOLDER == STATIC_BUTTON_SIMPLEST then  --TODO fix is it possible?
+        error([[STATIC_BUTTON_SIMPLEST= staticButtonSimplest dataset is not yet supported by ResNet model architecture, we are working on it? Try for now topUniqueSimplerWOTanh model]])
+    end  --mobileData can on the other hand be run with and vithout resnet
     DIFFERENT_FORMAT = IS_INCEPTION or IS_RESNET
 
     if IS_INCEPTION then
@@ -424,25 +411,31 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
        IM_HEIGHT = 200
     end
 
+    -- EXTRA PRIORS:
     if BRING_CLOSER_REWARD then
        PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","make_reward_closer"}}
     end
-
     if BRING_CLOSER_REF_POINT then
        PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","fixed_point"}}
     end
 
+    -- L1Smooth and cosDistance and max margin
+    --TODO PRIORS_CONFIGS_TO_APPLY.add('CosDist','L1SmoothDist','MaxMargin')
 
-    print_hyperparameters()
+    -- DEFAULT_PRECISION for all CONTINUOUS ACTIONS:
+    if USE_CONTINUOUS then  --otherwise, it is not used
+        DEFAULT_PRECISION = 0.01
+    end
 end
 
 function print_hyperparameters(extra_string_to_print)
+    extra_string_to_print = extra_string_to_print or ''
     print(extra_string_to_print)
     print("============ Experiment: DATA_FOLDER USED =========\n",
                         DATA_FOLDER,
 												" (LOG_FOLDER ", LOG_FOLDER,
                         ")\nUSE_CUDA ",USE_CUDA,", USE_CONTINUOUS ACTIONS: ",USE_CONTINUOUS, " MODEL: ",MODEL_ARCHITECTURE_FILE,". PRIORS_CONFIGS_TO_APPLY", PRIORS_CONFIGS_TO_APPLY)
-    print('EXTRAPOLATE_ACTION ','EXTRAPOLATE_ACTION_CAUS ','BRING_CLOSER_REWARD ','BRING_CLOSER_REF_POINT: ')
+    print('EXTRAPOLATE_ACTION  EXTRAPOLATE_ACTION_CAUS  BRING_CLOSER_REWARD  BRING_CLOSER_REF_POINT: ')
     print(EXTRAPOLATE_ACTION,EXTRAPOLATE_ACTION_CAUS,BRING_CLOSER_REWARD,BRING_CLOSER_REF_POINT)
     if USE_CONTINUOUS then  --otherwise, it is not used
         print ('MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD: ',MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD,' CONTINUOUS_ACTION_SIGMA: ', CONTINUOUS_ACTION_SIGMA)

@@ -59,6 +59,8 @@ NB_EPOCHS= 20
 DATA_AUGMENTATION = 0.01
 NORMALIZE_IMAGE = true
 
+-- COEF_* is a way to impose importance of the prior: because bringing rewards
+-- close together prior would set a new embedding very uncorrelated with ground truth, we lower its importance weight.
 COEF_TEMP=1
 COEF_PROP=1
 COEF_REP=1
@@ -67,5 +69,4 @@ COEF_CAUS=1
 COEF_CLOSE=0.001
 COEF_FIX = 1
 
-DIMENSION_OUT=2
-
+DIMENSION_OUT=3

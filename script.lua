@@ -39,6 +39,7 @@ function Rico_Training(Models,priors_used)
       -- reset gradients
       gradParameters:zero()
 
+      --See Get_Images_Set.lua file for selecting the images for each prior, which is key for each prior's loss function input
       --===========
       local mode='Temp' --Same for continuous or discrete actions
       if applying_prior(priors_used, mode) then
@@ -73,7 +74,11 @@ function Rico_Training(Models,priors_used)
       mode='make_reward_closer'
       if applying_prior(priors_used, mode) then
           batch = getRandomBatchFromSeparateList(BATCH_SIZE,mode)
+          print('loss_reward_closer')
+          print(loss_reward_closer)
           loss_reward_closer, gradClose=doStuff_temp(Models,temp_criterion,batch,COEF_CLOSE) --Just minimizing mse criterion, so we can use temp criterion
+          print('loss_reward_closer')
+          print(loss_reward_closer)
           TOTAL_LOSS_CLOSE = loss_reward_closer + TOTAL_LOSS_CLOSE
       end
 
@@ -83,6 +88,11 @@ function Rico_Training(Models,priors_used)
           loss_fix, gradClose=doStuff_temp(Models,temp_criterion,batch,COEF_FIX) --Just minimizing mse criterion, so we can use temp criterion
           TOTAL_LOSS_FIX = loss_fix + TOTAL_LOSS_FIX
       end
+
+      --TODO comparison with L1 smooth distance criterion (takes L1 norm in (-inf, -1) and (1, +inf) and L2 in the center of the interval for faster convergence updates far outside the iminma)
+
+      --TODO Comparison with Torch cosDistance criterion
+
 
       --NOTE: gradParameters  shouldnt be here  the sum of all gradRep, gradCaus, etc because
       --GradParameters is a tensor containing the internal gradient of all model's parameters
@@ -110,7 +120,7 @@ end
 function train(Models, priors_used)
 
    LOG_SEQ_USED = {}
-   
+
     local NB_BATCHES= math.ceil(NB_SEQUENCES*AVG_FRAMES_PER_RECORD/BATCH_SIZE/(4+4+2+2))
     --AVG_FRAMES_PER_RECORD to get an idea of the total number of images
     --div by 12 because the network sees 12 images per iteration (i.e. record)
@@ -155,8 +165,9 @@ end
 
 local function main(params)
     print("\n\n>> script.lua: main model builder")
-    set_hyperparams(params)--    print('In DATA_FOLDER: '..DATA_FOLDER..' params: ')
-    print(type(params))
+    set_hyperparams(params)
+    print('cmd default params (overridden by following set_hyperparams): ')
+    print(params)
     print_hyperparameters()
 
     if USE_CUDA then
