@@ -318,7 +318,6 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
         -- A point where the robot wants the state to be very similar.
         --Like a reference point for the robot
 
-
         -- just above the button
         --FIXED_POS = {0.587, -0.036, -0.143}
         FIXED_POS = { 0.598, 0.300, -0.143}
@@ -338,16 +337,13 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
         REWARD_INDEX = 2 -- Which column in the reward file indicates the value of reward ?
         INDEX_TABLE = {2,3,4} --column index for coordinates in state file, respectively (x,y,z)
 
-        DEFAULT_PRECISION = 0.02 -- for 'arrondit' function
+        DEFAULT_PRECISION = 0.05 -- for 'arrondit' function
+        -- During data generation the amplitude of actions is set randomly in the interval of (0.03, 0.07). 
         FILENAME_FOR_REWARD = "recorded_button1_is_pressed.txt"
         FILENAME_FOR_ACTION = "recorded_robot_limb_left_endpoint_action.txt" -- Never written, always computed on the fly
         FILENAME_FOR_STATE = "recorded_robot_limb_left_endpoint_state.txt"
 
         SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
-
-        if BRING_CLOSER_REF_POINT then
-           PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","fixed_pos"}}
-        end
 
     elseif DATA_FOLDER == COLORFUL then
         CLAMP_CAUSALITY = false --TODO: make false when continuous works
@@ -421,6 +417,10 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
     if BRING_CLOSER_REF_POINT then
        PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","fixed_point"}}
     end
+
+    -- L1Smooth and cosDistance and max margin
+    --TODO PRIORS_CONFIGS_TO_APPLY.add('CosDist','L1SmoothDist','MaxMargin')
+
     -- DEFAULT_PRECISION for all CONTINUOUS ACTIONS:
     if USE_CONTINUOUS then  --otherwise, it is not used
         DEFAULT_PRECISION = 0.01
