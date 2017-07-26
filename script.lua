@@ -181,7 +181,10 @@ local function main(params)
     if DATA_FOLDER == COMPLEX_DATA then
        NB_SEQUENCES = NB_SEQUENCES - 1 -- Just because it is a dumb looking action without much action, we dont consider it
     end
-
+    --Too much RAM needed: 24GB, freezes memory, and computer unusable for anyone
+    if DATA_FOLDER == COLORFUL then
+       NB_SEQUENCES = NB_SEQUENCES - 75 --To handle them in memory we start with 150-75 = 75
+    end
     if NB_SEQUENCES ==0  then --or not folder_exists(DATA_FOLDER) then
         error('Error: data was not found in input directory INPUT_DIR= '.. DATA_FOLDER)
     end
@@ -194,6 +197,7 @@ local function main(params)
           LOG_ACTION[#LOG_ACTION+1] = {}
        end
     end
+
 
     ALL_SEQ = precompute_all_seq()
 
