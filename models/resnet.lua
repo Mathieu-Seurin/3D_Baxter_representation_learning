@@ -51,6 +51,8 @@ function getModel(Dimension)
    whole_net:add(pretrain_net)
    whole_net:add(nn.Linear(512,Dimension))
 
+   whole_net:evaluate()
+
    return whole_net
 end
 

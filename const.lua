@@ -16,7 +16,7 @@ require 'hyperparams'
 ---NOTE: THESE ARE DEFAULTS (IF NOT COMMAND LINE ARGS ARE PASSED), AND ARE OVERRIDEN BY DATA_FOLDER SPECIFIC CASES BELOW :
 ----------------------------------------------------------------------------------------------------------------------------
 USE_CUDA = true
-USE_SECOND_GPU = true
+USE_SECOND_GPU = false
 
 USE_CONTINUOUS = false
 
@@ -221,23 +221,24 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
        --NOTE: DEFAULT PARAMETERS FOR OUR BASELINE DATABASE SET AT THE BEGINNING OF THE FILE (NEED TO BE DECLARED AS CONSTANTS
         CLAMP_CAUSALITY = false
 
-        MIN_TABLE = {-10000,-10000} -- for x,y
-        MAX_TABLE = {10000,10000} -- for x,y
+        DIMENSION_OUT = 2
+        -- MIN_TABLE = {-10000,-10000} -- for x,y
+        -- MAX_TABLE = {10000,10000} -- for x,y
 
-        DIMENSION_IN = 2
-        DIMENSION_OUT = 2  --worked just as well as 4 output dimensions
-        REWARD_INDEX = 1  --3 reward values: -1, 0, 10
-        INDEX_TABLE = {1,2} --column index for coordinate in state file (respectively x,y)
+        -- DIMENSION_IN = 2
+        -- DIMENSION_OUT = 2  --worked just as well as 4 output dimensions
+        -- REWARD_INDEX = 1  --3 reward values: -1, 0, 10
+        -- INDEX_TABLE = {1,2} --column index for coordinate in state file (respectively x,y)
 
-        DEFAULT_PRECISION = 0.1
-        FILENAME_FOR_ACTION = "recorded_robot_action.txt" --not used at all, we use state file, and compute the action with it (contains dx, dy)
-        FILENAME_FOR_STATE = "recorded_robot_state.txt"
-        FILENAME_FOR_REWARD = "recorded_robot_reward.txt"
+        -- DEFAULT_PRECISION = 0.1
+        -- FILENAME_FOR_ACTION = "recorded_robot_action.txt" --not used at all, we use state file, and compute the action with it (contains dx, dy)
+        -- FILENAME_FOR_STATE = "recorded_robot_state.txt"
+        -- FILENAME_FOR_REWARD = "recorded_robot_reward.txt"
 
-        SUB_DIR_IMAGE = 'recorded_camera_top'
+        -- SUB_DIR_IMAGE = 'recorded_camera_top'
         AVG_FRAMES_PER_RECORD = 90
 
-        -- Middle of field
+        -- -- Middle of field
         FIXED_POS = {1.54133736021, 1.71509412704}
 
         ROUNDING_VALUE_FIX = 0.1
