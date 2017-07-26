@@ -18,7 +18,7 @@ Documentation for colorblind-supported plots: #http://seaborn.pydata.org/introdu
 """
 
 SKIP_RENDERING = True  # Make True when running remotely via ssh for the batch/grid_search programs to save the plots and KNN figures folder
-#DATASETS AVAILABLE:
+#DATASETS AVAILABLE:  NOTE: when adding a new dataset, add also to ALL_DATASETS for stats and logging consistency purposes
 BABBLING = 'babbling'
 MOBILE_ROBOT = 'mobileRobot'
 SIMPLEDATA3D = 'simpleData3D'
@@ -26,6 +26,7 @@ PUSHING_BUTTON_AUGMENTED = 'pushingButton3DAugmented'
 STATIC_BUTTON_SIMPLEST = 'staticButtonSimplest'
 COMPLEX_DATA = 'complexData'
 COLORFUL = 'colorful'
+ALL_DATASETS = [BABBLING, MOBILE_ROBOT, SIMPLEDATA3D, PUSHING_BUTTON_AUGMENTED, STATIC_BUTTON_SIMPLEST,COMPLEX_DATA, COLORFUL]
 
 # 2 options of plotting:
 LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
