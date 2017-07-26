@@ -78,13 +78,12 @@ Step 2: Install dependencies
 sudo apt-get install build-essential python-dev python-setuptools python-numpy python-scipy libatlas-dev libatlas3gf-base
 
 Step 3:
-pip install --user --install-option="--prefix=" -U scikit-learn
+pip install --user --install-option="--prefix=" scikit-learn
 
 * Tkinker: if you encounter `tkinter.TclError: no display name and no $DISPLAY environment variable` while running
 ```
 python generateNNImages.py
 ```
-
 run instead 'ssh -X' instead of 'ssh', or
 
 ```
@@ -98,7 +97,10 @@ luarocks install torchnet-vision does not suffice:
 * luarocks install torchnet  
 * Install torchnet-vision via https://github.com/Cadene/torchnet-vision  (requires luarocks install argcheck)
 
-3. Pandas for Python results plotting and reporting:
+3. Pandas and Seaborn for Python results plotting and reporting:
+pip install --user pandas
+pip install --user seaborn (or  conda install seaborn
+or
 sudo apt-get pandas  ---see full scipy stack and add to readme
 
 Mac install: cd /etc/   and $ Natalias-MacBook:etc natalia$ sudo nano tsocks.conf
@@ -136,8 +138,14 @@ And then everything should work
 and after, reinstall torchnet and torchnet-vision as above indicated
 
 
-2. SKLEARN AND SCIPY VERSION CONFLICTS: USE ONLY CONDA INSTALL SPECIFIC ONLINE COMMAND OR PIP INSTALL -U _ WITHOUT SUDO.
+2. SKLEARN AND SCIPY VERSION CONFLICTS: USE ONLY CONDA INSTALL SPECIFIC ONLINE COMMAND OR PIP INSTALL --user  *** WITHOUT SUDO ! ***
 
+
+Do first (Requirements for scikit-learn) (Note: -U will give permission errors!):
+```
+pip install --user numpy
+pip install --user scipy
+```
 If sklearn.neighbours import fails, remove  and install:
 Either use conda (in which case all your installed packages would be in ~/miniconda/ or pip install --user don't mix the two. Removing either
 ```
@@ -147,18 +155,13 @@ pip uninstall sklearn
 ```
 and
 ```
-1)  pip install -U scikit-learn
+1)  pip install --user scikit-learn
 ```
 or
 ```
 2) conda install -c anaconda scikit-learn=0.18.1
 ```
 
-If needed, also do
-```
-pip install -U numpy
-pip install -U scipy
-```
 
 3. Matplotlib: If plots are not showing properly reward colours, or datapoints too small, your version of matplotlib may be too old, it needs to be at least 2.0. Run test in Utils.py library_versions_tests().
 
@@ -208,6 +211,12 @@ RuntimeError: Invalid DISPLAY variable
 ```
 
 I have not found other solution than running within the proxy network (run locally within ensta or from another Ubuntu machine?)
+
+* If you run into this error :
+```
+tkinter.TclError: no display name and no $DISPLAY environment variable
+```
+while running ssh, Instead of ssh account@machine, do: ssh -X
 
 * Running shell scripts:
 

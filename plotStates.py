@@ -19,7 +19,7 @@ print"\n\n >> Running plotStates.py....plotGroundTruthStates: ",plotGroundTruthS
 
 model_name = ''
 
-if len(sys.argv) < 2:
+if len(sys.argv) < 2:  # regular pipeline in gridsearch script
     lastModelFile = open('lastModel.txt')
     path = lastModelFile.readline()[:-1]+'/'
     model_name = path.split('/')[1]
@@ -117,8 +117,6 @@ if PLOT_DIMENSIONS == 2:
     plotStates('2D', rewards, toplot, plot_path, dataset=model_name)
 elif PLOT_DIMENSIONS ==3:
     plotStates('3D', rewards, toplot, plot_path, dataset=model_name)
-# elif PLOT_DIMENSIONS == 1:  #TODO  extend plotStates('1D') or allow cmap to run without gray -1 error
-#     plt.scatter(toplot, rewards, c=rewards, cmap=cmap, norm=norm, marker="o")
 else:
     print " PLOT_DIMENSIONS other than 2 or 3 not supported"
 

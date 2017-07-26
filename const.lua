@@ -24,6 +24,22 @@ MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.5
 CONTINUOUS_ACTION_SIGMA = 0.5
 DATA_FOLDER = MOBILE_ROBOT --works best!
 
+--===============================================
+--ALL POSSIBLE PRIORS: (set them in hyperparams)
+--===============================================
+REP = "Rep"
+CAUS = "Caus"
+PROP = "Prop"
+TEMP = "Temp"
+BRING_CLOSER_REWARD = "make_reward_closer"
+BRING_CLOSER_REF_POINT = "fixed_point"
+REWARD_PREDICTION_CRITERION= 'reward_prediction_criterion'
+ALL_PRIORS = {REP, CAUS,PROP,TEMP,BRING_CLOSER_REWARD,BRING_CLOSER_REF_POINT, REWARD_PREDICTION_CRITERION}
+--DEFAULTS BEING APPLIED (SET THEM IN HYPERPARAMS.LUA)
+PRIORS_CONFIGS_TO_APPLY ={{PROP, TEMP, CAUS, REP}}
+
+-- ====================================================
+
 if USE_CUDA then
     require 'cunn'
     require 'cutorch'
@@ -96,7 +112,6 @@ SUB_DIR_IMAGE = 'recorded_camera_top'
 AVG_FRAMES_PER_RECORD = 90
 
 --===============================================
-PRIORS_CONFIGS_TO_APPLY ={{"Prop","Temp","Caus","Rep"}}
 FILE_PATTERN_TO_EXCLUDE = 'deltas'
 CAN_HOLD_ALL_SEQ_IN_RAM = true
 -- ====================================================
@@ -123,6 +138,21 @@ function addLeadingZero(number)
     if number >= 0 and number <= 9 then  return "0" .. number else return tostring(number)    end
 end
 
+
+---------------------------------------------------------------------------------------
+-- Function :	priorsToString(params)
+--======================================================
+--we add the first 2 letters of each prior for logging the priors used in the name and folder of the model
+---------------------------------------------------------------------------------------
+function priorsToString(tableOfPriors)
+    str = '_'
+    for index, priors in pairs(tableOfPriors) do
+        for i=1,#priors do
+            str = str..string.sub(priors[i], 1,3)
+        end
+    end
+    return str
+end
 ---------------------------------------------------------------------------------------
 -- Function :	set_hyperparams(params)
 --======================================================
@@ -177,10 +207,10 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
     _, architecture_name = MODEL_ARCHITECTURE_FILE:match("(.+)/(.+)") --architecture_name, _ = split(architecture_name, ".")
 
     if USE_CONTINUOUS then
-        DAY = 'Y'..now.year..'_D'..addLeadingZero(now.day)..'_M'..addLeadingZero(now.month)..'_H'..addLeadingZero(now.hour)..'M'..addLeadingZero(now.min)..'S'..addLeadingZero(now.sec)..'_'..DATA_FOLDER..'_'..architecture_name..'_cont'..'_MCD'..MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD..'_S'..CONTINUOUS_ACTION_SIGMA
+        DAY = 'Y'..now.year..'_D'..addLeadingZero(now.day)..'_M'..addLeadingZero(now.month)..'_H'..addLeadingZero(now.hour)..'M'..addLeadingZero(now.min)..'S'..addLeadingZero(now.sec)..'_'..DATA_FOLDER..'_'..architecture_name..'_cont'..'_MCD'..MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD..'_S'..CONTINUOUS_ACTION_SIGMA..priorsToString(PRIORS_CONFIGS_TO_APPLY)
         DAY = DAY:gsub("%.", "_")  -- replace decimal points by '_' for folder naming
     else
-        DAY = 'Y'..now.year..'_D'..addLeadingZero(now.day)..'_M'..addLeadingZero(now.month)..'_H'..addLeadingZero(now.hour)..'M'..addLeadingZero(now.min)..'S'..addLeadingZero(now.sec)..'_'..DATA_FOLDER..'_'..architecture_name
+        DAY = 'Y'..now.year..'_D'..addLeadingZero(now.day)..'_M'..addLeadingZero(now.month)..'_H'..addLeadingZero(now.hour)..'M'..addLeadingZero(now.min)..'S'..addLeadingZero(now.sec)..'_'..DATA_FOLDER..'_'..architecture_name..priorsToString(PRIORS_CONFIGS_TO_APPLY)
     end
 
     NAME_SAVE= 'model'..DAY
@@ -203,7 +233,6 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
        FILENAME_FOR_STATE = "endpoint_state"
 
        SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
-       AVG_FRAMES_PER_RECORD = 95
 
        MIN_TABLE = {0.42,-0.1,-10} -- for x,y,z doesn't really matter in fact
        MAX_TABLE = {0.75,0.6,10} -- for x,y,z doesn't really matter in fact
@@ -268,28 +297,28 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
       AVG_FRAMES_PER_RECORD = 60
       -- Causality needs at least 2 different values of reward and in sparse dataset such as babbling_1, this does not occur always
       --PRIORS_TO_APPLY ={{"Rep","Prop","Temp"}}
-      PRIORS_CONFIGS_TO_APPLY ={{"Temp"}}--, works best than 3 priors for babbling so far  {"Prop","Temp"}, {"Prop","Rep"},  {"Temp","Rep"}, {"Prop","Temp","Rep"}}  --TODO report 1 vs 2 vs 3 priors, add all prioris when Babbling contains +1 reward value
+      PRIORS_CONFIGS_TO_APPLY ={{TEMP}}--, works best than 3 priors for babbling so far  {"Prop","Temp"}, {"Prop","Rep"},  {"Temp","Rep"}, {"Prop","Temp","Rep"}}  --TODO report 1 vs 2 vs 3 priors, add all prioris when Babbling contains +1 reward value
       --print('WARNING: Causality prior, at least, will be ignored for dataset because of too sparse rewards (<2 value types). TODO: convert to 3 reward values'..BABBLING?
 
     elseif DATA_FOLDER == PUSHING_BUTTON_AUGMENTED then
-        CLAMP_CAUSALITY = true --TODO: make false when continuous works
+      CLAMP_CAUSALITY = false --TODO: make false when continuous works
 
-        MIN_TABLE = {0.42,-0.2,-10} -- for x,y,z
-        MAX_TABLE = {0.8,0.7,10} -- for x,y,z
+      MIN_TABLE = {0.42,-0.2,-10} -- for x,y,z
+      MAX_TABLE = {0.8,0.7,10} -- for x,y,z
 
-        DIMENSION_IN = 3
-        DIMENSION_OUT = 3
+      DIMENSION_IN = 3
+      DIMENSION_OUT = 3
 
-        REWARD_INDEX = 2 --2 reward values: -0, 1 ?
-        INDEX_TABLE = {2,3,4} --column index for coordinates in state file, respectively (x,y,z)
+      REWARD_INDEX = 2 --2 reward values: -0, 1 ?
+      INDEX_TABLE = {2,3,4} --column index for coordinates in state file, respectively (x,y,z)
 
-        DEFAULT_PRECISION = 0.05 -- for 'arrondit' function
-        FILENAME_FOR_REWARD = "recorded_button1_is_pressed.txt"--"is_pressed"
-        FILENAME_FOR_ACTION = "recorded_robot_limb_left_endpoint_action.txt"--endpoint_action"  -- Never written, always computed on the fly
-        FILENAME_FOR_STATE = "recorded_robot_limb_left_endpoint_state.txt"--endpoint_state"
+      DEFAULT_PRECISION = 0.05 -- for 'arrondit' function
+      FILENAME_FOR_REWARD = "recorded_button1_is_pressed.txt"--"is_pressed"
+      FILENAME_FOR_ACTION = "recorded_robot_limb_left_endpoint_action.txt"--endpoint_action"  -- Never written, always computed on the fly
+      FILENAME_FOR_STATE = "recorded_robot_limb_left_endpoint_state.txt"--endpoint_state"
 
-        SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
-        AVG_FRAMES_PER_RECORD = 100
+      SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
+      AVG_FRAMES_PER_RECORD = 100
 
     elseif DATA_FOLDER == STATIC_BUTTON_SIMPLEST then
         CLAMP_CAUSALITY = false --TODO: make false when continuous works
@@ -328,7 +357,6 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
         -- FIXED_POS = {0.639, 0.286, 0.136}
         -- ROUNDING_VALUE_FIX = 0.04
 
-
         MIN_TABLE = {0.42,-0.1,-0.11} -- for x,y,z
         MAX_TABLE = {0.75,0.60,0.35} -- for x,y,z
 
@@ -339,7 +367,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
         INDEX_TABLE = {2,3,4} --column index for coordinates in state file, respectively (x,y,z)
 
         DEFAULT_PRECISION = 0.05 -- for 'arrondit' function
-        -- During data generation the amplitude of actions is set randomly in the interval of (0.03, 0.07). 
+        -- During data generation the amplitude of actions is set randomly in the interval of (0.03, 0.07).
         FILENAME_FOR_REWARD = "recorded_button1_is_pressed.txt"
         FILENAME_FOR_ACTION = "recorded_robot_limb_left_endpoint_action.txt" -- Never written, always computed on the fly
         FILENAME_FOR_STATE = "recorded_robot_limb_left_endpoint_state.txt"
@@ -391,9 +419,9 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
     if string.find(MODEL_ARCHITECTURE_FILE, 'minimalNetModel') then --TODO replace by constants
         error([[minimalNetModel should only be used in learn_autoencoder.lua, not script.lua]])
     end
-    if IS_RESNET and DATA_FOLDER == STATIC_BUTTON_SIMPLEST then  --TODO fix is it possible?
-        error([[STATIC_BUTTON_SIMPLEST= staticButtonSimplest dataset is not yet supported by ResNet model architecture, we are working on it? Try for now topUniqueSimplerWOTanh model]])
-    end  --mobileData can on the other hand be run with and vithout resnet
+    -- if IS_RESNET and DATA_FOLDER == STATIC_BUTTON_SIMPLEST then  --TODO fix is it possible?
+    --     error([[STATIC_BUTTON_SIMPLEST= staticButtonSimplest dataset is not yet supported by ResNet model architecture, we are working on it? Try for now topUniqueSimplerWOTanh model]])
+    -- end  --mobileData can on the other hand be run with and vithout resnet
     DIFFERENT_FORMAT = IS_INCEPTION or IS_RESNET
 
     if IS_INCEPTION then
@@ -412,14 +440,17 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
     end
 
     -- EXTRA PRIORS:
-    if BRING_CLOSER_REWARD then
-       PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","make_reward_closer"}}
+    if APPLY_BRING_CLOSER_REWARD then
+       table.insert(PRIORS_CONFIGS_TO_APPLY[1], BRING_CLOSER_REWARD)
     end
-    if BRING_CLOSER_REF_POINT then
-       PRIORS_CONFIGS_TO_APPLY ={{"Temp","Rep","Prop","Caus","fixed_point"}}
+    if APPLY_BRING_CLOSER_REF_POINT then
+       table.insert(PRIORS_CONFIGS_TO_APPLY[1], BRING_CLOSER_REF_POINT)
+    end
+    if APPLY_REWARD_PREDICTION_CRITERION then
+       table.insert(PRIORS_CONFIGS_TO_APPLY[1], REWARD_PREDICTION_CRITERION)
     end
 
-    -- L1Smooth and cosDistance and max margin
+    -- L1Smooth and cosDistance and max margin: compare with homemade MSDCriterion and replace if similar in the good practice of using native code
     --TODO PRIORS_CONFIGS_TO_APPLY.add('CosDist','L1SmoothDist','MaxMargin')
 
     -- DEFAULT_PRECISION for all CONTINUOUS ACTIONS:
@@ -435,8 +466,8 @@ function print_hyperparameters(extra_string_to_print)
                         DATA_FOLDER,
 												" (LOG_FOLDER ", LOG_FOLDER,
                         ")\nUSE_CUDA ",USE_CUDA,", USE_CONTINUOUS ACTIONS: ",USE_CONTINUOUS, " MODEL: ",MODEL_ARCHITECTURE_FILE,". PRIORS_CONFIGS_TO_APPLY", PRIORS_CONFIGS_TO_APPLY)
-    print('EXTRAPOLATE_ACTION  EXTRAPOLATE_ACTION_CAUS  BRING_CLOSER_REWARD  BRING_CLOSER_REF_POINT: ')
-    print(EXTRAPOLATE_ACTION,EXTRAPOLATE_ACTION_CAUS,BRING_CLOSER_REWARD,BRING_CLOSER_REF_POINT)
+    print('APPLY: EXTRAPOLATE_ACTION, EXTRAPOLATE_ACTION_CAUS, APPLY_BRING_CLOSER_REWARD, APPLY_BRING_CLOSER_REF_POINT, APPLY_REWARD_PREDICTION_CRITERION: ')
+    print(EXTRAPOLATE_ACTION,EXTRAPOLATE_ACTION_CAUS,APPLY_BRING_CLOSER_REWARD,APPLY_BRING_CLOSER_REF_POINT,APPLY_REWARD_PREDICTION_CRITERION)
     if USE_CONTINUOUS then  --otherwise, it is not used
         print ('MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD: ',MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD,' CONTINUOUS_ACTION_SIGMA: ', CONTINUOUS_ACTION_SIGMA)
     end

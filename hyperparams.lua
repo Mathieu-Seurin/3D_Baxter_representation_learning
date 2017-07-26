@@ -43,9 +43,10 @@ EXTRAPOLATE_ACTION_CAUS = false
 --TODO shall it be true for continuous actions too always? TODO if extrapolate_action_caus is false, same should be for CLAMP_CAUSALITY, otherwise it makes no sense?
 -- Always : i don't think so, but trying to see if it works better with it, why not
 
-
-BRING_CLOSER_REWARD = false
-BRING_CLOSER_REF_POINT = true
+--EXTRA PRIORS to apply:
+APPLY_BRING_CLOSER_REF_POINT = true
+APPLY_BRING_CLOSER_REWARD = false
+APPLY_REWARD_PREDICTION_CRITERION = true
 -- Create a point where the robot wants the state to be very similar. Like a reference point for the robot.
 
 LR=0.0001

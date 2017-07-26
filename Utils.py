@@ -42,7 +42,7 @@ def library_versions_tests():
     if not matplotlib.__version__.startswith('2.'):
         print "Using a too old matplotlib version (can be critical for properly plotting reward colours, otherwise the colors are difficult to see), to update, you need to do it via Anaconda: "
         print "Min version required is 2.0.0. Current version: ", matplotlib.__version__
-        print "Option 1) (Preferred)\n - pip install --upgrade matplotlib"
+        print "Option 1) (Preferred)\n - pip install --upgrade matplotlib (In general, prefer pip install --user (WITHOUT SUDO) to anaconda"
         print "2) To install anaconda (WARNING: can make sklearn PCA not work by installing a second version of numpy): \n -wget https://repo.continuum.io/archive/Anaconda2-4.4.0-Linux-x86_64.sh  \n -bash Anaconda2-4.4.0-Linux-x86_64.sh  \n -Restart terminal \n -conda update matplotlib"
         sys.exit(-1)
 
@@ -50,7 +50,7 @@ def library_versions_tests():
     #print "numpy_versions_installed: ", numpy_versions_installed
     if len(numpy_versions_installed)>1:
         print "Probably you have installed numpy with and without Anaconda, so there is a conflict because two numpy versions can be used."
-        print "Remove non-Anaconda numpy:\n 1) pip uninstall numpy \n and if needed, install 2.1) pip install -U numpy  \n "
+        print "Remove non-Anaconda numpy:\n 1) pip uninstall numpy \n and if needed, install 2.1) pip install --user numpy  \n "
         print "2.2) If 1 does not work: last version in: \n -https://anaconda.org/anaconda/numpy"
 
 def get_data_folder_from_model_name(model_name):
@@ -325,62 +325,62 @@ COMPLEX_TEST_SET = {
 }
 
 ROBOT_TEST_SET = {
-    'mobileRobot/record_005/recorded_camera_top/frame00001.jpg',
-    'mobileRobot/record_005/recorded_camera_top/frame00002.jpg',
-    'mobileRobot/record_005/recorded_camera_top/frame00003.jpg',
-    'mobileRobot/record_005/recorded_camera_top/frame00004.jpg',
-    'mobileRobot/record_005/recorded_camera_top/frame00005.jpg',
-    'mobileRobot/record_005/recorded_camera_top/frame00006.jpg',
-    'mobileRobot/record_005/recorded_camera_top/frame00007.jpg',
-    'mobileRobot/record_005/recorded_camera_top/frame00008.jpg',
-    'mobileRobot/record_005/recorded_camera_top/frame00009.jpg',
-    'mobileRobot/record_005/recorded_camera_top/frame00010.jpg',
-    'mobileRobot/record_005/recorded_camera_top/frame00011.jpg',
-    'mobileRobot/record_005/recorded_camera_top/frame00012.jpg',
-    'mobileRobot/record_005/recorded_camera_top/frame00013.jpg',
-    'mobileRobot/record_005/recorded_camera_top/frame00014.jpg',
-    'mobileRobot/record_005/recorded_camera_top/frame00015.jpg',
-    'mobileRobot/record_005/recorded_camera_top/frame00016.jpg',
-    'mobileRobot/record_005/recorded_camera_top/frame00017.jpg',
-    'mobileRobot/record_005/recorded_camera_top/frame00018.jpg',
-    'mobileRobot/record_005/recorded_camera_top/frame00019.jpg',
-    'mobileRobot/record_005/recorded_camera_top/frame00020.jpg',
-    'mobileRobot/record_005/recorded_camera_top/frame00021.jpg',
-    'mobileRobot/record_005/recorded_camera_top/frame00022.jpg',
-    'mobileRobot/record_000/recorded_camera_top/frame00048.jpg',
-    'mobileRobot/record_000/recorded_camera_top/frame00049.jpg',
-    'mobileRobot/record_000/recorded_camera_top/frame00050.jpg',
-    'mobileRobot/record_000/recorded_camera_top/frame00051.jpg',
-    'mobileRobot/record_000/recorded_camera_top/frame00052.jpg',
-    'mobileRobot/record_000/recorded_camera_top/frame00053.jpg',
-    'mobileRobot/record_000/recorded_camera_top/frame00054.jpg',
-    'mobileRobot/record_000/recorded_camera_top/frame00055.jpg',
-    'mobileRobot/record_000/recorded_camera_top/frame00056.jpg',
-    'mobileRobot/record_000/recorded_camera_top/frame00057.jpg',
-    'mobileRobot/record_000/recorded_camera_top/frame00058.jpg',
-    'mobileRobot/record_000/recorded_camera_top/frame00059.jpg',
-    'mobileRobot/record_000/recorded_camera_top/frame00060.jpg',
-    'mobileRobot/record_000/recorded_camera_top/frame00061.jpg',
-    'mobileRobot/record_000/recorded_camera_top/frame00062.jpg',
-    'mobileRobot/record_000/recorded_camera_top/frame00063.jpg',
-    'mobileRobot/record_000/recorded_camera_top/frame00064.jpg',
-    'mobileRobot/record_000/recorded_camera_top/frame00065.jpg',
-    'mobileRobot/record_000/recorded_camera_top/frame00066.jpg',
-    'mobileRobot/record_004/recorded_camera_top/frame00010.jpg',
-    'mobileRobot/record_004/recorded_camera_top/frame00011.jpg',
-    'mobileRobot/record_004/recorded_camera_top/frame00012.jpg',
-    'mobileRobot/record_004/recorded_camera_top/frame00013.jpg',
-    'mobileRobot/record_004/recorded_camera_top/frame00014.jpg',
-    'mobileRobot/record_004/recorded_camera_top/frame00015.jpg',
-    'mobileRobot/record_004/recorded_camera_top/frame00016.jpg',
-    'mobileRobot/record_004/recorded_camera_top/frame00017.jpg',
-    'mobileRobot/record_004/recorded_camera_top/frame00018.jpg',
-    'mobileRobot/record_004/recorded_camera_top/frame00019.jpg',
-    'mobileRobot/record_004/recorded_camera_top/frame00020.jpg',
-    'mobileRobot/record_004/recorded_camera_top/frame00021.jpg',
-    'mobileRobot/record_004/recorded_camera_top/frame00022.jpg',
-    'mobileRobot/record_004/recorded_camera_top/frame00023.jpg',
-    'mobileRobot/record_004/recorded_camera_top/frame00024.jpg'
+'mobileRobot/record_005/recorded_camera_top/frame00001.jpg',
+'mobileRobot/record_005/recorded_camera_top/frame00002.jpg',
+'mobileRobot/record_005/recorded_camera_top/frame00003.jpg',
+'mobileRobot/record_005/recorded_camera_top/frame00004.jpg',
+'mobileRobot/record_005/recorded_camera_top/frame00005.jpg',
+'mobileRobot/record_005/recorded_camera_top/frame00006.jpg',
+'mobileRobot/record_005/recorded_camera_top/frame00007.jpg',
+'mobileRobot/record_005/recorded_camera_top/frame00008.jpg',
+'mobileRobot/record_005/recorded_camera_top/frame00009.jpg',
+'mobileRobot/record_005/recorded_camera_top/frame00010.jpg',
+'mobileRobot/record_005/recorded_camera_top/frame00011.jpg',
+'mobileRobot/record_005/recorded_camera_top/frame00012.jpg',
+'mobileRobot/record_005/recorded_camera_top/frame00013.jpg',
+'mobileRobot/record_005/recorded_camera_top/frame00014.jpg',
+'mobileRobot/record_005/recorded_camera_top/frame00015.jpg',
+'mobileRobot/record_005/recorded_camera_top/frame00016.jpg',
+'mobileRobot/record_005/recorded_camera_top/frame00017.jpg',
+'mobileRobot/record_005/recorded_camera_top/frame00018.jpg',
+'mobileRobot/record_005/recorded_camera_top/frame00019.jpg',
+'mobileRobot/record_005/recorded_camera_top/frame00020.jpg',
+'mobileRobot/record_005/recorded_camera_top/frame00021.jpg',
+'mobileRobot/record_005/recorded_camera_top/frame00022.jpg',
+'mobileRobot/record_000/recorded_camera_top/frame00048.jpg',
+'mobileRobot/record_000/recorded_camera_top/frame00049.jpg',
+'mobileRobot/record_000/recorded_camera_top/frame00050.jpg',
+'mobileRobot/record_000/recorded_camera_top/frame00051.jpg',
+'mobileRobot/record_000/recorded_camera_top/frame00052.jpg',
+'mobileRobot/record_000/recorded_camera_top/frame00053.jpg',
+'mobileRobot/record_000/recorded_camera_top/frame00054.jpg',
+'mobileRobot/record_000/recorded_camera_top/frame00055.jpg',
+'mobileRobot/record_000/recorded_camera_top/frame00056.jpg',
+'mobileRobot/record_000/recorded_camera_top/frame00057.jpg',
+'mobileRobot/record_000/recorded_camera_top/frame00058.jpg',
+'mobileRobot/record_000/recorded_camera_top/frame00059.jpg',
+'mobileRobot/record_000/recorded_camera_top/frame00060.jpg',
+'mobileRobot/record_000/recorded_camera_top/frame00061.jpg',
+'mobileRobot/record_000/recorded_camera_top/frame00062.jpg',
+'mobileRobot/record_000/recorded_camera_top/frame00063.jpg',
+'mobileRobot/record_000/recorded_camera_top/frame00064.jpg',
+'mobileRobot/record_000/recorded_camera_top/frame00065.jpg',
+'mobileRobot/record_000/recorded_camera_top/frame00066.jpg',
+'mobileRobot/record_004/recorded_camera_top/frame00010.jpg',
+'mobileRobot/record_004/recorded_camera_top/frame00011.jpg',
+'mobileRobot/record_004/recorded_camera_top/frame00012.jpg',
+'mobileRobot/record_004/recorded_camera_top/frame00013.jpg',
+'mobileRobot/record_004/recorded_camera_top/frame00014.jpg',
+'mobileRobot/record_004/recorded_camera_top/frame00015.jpg',
+'mobileRobot/record_004/recorded_camera_top/frame00016.jpg',
+'mobileRobot/record_004/recorded_camera_top/frame00017.jpg',
+'mobileRobot/record_004/recorded_camera_top/frame00018.jpg',
+'mobileRobot/record_004/recorded_camera_top/frame00019.jpg',
+'mobileRobot/record_004/recorded_camera_top/frame00020.jpg',
+'mobileRobot/record_004/recorded_camera_top/frame00021.jpg',
+'mobileRobot/record_004/recorded_camera_top/frame00022.jpg',
+'mobileRobot/record_004/recorded_camera_top/frame00023.jpg',
+'mobileRobot/record_004/recorded_camera_top/frame00024.jpg'
 }
 
 COLORFUL_TEST_SET = {

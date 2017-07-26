@@ -18,19 +18,21 @@ test = unittest.TestCase('__init__')
 
 """
 NOTE, if sklearn.neighbours import fails, remove  and install:
-Either use conda (in which case all your installed packages would be in ~/miniconda/ or pip install --user don't mix the two. Removing either
+Either use conda (in which case all your installed packages would be in ~/miniconda/ or pip install --user don't mix the two and do not use -U, nor sudo.
+ Removing either
 rm -rf ~/.local/lib/python2.7/site-packages/sklearn or your ~/miniconda folder and reinstalling it cleanly should fix this.
 sudo rm -rf scikit_learn-0.18.1.egg-info/
 pip uninstall sklearn
 and
-1)  pip install -U scikit-learn
+1)  pip install --user scikit-learn
 or 2) conda install -c anaconda scikit-learn=0.18.1
 If needed, also do
-pip install -U numpy
-pip install -U scipy
-"""
+pip install --user numpy
+pip install --user scipy
 
-"""
+NOTE: Q: if this error is obtained: _tkinter.TclError: no display name and no $DISPLAY environment variable
+A: Instead of ssh account@machine, do: ssh -X
+
 Example to run this program for a given trained model:
 python generateNNImages.py 5 5 Log/modelY2017_D24_M06_H06M19S10_staticButtonSimplest_resnet_cont_MCD0_8_S0_4
 IMPORTANT: In order to run it with a non random fixed test set of images,
@@ -41,7 +43,7 @@ image in the test set and it will assess the test set of 50 images defined in Co
 
 print"\n\n >> Running generateNNImages.py...."
 if len(sys.argv) <= 1:
-        sys.exit("Give number of neighbors to produce, followed by number of input images (and model dir if you don't want to use the last model created)")
+    sys.exit("Give number of neighbors to produce, followed by number of input images (and model dir if you don't want to use the last model created)")
 
 # Some parameters
 nbr_neighbors= int(sys.argv[1])
@@ -53,15 +55,15 @@ with_title = True
 if len(sys.argv) >= 3:
 	nbr_images=int(sys.argv[2])
 if len(sys.argv) == 4:
-        path_to_model = sys.argv[3]
-        print """====================================
-        WARNING DATASET IS SET BY HAND HERE : MOBILE ROBOT FOR NOW
-        ============================================="""
-        data_folder = 'mobileRobot'
+    path_to_model = sys.argv[3]
+    print """====================================
+    WARNING: DATASET IS SET BY HAND HERE  (IN ALL PYTHON SCRIPTS, take into account when running pipeline scripts such as gridsearch): MOBILE ROBOT FOR NOW
+    ============================================="""
+    data_folder = 'mobileRobot'
 else:
-        lastModelFile = open(LAST_MODEL_FILE)
-        path_to_model = lastModelFile.readline()[:-1]
-        data_folder = get_data_folder_from_model_name(path_to_model)
+    lastModelFile = open(LAST_MODEL_FILE)
+    path_to_model = lastModelFile.readline()[:-1]
+    data_folder = get_data_folder_from_model_name(path_to_model)
 
 TEST_SET = get_test_set_for_data_folder(data_folder)
 
@@ -71,7 +73,8 @@ if len(sys.argv) == 2:
 	nbr_images = len(TEST_SET) 
     
 # THE FOLLOWING ONLY WILL RUN IN USE_CUDA false way  #print('Calling lua subprocesses with ',data_folder)
-subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_cuda','-use_continuous','-data_folder', data_folder])  # TODO: READ CMD LINE ARGS FROM FILE INSTEAD (and set accordingly here) TO NOT HAVING TO MODIFY INSTEAD train_predict_plotStates and the python files
+subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_cuda','-use_continuous','-data_folder', data_folder])  
+# TODO: READ CMD LINE ARGS FROM FILE INSTEAD (and set accordingly here) TO NOT HAVING TO MODIFY INSTEAD train_predict_plotStates and the python files
 subprocess.call(['th','create_all_reward.lua','-use_cuda','-use_continuous','-data_folder',data_folder])
 # TODO: ADD ,'-use_continuous'
 
