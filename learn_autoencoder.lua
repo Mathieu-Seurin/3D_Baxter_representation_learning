@@ -159,7 +159,7 @@ local function main(params)
    if VISUALIZE_AE then
       w = image.display(torch.Tensor(3,200,400))
    end
-   
+
    -- if DIFFERENT_FORMAT then
    --    error([[Don't forget to switch model to BASE_TIMNET in hyperparameters
    --  Because the images' format is the same for auto-encoder]])
@@ -173,7 +173,7 @@ local function main(params)
     NB_TEST = 3
     NB_SEQUENCES = #list_folders_images-NB_TEST --That way, the last X sequences are used as test
 
-    ALL_SEQ = precompute_all_seq()
+    ALL_SEQ = precompute_all_seq(NB_SEQUENCES)
 
     image_width=IM_LENGTH
     image_height=IM_HEIGHT

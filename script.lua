@@ -200,7 +200,7 @@ local function main(params)
     end
 
 
-    ALL_SEQ = precompute_all_seq()
+    ALL_SEQ = precompute_all_seq(NB_SEQUENCES)
 
     for nb_test=1, #PRIORS_CONFIGS_TO_APPLY do
        if RELOAD_MODEL then

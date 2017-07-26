@@ -134,12 +134,19 @@ function save_model(model)
    f:close()
 end
 
-function precompute_all_seq()
+
+---------------------------------------------------------------------------------------
+-- Function :precompute_all_seq(first_n_seqs)
+-- Input ():
+-- Output (): a preload_folder containing all images and their mean and std dev for accelerating training of each batch
+---------------------------------------------------------------------------------------
+function precompute_all_seq(first_n_seqs)
    if CAN_HOLD_ALL_SEQ_IN_RAM then
-      print("Preloading all sequences in memory in order to accelerate batch selection ")
+      print("Preloading all sequences in memory in order to accelerate batch selection (first_n_seqs):")
+      print(first_n_seqs)
       --[WARNING: In CPU only mode (USE_CUDA = false), RAM memory runs out]	 Torch: not enough memory: you tried to allocate 0GB. Buy new RAM!
       all_seq = {} -- Preload all the sequences instead of loading specific sequences during batch selection
-      for id=1,NB_SEQUENCES do
+      for id=1,first_n_seqs do
          all_seq[#all_seq+1] = load_seq_by_id(id)
       end
    else
@@ -423,7 +430,7 @@ end
 
 function getInfos(txt,txt_reward,txt_state)
 
-   
+
    local Infos={}
    for dim=1,DIMENSION_IN do
       Infos[dim] = {}
@@ -468,7 +475,7 @@ function getInfos(txt,txt_reward,txt_state)
    end
 
    Infos.txt = txt
-   
+
    return Infos
 end
 
@@ -504,7 +511,7 @@ end
 function is_out_of_bound(list_positions)
    -- For each dimension you check if the value is inside
    -- barrier fix by MIN_TABLE and MAX_TABLE
-   
+
    for dim=1,#list_positions do
       if list_positions[dim] < MIN_TABLE[dim] or list_positions[dim] > MAX_TABLE[dim] then
          return true
