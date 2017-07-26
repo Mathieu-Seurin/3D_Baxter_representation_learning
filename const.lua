@@ -235,12 +235,12 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
         -- FILENAME_FOR_REWARD = "recorded_robot_reward.txt"
 
         -- SUB_DIR_IMAGE = 'recorded_camera_top'
-        -- AVG_FRAMES_PER_RECORD = 90
+        AVG_FRAMES_PER_RECORD = 90
 
         -- -- Middle of field
-        -- FIXED_POS = {1.54133736021, 1.71509412704}
+        FIXED_POS = {1.54133736021, 1.71509412704}
 
-        -- ROUNDING_VALUE_FIX = 0.1
+        ROUNDING_VALUE_FIX = 0.1
 
     elseif DATA_FOLDER == BABBLING then
       -- Leni's real Baxter data on  ISIR dataserver. It is named "data_archive_sim_1".
