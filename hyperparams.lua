@@ -7,7 +7,9 @@ PUSHING_BUTTON_AUGMENTED = 'pushingButton3DAugmented'
 BABBLING = 'babbling'
 STATIC_BUTTON_SIMPLEST = 'staticButtonSimplest'
 COMPLEX_DATA = 'complexData'
-COLORFUL = 'colorful'
+COLORFUL = 'colorful'-- 150 data recording sequences
+COLORFUL75 = 'colorful75'-- a smaller version half size of colorful
+
 --!!! AVOID SETTING IT HERE FOR INCONSISTENCIES< SET VIA COMMAND LINE !!!
 --DATA_FOLDER = MOBILE_ROBOT
 --DATA_FOLDER = STATIC_BUTTON_SIMPLEST --PUSHING_BUTTON_AUGMENTED
@@ -20,7 +22,7 @@ INCEPTIONV4 = './models/inceptionFineTunning' --finetuned trained model
 RESNET = './models/resnet'  --finetuned trained model
 
 RESNET_VERSION = 18 --34 or 50 maybe
-FROZEN_LAYER = 0 --the number of layers that don't learn at all (i.e., their learning_rate=0)
+FROZEN_LAYER = 0 --the number of layers that don't learn at all (i.e., their learning_rate=0) out of the (Resnet-N) N layers: see Resnet.lua updateGradInput
 AENET = './models/autoencoder_conv'
 BASE_TIMNET = './models/topUniqueSimplerWOTanh'--ImageNet-inspired Convolutional network with ReLu. This is the only model that should be used with learn_autoencoder, not in regular training in script.lua
 --otherwise, we get:  /home/gpu_center/torch/install/bin/lua: imagesAndReprToTxt.lua:53: bad argument #1 to 'size' (out of range)
@@ -42,9 +44,10 @@ EXTRAPOLATE_ACTION_CAUS = false
 --TODO shall it be true for continuous actions too always? TODO if extrapolate_action_caus is false, same should be for CLAMP_CAUSALITY, otherwise it makes no sense?
 -- Always : i don't think so, but trying to see if it works better with it, why not
 
-
-BRING_CLOSER_REWARD = false
-BRING_CLOSER_REF_POINT = true
+--EXTRA PRIORS to apply:
+APPLY_BRING_CLOSER_REF_POINT = true
+APPLY_BRING_CLOSER_REWARD = false
+APPLY_REWARD_PREDICTION_CRITERION = true
 -- Create a point where the robot wants the state to be very similar. Like a reference point for the robot.
 
 LR=0.0001
@@ -66,6 +69,8 @@ COEF_TEMP=1
 COEF_PROP=1
 COEF_REP=1
 COEF_CAUS=1
+COEF_REWARD_PRED=1
+COEF_MSE = 1
 
 COEF_CLOSE=0.001
 COEF_FIX = 1

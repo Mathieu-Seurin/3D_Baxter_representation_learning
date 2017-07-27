@@ -154,12 +154,12 @@ local function main(params)
    optimizer = set_AE_hyperparams(params)
    print('cmd default params (overridden by following set_hyperparams): ')
    print(params)
-   print_hyperparameters()
+   print_hyperparameters(false, 'learn_autoencoder.lua hyperparams:')
 
    if VISUALIZE_AE then
       w = image.display(torch.Tensor(3,200,400))
    end
-   
+
    -- if DIFFERENT_FORMAT then
    --    error([[Don't forget to switch model to BASE_TIMNET in hyperparameters
    --  Because the images' format is the same for auto-encoder]])
@@ -173,7 +173,7 @@ local function main(params)
     NB_TEST = 3
     NB_SEQUENCES = #list_folders_images-NB_TEST --That way, the last X sequences are used as test
 
-    ALL_SEQ = precompute_all_seq()
+    ALL_SEQ = precompute_all_seq(NB_SEQUENCES)
 
     image_width=IM_LENGTH
     image_height=IM_HEIGHT
@@ -185,7 +185,7 @@ local function main(params)
 
     parameters,gradParameters = model:getParameters()
     train_Epoch(optimizer, list_folders_images,list_txt,Log_Folder)
-    print_hyperparameters("Experiment run successfully for hyperparams: ")
+    print_hyperparameters(false, "Experiment run successfully for hyperparams: ")
     imgs={} --memory is free!!!!!
 end
 

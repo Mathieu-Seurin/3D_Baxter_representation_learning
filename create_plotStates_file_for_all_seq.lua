@@ -1,13 +1,12 @@
 require 'functions'
 
 local function main(params)
-    print("\n\n>> create_plotStates_file_for_all_seq: Creating all states file for NN-Quantitative Criterion plot. ")
-    set_hyperparams(params)
-    print_hyperparameters()
+    print("\n\n>> create_plotStates_file_for_all_seq: Creating all states file for NN-Quantitative Criterion plot. ") --
+    set_hyperparams(params)  --only relevant params are set (cuda usage in this case only)
+    print_hyperparameters(true, 'create_plotStates_file_for_all_seq.lua Hyperparams')
 
     local images_folder = DATA_FOLDER
-    print('In DATA_FOLDER: '..images_folder..' params: ')
-    print(params)
+    print('In DATA_FOLDER: '..images_folder)--..' params: ')    print(params)
 
 
     list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(images_folder)
@@ -60,9 +59,9 @@ local function main(params)
        outStr = outStr..'\n'
     end
 
-    f = io.open('allStates.txt', 'w')-- for last model run
+    f = io.open('allStatesGT.txt', 'w')-- for last model run only, but to avoid dataset related errors, use the next file below:
     f:write(outStr)
-    f = io.open('allStates_'..images_folder..'.txt', 'w') -- for evaluation purposes efficiency
+    f = io.open('allStatesGT_'..images_folder..'.txt', 'w') -- for evaluation purposes efficiency
     f:write(outStr)
     f:close()
 end
@@ -72,7 +71,7 @@ end
 local cmd = torch.CmdLine()
 cmd:option('-use_cuda', false, 'true to use GPU, false (default) for CPU only mode')
 cmd:option('-use_continuous', false, 'true to use a continuous action space, false (default) for discrete one (0.5 range actions)')
-cmd:option('-data_folder', STATIC_BUTTON_SIMPLEST, 'Possible Datasets to use: staticButtonSimplest, mobileRobot, staticButtonSimplest, simpleData3D, pushingButton3DAugmented, babbling')
+cmd:option('-data_folder', MOBILE_ROBOT, 'Possible Datasets to use: staticButtonSimplest, mobileRobot, staticButtonSimplest, simpleData3D, pushingButton3DAugmented, babbling')
 cmd:option('-mcd', 0.5, 'Max. cosine distance allowed among actions for priors loss function evaluation (MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD)')
 cmd:option('-sigma', 0.1, "Sigma: denominator in continuous actions' extra factor (CONTINUOUS_ACTION_SIGMA)")
 

@@ -3,12 +3,11 @@ require 'functions'
 
 local function main(params)
     print("\n\n>> create_all_rewards.lua: Creating all rewards for plot")
-    set_hyperparams(params)
-    print_hyperparameters()
+    set_hyperparams(params) --only relevant params are set (cuda usage in this case only)
+    print_hyperparameters(true, 'create_all_rewards.lua Hyperparams')
 
     local images_folder = DATA_FOLDER
-    print('In DATA_FOLDER: '..images_folder..' params: ')
-    print(params)
+    print('In DATA_FOLDER: '..images_folder)--..' params: ')  print(params)
 
     list_folders_images, list_txt_action,list_txt_button, list_txt_state= Get_HeadCamera_View_Files(images_folder)
     all_button = {}
@@ -26,9 +25,9 @@ local function main(params)
        outStr = outStr..all_button[num_line]..' \n'
     end
 
-    f = io.open('allRewards.txt', 'w') -- for last model run
+    f = io.open('allRewardsGT.txt', 'w') -- for last model run only, but to avoid dataset related errors, use the next file below:
     f:write(outStr)
-    f = io.open('allRewards_'..images_folder..'.txt', 'w') -- for evaluation purposes efficiency
+    f = io.open('allRewardsGT_'..images_folder..'.txt', 'w') -- for evaluation purposes efficiency
     f:write(outStr)
     f:close()
 end

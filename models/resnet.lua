@@ -12,7 +12,7 @@ local function patch(nn_module)
          patch(nn_module.modules[i])
       end
    else
-      nn_module.accGradParameters = function(self,inp, out) end
+      nn_module.accGradParameters = function(self,inp, out) end  -- this is freezing FROZEN_LAYER
    end
 end
 
@@ -42,7 +42,7 @@ function getModel(Dimension)
       error("Version of resnet not known or not available")
    end
 
-   -- Block backprop
+   -- Block backpropagation, i.e Freeze FROZEN_LAYER layers (defined in hyperparams.lua)
    for i=1,FROZEN_LAYER do
       nn_module = pretrain_net:get(i)
       patch(nn_module)

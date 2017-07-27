@@ -1,6 +1,6 @@
 # coding: utf-8
 from Utils import library_versions_tests, get_data_folder_from_model_name, plotStates
-from Utils import BABBLING, MOBILE_ROBOT, SIMPLEDATA3D, PUSHING_BUTTON_AUGMENTED, STATIC_BUTTON_SIMPLEST, LEARNED_REPRESENTATIONS_FILE, SKIP_RENDERING
+from Utils import MOBILE_ROBOT, LEARNED_REPRESENTATIONS_FILE, SKIP_RENDERING
 import numpy as np
 import sys
 import os.path
@@ -19,14 +19,14 @@ print"\n\n >> Running plotStates.py....plotGroundTruthStates: ",plotGroundTruthS
 
 model_name = ''
 
-if len(sys.argv) < 2:
+if len(sys.argv) < 2:  # regular pipeline in gridsearch script
     lastModelFile = open('lastModel.txt')
     path = lastModelFile.readline()[:-1]+'/'
     model_name = path.split('/')[1]
     # ONLY FOR FAST TESTING !!:   model_name = MOBILE_ROBOT#STATIC_BUTTON_SIMPLEST#'pushingButton3DAugmented' #TODO REMOVE-testing  model_name = MOBILE_ROBOT
     data_folder = get_data_folder_from_model_name(model_name)
     if plotGroundTruthStates:
-        state_file_str = 'allStates_'+data_folder+'.txt'
+        state_file_str = 'allStatesGT_'+data_folder+'.txt'
         print "*********************\nPLOTTING GROUND TRUTH (OBSERVED) STATES for model: ", model_name#(Baxter left wrist position for 3D PUSHING_BUTTON_AUGMENTED dataset, or grid 2D position for MOBILE_ROBOT dataset)
         plot_path = path+'GroundTruthStatesPlot_'+model_name+'.png'
     else:
@@ -48,13 +48,15 @@ else:
     else:
         data_folder = 'mobileData'
 
-    # if not os.path.isfile(state_file_str): # print('Calling subprocess create_plotStates_file_for_all_seq with ',data_folder)
+reward_file_str = 'allRewardsGT_'+data_folder+'.txt'
+print "state file ",state_file_str
+if not os.path.isfile(state_file_str): 
+    print('Calling subprocess to write to file all GT states: create_plotStates_file_in file and for dataset: ',state_file_str, data_folder)
     subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_cuda','-use_continuous','-data_folder', data_folder])  # TODO: READ CMD LINE ARGS FROM FILE INSTEAD (and set accordingly here) TO NOT HAVING TO MODIFY INSTEAD train_predict_plotStates and the python files
-    # if not os.path.isfile(reward_file_str): #print('Calling subprocess create_all_reward with ',data_folder)
+if not os.path.isfile(reward_file_str): 
+    print('Calling subprocess to write to file all GT rewards: create_all_reward in file and for dataset: ',reward_file_str, data_folder)
     subprocess.call(['th','create_all_reward.lua', '-use_cuda','-use_continuous','-data_folder', data_folder])
 
-
-reward_file_str = 'allRewards_'+data_folder+'.txt'
 
 total_rewards = 0
 total_states = 0
@@ -69,7 +71,7 @@ if 'recorded_robot' in state_file_str :
                 states_l.append([ float(words[0]),float(words[1])] )
     states=np.asarray(states_l)
 else: # general case
-    print 'NAME_SAVE', state_file_str
+    print 'GT states file name: ', state_file_str
     with open(state_file_str) as f:
         for line in f:
             if line[0]!='#':
@@ -117,8 +119,6 @@ if PLOT_DIMENSIONS == 2:
     plotStates('2D', rewards, toplot, plot_path, dataset=model_name)
 elif PLOT_DIMENSIONS ==3:
     plotStates('3D', rewards, toplot, plot_path, dataset=model_name)
-# elif PLOT_DIMENSIONS == 1:  #TODO  extend plotStates('1D') or allow cmap to run without gray -1 error
-#     plt.scatter(toplot, rewards, c=rewards, cmap=cmap, norm=norm, marker="o")
 else:
     print " PLOT_DIMENSIONS other than 2 or 3 not supported"
 
