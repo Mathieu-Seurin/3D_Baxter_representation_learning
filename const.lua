@@ -464,7 +464,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
     print('Model to be saved in: '..SAVED_MODEL_PATH)
 end
 
-function print_hyperparameters(extra_string_to_print)
+function print_hyperparameters(using_precomputed_model, extra_string_to_print)
     extra_string_to_print = extra_string_to_print or ''
     print(extra_string_to_print)
     print("============ Experiment: DATA_FOLDER USED =========\n",
@@ -473,7 +473,8 @@ function print_hyperparameters(extra_string_to_print)
                         ")\nUSE_CUDA ",USE_CUDA,", USE_CONTINUOUS ACTIONS: ",USE_CONTINUOUS, " MODEL: ",MODEL_ARCHITECTURE_FILE,". PRIORS_CONFIGS_TO_APPLY", PRIORS_CONFIGS_TO_APPLY)
     print('APPLY: EXTRAPOLATE_ACTION, EXTRAPOLATE_ACTION_CAUS, APPLY_BRING_CLOSER_REWARD, APPLY_BRING_CLOSER_REF_POINT, APPLY_REWARD_PREDICTION_CRITERION: ')
     print(EXTRAPOLATE_ACTION,EXTRAPOLATE_ACTION_CAUS,APPLY_BRING_CLOSER_REWARD,APPLY_BRING_CLOSER_REF_POINT,APPLY_REWARD_PREDICTION_CRITERION)
-    if USE_CONTINUOUS then  --otherwise, it is not used
+    if USE_CONTINUOUS and not using_precomputed_model then  --otherwise, it is not used
+        --if we are using a precomputed model stored in a file, the command line default parameters are not effective and thus we should not print them, as they will be contradicting the ones being applied on the precomputed model that is going to be preloaded
         print ('MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD: ',MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD,' CONTINUOUS_ACTION_SIGMA: ', CONTINUOUS_ACTION_SIGMA)
     end
     print("\n================================")

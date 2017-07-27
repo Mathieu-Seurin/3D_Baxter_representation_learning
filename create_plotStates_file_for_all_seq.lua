@@ -1,13 +1,12 @@
 require 'functions'
 
 local function main(params)
-    print("\n\n>> create_plotStates_file_for_all_seq: Creating all states file for NN-Quantitative Criterion plot. ")
-    set_hyperparams(params)
-    print_hyperparameters()
+    print("\n\n>> create_plotStates_file_for_all_seq: Creating all states file for NN-Quantitative Criterion plot. ") --
+    set_hyperparams(params)  --only relevant params are set (cuda usage in this case only)
+    print_hyperparameters(true, 'create_plotStates_file_for_all_seq.lua Hyperparams')
 
     local images_folder = DATA_FOLDER
-    print('In DATA_FOLDER: '..images_folder..' params: ')
-    print(params)
+    print('In DATA_FOLDER: '..images_folder)--..' params: ')    print(params)
 
 
     list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(images_folder)

@@ -174,7 +174,7 @@ local function main(params)
     set_hyperparams(params)
     print('cmd default params (overridden by following set_hyperparams): ')
     print(params)
-    print_hyperparameters()
+    print_hyperparameters(false, 'script.lua Hyperparams:')
 
     local records_paths = Get_Folders(DATA_FOLDER, 'record') --local list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(DATA_FOLDER)
     NB_SEQUENCES= #records_paths
@@ -232,7 +232,7 @@ local function main(params)
 
        print("Experiment "..nb_test .." (Log_Folder="..Log_Folder..")")
        train(Models, priors_used)
-       print_hyperparameters("Experiment run successfully for hyperparams: ")
+       print_hyperparameters(false, "Experiment run successfully for hyperparams: ")
     end
 
     if LOGGING_ACTIONS then

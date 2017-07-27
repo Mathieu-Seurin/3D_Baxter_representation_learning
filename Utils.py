@@ -210,7 +210,7 @@ def get_test_set_for_data_folder(data_folder):
         sys.exit('get_list_of_test_imgs_for_dataset: Dataset has not a defined test set: {}'.format(data_folder))
 
 
-# 49 (1 repeated by error) IMAGES TEST SET HANDPICKED TO SHOW VISUAL VARIABILITY
+# 50 lines, 49 images (1 repeated by error) IMAGES TEST SET HANDPICKED TO SHOW VISUAL VARIABILITY
 IMG_TEST_SET = {
 'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00000.jpg',
 'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00012.jpg',
@@ -273,7 +273,9 @@ IMG_TEST_SET = {
 'staticButtonSimplest/record_052/recorded_cameras_head_camera_2_image_compressed/frame00008.jpg',
 'staticButtonSimplest/record_052/recorded_cameras_head_camera_2_image_compressed/frame00068.jpg',
 'staticButtonSimplest/record_052/recorded_cameras_head_camera_2_image_compressed/frame00025.jpg'}
+#print(len(IMG_TEST_SET))
 
+# 50 unique images 
 COMPLEX_TEST_SET = {
 'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00030.jpg',
 'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00003.jpg',
@@ -326,7 +328,10 @@ COMPLEX_TEST_SET = {
 'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00019.jpg',
 'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00046.jpg'
 }
+#print(len(COMPLEX_TEST_SET))
 
+
+# 56 Images
 ROBOT_TEST_SET = {
 'mobileRobot/record_005/recorded_camera_top/frame00001.jpg',
 'mobileRobot/record_005/recorded_camera_top/frame00002.jpg',
@@ -388,6 +393,7 @@ ROBOT_TEST_SET = {
 
 
 # NOTE, this is used both for COLORFUL and COLORFUL75 datasets
+# 50 Images
 COLORFUL_TEST_SET = {   
 'colorful/record_150/recorded_cameras_head_camera_2_image_compressed/frame00030.jpg',
 'colorful/record_150/recorded_cameras_head_camera_2_image_compressed/frame00003.jpg',
@@ -441,3 +447,4 @@ COLORFUL_TEST_SET = {
 'colorful/record_150/recorded_cameras_head_camera_2_image_compressed/frame00046.jpg'
 }
 #library_versions_tests()
+
