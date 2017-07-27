@@ -26,9 +26,9 @@ local function main(params)
        outStr = outStr..all_button[num_line]..' \n'
     end
 
-    f = io.open('allRewards.txt', 'w') -- for last model run
+    f = io.open('allRewardsGT.txt', 'w') -- for last model run only, but to avoid dataset related errors, use the next file below:
     f:write(outStr)
-    f = io.open('allRewards_'..images_folder..'.txt', 'w') -- for evaluation purposes efficiency
+    f = io.open('allRewardsGT_'..images_folder..'.txt', 'w') -- for evaluation purposes efficiency
     f:write(outStr)
     f:close()
 end

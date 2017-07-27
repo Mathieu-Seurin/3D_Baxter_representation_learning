@@ -183,8 +183,8 @@ local function main(params)
        NB_SEQUENCES = NB_SEQUENCES - 1 -- Just because it is a dumb looking action without much action, we dont consider it
     end
     --Too much RAM needed: 24GB, freezes memory, and computer unusable for anyone
-    -- if DATA_FOLDER == COLORFUL then
-    --    NB_SEQUENCES = NB_SEQUENCES - 75 --To handle them in memory we start with 150-75 = 75 USE COLORFUL75 INSTEAD FOR EFFICIENCY IN THE PIPELINE AND AVOID USING FULL DATASET REPRESENTATIONS STATES ETC IN IMAGEANDREPRTOTEXT.LUA
+    -- if DATA_FOLDER == COLORFUL then  --USE COLORFUL75 INSTEAD FOR EFFICIENCY IN THE PIPELINE AND AVOID USING FULL DATASET REPRESENTATIONS STATES ETC IN IMAGEANDREPRTOTEXT.LUA
+    --    NB_SEQUENCES = NB_SEQUENCES - 75 --To handle them in memory we start with 150-75 = 75
     -- end
     if NB_SEQUENCES ==0  then --or not folder_exists(DATA_FOLDER) then
         error('Error: data was not found in input directory INPUT_DIR= '.. DATA_FOLDER)

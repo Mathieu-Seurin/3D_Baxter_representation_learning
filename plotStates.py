@@ -11,7 +11,7 @@ test = unittest.TestCase('__init__')
 # PLOTTING GROUND TRUTH OR LEARNED STATES
 #####################
 # True if we plot ground truth observed states, and false to plot the learned state representations
-plotGroundTruthStates = False
+plotGroundTruthStates = True#False
 with_title = False #do you want the title on your plots or nop ? Not implemented at the moment
 
 library_versions_tests()
@@ -26,7 +26,7 @@ if len(sys.argv) < 2:  # regular pipeline in gridsearch script
     # ONLY FOR FAST TESTING !!:   model_name = MOBILE_ROBOT#STATIC_BUTTON_SIMPLEST#'pushingButton3DAugmented' #TODO REMOVE-testing  model_name = MOBILE_ROBOT
     data_folder = get_data_folder_from_model_name(model_name)
     if plotGroundTruthStates:
-        state_file_str = 'allStates_'+data_folder+'.txt'
+        state_file_str = 'allStatesGT_'+data_folder+'.txt'
         print "*********************\nPLOTTING GROUND TRUTH (OBSERVED) STATES for model: ", model_name#(Baxter left wrist position for 3D PUSHING_BUTTON_AUGMENTED dataset, or grid 2D position for MOBILE_ROBOT dataset)
         plot_path = path+'GroundTruthStatesPlot_'+model_name+'.png'
     else:
@@ -48,12 +48,13 @@ else:
     else:
         data_folder = 'mobileData'
 
-reward_file_str = 'allRewards_'+data_folder+'.txt'
+reward_file_str = 'allRewardsGT_'+data_folder+'.txt'
+print "state file ",state_file_str
 if not os.path.isfile(state_file_str): 
     print('Calling subprocess to write to file all GT states: create_plotStates_file_in file and for dataset: ',state_file_str, data_folder)
     subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_cuda','-use_continuous','-data_folder', data_folder])  # TODO: READ CMD LINE ARGS FROM FILE INSTEAD (and set accordingly here) TO NOT HAVING TO MODIFY INSTEAD train_predict_plotStates and the python files
 if not os.path.isfile(reward_file_str): 
-    print('Calling subprocess to write to file all GT rewards: create_all_reward in file and for dataset: ',state_file_str, data_folder)
+    print('Calling subprocess to write to file all GT rewards: create_all_reward in file and for dataset: ',reward_file_str, data_folder)
     subprocess.call(['th','create_all_reward.lua', '-use_cuda','-use_continuous','-data_folder', data_folder])
 
 
@@ -70,7 +71,7 @@ if 'recorded_robot' in state_file_str :
                 states_l.append([ float(words[0]),float(words[1])] )
     states=np.asarray(states_l)
 else: # general case
-    print 'NAME_SAVE', state_file_str
+    print 'GT states file name: ', state_file_str
     with open(state_file_str) as f:
         for line in f:
             if line[0]!='#':

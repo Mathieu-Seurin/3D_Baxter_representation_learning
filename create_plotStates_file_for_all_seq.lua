@@ -60,9 +60,9 @@ local function main(params)
        outStr = outStr..'\n'
     end
 
-    f = io.open('allStates.txt', 'w')-- for last model run
+    f = io.open('allStatesGT.txt', 'w')-- for last model run only, but to avoid dataset related errors, use the next file below:
     f:write(outStr)
-    f = io.open('allStates_'..images_folder..'.txt', 'w') -- for evaluation purposes efficiency
+    f = io.open('allStatesGT_'..images_folder..'.txt', 'w') -- for evaluation purposes efficiency
     f:write(outStr)
     f:close()
 end
