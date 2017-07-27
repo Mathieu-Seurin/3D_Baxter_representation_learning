@@ -33,6 +33,7 @@ PROP = "Prop"
 TEMP = "Temp"
 BRING_CLOSER_REWARD = "make_reward_closer"
 BRING_CLOSER_REF_POINT = "fixed_point"
+ROUNDING_VALUE_FIX = 0.1  -- used in BRING_CLOSER_REF_POINT
 REWARD_PREDICTION_CRITERION= 'reward_prediction_criterion'
 ALL_PRIORS = {REP, CAUS,PROP,TEMP,BRING_CLOSER_REWARD, BRING_CLOSER_REF_POINT, REWARD_PREDICTION_CRITERION}
 --DEFAULTS BEING APPLIED (SET THEM IN HYPERPARAMS.LUA)
@@ -79,7 +80,6 @@ RELOAD_MODEL = false
 -- VISUALIZATION TOOL
 -- if you want to visualize images, use 'qlua' instead of 'th'
 --===========================================================
-
 VISUALIZE_IMAGES_TAKEN = false -- true for visualizing images taken in each prior
 VISUALIZE_CAUS_IMAGE = false
 VISUALIZE_IMAGE_CROP = false
@@ -102,6 +102,7 @@ REWARD_INDEX = 1  --3 reward values: -1, 0, 10
 INDEX_TABLE = {1,2} --column index for coordinate in state file (respectively x,y)
 
 DEFAULT_PRECISION = 0.05
+
 FILENAME_FOR_ACTION = "recorded_robot_action.txt" --not used at all, we use state file, and compute the action with it (contains dx, dy)
 FILENAME_FOR_STATE = "recorded_robot_state.txt"
 FILENAME_FOR_REWARD = "recorded_robot_reward.txt"

@@ -82,7 +82,6 @@ function Rico_Training(Models,priors_used)
 
       mode = BRING_CLOSER_REF_POINT
       if applying_prior(priors_used, mode) then
-          print('applying BRING_CLOSER_REF_POINT prior: ')
           batch = getRandomBatchFromSeparateList(BATCH_SIZE, mode)
           loss_fix, gradClose=doStuff_temp(Models,temp_criterion,batch,COEF_FIX) --Just minimizing mse criterion, so we can use temp criterion
           TOTAL_LOSS_FIX = loss_fix + TOTAL_LOSS_FIX
@@ -184,9 +183,9 @@ local function main(params)
        NB_SEQUENCES = NB_SEQUENCES - 1 -- Just because it is a dumb looking action without much action, we dont consider it
     end
     --Too much RAM needed: 24GB, freezes memory, and computer unusable for anyone
-    if DATA_FOLDER == COLORFUL then
-       NB_SEQUENCES = NB_SEQUENCES - 75 --To handle them in memory we start with 150-75 = 75
-    end
+    -- if DATA_FOLDER == COLORFUL then
+    --    NB_SEQUENCES = NB_SEQUENCES - 75 --To handle them in memory we start with 150-75 = 75 USE COLORFUL75 INSTEAD FOR EFFICIENCY IN THE PIPELINE AND AVOID USING FULL DATASET REPRESENTATIONS STATES ETC IN IMAGEANDREPRTOTEXT.LUA
+    -- end
     if NB_SEQUENCES ==0  then --or not folder_exists(DATA_FOLDER) then
         error('Error: data was not found in input directory INPUT_DIR= '.. DATA_FOLDER)
     end
