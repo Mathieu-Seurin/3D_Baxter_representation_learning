@@ -22,7 +22,7 @@ INCEPTIONV4 = './models/inceptionFineTunning' --finetuned trained model
 RESNET = './models/resnet'  --finetuned trained model
 
 RESNET_VERSION = 18 --34 or 50 maybe
-FROZEN_LAYER = 3 --the number of layers that don't learn at all (i.e., their learning_rate=0) out of the (Resnet-N) N layers: see Resnet.lua updateGradInput
+FROZEN_LAYER = 0 --the number of layers that don't learn at all (i.e., their learning_rate=0) out of the (Resnet-N) N layers: see Resnet.lua updateGradInput
 AENET = './models/autoencoder_conv'
 BASE_TIMNET = './models/topUniqueSimplerWOTanh'--ImageNet-inspired Convolutional network with ReLu. This is the only model that should be used with learn_autoencoder, not in regular training in script.lua
 --otherwise, we get:  /home/gpu_center/torch/install/bin/lua: imagesAndReprToTxt.lua:53: bad argument #1 to 'size' (out of range)
@@ -30,7 +30,6 @@ BASE_TIMNET = './models/topUniqueSimplerWOTanh'--ImageNet-inspired Convolutional
 --MODEL_ARCHITECTURE_FILE = INCEPTIONV4 --Too big
 --MODEL_ARCHITECTURE_FILE = BASE_TIMNET--without last layer as Tanh, use it for AE
 MODEL_ARCHITECTURE_FILE = RESNET
-
 
 --==================================================
 -- Hyperparams : Learning rate, batchsize, USE_CUDA etc...
@@ -57,13 +56,15 @@ LR_DECAY = 3*1e-6
 SGD_METHOD = 'adam' -- Can be adam or adagrad
 
 BATCH_SIZE = 12
-NB_EPOCHS= 20
+NB_EPOCHS= 50
 
 DATA_AUGMENTATION = 0.01
 NORMALIZE_IMAGE = true
 
--- COEF_* is a way to impose importance of the prior: because bringing rewards
--- close together prior would set a new embedding very uncorrelated with ground truth, we lower its importance weight.
+-- COEF_* is a way to impose importance of the prior
+-- Because bring_rewards_close prior would set a new embedding very
+-- uncorrelated with ground truth, we lower its importance weight.
+
 COEF_TEMP=1
 COEF_PROP=1
 COEF_REP=1

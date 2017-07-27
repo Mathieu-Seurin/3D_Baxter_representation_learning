@@ -16,7 +16,7 @@ require 'hyperparams'
 ---NOTE: THESE ARE DEFAULTS (IF NOT COMMAND LINE ARGS ARE PASSED), AND ARE OVERRIDEN BY DATA_FOLDER SPECIFIC CASES BELOW :
 ----------------------------------------------------------------------------------------------------------------------------
 USE_CUDA = true
-USE_SECOND_GPU = false
+USE_SECOND_GPU = true
 
 USE_CONTINUOUS = false
 
@@ -242,7 +242,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
        --NOTE: DEFAULT PARAMETERS FOR OUR BASELINE DATABASE SET AT THE BEGINNING OF THE FILE (NEED TO BE DECLARED AS CONSTANTS
         CLAMP_CAUSALITY = false
 
-        DIMENSION_OUT = 2
+        DIMENSION_OUT = 100
         -- MIN_TABLE = {-10000,-10000} -- for x,y
         -- MAX_TABLE = {10000,10000} -- for x,y
 
@@ -343,7 +343,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
         -- just above the button
         --FIXED_POS = {0.587, -0.036, -0.143}
         FIXED_POS = { 0.598, 0.300, -0.143}
-        ROUNDING_VALUE_FIX = 0.03
+        ROUNDING_VALUE_FIX = 0.04
 
         -- Above and further
         -- FIXED_POS = {0.639, 0.286, 0.136}
