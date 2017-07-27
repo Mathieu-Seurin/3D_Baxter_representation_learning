@@ -125,9 +125,9 @@ else:
 	numline = 3
 
 # TODO: more efficient: for img_name in test_set.keys() revising data above
-print 'nbr_neighbours: ', nbr_neighbors, ' nbr of images: ', len(data), 'use_test_set ',use_test_set, ' of size: ', len(TEST_SET)
+print 'nbr_neighbours: ', nbr_neighbors, ' nbr of images: ', len(data), 'use_test_set ',use_test_set, ' of size: ', len(TEST_SET), TEST_SET
 for img_name,neigbour_indexes,dist,state in data:
-	if use_test_set:
+	if use_test_set: #		print img_name
 		if not(img_name in TEST_SET): 
 			continue
 	base_name= os.path.splitext(os.path.basename(img_name))[0]
