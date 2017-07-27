@@ -87,16 +87,16 @@ function Rico_Training(Models,priors_used)
           TOTAL_LOSS_FIX = loss_fix + TOTAL_LOSS_FIX
       end
 
-      mode= REWARD_PREDICTION_CRITERION
-      if applying_prior(priors_used, mode) then
-          batch = getRandomBatchFromSeparateList(BATCH_SIZE,mode)
-          loss_reward_pred, gradRewardPred =doStuff_reward_pred(Models,reward_prediction_criterion,batch,COEF_REWARD_PRED) --Just minimizing mse criterion, so we can use temp criterion
-          TOTAL_LOSS_REWARD_PRED = TOTAL_LOSS_REWARD_PRED + loss_reward_pred
-      end
+    --   mode= REWARD_PREDICTION_CRITERION
+    --   if applying_prior(priors_used, mode) then
+    --       batch = getRandomBatchFromSeparateList(BATCH_SIZE,mode)
+    --       loss_reward_pred, gradRewardPred =doStuff_reward_pred(Models,reward_prediction_criterion,batch,COEF_REWARD_PRED) --Just minimizing mse criterion, so we can use temp criterion
+    --       TOTAL_LOSS_REWARD_PRED = TOTAL_LOSS_REWARD_PRED + loss_reward_pred
+    --   end
 
       --TODO comparison with L1 smooth distance criterion (takes L1 norm in (-inf, -1) and (1, +inf) and L2 in the center of the interval for faster convergence updates far outside the iminma)
       --TODO Comparison with Torch cosDistance criterion
-      --NOTE: gradParameters  shouldnt be here  the sum of all gradRep, gradCaus, etc because
+      --NOTE: gradParameters  shouldnt be here  the sum of all gradRep, gradCaus, etc? No because
       --GradParameters is a tensor containing the internal gradient of all model's parameters
       -- So the sum of gradients is already present in there
       return loss_rep+loss_caus+loss_prop+loss_temp+loss_fix+loss_reward_closer+loss_reward_pred, gradParameters
@@ -107,11 +107,11 @@ function Rico_Training(Models,priors_used)
     optimState={learningRate=LR, learningRateDecay=LR_DECAY}
 
     if SGD_METHOD == 'adagrad' then
-        parameters, loss = optim.adagrad(feval,parameters,optimState)
+        parameters, loss = optim.adagrad(feval, parameters, optimState)
     elseif SGD_METHOD == 'adam' then
-        parameters, loss = optim.adam(feval,parameters,optimState)
+        parameters, loss = optim.adam(feval, parameters, optimState)
     else
-       parameters, loss = optim.adamax(feval,parameters,optimState)
+       parameters, loss = optim.adamax(feval, parameters, optimState)
     end
 
     -- loss[1] table of one value transformed in just a value
@@ -217,10 +217,10 @@ local function main(params)
           Model=Model:cuda()
        end
 
-       parameters,gradParameters = Model:getParameters()
+       parameters, gradParameters = Model:getParameters()
        -- In siamese networks we need one copy of the network per input (image) we want to compare at the same time, because otherwise,
        -- we could not compare results if we would otherwise have the same network being applied twice. Since the max number of different images
-       -- we need for all priors is 4 (accounting for states and rewards in total (see priors formulas), therefore, 4 clones of the network are enogh. I.e.
+       -- we need for all priors is 4 (accounting for states and rewards in total (see priors formulas, Repeatability and proportionality need 4 images each), therefore, 4 clones of the network are enogh. I.e.
        -- we dont need one clone per prior, but one per different image we need to get data from to be compared in our priors)
        Model2=Model:clone('weight','bias','gradWeight','gradBias','running_mean','running_std')
        Model3=Model:clone('weight','bias','gradWeight','gradBias','running_mean','running_std')

@@ -1,39 +1,40 @@
 require 'functions'
 
-function doStuff_reward_pred(Models,criterion,Batch,coef)
-    -- Returns the loss and the gradient
-    local coef= coef or 1
-    local im1, im2, Model, Model2, State1, State2
-
-    local batchSize = Batch:size(2)
-
-    if USE_CUDA then
-       im1=Batch[1]:cuda()
-       im2=Batch[2]:cuda()
-    else
-       im1=Batch[1]
-       im2=Batch[2]
-    end
-
-    Model=Models.Model1
-    Model2=Models.Model2
-    State1=Model:forward(im1)
-    State2=Model2:forward(im2)
-
-    assert(batchSize==State1:size(1), "Batch Size changed during 'forward method, maybe a nn.view is done badly ...")
-
-    if USE_CUDA then
-       criterion=criterion:cuda()
-    end
-    loss=criterion:forward({State2,State1})
-    GradOutputs=criterion:backward({State2,State1})
-
-    -- calculer les gradients pour les deux images
-    Model:backward(im1,coef*GradOutputs[2])
-    Model2:backward(im2,coef*GradOutputs[1])
-
-    return loss, coef*GradOutputs[1]:cmul(GradOutputs[1]):mean()
-end
+-- function doStuff_reward_pred(Models,criterion,Batch,coef)
+--     -- Returns the loss and the gradient
+--     local coef= coef or 1
+--     local im1, im2, Model, Model2, State1, State2
+--
+--     local batchSize = Batch:size(2)
+--
+--     if USE_CUDA then
+--        im1=Batch[1]:cuda()
+--        im2=Batch[2]:cuda()
+--     else
+--        im1=Batch[1]
+--        im2=Batch[2]
+--     end
+--
+--     Model=Models.Model1
+--     Model2=Models.Model2
+--     State1=Model:forward(im1)
+--     State2=Model2:forward(im2)
+--     print(batchSize)
+--     print(State1:size(1))
+--     assert(batchSize==State1:size(1), "Batch Size changed during 'forward method, maybe a nn.view is done badly ...")
+--
+--     if USE_CUDA then
+--        criterion=criterion:cuda()
+--     end
+--     loss=criterion:forward({State2,State1})
+--     GradOutputs=criterion:backward({State2,State1})
+--
+--     -- calculer les gradients pour les deux images
+--     Model:backward(im1,coef*GradOutputs[2])
+--     Model2:backward(im2,coef*GradOutputs[1])
+--
+--     return loss, coef*GradOutputs[1]:cmul(GradOutputs[1]):mean()
+-- end
 
 
 function doStuff_temp(Models,criterion,Batch,coef)
