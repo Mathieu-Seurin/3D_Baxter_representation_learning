@@ -102,6 +102,8 @@ if not os.path.exists(path_to_neighbour):
 
 if use_test_set or nbr_images == -1:
 	data = zip(images,indexes,distances,representations)
+	if len(set(images).intersection(TEST_SET)) == 0:
+		sys.exit('Error in generateNNImages.py: the TEST_SET for this dataset has not been properly defined in Utils.py. TEST_SET must contain a subset of the full set of images in DATA_FOLDER => which in this case is:',DATA_FOLDER)
 else:
 	print ('Using a random test set of images for KNN MSE evaluation...')
 	data = random.sample(zip(images,indexes,distances,representations),nbr_images)
@@ -124,7 +126,8 @@ elif nbr_neighbors<=10:
 else:
 	numline = 3
 
-# TODO: more efficient: for img_name in test_set.keys() revising data above
+# TODO: more efficient: for img_name in test_set.keys() revising data above: 
+# HOWEVER this needs to compute also in create_all_rewards and create_plotStates for the test set, separately and  an extra file. Is it fair comparison to test images for nearest neigbours that are seen during training?
 print 'nbr_neighbours: ', nbr_neighbors, ' nbr of images: ', len(data), 'use_test_set ',use_test_set, ' of size: ', len(TEST_SET)#, TEST_SET
 for img_name,neigbour_indexes,dist,state in data:
 	if use_test_set: #		print img_name   colorful75/record_073/recorded_cameras_head_camera_2_image_compressed/frame00022.jpg
