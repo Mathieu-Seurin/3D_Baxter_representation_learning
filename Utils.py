@@ -67,10 +67,10 @@ def get_data_folder_from_model_name(model_name):
         return STATIC_BUTTON_SIMPLEST
     elif COMPLEX_DATA in model_name:
         return COMPLEX_DATA
+    elif COLORFUL75 in model_name:  # VERY IMPORTANT THE ORDER! TO NOT PROCESS THE WRONG SUPER LARGE DATASET WHEN RESOURCES NOT AVAILABLE!
+        return COLORFUL75
     elif COLORFUL in model_name:
         return COLORFUL
-    elif COLORFUL75 in model_name:
-        return COLORFUL75
     else:
         sys.exit("get_data_folder_from_model_name: Unsupported dataset!")
 

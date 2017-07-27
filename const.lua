@@ -203,19 +203,10 @@ end
 
 function set_dataset_specific_hyperparams(DATA_FOLDER)
     STRING_MEAN_AND_STD_FILE = PRELOAD_FOLDER..'meanStdImages_'..DATA_FOLDER..'.t7'
-    now = os.date("*t")
     -- print(MODEL_ARCHITECTURE_FILE) --./models/minimalNetModel      -- print(MODEL_ARCHITECTURE_FILE:match("(.+)/(.+)")) -- returns  ./models	minimalNetModel
     _, architecture_name = MODEL_ARCHITECTURE_FILE:match("(.+)/(.+)") --architecture_name, _ = split(architecture_name, ".")
 
-    if USE_CONTINUOUS then
-        DAY = 'Y'..now.year..'_D'..addLeadingZero(now.day)..'_M'..addLeadingZero(now.month)..'_H'..addLeadingZero(now.hour)..'M'..addLeadingZero(now.min)..'S'..addLeadingZero(now.sec)..'_'..DATA_FOLDER..'_'..architecture_name..'_cont'..'_MCD'..MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD..'_S'..CONTINUOUS_ACTION_SIGMA..priorsToString(PRIORS_CONFIGS_TO_APPLY)
-        DAY = DAY:gsub("%.", "_")  -- replace decimal points by '_' for folder naming
-    else
-        DAY = 'Y'..now.year..'_D'..addLeadingZero(now.day)..'_M'..addLeadingZero(now.month)..'_H'..addLeadingZero(now.hour)..'M'..addLeadingZero(now.min)..'S'..addLeadingZero(now.sec)..'_'..DATA_FOLDER..'_'..architecture_name..priorsToString(PRIORS_CONFIGS_TO_APPLY)
-    end
 
-    NAME_SAVE= 'model'..DAY
-    SAVED_MODEL_PATH = LOG_FOLDER..NAME_SAVE
 
     if DATA_FOLDER == SIMPLEDATA3D then
        DEFAULT_PRECISION = 0.05 -- for 'arrondit' function
@@ -458,6 +449,19 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
     if USE_CONTINUOUS then  --otherwise, it is not used
         DEFAULT_PRECISION = 0.01
     end
+
+    -- SAVING MODEL CONFIG
+    now = os.date("*t")
+    if USE_CONTINUOUS then
+        DAY = 'Y'..now.year..'_D'..addLeadingZero(now.day)..'_M'..addLeadingZero(now.month)..'_H'..addLeadingZero(now.hour)..'M'..addLeadingZero(now.min)..'S'..addLeadingZero(now.sec)..'_'..DATA_FOLDER..'_'..architecture_name..'_cont'..'_MCD'..MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD..'_S'..CONTINUOUS_ACTION_SIGMA..priorsToString(PRIORS_CONFIGS_TO_APPLY)
+        DAY = DAY:gsub("%.", "_")  -- replace decimal points by '_' for folder naming
+    else
+        DAY = 'Y'..now.year..'_D'..addLeadingZero(now.day)..'_M'..addLeadingZero(now.month)..'_H'..addLeadingZero(now.hour)..'M'..addLeadingZero(now.min)..'S'..addLeadingZero(now.sec)..'_'..DATA_FOLDER..'_'..architecture_name..priorsToString(PRIORS_CONFIGS_TO_APPLY)
+    end
+
+    NAME_SAVE= 'model'..DAY
+    SAVED_MODEL_PATH = LOG_FOLDER..NAME_SAVE
+    print('Model to be saved in: '..SAVED_MODEL_PATH)
 end
 
 function print_hyperparameters(extra_string_to_print)

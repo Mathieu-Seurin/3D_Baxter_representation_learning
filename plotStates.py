@@ -11,7 +11,7 @@ test = unittest.TestCase('__init__')
 # PLOTTING GROUND TRUTH OR LEARNED STATES
 #####################
 # True if we plot ground truth observed states, and false to plot the learned state representations
-plotGroundTruthStates = True#False
+plotGroundTruthStates = False
 with_title = False #do you want the title on your plots or nop ? Not implemented at the moment
 
 library_versions_tests()

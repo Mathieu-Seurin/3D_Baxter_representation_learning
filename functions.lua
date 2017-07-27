@@ -38,6 +38,9 @@ function get_last_used_model_folder_and_name()
 end
 
 function get_data_folder_from_model_name(model_name)
+    --!!!!!!!!!!!!!
+    -- VERY IMPORTANT THE ORDER! for specific smaller versions of a given dataset, set the condition before, otherwise wil lload the largest dataset instead!!
+
     if string.find(model_name, BABBLING) then
         return BABBLING
     elseif string.find(model_name, MOBILE_ROBOT)  then
@@ -50,6 +53,9 @@ function get_data_folder_from_model_name(model_name)
         return STATIC_BUTTON_SIMPLEST
     elseif string.find(model_name, COMPLEX_DATA) then
         return COMPLEX_DATA
+    elseif string.find(model_name, COLORFUL75) then
+         -- VERY IMPORTANT THE ORDER HERE!!! (SEE Above)
+        return COLORFUL75
     elseif string.find(model_name, COLORFUL) then
         return COLORFUL
     else
