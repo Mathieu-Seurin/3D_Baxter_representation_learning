@@ -168,15 +168,18 @@ def file2dict(file): # DO SAME FUNCTIONS IN LUA and call at the end of set_hyper
                d[key] = map(float, values)
     return d
 
-def parse_true_state_file():
+def parse_true_state_file(dataset):
     true_states = {}
-    file_state = open(ALL_STATE_FILE, "r")
+    all_states_file = ALL_STATE_FILE.replace('.txt', '_'+dataset)
+    file_state = open(all_states_file, "r")
 
     for line in file_state:
         if line[0]!='#':
             words = line.split()
             true_states[words[0]] = np.array(map(float,words[1:]))
-
+    print "parse_true_state_file: ",all_states_file," returned #true_states: ",len(true_states)
+    if len(true_states) == 0:
+        sys.exit('parse_true_state_file could not find any states file!')
     return true_states
 
 def parse_repr_file(file_representation_string):
@@ -191,7 +194,11 @@ def parse_repr_file(file_representation_string):
             words = line.split()
             images.append(words[0])
             representations.append(words[1:])
-
+    print "parse_repr_file: ",file_representation_string," returned #representations: ",len(representations)
+    if len(images) == 0:
+        sys.exit('parse_repr_file could not find any images !')
+    if len(representations) == 0:
+        sys.exit('parse_repr_file could not find any representations file!: ',file_representation_string)
     return images, representations
 
 

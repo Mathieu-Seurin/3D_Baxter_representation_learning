@@ -230,7 +230,7 @@ local function main(params)
        local priors_used= PRIORS_CONFIGS_TO_APPLY[nb_test]
        local Log_Folder=Get_Folder_Name(LOG_FOLDER, priors_used)
 
-       print("Experiment "..nb_test .." (Log_Folder="..Log_Folder..")")
+       print("Experiment "..nb_test)-- .." (Log_Folder="..Log_Folder..")")
        train(Models, priors_used)
        print_hyperparameters(false, "Experiment run successfully for hyperparams: ")
     end

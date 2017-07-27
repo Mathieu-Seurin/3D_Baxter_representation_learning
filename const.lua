@@ -461,7 +461,6 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
 
     NAME_SAVE= 'model'..DAY
     SAVED_MODEL_PATH = LOG_FOLDER..NAME_SAVE
-    print('Model to be saved in: '..SAVED_MODEL_PATH)
 end
 
 function print_hyperparameters(using_precomputed_model, extra_string_to_print)
