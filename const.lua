@@ -34,7 +34,7 @@ TEMP = "Temp"
 BRING_CLOSER_REWARD = "make_reward_closer"
 BRING_CLOSER_REF_POINT = "fixed_point"
 REWARD_PREDICTION_CRITERION= 'reward_prediction_criterion'
-ALL_PRIORS = {REP, CAUS,PROP,TEMP,BRING_CLOSER_REWARD,BRING_CLOSER_REF_POINT, REWARD_PREDICTION_CRITERION}
+ALL_PRIORS = {REP, CAUS,PROP,TEMP,BRING_CLOSER_REWARD, BRING_CLOSER_REF_POINT, REWARD_PREDICTION_CRITERION}
 --DEFAULTS BEING APPLIED (SET THEM IN HYPERPARAMS.LUA)
 PRIORS_CONFIGS_TO_APPLY ={{PROP, TEMP, CAUS, REP}}
 
@@ -374,7 +374,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
 
         SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
 
-    elseif DATA_FOLDER == COLORFUL then
+    elseif DATA_FOLDER == COLORFUL or DATA_FOLDER == COLORFUL75 then
         CLAMP_CAUSALITY = false --TODO: make false when continuous works
 
         FIXED_POS  = {0.6, 0.30, 0.10} -- starting point for every sequence
@@ -419,7 +419,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
     if string.find(MODEL_ARCHITECTURE_FILE, 'minimalNetModel') then --TODO replace by constants
         error([[minimalNetModel should only be used in learn_autoencoder.lua, not script.lua]])
     end
-    -- if IS_RESNET and DATA_FOLDER == STATIC_BUTTON_SIMPLEST then  --TODO fix is it possible?
+    -- if IS_RESNET and DATA_FOLDER == STATIC_BUTTON_SIMPLEST then  --TODO FIx and remove this check (Mat was able to run this, it should be
     --     error([[STATIC_BUTTON_SIMPLEST= staticButtonSimplest dataset is not yet supported by ResNet model architecture, we are working on it? Try for now topUniqueSimplerWOTanh model]])
     -- end  --mobileData can on the other hand be run with and vithout resnet
     DIFFERENT_FORMAT = IS_INCEPTION or IS_RESNET

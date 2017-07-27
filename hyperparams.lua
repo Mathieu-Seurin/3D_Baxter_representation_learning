@@ -7,7 +7,9 @@ PUSHING_BUTTON_AUGMENTED = 'pushingButton3DAugmented'
 BABBLING = 'babbling'
 STATIC_BUTTON_SIMPLEST = 'staticButtonSimplest'
 COMPLEX_DATA = 'complexData'
-COLORFUL = 'colorful'
+COLORFUL = 'colorful'-- 150 data recording sequences
+COLORFUL75 = 'colorful75'-- a smaller version half size of colorful
+
 --!!! AVOID SETTING IT HERE FOR INCONSISTENCIES< SET VIA COMMAND LINE !!!
 --DATA_FOLDER = MOBILE_ROBOT
 --DATA_FOLDER = STATIC_BUTTON_SIMPLEST --PUSHING_BUTTON_AUGMENTED
@@ -20,7 +22,7 @@ INCEPTIONV4 = './models/inceptionFineTunning' --finetuned trained model
 RESNET = './models/resnet'  --finetuned trained model
 
 RESNET_VERSION = 18 --34 or 50 maybe
-FROZEN_LAYER = 3 --the number of layers that don't learn at all (i.e., their learning_rate=0)
+FROZEN_LAYER = 3 --the number of layers that don't learn at all (i.e., their learning_rate=0) out of the (Resnet-N) N layers: see Resnet.lua updateGradInput
 AENET = './models/autoencoder_conv'
 BASE_TIMNET = './models/topUniqueSimplerWOTanh'--ImageNet-inspired Convolutional network with ReLu. This is the only model that should be used with learn_autoencoder, not in regular training in script.lua
 --otherwise, we get:  /home/gpu_center/torch/install/bin/lua: imagesAndReprToTxt.lua:53: bad argument #1 to 'size' (out of range)

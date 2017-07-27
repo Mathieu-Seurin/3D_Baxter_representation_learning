@@ -23,7 +23,7 @@ function Rico_Training(Models,priors_used)
    local prop_criterion=get_Prop_criterion()
    local caus_criterion=get_Caus_criterion()
    local temp_criterion=nn.MSDCriterion() -- MEAN square distance see https://github.com/torch/nn/blob/master/doc/criterion.md
-   local predict_reward_criterion=nn.MSECriterion() --TODO
+   local predict_reward_criterion= nn.MSECriterion() --TODO
    local mse_criterion = nn.MSECriterion()
 
    -- create closure to evaluate f(X) and df/dX in backprop
@@ -80,9 +80,10 @@ function Rico_Training(Models,priors_used)
           TOTAL_LOSS_CLOSE = loss_reward_closer + TOTAL_LOSS_CLOSE
       end
 
-      mode= FIXED_POS
+      mode = BRING_CLOSER_REF_POINT
       if applying_prior(priors_used, mode) then
-          batch = getRandomBatchFromSeparateList(BATCH_SIZE,mode)
+          print('applying BRING_CLOSER_REF_POINT prior: ')
+          batch = getRandomBatchFromSeparateList(BATCH_SIZE, mode)
           loss_fix, gradClose=doStuff_temp(Models,temp_criterion,batch,COEF_FIX) --Just minimizing mse criterion, so we can use temp criterion
           TOTAL_LOSS_FIX = loss_fix + TOTAL_LOSS_FIX
       end
@@ -111,7 +112,7 @@ function Rico_Training(Models,priors_used)
     elseif SGD_METHOD == 'adam' then
         parameters, loss = optim.adam(feval, parameters, optimState)
     else
-       parameters, loss = optim.adamax(feval, parameters, optimState)
+        parameters, loss = optim.adamax(feval, parameters, optimState)
     end
 
     -- loss[1] table of one value transformed in just a value

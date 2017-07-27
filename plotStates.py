@@ -1,6 +1,6 @@
 # coding: utf-8
 from Utils import library_versions_tests, get_data_folder_from_model_name, plotStates
-from Utils import BABBLING, MOBILE_ROBOT, SIMPLEDATA3D, PUSHING_BUTTON_AUGMENTED, STATIC_BUTTON_SIMPLEST, LEARNED_REPRESENTATIONS_FILE, SKIP_RENDERING
+from Utils import MOBILE_ROBOT, LEARNED_REPRESENTATIONS_FILE, SKIP_RENDERING
 import numpy as np
 import sys
 import os.path
@@ -48,13 +48,14 @@ else:
     else:
         data_folder = 'mobileData'
 
-    # if not os.path.isfile(state_file_str): # print('Calling subprocess create_plotStates_file_for_all_seq with ',data_folder)
+reward_file_str = 'allRewards_'+data_folder+'.txt'
+if not os.path.isfile(state_file_str): 
+    print('Calling subprocess to write to file all GT states: create_plotStates_file_in file and for dataset: ',state_file_str, data_folder)
     subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_cuda','-use_continuous','-data_folder', data_folder])  # TODO: READ CMD LINE ARGS FROM FILE INSTEAD (and set accordingly here) TO NOT HAVING TO MODIFY INSTEAD train_predict_plotStates and the python files
-    # if not os.path.isfile(reward_file_str): #print('Calling subprocess create_all_reward with ',data_folder)
+if not os.path.isfile(reward_file_str): 
+    print('Calling subprocess to write to file all GT rewards: create_all_reward in file and for dataset: ',state_file_str, data_folder)
     subprocess.call(['th','create_all_reward.lua', '-use_cuda','-use_continuous','-data_folder', data_folder])
 
-
-reward_file_str = 'allRewards_'+data_folder+'.txt'
 
 total_rewards = 0
 total_states = 0

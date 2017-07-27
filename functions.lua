@@ -164,9 +164,9 @@ end
 ---------------------------------------------------------------------------------------
 function getRandomBatchFromSeparateList(batch_size, mode)
 
-   if mode=="Prop" or mode=="Rep" then
+   if mode==PROP or mode==REP then
       batch=torch.Tensor(4, batch_size, IM_CHANNEL, IM_LENGTH, IM_HEIGHT)
-   elseif mode=='Caus' or mode=='Temp' or mode=='make_reward_closer' or mode=='fixed_point' then
+  elseif mode==CAUS or mode==TEMP or mode==BRING_CLOSER_REWARD or mode==BRING_CLOSER_REF_POINT then
       batch=torch.Tensor(2, batch_size, IM_CHANNEL, IM_LENGTH, IM_HEIGHT)
    else
       batch=torch.Tensor(batch_size, IM_CHANNEL, IM_LENGTH, IM_HEIGHT)
@@ -192,7 +192,7 @@ function getRandomBatchFromSeparateList(batch_size, mode)
       assert(data1, "Something went wrong while loading data1")
       assert(data2, "Something went wrong while loading data2")
 
-      if mode=="Prop" or mode=="Rep" then
+      if mode==PROP or mode==REP then
          set = get_two_Prop_Pair(data1.Infos, data2.Infos)
          im1,im2 = data1.images[set.im1], data1.images[set.im2]
          im3,im4 = data2.images[set.im3], data2.images[set.im4]
@@ -200,13 +200,13 @@ function getRandomBatchFromSeparateList(batch_size, mode)
          batch[2][i]= im2
          batch[3][i]= im3
          batch[4][i]= im4
-      elseif mode=="Temp" then
+     elseif mode==TEMP then
          set=get_one_random_Temp_Set(#data1.images)
          im1,im2 = data1.images[set.im1], data1.images[set.im2]
 
          batch[1][i]=im1
          batch[2][i]=im2
-      elseif mode=="Caus" then
+     elseif mode==CAUS then
          set=get_one_random_Caus_Set(data1.Infos, data2.Infos)
          im1,im2,im3,im4 = data1.images[set.im1], data2.images[set.im2], data1.images[set.im3], data2.images[set.im4]
          --The last two are for viz purpose only
@@ -216,13 +216,13 @@ function getRandomBatchFromSeparateList(batch_size, mode)
 
          im2,im3 = im3,im2 --I switch them for a better viz, that's all
 
-      elseif mode=='make_reward_closer' then
+     elseif mode==BRING_CLOSER_REWARD then
          set=get_one_random_reward_close_set(data1.Infos, data2.Infos)
          im1,im2 = data1.images[set.im1], data2.images[set.im2]
          batch[1][i]=im1
          batch[2][i]=im2
 
-      elseif mode=='fixed_point' then
+     elseif mode== BRING_CLOSER_REF_POINT then
          local seqThatMatch = false
          while not seqThatMatch do
             set=get_one_fixed_point_set(data1.Infos, data2.Infos)
@@ -264,7 +264,7 @@ function getRandomBatchFromSeparateList(batch_size, mode)
          batch[i] = data1.images[id]
       end
 
-      if LOGGING_ACTIONS and mode=='Caus' then
+      if LOGGING_ACTIONS and mode==CAUS then
 
          if LOG_ACTION[INDEX1][set.im1] then
             LOG_ACTION[INDEX1][set.im1] = LOG_ACTION[INDEX1][set.im1]+ 1

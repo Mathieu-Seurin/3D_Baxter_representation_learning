@@ -25,8 +25,9 @@ SIMPLEDATA3D = 'simpleData3D'
 PUSHING_BUTTON_AUGMENTED = 'pushingButton3DAugmented'
 STATIC_BUTTON_SIMPLEST = 'staticButtonSimplest'
 COMPLEX_DATA = 'complexData'
-COLORFUL = 'colorful'
-ALL_DATASETS = [BABBLING, MOBILE_ROBOT, SIMPLEDATA3D, PUSHING_BUTTON_AUGMENTED, STATIC_BUTTON_SIMPLEST,COMPLEX_DATA, COLORFUL]
+COLORFUL = 'colorful'  # 150 data recording sequences
+COLORFUL75 = 'colorful75' # a smaller version half size of colorful
+ALL_DATASETS = [BABBLING, MOBILE_ROBOT, SIMPLEDATA3D, PUSHING_BUTTON_AUGMENTED, STATIC_BUTTON_SIMPLEST,COMPLEX_DATA, COLORFUL, COLORFUL75]
 
 # 2 options of plotting:
 LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
@@ -68,6 +69,8 @@ def get_data_folder_from_model_name(model_name):
         return COMPLEX_DATA
     elif COLORFUL in model_name:
         return COLORFUL
+    elif COLORFUL75 in model_name:
+        return COLORFUL75
     else:
         sys.exit("get_data_folder_from_model_name: Unsupported dataset!")
 
@@ -199,7 +202,7 @@ def get_test_set_for_data_folder(data_folder):
         return IMG_TEST_SET
     elif data_folder == COMPLEX_DATA:
         return COMPLEX_TEST_SET
-    elif data_folder == COLORFUL:
+    elif data_folder == COLORFUL or data_folder == COLORFUL75:
         return COLORFUL_TEST_SET
     elif data_folder == MOBILE_ROBOT:
         return ROBOT_TEST_SET
@@ -383,7 +386,9 @@ ROBOT_TEST_SET = {
 'mobileRobot/record_004/recorded_camera_top/frame00024.jpg'
 }
 
-COLORFUL_TEST_SET = {
+
+# NOTE, this is used both for COLORFUL and COLORFUL75 datasets
+COLORFUL_TEST_SET = {   
 'colorful/record_150/recorded_cameras_head_camera_2_image_compressed/frame00030.jpg',
 'colorful/record_150/recorded_cameras_head_camera_2_image_compressed/frame00003.jpg',
 'colorful/record_150/recorded_cameras_head_camera_2_image_compressed/frame00021.jpg',
