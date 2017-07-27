@@ -76,7 +76,6 @@ if len(sys.argv) == 2:
 subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_cuda','-use_continuous','-data_folder', data_folder])  
 # TODO: READ CMD LINE ARGS FROM FILE INSTEAD (and set accordingly here) TO NOT HAVING TO MODIFY INSTEAD train_predict_plotStates and the python files
 subprocess.call(['th','create_all_reward.lua','-use_cuda','-use_continuous','-data_folder',data_folder])
-# TODO: ADD ,'-use_continuous'
 
 #Parsing representation file
 #===================
@@ -85,7 +84,7 @@ images, representations = parse_repr_file(file_representation_string)
 
 #Parsing true state file
 #===================
-true_states = parse_true_state_file() #No need to send parameters, the const ALL_STATE_FILE is used
+true_states = parse_true_state_file(data_folder) #No need to send parameters, the const ALL_STATE_FILE is used
 
 # Compute nearest neighbors
 nbrs = NearestNeighbors(n_neighbors=(nbr_neighbors+1), algorithm='ball_tree').fit(representations)
@@ -149,25 +148,25 @@ for img_name,neigbour_indexes,dist,state in data:
 		a.set_title(seq_name + "/" + base_name + ": \n" + state_str + '\n' + str(original_coord))
 
 	for i in range(0,nbr_neighbors):
-			a=fig.add_subplot(numline+1,5,6+i)
-			img_name=images[neigbour_indexes[i+1]]
-			# img = mpimg.imread(img_name)
-			img = Image.open(img_name)
-			imgplot = plt.imshow(img)
+		a=fig.add_subplot(numline+1,5,6+i)
+		img_name=images[neigbour_indexes[i+1]]
+		# img = mpimg.imread(img_name)
+		img = Image.open(img_name)
+		imgplot = plt.imshow(img)
 
-			base_name_n= os.path.splitext(os.path.basename(img_name))[0]
-			seq_name_n= img_name.split("/")[1]
+		base_name_n= os.path.splitext(os.path.basename(img_name))[0]
+		seq_name_n= img_name.split("/")[1]
 
-			dist_str = ' d=' + '{:.4f}'.format(dist[i+1])
+		dist_str = ' d=' + '{:.4f}'.format(dist[i+1])
 
-			state_str='[' + ",".join(['{:.3f}'.format(float(x)) for x in representations[neigbour_indexes[i+1]]]) + "]"
-			neighbour_coord = true_states[img_name]
-			total_error += np.linalg.norm(neighbour_coord-original_coord)
-			nb_tot_img += 1
+		state_str='[' + ",".join(['{:.3f}'.format(float(x)) for x in representations[neigbour_indexes[i+1]]]) + "]"
+		neighbour_coord = true_states[img_name]
+		total_error += np.linalg.norm(neighbour_coord-original_coord)
+		nb_tot_img += 1
 
-			if with_title:
-				a.set_title(seq_name_n + "/" + base_name_n + ": \n" + state_str + dist_str + '\n' + str(neighbour_coord))
-			a.axis('off')
+		if with_title:
+			a.set_title(seq_name_n + "/" + base_name_n + ": \n" + state_str + dist_str + '\n' + str(neighbour_coord))
+		a.axis('off')
 
 
 	plt.tight_layout()
