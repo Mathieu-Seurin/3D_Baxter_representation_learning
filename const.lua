@@ -440,9 +440,14 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach)
         DEFAULT_PRECISION = 0.01
     end
 
+    ------------------ Predictive priors settings---------
+    ----------------------------------------------------------
     if ACTIVATE_PREDICTIVE_PRIORS then
         LR = 0.003
+        SGD_METHOD = 'adam'
+        HIDDEN_LAYERS = 100 --neurons in Model learning DDPG (ML-DDPG)
     end
+
     -- SAVING MODEL CONFIG
     now = os.date("*t")
     if USE_CONTINUOUS then

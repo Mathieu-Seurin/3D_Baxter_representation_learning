@@ -332,13 +332,11 @@ function clamp_causality_prior_value(value, prec, action_amplitude)
    prec = prec or 0.01
    action_amplitude = action_amplitude or 0.05 --An action has an amplitude either of
    --- 0 or 0.05 in the 'simple3D' database (on each axis), see const.lua
-
    if math.abs(value) < prec then
       value = 0
    else
       value = sign(value)*action_amplitude
    end
-
    return value
 end
 
@@ -356,7 +354,7 @@ function get_one_random_reward_close_set(Infos1, Infos2)
       -- Since all rewards are different from 2
       -- it means that you take the first action you got
       -- I did this because it's easier if you want to group only certain reward
-      -- But yea, if you want to group every reward, this code look silly
+      -- But yea, if you want to group every reward, this code looks silly
 
       for i=1, size2 do
          id_second_state=torch.random(1,size2)
@@ -368,9 +366,37 @@ function get_one_random_reward_close_set(Infos1, Infos2)
       watchDog=watchDog+1
    end
 
-   error("CLOSE REWARD WATCHDOG ATTACK!!!!!!!!!!!!!!!!!!")
+   error("BRING_CLOSER_REWARD WATCHDOG ATTACK!!!!!!!!!!!!!!!!!!")
 end
 
+function get_one_random_predictive_reward_set(Infos1, Infos2)
+
+   local size1=#Infos1[1]
+   local size2=#Infos2[1]
+   local watchDog=0
+
+   while watchDog<50 do
+      repeat
+         id_ref_state= torch.random(1,size1)
+         reward1 = Infos1.reward[id_ref_state]
+      until (reward1~=2) --until (reward1==1)
+      -- Since all rewards are different from 2
+      -- it means that you take the first action you got
+      -- I did this because it's easier if you want to group only certain reward
+      -- But yea, if you want to group every reward, this code looks silly
+
+      for i=1, size2 do
+         id_second_state=torch.random(1,size2)
+
+         if Infos2.reward[id_second_state]==reward1 then
+            return {im1=id_ref_state, im2=id_second_state}
+         end
+      end
+      watchDog=watchDog+1
+   end
+
+   error("BRING_CLOSER_REWARD WATCHDOG ATTACK!!!!!!!!!!!!!!!!!!")
+end
 
 function get_one_fixed_point_set(Infos1, Infos2)
 

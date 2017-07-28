@@ -157,9 +157,9 @@ function train(Models, priors_used)
        if APPLY_REWARD_PREDICTION_CRITERION then
            print("Loss REWARD_PREDICTION_CRITERION", TOTAL_LOSS_REWARD_PRED/NB_BATCHES/BATCH_SIZE)
        end
-       if APPLY_MSE_CRITERION then
-           print("Loss MSE_CRITERION ", TOTAL_LOSS_MSE/NB_BATCHES/BATCH_SIZE)
-       end
+    --    if APPLY_MSE_CRITERION then
+    --        print("Loss MSE_CRITERION ", TOTAL_LOSS_MSE/NB_BATCHES/BATCH_SIZE)
+    --    end
 
        save_model(Models.Model1, NAME_SAVE) --TODO Do we need to write NB_EPOCH TIMES? isnt enough the last time to write once and not overwrite NB_EPOCH TIMES?
    end
