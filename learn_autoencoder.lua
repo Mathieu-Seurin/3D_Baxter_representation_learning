@@ -135,7 +135,7 @@ end
 function set_AE_hyperparams(params)
    -- OVERRIDING hyperparameters since it's not for auto-encoders :  ** MAIN DIFFERENCES:
    MODEL_ARCHITECTURE_FILE = AENET -- important to call in this order, as DIFFERENT_FORMAT is defined based on this setting. TODO idea: Pass MODEL_ARCHITECTURE_FILE as default cmd param in which is different in each script?
-   set_hyperparams(params)
+   set_hyperparams(params, 'AE')
    LR = 0.0001
    LR_DECAY = 3*1e-6
 
