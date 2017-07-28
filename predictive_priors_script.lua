@@ -171,8 +171,8 @@ end
 
 local function main(params)
     ACTIVATE_PREDICTIVE_PRIORS = true -- Momentaneous substitution of APPLY_REWARD_PREDICTION_CRITERION  TODO: replace when wokring by APPLY_REWARD_PREDICTION_CRITERION
-    print("\n\n>> script.lua: main model builder")
-    set_hyperparams(params)
+    print("\n\n>> predictive_priors_script.lua: main model builder")
+    set_hyperparams(params, 'PredictPrior')  -- 2nd param adds model approach to model name
     print('cmd default params (overridden by following set_hyperparams): ')
     print(params)
     print_hyperparameters(false, 'predictive_priors_script.lua Hyperparams:')
@@ -231,9 +231,9 @@ local function main(params)
        local priors_used= PRIORS_CONFIGS_TO_APPLY[nb_test]
        local Log_Folder=Get_Folder_Name(LOG_FOLDER, priors_used)
 
-       print("Experiment "..nb_test)-- .." (Log_Folder="..Log_Folder..")")
+       print("Predictive priors Experiment "..nb_test)-- .." (Log_Folder="..Log_Folder..")")
        train(Models, priors_used)
-       print_hyperparameters(false, "Experiment run successfully for hyperparams: ")
+       print_hyperparameters(false, "Predictive priors Experiment run successfully for hyperparams: ")
     end
 
     if LOGGING_ACTIONS then

@@ -26,10 +26,10 @@ do
     for s in 0.2 0.4 0.5 0.6 0.8 0.9 #0.2 0.4 0.5
     do
         echo "\n ********** Running pipeline for finetuning mcd: $max_cos_dis and sigma: $s *************"
-        qlua script.lua  -use_cuda -use_continuous -mcd $max_cos_dis -sigma $s -data_folder mobileRobot #complexData #colorful  #stati$
+        qlua predictive_priors_script.lua  -use_continuous -mcd $max_cos_dis -sigma $s -data_folder mobileRobot #complexData #colorful  #stati$
         has_command_finished_correctly
 
-        th imagesAndReprToTxt.lua  -use_cuda -use_continuous -data_folder mobileRobot # complexData #colorful  #staticButtonSimplest
+        th imagesAndReprToTxt.lua  -use_continuous -data_folder mobileRobot # complexData #colorful  #staticButtonSimplest
         has_command_finished_correctly
 
         python generateNNImages.py 10

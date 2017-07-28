@@ -151,18 +151,12 @@ function priorsToString(tableOfPriors)
     return str
 end
 ---------------------------------------------------------------------------------------
+--======================================================
 -- Function :	set_hyperparams(params)
 --======================================================
---Continuous actions SETTINGS
---======================================================
---USE_CONTINUOUS = true --A switch between discrete and continuous actions (translates into calling getRandomBatchFromSeparateListContinuous instead of getRandomBatchFromSeparateList
---ACTION_AMPLITUDE = 0.01
--- The following parameter eliminates the need of finding close enough actions for assessing all priors except for the temporal.one.
--- If the actions are too far away, they will make the gradient 0 and will not be considered for the update rule
---CONTINUOUS_ACTION_SIGMA = 0.4
-    -- TODO shall it be different (and saevd into CONFIG.TXT file (TODO) for each dataset depending on the variance of the input state space?
+-- TODO shall it be different (and saevd into CONFIG.TXT file (TODO) for each dataset depending on the variance of the input state space?
 --If so, What is a good proxy  parameter to set it?
--- Input ():
+-- Input ():  modelApproach string, 2nd param adds model approach to model name
 -- Output ():
 ---------------------------------------------------------------------------------------
 function set_hyperparams(params)
