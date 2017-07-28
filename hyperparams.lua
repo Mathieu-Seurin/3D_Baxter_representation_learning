@@ -45,10 +45,11 @@ EXTRAPOLATE_ACTION_CAUS = false
 -- Always : i don't think so, but trying to see if it works better with it, why not
 
 --EXTRA PRIORS to apply:
+-- Creates a point where the robot wants the state to be very similar. Like a reference point for the robot.
 APPLY_BRING_CLOSER_REF_POINT = true
 APPLY_BRING_CLOSER_REWARD = false
-APPLY_REWARD_PREDICTION_CRITERION = true
--- Create a point where the robot wants the state to be very similar. Like a reference point for the robot.
+APPLY_REWARD_PREDICTION_CRITERION = false
+
 
 LR=0.0001
 LR_DECAY = 3*1e-6
