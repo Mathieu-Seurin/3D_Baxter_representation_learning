@@ -54,10 +54,6 @@ if USE_CUDA then
     vision = require 'torchnet-vision'  -- Install via https://github.com/Cadene/torchnet-vision
 end
 
-if USE_CUDA and USE_SECOND_GPU then
-   cutorch.setDevice(2)
-end
-
 --torch.manualSeed(100)
 --=====================================
 --DATA AND LOG FOLDER NAME etc..
