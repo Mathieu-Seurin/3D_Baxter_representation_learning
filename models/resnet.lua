@@ -45,7 +45,7 @@ function getModel(Dimension)
    -- Block backpropagation, i.e Freeze FROZEN_LAYER layers (defined in hyperparams.lua)
    for i=1,FROZEN_LAYER do
       nn_module = pretrain_net:get(i)
-      patch(nn_module)
+      patch(nn_module)  -- Freezes
    end
 
    whole_net:add(pretrain_net)

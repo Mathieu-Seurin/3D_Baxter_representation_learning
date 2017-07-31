@@ -215,7 +215,7 @@ local function main(params)
 
        if USE_CUDA then
           Model=Model:cuda()
-       end
+      end  -- in non cuda mode, cutorch = require 'cutorch'      cudnn = require 'cudnn' required?
 
        parameters, gradParameters = Model:getParameters()
        -- In siamese networks we need one copy of the network per input (image) we want to compare at the same time, because otherwise,

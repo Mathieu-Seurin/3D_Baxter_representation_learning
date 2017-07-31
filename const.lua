@@ -40,6 +40,10 @@ PRIORS_CONFIGS_TO_APPLY ={{PROP, TEMP, CAUS, REP}}
 
 SAVE_MODEL_T7_FILE = false
 -- ====================================================
+---- needed for non cuda mode?
+cutorch = require 'cutorch'
+cudnn = require 'cudnn'
+cunn = require 'cunn'
 
 if USE_CUDA then
     require 'cunn'
@@ -379,6 +383,8 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach)
 
         SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
         AVG_FRAMES_PER_RECORD = 250  --HINT: reduce for fast full epoch testing in CPU mode
+        NB_EPOCHS = 5 --otherwise, see hyperparams for default value. colorful75 converges in losses fast, as it has more images, around epoch 3-5 and therefore 5-10 epocs are enough, while for the rest of smaller #seqs (~50), the nr of epocs is 50.
+
     else
       print("No supported data folder provided, please add either of the data folders defined in hyperparams: "..BABBLING..", "..MOBILE_ROBOT.." "..SIMPLEDATA3D..' or others in const.lua' )
       os.exit()
@@ -431,7 +437,9 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach)
     if APPLY_REWARD_PREDICTION_CRITERION then
        table.insert(PRIORS_CONFIGS_TO_APPLY[1], REWARD_PREDICTION_CRITERION)
     end
-
+    if RUN_FORWARD_MODEL then
+        PRIORS_CONFIGS_TO_APPLY = {{FORWARD_MODEL}}
+    end
     -- L1Smooth and cosDistance and max margin: compare with homemade MSDCriterion and replace if similar in the good practice of using native code
     --TODO PRIORS_CONFIGS_TO_APPLY.add('CosDist','L1SmoothDist','MaxMargin')
 
@@ -439,7 +447,6 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach)
     if USE_CONTINUOUS then  --otherwise, it is not used
         DEFAULT_PRECISION = 0.01
     end
-
     ------------------ Predictive priors settings---------
     ----------------------------------------------------------
     if ACTIVATE_PREDICTIVE_PRIORS then

@@ -57,7 +57,7 @@ LR_DECAY = 3*1e-6
 SGD_METHOD = 'adam' -- Can be adam or adagrad
 
 BATCH_SIZE = 12
-NB_EPOCHS= 50
+NB_EPOCHS= 50  --modified to 5 in colorful75 for const
 
 DATA_AUGMENTATION = 0.01
 NORMALIZE_IMAGE = true

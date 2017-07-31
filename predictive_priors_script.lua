@@ -181,7 +181,7 @@ function train(Models, priors_used)
        if APPLY_REWARD_PREDICTION_CRITERION then
            print("Loss REWARD_PREDICTION_CRITERION", TOTAL_LOSS_REWARD_PRED/NB_BATCHES/BATCH_SIZE)
        end
-       if APPLY_MSE_CRITERION then
+       if APPLY_MSE_CRITERION or APPLY_FORWARD_MODEL then
            print("Loss MSE_CRITERION ", TOTAL_LOSS_MSE/NB_BATCHES/BATCH_SIZE)
        end
 
@@ -194,9 +194,17 @@ end
 
 
 local function main(params)
-    ACTIVATE_PREDICTIVE_PRIORS = true -- Momentaneous substitution of APPLY_REWARD_PREDICTION_CRITERION  TODO: replace when wokring by APPLY_REWARD_PREDICTION_CRITERION
+    --TODO 2nd approach
+    ACTIVATE_PREDICTIVE_PRIORS = false -- Momentaneous substitution of APPLY_REWARD_PREDICTION_CRITERION  TODO: replace when wokring by APPLY_REWARD_PREDICTION_CRITERION
+    RUN_FORWARD_MODEL = true
+    USE_CUDA = false --TODO for testing locally only
+
     print("\n\n>> predictive_priors_script.lua: main model builder")
-    set_hyperparams(params, 'PredictPrior')  -- 2nd param adds model approach to model name
+    if RUN_FORWARD_MODEL then
+        set_hyperparams(params, 'Fwd')
+    else
+        set_hyperparams(params, 'PredictRewPrior')  -- 2nd param adds model approach to model name
+    end
     print('cmd default params (overridden by following set_hyperparams): ')
     print(params)
     print_hyperparameters(false, 'predictive_priors_script.lua Hyperparams:')
