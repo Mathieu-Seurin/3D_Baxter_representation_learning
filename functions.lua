@@ -134,13 +134,14 @@ function save_model(model)
        -- --convert model to nn instead of cunn (for pytorch too) and patch it (convert view function)
        -- torch.save(file_string..'-pytorch', model_to_save)
 
-       print("Saved model at: "..path)
-       f = io.open(LAST_MODEL_FILE,'w')
-       f:write(path..'\n'..NAME_SAVE..'.t7')
-       f:close()
+       print("Saved full model at: "..path)
    else
        print("Saved model config and performance (not full .t7 file) at: "..path)
    end
+   -- Saving either way the last model run for the pipeline to work:
+   f = io.open(LAST_MODEL_FILE,'w')
+   f:write(path..'\n'..NAME_SAVE..'.t7')
+   f:close()
 end
 
 

@@ -141,12 +141,12 @@ function getStateAndActionToNextStateResNet(Dimension, currentAction)
    ----------------------------
    whole_net:add(nn.Linear(512,Dimension)) -- == FC layer
 
-   whole_net:evaluate()
+   --whole_net:evaluate()
    return whole_net
 end
 
 
-function getSiameseResNetForwardModel(Dimension, currentAction)
+function getSiameseResNetForwardModel(Dimension)
     --Regunar next state prediction ResNet model
     nextStateModel = getResNetModel(Dimension)
     --Predictive model
@@ -162,12 +162,18 @@ function getSiameseResNetForwardModel(Dimension, currentAction)
     fwdModel
     --nextState, next
     fwdModel = nn.joinTable{s_t, s_tplus1}
+    local a,b = (model):split(2)
     return fwdModel
 end
 
 
+function getSimpleLinearModel(Dimension)
+    --Input: {image, action}
+    --Output: {}
 
+end
 
-M.getModel = getSiameseResNetForwardModel
+M.getModel = getSimpleLinearModel
+--M.getModel = getSiameseResNetForwardModel
 
 return M
