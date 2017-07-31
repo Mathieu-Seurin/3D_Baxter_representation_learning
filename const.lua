@@ -404,6 +404,11 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach)
         -- since the model require images to be a 3x299x299, and normalize differently, we need to adapt
         IS_RESNET = true
     end
+
+    if string.find(MODEL_ARCHITECTURE_FILE, 'autoencoder_conv') then 
+       IS_RESNET = true -- AUTO_ENCODER USES RESNET AT THE MOMENT (encoding part)
+    end
+
     if string.find(MODEL_ARCHITECTURE_FILE, 'minimalNetModel') then --TODO replace by constants
         error([[minimalNetModel should only be used in learn_autoencoder.lua, not script.lua]])
     end
