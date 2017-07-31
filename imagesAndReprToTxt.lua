@@ -122,7 +122,7 @@ end  --TODO call predict and add predict to script?
 local function main(params)
    print("\n\n>> imagesAndReprToTxt.lua")
    set_hyperparams(params) --    print('In DATA_FOLDER: '..DATA_FOLDER..' params: ')- Overridden by the model loaded, therefore not used here: print(params)
-   print_hyperparameters(true, 'imagesAndReprToTxt.lua Hyperparams')
+   print_hyperparameters(false, 'imagesAndReprToTxt.lua Hyperparams')
 
    local images_folder = DATA_FOLDER
    local path, modelString

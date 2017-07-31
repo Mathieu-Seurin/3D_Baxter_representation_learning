@@ -3,7 +3,7 @@ require 'functions'
 local function main(params)
     print("\n\n>> create_plotStates_file_for_all_seq: Creating all states file for NN-Quantitative Criterion plot. ") --
     set_hyperparams(params)  --only relevant params are set (cuda usage in this case only)
-    print_hyperparameters(true, 'create_plotStates_file_for_all_seq.lua Hyperparams')
+    print_hyperparameters(false, 'create_plotStates_file_for_all_seq.lua Hyperparams')
 
     local images_folder = DATA_FOLDER
     print('In DATA_FOLDER: '..images_folder)--..' params: ')    print(params)

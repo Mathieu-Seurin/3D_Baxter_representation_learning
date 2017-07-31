@@ -41,9 +41,9 @@ PRIORS_CONFIGS_TO_APPLY ={{PROP, TEMP, CAUS, REP}}
 SAVE_MODEL_T7_FILE = false
 -- ====================================================
 ---- needed for non cuda mode?
-cutorch = require 'cutorch'
-cudnn = require 'cudnn'
-cunn = require 'cunn'
+-- cutorch = require 'cutorch'
+-- cudnn = require 'cudnn'
+-- cunn = require 'cunn'
 
 if USE_CUDA then
     require 'cunn'
@@ -138,7 +138,6 @@ function addLeadingZero(number)
     -- Returns a string with a leading zero of the number if the number has only one digit (for model logging and sorting purposes)
     if number >= 0 and number <= 9 then  return "0" .. number else return tostring(number)    end
 end
-
 
 ---------------------------------------------------------------------------------------
 -- Function :	priorsToString(params)
@@ -405,7 +404,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach)
         IS_RESNET = true
     end
 
-    if string.find(MODEL_ARCHITECTURE_FILE, 'autoencoder_conv') then 
+    if string.find(MODEL_ARCHITECTURE_FILE, 'autoencoder_conv') then
        IS_RESNET = true -- AUTO_ENCODER USES RESNET AT THE MOMENT (encoding part)
     end
 
@@ -474,10 +473,10 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach)
         NAME_SAVE= 'model'..DAY
     end
     SAVED_MODEL_PATH = LOG_FOLDER..NAME_SAVE
-    print ('saving model to '..SAVED_MODEL_PATH)
+    print ('The model will be saved in '..SAVED_MODEL_PATH)
 end
 
-function print_hyperparameters(using_precomputed_model, extra_string_to_print)
+function print_hyperparameters(print_continuous_actions_config, extra_string_to_print)
     extra_string_to_print = extra_string_to_print or ''
     print(extra_string_to_print)
     print("============ Experiment: DATA_FOLDER USED =========\n",
@@ -486,9 +485,12 @@ function print_hyperparameters(using_precomputed_model, extra_string_to_print)
                         ")\nUSE_CUDA ",USE_CUDA,", USE_CONTINUOUS ACTIONS: ",USE_CONTINUOUS, " MODEL: ",MODEL_ARCHITECTURE_FILE,". PRIORS_CONFIGS_TO_APPLY", PRIORS_CONFIGS_TO_APPLY)
     print('APPLY: EXTRAPOLATE_ACTION, EXTRAPOLATE_ACTION_CAUS, APPLY_BRING_CLOSER_REWARD, APPLY_BRING_CLOSER_REF_POINT, APPLY_REWARD_PREDICTION_CRITERION: ')
     print(EXTRAPOLATE_ACTION,EXTRAPOLATE_ACTION_CAUS,APPLY_BRING_CLOSER_REWARD,APPLY_BRING_CLOSER_REF_POINT,APPLY_REWARD_PREDICTION_CRITERION)
-    if USE_CONTINUOUS and not using_precomputed_model then  --otherwise, it is not used
+    if print_continuous_actions_config then--USE_CONTINUOUS and not using_precomputed_model then  --otherwise, it is not used
         --if we are using a precomputed model stored in a file, the command line default parameters are not effective and thus we should not print them, as they will be contradicting the ones being applied on the precomputed model that is going to be preloaded
-        print ('MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD: ',MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD,' CONTINUOUS_ACTION_SIGMA: ', CONTINUOUS_ACTION_SIGMA)
+        --Keep separated ifs to avoid conflicts with default parameters
+        if USE_CONTINUOUS then
+            print ('MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD: ',MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD,' CONTINUOUS_ACTION_SIGMA: ', CONTINUOUS_ACTION_SIGMA)
+        end
     end
     print("\n================================")
 end

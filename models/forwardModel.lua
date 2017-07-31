@@ -54,11 +54,12 @@ local function patch(nn_module)
          patch(nn_module.modules[i])
       end
    else
-      nn_module.accGradParameters = function(self,inp, out) end  -- this is freezing FROZEN_LAYER
+       -- this is freezing FROZEN_LAYER: to freeze that layer, set that layer's accGradParameters function to an empty function.
+      nn_module.accGradParameters = function(self,inp, out) end
    end
 end
 
-function getModel(Dimension)
+function getResNetModel(Dimension)
 
    local whole_net, pretrain_net
 
@@ -91,13 +92,82 @@ function getModel(Dimension)
    end
 
    whole_net:add(pretrain_net)
-   whole_net:add(nn.Linear(512,Dimension))
+   whole_net:add(nn.Linear(512,Dimension)) -- == FC layer?
 
    whole_net:evaluate()
-
    return whole_net
 end
 
-M.getModel = getModel
+
+function getStateAndActionToNextStateResNet(Dimension, currentAction)
+
+   local whole_net, pretrain_net
+
+   whole_net = nn.Sequential()
+
+   local model = "resnet-"..RESNET_VERSION..".t7"
+   local model_full_path = "./models/"..model
+
+   if file_exists(model_full_path) then
+      pretrain_net = torch.load(model_full_path)
+   else
+      print(model_full_path)
+      error([[------------------The above model was required but it doesn't exist,
+      download it here :\n https://github.com/facebook/fb.resnet.torch/tree/master/pretrained \nAnd put it in models/ as resnet-VERSION.t7
+      Ex : resnet-18.t7 -------------------]])
+   end
+
+   if RESNET_VERSION == 18 or RESNET_VERSION == 34 then
+      pretrain_net.modules[11] = nil --nn.Linear(512 -> 1000)
+      --pretrain_net.modules[10] is a View(512)
+
+   else
+      error("Version of resnet not known or not available")
+   end
+
+   -- Block backpropagation, i.e Freeze FROZEN_LAYER layers (defined in hyperparams.lua)
+   for i=1,FROZEN_LAYER do
+      nn_module = pretrain_net:get(i)
+      patch(nn_module)  -- Freezes
+   end
+
+   whole_net:add(pretrain_net)
+
+   -- EXTENSION TO INCLUDE THE ACTIONS AS INPUT (APART FROM THE STATE S_t):
+   ---------------------
+
+
+
+   ----------------------------
+   whole_net:add(nn.Linear(512,Dimension)) -- == FC layer
+
+   whole_net:evaluate()
+   return whole_net
+end
+
+
+function getSiameseResNetForwardModel(Dimension, currentAction)
+    --Regunar next state prediction ResNet model
+    nextStateModel = getResNetModel(Dimension)
+    --Predictive model
+    predictiveStateModel = getStateAndActionToNextStateResNet(Dimension)
+
+    -- Extending basic ResNet to include a prediction of the next state given current state and current action
+    fwdModel = nn.Parallel()
+    fwdModel:add(nextStateModel)
+    fwdModel:add(nextStateFromPrevStateAndAction)
+
+    --Putting everything together
+    fwdModel = nn.Sequential()
+    fwdModel
+    --nextState, next
+    fwdModel = nn.joinTable{s_t, s_tplus1}
+    return fwdModel
+end
+
+
+
+
+M.getModel = getSiameseResNetForwardModel
 
 return M
