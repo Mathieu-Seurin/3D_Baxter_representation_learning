@@ -8,6 +8,7 @@ import torch
 
 import os
 import subprocess
+import sys
 
 """
 This program adds synthetic extra negative reward to the images where the robot arm
@@ -16,6 +17,16 @@ It is done manually by knowning the 3D coordinate space that belongs to the fiel
 TODO: if impossible to do in ROS? apply same procedure to Babbling dataset of Leni (-> Is there a more precise way to get bounds
 other than max and min (x, y, z) of arm position, respectively?)
 """
+
+BUTTON_POSITION = [0.6, 0.3, -0.16] #relative position
+BUTTON_POSITION = np.array(BUTTON_POSITION)
+if len(sys.argv) >= 1:
+    print("Using continuous rewards")
+    CONT = True
+    # alpha = float(sys.argv[1])
+    alpha = 1.5
+else:
+    print("Discrete Rewards.")
 
 def is_in_bound(coordinate):
     BOUND_INF = [0.42,-0.09,-10] #-10 axis because we don't care about z axis at the moment
@@ -26,7 +37,7 @@ def is_in_bound(coordinate):
             return False
     return True
 
-database_folder =  'staticButtonSimplest/'
+database_folder =  'colorful75/'
 reward_file_name = 'recorded_button1_is_pressed.txt'
 
 for record in os.listdir(database_folder):
@@ -63,10 +74,16 @@ for record in os.listdir(database_folder):
             current_rew = int(line_rew[1])
             if current_rew == 0 :
                 coordinate = [float(i) for i in line_state[1:]]
-
                 if is_in_bound(coordinate):
-                    #don't modify line
-                    new_reward_file_content += line_rew_raw
+                    #don't modify line unless to make continuous
+                    if CONT:
+                        # print(coordinate)
+                        coordinate = np.array(coordinate)
+                        dist = coordinate - BUTTON_POSITION
+                        reward_new = 1 - alpha * np.linalg.norm(dist)
+                        new_reward_file_content += line_rew_raw[:-2] + str(reward_new) +'\n'
+                    else:
+                        new_reward_file_content += line_rew_raw
                 else:
                     new_reward_file_content += line_rew_raw[:-2]+'-1\n'
             else:
@@ -76,8 +93,8 @@ for record in os.listdir(database_folder):
     reward_file.close()
     state_file.close()
 
-    subprocess.call(["mv",reward_file_whole_path,reward_file_whole_path+'.old'])
+    subprocess.call(["mv",reward_file_whole_path,reward_file_whole_path])
 
-    new_reward_file = open(reward_file_whole_path,'w')
+    new_reward_file = open(reward_file_whole_path+'.cont','w')
     new_reward_file.write(new_reward_file_content)
     new_reward_file.close()
