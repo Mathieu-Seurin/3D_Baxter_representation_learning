@@ -18,6 +18,29 @@ require 'definition_priors'
 require 'const'
 -- try to avoid global variable as much as possible
 
+
+--Differences with respect to script.lua
+-- For both ML-DDPG and DDPG an ERD, batch-normalization,
+-- an L2 penalty c = 0:002 on the critic weights and “soft”
+-- updates of the target networks with  = 10􀀀3 are used to
+-- stabilize the learning. Adam [24] is used for learning the
+-- weights of all three DNNs with a base learning rate of m =
+-- 10􀀀3, a = 10􀀀4 and c = 10􀀀3 for the model, actor and
+-- critic respectively. The hidden layers of all three networks
+-- contain 100 neurons each. a = 50 and m = 10 and
+--  =0:99.
+-- 40000 learning steps for the 2-link arm
+-- problem and 30000 learning steps for the octopus. Every 100
+-- learning steps the policy  is evaluated
+--settling time s of the learning curve is then defined as
+-- the number of learning steps after which the learning curve
+-- enters and remains within a band  of the final value Rf :
+-- s = Tt  arg maxj (|Rbar_f - R_j|>=epsilon* R_f)
+-- In this paper c (learning steps) = 1000
+-- epsilon (band of the final value Rbar_f) =  0:05 .
+-- Octopus BenchmarK: The reward from the environment is based on the Euclidean distance D between the food and the segment (efector)
+--2-link arm ben
+
 function Rico_Training(Models,priors_used)
    local rep_criterion=get_Rep_criterion()
    local prop_criterion=get_Prop_criterion()
@@ -87,12 +110,12 @@ function Rico_Training(Models,priors_used)
           TOTAL_LOSS_FIX = loss_fix + TOTAL_LOSS_FIX
       end
 
-    --   mode= REWARD_PREDICTION_CRITERION
-    --   if applying_prior(priors_used, mode) then
-    --       batch = getRandomBatchFromSeparateList(BATCH_SIZE,mode)
-    --       loss_reward_pred, gradRewardPred =doStuff_reward_pred(Models,reward_prediction_criterion,batch,COEF_REWARD_PRED) --Just minimizing mse criterion, so we can use temp criterion
-    --       TOTAL_LOSS_REWARD_PRED = TOTAL_LOSS_REWARD_PRED + loss_reward_pred
-    --   end
+      mode= REWARD_PREDICTION_CRITERION
+      if ACTIVATE_PREDICTIVE_PRIORS then -- TODO CHANGE: applying_prior(priors_used, mode) then
+          batch = getRandomBatchFromSeparateList(BATCH_SIZE,mode)
+          loss_reward_pred, gradRewardPred = get_loss_and_gradient_for_reward_pred(Models,reward_prediction_criterion,batch,COEF_REWARD_PRED) --Just minimizing mse criterion, so we can use temp criterion
+          TOTAL_LOSS_REWARD_PRED = TOTAL_LOSS_REWARD_PRED + loss_reward_pred
+      end
 
       --TODO comparison with L1 smooth distance criterion (takes L1 norm in (-inf, -1) and (1, +inf) and L2 in the center of the interval for faster convergence updates far outside the iminma)
       --TODO Comparison with Torch cosDistance criterion
@@ -109,6 +132,7 @@ function Rico_Training(Models,priors_used)
     if SGD_METHOD == 'adagrad' then
         parameters, loss = optim.adagrad(feval, parameters, optimState)
     elseif SGD_METHOD == 'adam' then
+        print 'applying adam'
         parameters, loss = optim.adam(feval, parameters, optimState)
     else
         parameters, loss = optim.adamax(feval, parameters, optimState)
@@ -157,9 +181,9 @@ function train(Models, priors_used)
        if APPLY_REWARD_PREDICTION_CRITERION then
            print("Loss REWARD_PREDICTION_CRITERION", TOTAL_LOSS_REWARD_PRED/NB_BATCHES/BATCH_SIZE)
        end
-    --    if APPLY_MSE_CRITERION then
-    --        print("Loss MSE_CRITERION ", TOTAL_LOSS_MSE/NB_BATCHES/BATCH_SIZE)
-    --    end
+       if APPLY_MSE_CRITERION then
+           print("Loss MSE_CRITERION ", TOTAL_LOSS_MSE/NB_BATCHES/BATCH_SIZE)
+       end
 
        save_model(Models.Model1, NAME_SAVE) --TODO Do we need to write NB_EPOCH TIMES? isnt enough the last time to write once and not overwrite NB_EPOCH TIMES?
    end
@@ -170,11 +194,12 @@ end
 
 
 local function main(params)
-    print("\n\n>> script.lua: main model builder")
-    set_hyperparams(params)
+    ACTIVATE_PREDICTIVE_PRIORS = true -- Momentaneous substitution of APPLY_REWARD_PREDICTION_CRITERION  TODO: replace when wokring by APPLY_REWARD_PREDICTION_CRITERION
+    print("\n\n>> predictive_priors_script.lua: main model builder")
+    set_hyperparams(params, 'PredictPrior')  -- 2nd param adds model approach to model name
     print('cmd default params (overridden by following set_hyperparams): ')
     print(params)
-    print_hyperparameters(false, 'script.lua Hyperparams:')
+    print_hyperparameters(false, 'predictive_priors_script.lua Hyperparams:')
 
     local records_paths = Get_Folders(DATA_FOLDER, 'record') --local list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(DATA_FOLDER)
     NB_SEQUENCES= #records_paths
@@ -230,9 +255,9 @@ local function main(params)
        local priors_used= PRIORS_CONFIGS_TO_APPLY[nb_test]
        local Log_Folder=Get_Folder_Name(LOG_FOLDER, priors_used)
 
-       print("Experiment "..nb_test)-- .." (Log_Folder="..Log_Folder..")")
+       print("Predictive priors Experiment "..nb_test)-- .." (Log_Folder="..Log_Folder..")")
        train(Models, priors_used)
-       print_hyperparameters(false, "Experiment run successfully for hyperparams: ")
+       print_hyperparameters(false, "Predictive priors Experiment run successfully for hyperparams: ")
     end
 
     if LOGGING_ACTIONS then

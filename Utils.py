@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # coding: utf-8
-from sklearn.decomposition import PCA  # with some version of sklearn fails with ImportError: undefined symbol: PyFPE_jbuf
 import matplotlib.pyplot as plt
 from matplotlib import colors
 from matplotlib.colors import ListedColormap

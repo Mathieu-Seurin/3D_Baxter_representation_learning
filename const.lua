@@ -54,10 +54,6 @@ if USE_CUDA then
     vision = require 'torchnet-vision'  -- Install via https://github.com/Cadene/torchnet-vision
 end
 
-if USE_CUDA and USE_SECOND_GPU then
-   cutorch.setDevice(2)
-end
-
 --torch.manualSeed(100)
 --=====================================
 --DATA AND LOG FOLDER NAME etc..
@@ -155,21 +151,15 @@ function priorsToString(tableOfPriors)
     return str
 end
 ---------------------------------------------------------------------------------------
+--======================================================
 -- Function :	set_hyperparams(params)
 --======================================================
---Continuous actions SETTINGS
---======================================================
---USE_CONTINUOUS = true --A switch between discrete and continuous actions (translates into calling getRandomBatchFromSeparateListContinuous instead of getRandomBatchFromSeparateList
---ACTION_AMPLITUDE = 0.01
--- The following parameter eliminates the need of finding close enough actions for assessing all priors except for the temporal.one.
--- If the actions are too far away, they will make the gradient 0 and will not be considered for the update rule
---CONTINUOUS_ACTION_SIGMA = 0.4
-    -- TODO shall it be different (and saevd into CONFIG.TXT file (TODO) for each dataset depending on the variance of the input state space?
+-- TODO shall it be different (and saevd into CONFIG.TXT file (TODO) for each dataset depending on the variance of the input state space?
 --If so, What is a good proxy  parameter to set it?
--- Input ():
+-- Input ():  modelApproach string, 2nd param adds model approach to model name
 -- Output ():
 ---------------------------------------------------------------------------------------
-function set_hyperparams(params)
+function set_hyperparams(params, modelApproach)
     --overriding the defaults:
     USE_CUDA = params.use_cuda      --print ('Boolean param: ') -- type is boolean
     USE_CONTINUOUS = params.use_continuous
@@ -177,7 +167,7 @@ function set_hyperparams(params)
     CONTINUOUS_ACTION_SIGMA = params.sigma
     DATA_FOLDER = params.data_folder  --print('[Log: Setting command line dataset to '..params.data_folder..']') type is a str
     set_cuda_hyperparams(USE_CUDA)
-    set_dataset_specific_hyperparams(DATA_FOLDER)
+    set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach)
 end
 
 function set_cuda_hyperparams(USE_CUDA)
@@ -201,7 +191,7 @@ function set_cuda_hyperparams(USE_CUDA)
     end
 end
 
-function set_dataset_specific_hyperparams(DATA_FOLDER)
+function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach)
     STRING_MEAN_AND_STD_FILE = PRELOAD_FOLDER..'meanStdImages_'..DATA_FOLDER..'.t7'
     -- print(MODEL_ARCHITECTURE_FILE) --./models/minimalNetModel      -- print(MODEL_ARCHITECTURE_FILE:match("(.+)/(.+)")) -- returns  ./models	minimalNetModel
     _, architecture_name = MODEL_ARCHITECTURE_FILE:match("(.+)/(.+)") --architecture_name, _ = split(architecture_name, ".")
@@ -242,7 +232,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
        --NOTE: DEFAULT PARAMETERS FOR OUR BASELINE DATABASE SET AT THE BEGINNING OF THE FILE (NEED TO BE DECLARED AS CONSTANTS
         CLAMP_CAUSALITY = false
 
-        DIMENSION_OUT = 100
+        DIMENSION_OUT = 2 --100 is a bit better, but we keep it default 2 for now
         -- MIN_TABLE = {-10000,-10000} -- for x,y
         -- MAX_TABLE = {10000,10000} -- for x,y
 
@@ -450,6 +440,14 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
         DEFAULT_PRECISION = 0.01
     end
 
+    ------------------ Predictive priors settings---------
+    ----------------------------------------------------------
+    if ACTIVATE_PREDICTIVE_PRIORS then
+        LR = 0.003
+        SGD_METHOD = 'adam'
+        HIDDEN_LAYERS = 100 --neurons in Model learning DDPG (ML-DDPG)
+    end
+
     -- SAVING MODEL CONFIG
     now = os.date("*t")
     if USE_CONTINUOUS then
@@ -458,9 +456,13 @@ function set_dataset_specific_hyperparams(DATA_FOLDER)
     else
         DAY = 'Y'..now.year..'_D'..addLeadingZero(now.day)..'_M'..addLeadingZero(now.month)..'_H'..addLeadingZero(now.hour)..'M'..addLeadingZero(now.min)..'S'..addLeadingZero(now.sec)..'_'..DATA_FOLDER..'_'..architecture_name..priorsToString(PRIORS_CONFIGS_TO_APPLY)
     end
-
-    NAME_SAVE= 'model'..DAY
+    if modelApproach then
+        NAME_SAVE= modelApproach..'model'..DAY
+    else
+        NAME_SAVE= 'model'..DAY
+    end
     SAVED_MODEL_PATH = LOG_FOLDER..NAME_SAVE
+    print ('saving model to '..SAVED_MODEL_PATH)
 end
 
 function print_hyperparameters(using_precomputed_model, extra_string_to_print)

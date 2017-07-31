@@ -32,7 +32,7 @@ cmd:option('-sigma', 0.6, "Sigma: denominator in continuous actions' extra facto
 RELATIVE = false
 
 local params = cmd:parse(arg)
-set_hyperparams(params)
+set_hyperparams(params, 'Supervised')
 
 print("testing DATA_FOLDER", DATA_FOLDER)
 local list_folders_images, list_txt_action,list_txt_button, list_txt_state, list_txt_posButton=Get_HeadCamera_View_Files(DATA_FOLDER)
