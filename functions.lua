@@ -124,20 +124,23 @@ function save_model(model)
       os.execute("cp const.lua "..path)
    end
 
-   model:clearState() --It doesn't reset the model, just clean the last batch loaded in memory.
-   model_to_save = model:clone():float()
-   torch.save(file_string, model_to_save) --Saving model to analyze the results afterward (imagesAndRepr.lua etc...)
+   if SAVE_MODEL_T7_FILE then
+       model:clearState() --It doesn't reset the model, just clean the last batch loaded in memory.
+       model_to_save = model:clone():float()
+       torch.save(file_string, model_to_save) --Saving model to analyze the results afterward (imagesAndRepr.lua etc...)
 
-   -- not enough disk space for the PyTorch version!!
-   -- patch(cudnn.convert(model_to_save,nn))
-   -- --convert model to nn instead of cunn (for pytorch too) and patch it (convert view function)
-   -- torch.save(file_string..'-pytorch', model_to_save)
+       -- not enough disk space for the PyTorch version!!
+       -- patch(cudnn.convert(model_to_save,nn))
+       -- --convert model to nn instead of cunn (for pytorch too) and patch it (convert view function)
+       -- torch.save(file_string..'-pytorch', model_to_save)
 
-   print("Saved model at : "..path)
-
-   f = io.open(LAST_MODEL_FILE,'w')
-   f:write(path..'\n'..NAME_SAVE..'.t7')
-   f:close()
+       print("Saved model at: "..path)
+       f = io.open(LAST_MODEL_FILE,'w')
+       f:write(path..'\n'..NAME_SAVE..'.t7')
+       f:close()
+   else
+       print("Saved model config and performance (not full .t7 file) at: "..path)
+   end
 end
 
 

@@ -185,7 +185,7 @@ function train(Models, priors_used)
            print("Loss MSE_CRITERION ", TOTAL_LOSS_MSE/NB_BATCHES/BATCH_SIZE)
        end
 
-       save_model(Models.Model1, NAME_SAVE) --TODO Do we need to write NB_EPOCH TIMES? isnt enough the last time to write once and not overwrite NB_EPOCH TIMES?
+       save_model(Models.Model1, NAME_SAVE, SAVE_MODEL_T7_FILE) --TODO Do we need to write NB_EPOCH TIMES? isnt enough the last time to write once and not overwrite NB_EPOCH TIMES?
    end
    log_model_params()
    return Models.Model1, NAME_SAVE

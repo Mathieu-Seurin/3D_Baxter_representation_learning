@@ -17,7 +17,6 @@ require 'hyperparams'
 ----------------------------------------------------------------------------------------------------------------------------
 USE_CUDA = true
 USE_SECOND_GPU = true
-
 USE_CONTINUOUS = false
 
 MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.5
@@ -39,6 +38,7 @@ ALL_PRIORS = {REP, CAUS,PROP,TEMP,BRING_CLOSER_REWARD, BRING_CLOSER_REF_POINT, R
 --DEFAULTS BEING APPLIED (SET THEM IN HYPERPARAMS.LUA)
 PRIORS_CONFIGS_TO_APPLY ={{PROP, TEMP, CAUS, REP}}
 
+SAVE_MODEL_T7_FILE = false
 -- ====================================================
 
 if USE_CUDA then
