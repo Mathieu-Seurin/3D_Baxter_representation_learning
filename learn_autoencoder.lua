@@ -59,7 +59,7 @@ function test_model(model, list_folders_images)
    criterion:cuda()
 
    -- for num_test=1,NB_TEST-1 do
-   img = getRandomBatchFromSeparateList(1, 'regular'):view(1,3,200,200):cuda()
+   img = getRandomBatchFromSeparateList(1, 'regular'):view(1,3,224,224):cuda()
    output = model:forward(img)
 
    if VISUALIZE_AE then
