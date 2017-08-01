@@ -242,7 +242,7 @@ luarocks install qtlua
 A: the error disappears if using instead th instead of qlua. Some versions of Ubuntu 14.04 do not handle well qtlua, see versions.
 
 * torchnet' not found
-The issue can be related to qlua not being properly installed. Install from https://github.com/LuaDist/qtlua
+The issue can be related to qlua not being properly installed. Avoid installing from https://github.com/LuaDist/qtlua  and only INSTALL FROM: https://github.com/torch/qtlua
 if luarocks install qtlua fails with
 ```
 /tmp/luarocks_qtlua-scm-1-MmsVrW/qtlua/qtlua/qtluautils.cpp: In function ‘const char* pushnexttemplate(lua_State*, const char*)’:

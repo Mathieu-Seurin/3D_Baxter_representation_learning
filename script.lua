@@ -140,7 +140,7 @@ function train(Models, priors_used)
           xlua.progress(numBatch, NB_BATCHES)
        end
 
-       print("Loss Temp", TOTAL_LOSS_TEMP/NB_BATCHES/BATCH_SIZE)
+       print("Loss Temp", TOTAL_LOSS_TEMP/NB_BATCHES/BATCH_SIZE)  ---{*}
        print("Loss Prop", TOTAL_LOSS_PROP/NB_BATCHES/BATCH_SIZE)
        print("Loss Caus", TOTAL_LOSS_CAUS/NB_BATCHES/BATCH_SIZE)
        print("Loss Rep", TOTAL_LOSS_REP/NB_BATCHES/BATCH_SIZE)
@@ -259,3 +259,7 @@ cmd:option('-sigma', 0.4, "Sigma: denominator in continuous actions' extra facto
 
 local params = cmd:parse(arg)  --TODO function to get all command line arguments that are the same right now for all Lua scripts, only in one function.
 main(params)
+
+
+----
+--[*} https://discuss.pytorch.org/t/how-to-combine-multiple-criterions-to-a-loss-function/348/8  Iterating over a batch and summing up the losses should work too, but is unnecessary, since the criterions already support batched inputs. It probably doesn't work for you, because criterions average the loss over the batch, instead of summing them (this can be changed using the size_average constructor argument). So if you have very large batches, your gradients will get multiplied by the batch size, and will likely blow up your network. Just divide the loss by the batch size and it should be fine.]

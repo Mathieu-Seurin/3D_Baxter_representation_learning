@@ -44,6 +44,8 @@ do
         python report_results.py
         has_command_finished_correctly
 
+        python distortion_crit.py
+        has_command_finished_correctly
     done
 done
 
