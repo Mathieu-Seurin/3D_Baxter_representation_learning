@@ -97,6 +97,7 @@ MIN_TABLE = {-10000,-10000} -- for x,y
 MAX_TABLE = {10000,10000} -- for x,y
 
 DIMENSION_IN = 2
+DIMENSION_OUT= 3
 
 REWARD_INDEX = 1  --3 reward values: -1, 0, 10
 INDEX_TABLE = {1,2} --column index for coordinate in state file (respectively x,y)
@@ -205,8 +206,6 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach, createNewM
 
        MIN_TABLE = {0.42,-0.2,-10} -- for x,y,z doesn't really matter in fact
        MAX_TABLE = {0.8,0.7,10} -- for x,y,z doesn't really matter in fact
-
-       DIMENSION_IN = 3
 
        REWARD_INDICE = 2
        INDEX_TABLE = {2,3,4} --column indice for coordinate in state file (respectively x,y,z)
