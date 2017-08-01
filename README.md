@@ -318,6 +318,12 @@ Loss Rep	0.044838557231332
 Loss Fix (BRING_CLOSER_REF_POINT) 	0.0047991881112797
 
 
+## Visualizing Graphs
+Use nngraph_visualization.lua
+Pre-requirements:
+sudo apt-get install graphviz -y
+luarocks install nngraph
+
 
 ## REFERENCES
 [1] Learning state representations with robotic priors. Rico Jonschkowski, Oliver Brock, 2015.

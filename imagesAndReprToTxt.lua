@@ -121,7 +121,7 @@ end  --TODO call predict and add predict to script?
 
 local function main(params)
    print("\n\n>> imagesAndReprToTxt.lua")
-   set_hyperparams(params) --    print('In DATA_FOLDER: '..DATA_FOLDER..' params: ')- Overridden by the model loaded, therefore not used here: print(params)
+   set_hyperparams(params, false) --    print('In DATA_FOLDER: '..DATA_FOLDER..' params: ')- Overridden by the model loaded, therefore not used here: print(params)
    print_hyperparameters(false, 'imagesAndReprToTxt.lua Hyperparams')
 
    local images_folder = DATA_FOLDER
@@ -173,9 +173,8 @@ local cmd = torch.CmdLine()
 cmd:option('-use_cuda', false, 'true to use GPU, false (default) for CPU only mode')
 cmd:option('-use_continuous', false, 'true to use a continuous action space, false (default) for discrete one (0.5 range actions)')
 cmd:option('-data_folder', MOBILE_ROBOT, 'Possible Datasets to use: staticButtonSimplest, mobileRobot, staticButtonSimplest, simpleData3D, pushingButton3DAugmented, babbling')
-cmd:option('-mcd', 0.5, 'Max. cosine distance allowed among actions for priors loss function evaluation (MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD)')
-cmd:option('-sigma', 0.1, "Sigma: denominator in continuous actions' extra factor (CONTINUOUS_ACTION_SIGMA)")
-
+cmd:option('-mcd', 0.4, 'Max. cosine distance allowed among actions for priors loss function evaluation (MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD)')
+cmd:option('-sigma', 0.4, "Sigma: denominator in continuous actions' extra factor (CONTINUOUS_ACTION_SIGMA)")4
 cmd:option('-visualize_seq', false, "instead of computing representation for all images, just visualize a few for debugging purpose")
 
 local params = cmd:parse(arg)

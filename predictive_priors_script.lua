@@ -201,9 +201,9 @@ local function main(params)
 
     print("\n\n>> predictive_priors_script.lua: main model builder")
     if RUN_FORWARD_MODEL then
-        set_hyperparams(params, 'Fwd')
+        set_hyperparams(params, 'Fwd', true)
     else
-        set_hyperparams(params, 'PredictRewPrior')  -- 2nd param adds model approach to model name
+        set_hyperparams(params, 'PredictRewPrior', true)  -- 2nd param adds model approach to model name
     end
     print('cmd default params (overridden by following set_hyperparams): ')
     print(params)
