@@ -38,7 +38,7 @@ ALL_PRIORS = {REP, CAUS,PROP,TEMP,BRING_CLOSER_REWARD, BRING_CLOSER_REF_POINT, R
 --DEFAULTS BEING APPLIED (SET THEM IN HYPERPARAMS.LUA)
 PRIORS_CONFIGS_TO_APPLY ={{PROP, TEMP, CAUS, REP}}
 
-SAVE_MODEL_T7_FILE = false
+SAVE_MODEL_T7_FILE = true --NECESSARY STEP TO RUN FULL EVALUATION PIPELINE (REQUIRED FILE BY imagesAndReprToTxt.lua)
 -- ====================================================
 ---- needed for non cuda mode?
 -- cutorch = require 'cutorch'
