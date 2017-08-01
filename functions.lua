@@ -33,7 +33,7 @@ function get_last_used_model_folder_and_name()
        f:close()
        return {path, modelString}
     else
-       error(LAST_MODEL_FILE.." should exist")
+        error(LAST_MODEL_FILE.." file should exist")
     end
 end
 

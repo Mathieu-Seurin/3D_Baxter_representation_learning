@@ -129,8 +129,8 @@ local function main(params)
    folder_and_name = get_last_used_model_folder_and_name()
    path = folder_and_name[1]
    modelString = folder_and_name[2]
-
-   print('Last model used: '..path..'/'..modelString)
+   savedModel = path..'/'..modelString  --t7 file
+   print('Last model used: '..savedModel)
 
    -- if get_last_architecture_used(modelString) == 'AE' then
    --    assert(not(DIFFERENT_FORMAT), "For training the auto-encoder, the model architecture needs to be in the same format as BASE_TIMNET. Change in hyperparams.lua")
@@ -139,33 +139,37 @@ local function main(params)
    -- end
 
    -- NOT USEFUL ANYMORE : AE uses resnet now
+    if not file_exists(savedModel) then
+       print('SAVE_MODEL_T7_FILE = needs to be true (NECESSARY STEP TO RUN FULL EVALUATION PIPELINE (REQUIRED FILE BY imagesAndReprToTxt.lua)')
+       error(savedModel.." file should exist")
+    else
+       local  model = torch.load(savedModel)
+       if USE_CUDA then
+          model = model:cuda()
+       else
+          model = model:double()
+       end
 
-   local  model = torch.load(path..'/'..modelString)
-   if USE_CUDA then
-      model = model:cuda()
-   else
-      model = model:double()
-   end
+       if params.visualize_seq then
+          visualize_images_and_repr('saved_seq', model)
+       else
+          outStr = ''
+          tempSeq = {}
+          tempSeq = represent_all_images(images_folder, model)
 
-   if params.visualize_seq then
-      visualize_images_and_repr('saved_seq', model)
-   else
-      outStr = ''
-      tempSeq = {}
-      tempSeq = represent_all_images(images_folder, model)
+          table.sort(tempSeq, function (a,b) return a[1] < b[1] end)
+          tempSeqStr = ''
+          for key in pairs(tempSeq) do
+             tempSeqStr = tempSeqStr..tempSeq[key][2]..'\n'
+          end
+          path_to_output_file = path..'/'..LEARNED_REPRESENTATIONS_FILE
 
-      table.sort(tempSeq, function (a,b) return a[1] < b[1] end)
-      tempSeqStr = ''
-      for key in pairs(tempSeq) do
-         tempSeqStr = tempSeqStr..tempSeq[key][2]..'\n'
-      end
-      path_to_output_file = path..'/'..LEARNED_REPRESENTATIONS_FILE
-
-      print('Saving images and their learnt representations to file '..path_to_output_file)
-      file = io.open(path_to_output_file, 'w')
-      file:write(tempSeqStr)
-      file:close()
-   end
+          print('Saving images and their learnt representations to file '..path_to_output_file)
+          file = io.open(path_to_output_file, 'w')
+          file:write(tempSeqStr)
+          file:close()
+       end
+    end
 end
 
 -- Command-line options
