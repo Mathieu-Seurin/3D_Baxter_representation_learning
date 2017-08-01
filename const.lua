@@ -467,7 +467,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach, createNewM
         else
             DAY = 'Y'..now.year..'_D'..addLeadingZero(now.day)..'_M'..addLeadingZero(now.month)..'_H'..addLeadingZero(now.hour)..'M'..addLeadingZero(now.min)..'S'..addLeadingZero(now.sec)..'_'..DATA_FOLDER..'_'..architecture_name..priorsToString(PRIORS_CONFIGS_TO_APPLY)
         end
-        if modelApproach then
+        if modelApproach then --to add an extra keyword  to the model name
             NAME_SAVE= modelApproach..'model'..DAY
         else
             NAME_SAVE= 'model'..DAY

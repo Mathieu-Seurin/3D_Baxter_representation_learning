@@ -46,7 +46,7 @@ EXTRAPOLATE_ACTION_CAUS = false
 
 --EXTRA PRIORS to apply:
 -- Creates a point where the robot wants the state to be very similar. Like a reference point for the robot.
-APPLY_BRING_CLOSER_REF_POINT = true
+APPLY_BRING_CLOSER_REF_POINT = false
 APPLY_BRING_CLOSER_REWARD = false
 APPLY_REWARD_PREDICTION_CRITERION = false
 ACTIVATE_PREDICTIVE_PRIORS = false -- Momentaneous substitution of APPLY_REWARD_PREDICTION_CRITERION

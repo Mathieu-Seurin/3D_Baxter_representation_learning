@@ -171,7 +171,7 @@ end
 
 local function main(params)
     print("\n\n>> script.lua: main model builder")
-    set_hyperparams(params)
+    set_hyperparams(params, '', true) --second param adds extra keyword to the model name if desired
     print('cmd default params (overridden by following set_hyperparams): ')
     print(params)
     print_hyperparameters(false, 'script.lua Hyperparams:')
