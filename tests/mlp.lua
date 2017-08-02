@@ -1,7 +1,7 @@
 require 'nngraph'
 
 DIMENSION_IN = 2 --Default for mobileRobot
-DIMENSION_OUT= 2 --Default for mobileRobot
+DIMENSION_OUT = 3 --Default for mobileRobot
 LR = 0.05
 NB_EPOCHS = 10 --1000
 WEIGHT_IMPORTANCE_FOR_FIRST_INPUT = 0.5
@@ -70,6 +70,7 @@ end
 
 ------------
 --Torch.nngraph Version: more modularity and power than Torch.nn
+-- TEST
 ------------
 function twoInputs2OutputsNNGraph()
     print('2 input 2 output model')
@@ -129,7 +130,7 @@ end
 --     local loss = torch.Tensor(epochs):fill(0) -- training loss initialization
 --     for i=1, epochs do             -- A few steps of training such a network..
 --        pred = net:forward(x) --network forward step
---        loss[i] = criterion:forward(pred,y) -- network error evaluation (output, target)
+--        loss[i] = criterion:forward(pred, y) -- network error evaluation (output, target)
 --        local gradients = criterion:backward(pred, y); --loss gradients
 --        net:zeroGradParameters(); -- zero reset of gradients
 --        net:backward(x, gradients); --network backward step  (outputs, target)
@@ -139,21 +140,26 @@ end
 --     return net:evaluate()  --Needed in nngraph too? only for sequential models?
 -- end
 
-
+function printAll(t, name)
+    print(name)
+    print (type(t), #t)
+end
 ----------------
 ------TORCH.NNGraph VERSION
 ----------------
--- Use a typical generic gradient update function
+-- Uses a typical generic gradient update function
 function updateGradient(net, x, y, criterion, learningRate)
+    printAll(x,'x')
     local y_pred = net:forward(x) --network forward step
     print("prediction: ", y_pred)
-    local loss = criterion:forward(y_pred, y) -- -- network error evaluation (output, target)   --NOTE: how is different from applying to  output = mc:forward(x, y)?
+    local loss = criterion:forward(y_pred, y) -- -- network error evaluation (output, target)
     local gradients = criterion:backward(y_pred, y) --loss gradients
-    net:zeroGradParameters(); -- zero reset of gradients
-    net:backward(x, gradients); --network backward step  (outputs, target)
-    net:updateParameters(LR); --given the LR, update parameters
+    net:zeroGradParameters() -- zero reset of gradients,  --sets them to zero, needs to be done in each fwd and backward update, otherwise Torch internally accumulates the sum of all gradients
+    net:backward(x, gradients) --network backward step  (outputs, target)
+    net:updateParameters(LR) --given the LR, update parameters
     return loss
 end
+
 
 --Uses 2 losses, one per output being optimized
 function trainSeveralLossesNNGraph(net, input, output, epochs, LR, weightImportanceForFirstInput)
@@ -161,28 +167,34 @@ function trainSeveralLossesNNGraph(net, input, output, epochs, LR, weightImporta
     -- multiCriterion = nn.MultiCriterion() -- returns a Criterion which is a weighted sum of other Criterion.
     -- Criterions are added using the method :add,
     -- where weight is a scalar (default 1). Each criterion is applied to the same input and target.
-    MSECrit = nn.MSECriterion() --.cuda()
-    multiCrit = nn.MultiCriterion():add(MSECrit, weightImportanceForFirstInput):add(MSECrit) -- avged sum of criteria
-    --alternatively
-    --loss = MSECrit(x1, label1) + MSECrit(x2, label2)
-    --loss.backward()  --vs net:backward(x, gradients)?
+    local MSECrit = nn.MSECriterion() --.cuda()
+    --https://github.com/torch/nn/blob/master/doc/criterion.md#nn.CrossEntropyCriterion
+    --you don't put any activation unit at the end of you network
+    -- and this criterion calculate the logsoftmax and the classification loss
+    local crossEntrCrit = nn.CrossEntropyCriterion(weights)
+    crossEntrCrit.nll.sizeAverage = false
+    local multiCrit = nn.MultiCriterion():add(MSECrit, weightImportanceForFirstInput):add(crossEntrCrit) -- avged sum of criteria
+    --alternatively:    --loss = MSECrit(x1, label1) + MSECrit(x2, label2)
+    --loss:backward()  --vs net:backward(x, gradients)?
 
     local loss = torch.Tensor(epochs):fill(0) -- training loss initialization
     for i=1, epochs do             -- A few steps of training such a network..
        loss[i] = updateGradient(net, input, output, multiCrit, LR)
-       print('Error (MSE):', loss[i])
+       print('Error (MSE loss):', loss[i])
     end
+    net:evaluate() --Should be done only once per whole training, needed really only if doing dropout
 end
 
 --1 unique loss
 function trainNNGraph(net, input, output, epochs, LR)
-    criterion = nn.MSECriterion() --.cuda()
+    local MSECrit = nn.MSECriterion() --.cuda()
     print('trainNNGraph: input, output and sizes: ',input, output, input:size(), output:size())
     local loss = torch.Tensor(epochs):fill(0) -- training loss initialization
     for i=1, epochs do             -- A few steps of training such a network..
        loss[i] = updateGradient(net, input, output, MSECrit, LR)
-       print('Error (MSE):', loss[i])
+       print('Error (MSE loss):', loss[i])
     end
+    net:evaluate() --Should be done only once per whole training, needed really only if doing dropout
 end
 ---------------------
 --Torch.nngraph Version Network
@@ -190,33 +202,42 @@ end
 --
 ---------------------
 function getStateAndAction2stateAndRewardNetwork(state_in_dim, state_out_dim)
-    -- Input: State representation (s_t) and action
+    -- Input: State representation (s_t) and action  TODO: nb_neurons per layer, e.g. 32 in TimNet, use dropout as in https://github.com/Element-Research/rnn/issues/243  ?
     -- Output: State representation (next state s_t+1) and reward
+    --state_out_dim = nb_filter = hyperparam, we keep it simple to 2 right now
     -- size mismatch, m1: [8 x 2], m2: [1 x 2] at /tmp/luarocks_torch-scm-1-1606/torch7/lib/TH/generic/THTensorMath.c:1293
-    -- ReLU in pyTorch:  import torch.nn.functional as F .. x = F.relu( Conv2d(20, 20, 5)
-    -- ReLU in Torch: nn.ReLU
+    -- ReLU in pyTorch:  import torch.nn.functional as F .. x = F.relu( Conv2d(20, 20, 5) | ReLU in Torch: nn.ReLU
     -- nn.HardShrink applies the hard shrinkage function element-wise to the input Tensor. lambda is set to 0.5 by default.
     -- HardShrinkage operator is defined as:
     --        ⎧ x, if x >  lambda
     -- f(x) = ⎨ x, if x < -lambda
     --        ⎩ 0, otherwise
+    --May need extra layer for modularity:  https://github.com/torch/nn/blob/master/doc/criterion.md#nn.ClassNLLCriterion
+    --See https://github.com/torch/nn/blob/master/doc/table.md#nn.ConcatTable
+    -- ConcatTable applies each member module to the same input Tensor and outputs a table
     -- A)
-    identity_for_state = nn.Identity(state_in_dim)
-    identity_for_action = nn.Identity(state_in_dim)
-    inStateT = nn.Linear(state_in_dim, state_out_dim)(identity_for_state)
-    inAction = nn.Linear(state_in_dim, state_out_dim)(identity_for_action)
+    inStateT = nn.Identity()()
+    inAction = nn.Identity()()
+    --hidd_state = nn.Linear(state_in_dim, state_out_dim)(inStateT)
+    stateAndAction = nn.ConcatTable()()-- nn.Concat(1) -- dim throuh which inputs are concatenated: inAction, stateT)
+    stateAndAction:add(inStateT)
+    stateAndAction:add(inAction) -- Action does not need to be encoded nor perturbed, it needs to help predict the reward
+    --hidd_action = nn.Linear(state_in_dim, state_out_dim)(inAction)
     -- B)
     -- inStateT = nn.Linear(state_in_dim, state_out_dim)() -- Linear layer with input size 1 and output size 2
     -- inAction = nn.Linear(state_in_dim, state_out_dim)()
-    outStateT1 = nn.ReLu()(nn.Linear(state_out_dim, state_in_dim)(inStateT)) -- equivalent to applying left to right or what in Python would be Linear(Tanh(h1))
-    outRewardT = nn.HardShrink(0)(nn.Linear(state_out_dim, state_in_dim)(inAction)) --NOTE Reward T or T+1?
-    --stateAndAction = nn.Concat()({hh1, hh2}) --Combining them by  CONCAT? before or after the activ function?
-
-
+    -- outStateT1 = nn.ReLU()(nn.Linear(state_out_dim, state_out_dim)(inStateT)) -- equivalent to applying left to right or what in Python would be Linear(Tanh(h1))
+    -- outRewardT = nn.HardShrink(0)(nn.Linear(state_out_dim, state_in_dim)(inAction)) --NOTE Reward T or T+1?
+    -- --stateAndAction = nn.Concat()({hh1, hh2}) --Combining them by  CONCAT? before or after the activ function?
+    print(stateAndAction)--, 'stateAndAction')
+    outStateT1 = nn.Linear(state_out_dim, state_out_dim)(stateAndAction)-- equivalent to applying left to right or what in Python would be Linear(Tanh(h1))
+    --outRewardT = nn.Linear(state_out_dim, 1)(hidd_state) --NOTE Reward T or T+1? (in any case, 1 output numeric value)
+    --option B: --Predict reward based on direct state or encoded hidd_state?
+    outRewardT = nn.Linear(state_in_dim, 1)(inStateT)
     --it in a 2 tensor input 2 tensor output network to create a bottle neck -- nn.Concat concatenates the output of one layer of "parallel" modules along the provided dimension"
     --outState = nn.ReLU()(stateAndAction) --nn.Sigmoid()(stateAndAction)
     --No need for any activ. function at all because our states should not be constrained in any range outReward = nn.HardShrink(0)(stateAndAction)
-    --For rewards of -1, 0 and 10 ->TODO: is it a problem to map 10 to 1? renormalize? nn.Tanh()(stateAndAction)
+    --For rewards of -1, 0 and 10 ---TODO: add xavier weight initialization? https://github.com/Mathieu-Seurin/baxter_representation_learning_3D/blob/master/models/topUniqueSimplerWOTanh.lua
     gmod = nn.gModule({inStateT, inAction}, {outStateT1, outRewardT}) -- Parameters are Input and Output to our network  --Alterhative to nn.JoinTable?
     --printNetworkGraph(gmod)
     return gmod
@@ -246,18 +267,8 @@ end
 --     return gmod
 -- end
 
--- Use a typical generic gradient update function
-function updateGradient(net, x, y, criterion, learningRate)
-    local y_pred = net:forward(x)
-    print("prediction: ", y_pred)
-    local output = criterion:forward(y_pred, y) --    output = mc:forward(x, y) --NOTE: how is different from applying to (y_pred, y)?
-    local gradients = criterion:backward(y_pred, y)
-    net:zeroGradParameters() --sets them to zero, needs to be done in each fwd and backward update, otherwise Torch internally accumulates the sum of all gradients
-    net:backward(x, gradients)
-    net:updateParameters(learningRate)
+-------------------------------------------------------------------------------
 
-    net:evaluate() --Best place is here (once per epoch) or once per whole training?
-end
 
 --sequentialTorchNNExample()
 --train(n, x, y, NB_EPOCHS) --requires generating XOR dataset
@@ -269,18 +280,18 @@ x2 = torch.rand(10)
 
 
 --First NeuralNetworksForBeginners
-local statesT = torch.Tensor({{0,1},{1,1}, {1,0},{1,-1},{0,-1},{-1,-1},{-1,0},{-1,1}})
+local statesT = torch.Tensor{{0,1},{1,1}, {1,0},{1,-1},{0,-1},{-1,-1},{-1,0},{-1,1}}
 --clockwise from 12 o'clock to 10.30, where the reward finally is
-local actions = torch.Tensor({{0,1},{1,1}, {1,0},{1,-1},{0,-1},{-1,-1},{-1,0},{-1,1}})
-local statesT1 = torch.Tensor({{0,1},{1,1}, {1,0},{1,-1},{0,-1},{-1,-1},{-1,0},{-1,1}})
-local rewards = torch.Tensor({0,0,0,0,0,0,0,1}) --torch.rand(10)
-n = getStateAndAction2stateAndRewardNetwork(DIMENSION_OUT)
+local actions = torch.Tensor{{0,1},{1,1}, {1,0},{1,-1},{0,-1},{-1,-1},{-1,0},{-1,1}}
+local statesT1 = torch.Tensor{{1,1}, {1,0},{1,-1},{0,-1},{-1,-1},{-1,0},{-1,1},{0,1}}
+local rewards = torch.Tensor{0,0,0,0,0,0,0,1} --torch.rand(10)
+n = getStateAndAction2stateAndRewardNetwork(DIMENSION_IN, DIMENSION_OUT)
 trainSeveralLossesNNGraph(n, {statesT, actions}, {statesT1, rewards}, NB_EPOCHS, LR, WEIGHT_IMPORTANCE_FOR_FIRST_INPUT)
 
 x=torch.ones(10,2);  -- or torch.randn(10,2)
-y=torch.Tensor(3); y:copy(x:select(2,1,1):narrow(1,1,3))
+y=torch.Tensor(3); y:copy(x:select(2,1,1):narrow(1,1,3)) --narrow
 
 -- 2nd Networks--
-local imgs = torch.Tensor({{1,2,3},{4,5,6},{7,8,9}})
--- m = getImageAndAction2stateAndRewardNetwork(DIMENSION_OUT)
+local imgs = torch.Tensor{{1,2,3},{4,5,6},{7,8,9}}
+-- m = getImageAndAction2stateAndRewardNetwork(DIMENSION_IN, DIMENSION_OUT)
 -- trainSeveralLossesNNGraph(m, imgs, states,  NB_EPOCHS, LR, WEIGHT_IMPORTANCE_FOR_FIRST_INPUT)

@@ -44,8 +44,8 @@ do
         python report_results.py
         has_command_finished_correctly
 
-        python distortion_crit.py
-        has_command_finished_correctly
+        #python distortion_crit.py  # short to compute, it's just that it doesn't seem to be very useful
+        #has_command_finished_correctly
     done
 done
 

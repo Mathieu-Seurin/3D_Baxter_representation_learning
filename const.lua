@@ -357,6 +357,8 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach, createNewM
         SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
 
     elseif DATA_FOLDER == COLORFUL or DATA_FOLDER == COLORFUL75 then
+        -- IMPORTANT: NOTE THAT BOTH THESE DATASETS HAVE CUSTOM TEST SETS THAT SHOULD BE USED, it is called sequence number record_150
+        -- because it contains all different colors in domain randomization for a more fair assessment of the KNN_MSE
         CLAMP_CAUSALITY = false --TODO: make false when continuous works
 
         FIXED_POS  = {0.6, 0.30, 0.10} -- starting point for every sequence

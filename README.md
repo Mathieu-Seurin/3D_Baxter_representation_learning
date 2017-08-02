@@ -277,8 +277,7 @@ export LD_LIBRARY_PATH=~/cuda:$LD_LIBRARY_PATH
 
 ~/torch/install/bin/luarocks install qtlua
 
-Chintala: I STRONGLY recommend that you guys use our packaged self-contained luajit+luarocks when using torch. With this repo:
-https://github.com/soumith/torch-distro
+Chintala: I STRONGLY recommend that you guys use our packaged self-contained luajit+luarocks when using torch. With this repo: https://github.com/soumith/torch-distro
 When there's system lua installed, things get messy with torch global install.
 Or
 1-paths source file should be revised to handle this issue. (first things first, might be the best solution)
@@ -302,6 +301,12 @@ Option c) https://github.com/torch/cutorch/issues/175
 
 ~/qtlua/bld$ ../configure --help
 
+
+
+Q: if some writing operation of model fails due to a previous run or first run, this may help:
+mkdir Log   [if it does not exist]
+rm lastModel.txt
+rm -r preload_folder
 
 
 

@@ -159,8 +159,17 @@ function getSiameseResNetForwardModel(Dimension)
     fwdModel:add(nextStateFromPrevStateAndAction)
 
     --Putting everything together
-    fwdModel = nn.Sequential()
-    fwdModel
+    --A network that contains two networks that looks the exact same but they are not a clon.
+
+    doppelganger = nn.Sequential()
+    doppelganger:add(nn.SplitTable(1))
+    m:add(nn.ParallelTable():add(nn.Linear(10, 20)):add(nn.Linear(10, 30)))
+    input = nn.Identity()()
+    input1, input2 = m(input):split(2)
+    m3 = nn.JoinTable(1)({input1, input2})
+
+    g = nn.gModule({input}, {m3})
+
     --nextState, next
     fwdModel = nn.joinTable{s_t, s_tplus1}
     local a,b = (model):split(2)
@@ -171,8 +180,7 @@ end
 function getSimpleLinearModel(Dimension)
     --Input: {image, action}
     --Output: {}
-
-
+    return forwardNetwork(DIMENSION_IN, DIMENSION_OUT)
 end
 
 M.getModel = getSimpleLinearModel
