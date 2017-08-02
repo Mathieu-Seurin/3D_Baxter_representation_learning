@@ -310,7 +310,7 @@ end
 ---------------------------------------------------------------------------------------
 function load_seq_by_id(id)
    local string_precomputed_data
-
+   
    if IS_INCEPTION then
       -- since the model require images to be a 3x299x299
       --and normalize differently, we need to adapt
