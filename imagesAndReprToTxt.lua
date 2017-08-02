@@ -121,16 +121,16 @@ end  --TODO call predict and add predict to script?
 
 local function main(params)
    print("\n\n>> imagesAndReprToTxt.lua")
-   set_hyperparams(params) --    print('In DATA_FOLDER: '..DATA_FOLDER..' params: ')- Overridden by the model loaded, therefore not used here: print(params)
-   print_hyperparameters(true, 'imagesAndReprToTxt.lua Hyperparams')
+   set_hyperparams(params, '', false) --    print('In DATA_FOLDER: '..DATA_FOLDER..' params: ')- Overridden by the model loaded, therefore not used here: print(params)
+   print_hyperparameters(false, 'imagesAndReprToTxt.lua Hyperparams')
 
    local images_folder = DATA_FOLDER
    local path, modelString
    folder_and_name = get_last_used_model_folder_and_name()
    path = folder_and_name[1]
    modelString = folder_and_name[2]
-
-   print('Last model used: '..path..'/'..modelString)
+   savedModel = path..'/'..modelString  --t7 file
+   print('Last model used: '..savedModel)
 
    -- if get_last_architecture_used(modelString) == 'AE' then
    --    assert(not(DIFFERENT_FORMAT), "For training the auto-encoder, the model architecture needs to be in the same format as BASE_TIMNET. Change in hyperparams.lua")
@@ -139,33 +139,37 @@ local function main(params)
    -- end
 
    -- NOT USEFUL ANYMORE : AE uses resnet now
+    if not file_exists(savedModel) then
+       print('SAVE_MODEL_T7_FILE = needs to be true (NECESSARY STEP TO RUN FULL EVALUATION PIPELINE (REQUIRED FILE BY imagesAndReprToTxt.lua)')
+       error(savedModel.." file should exist")
+    else
+       local  model = torch.load(savedModel)
+       if USE_CUDA then
+          model = model:cuda()
+       else
+          model = model:double()
+       end
 
-   local  model = torch.load(path..'/'..modelString)
-   if USE_CUDA then
-      model = model:cuda()
-   else
-      model = model:double()
-   end
+       if params.visualize_seq then
+          visualize_images_and_repr('saved_seq', model)
+       else
+          outStr = ''
+          tempSeq = {}
+          tempSeq = represent_all_images(images_folder, model)
 
-   if params.visualize_seq then
-      visualize_images_and_repr('saved_seq', model)
-   else
-      outStr = ''
-      tempSeq = {}
-      tempSeq = represent_all_images(images_folder, model)
+          table.sort(tempSeq, function (a,b) return a[1] < b[1] end)
+          tempSeqStr = ''
+          for key in pairs(tempSeq) do
+             tempSeqStr = tempSeqStr..tempSeq[key][2]..'\n'
+          end
+          path_to_output_file = path..'/'..LEARNED_REPRESENTATIONS_FILE
 
-      table.sort(tempSeq, function (a,b) return a[1] < b[1] end)
-      tempSeqStr = ''
-      for key in pairs(tempSeq) do
-         tempSeqStr = tempSeqStr..tempSeq[key][2]..'\n'
-      end
-      path_to_output_file = path..'/'..LEARNED_REPRESENTATIONS_FILE
-
-      print('Saving images and their learnt representations to file '..path_to_output_file)
-      file = io.open(path_to_output_file, 'w')
-      file:write(tempSeqStr)
-      file:close()
-   end
+          print('Saving images and their learnt representations to file '..path_to_output_file)
+          file = io.open(path_to_output_file, 'w')
+          file:write(tempSeqStr)
+          file:close()
+       end
+    end
 end
 
 -- Command-line options
@@ -173,9 +177,8 @@ local cmd = torch.CmdLine()
 cmd:option('-use_cuda', false, 'true to use GPU, false (default) for CPU only mode')
 cmd:option('-use_continuous', false, 'true to use a continuous action space, false (default) for discrete one (0.5 range actions)')
 cmd:option('-data_folder', MOBILE_ROBOT, 'Possible Datasets to use: staticButtonSimplest, mobileRobot, staticButtonSimplest, simpleData3D, pushingButton3DAugmented, babbling')
-cmd:option('-mcd', 0.5, 'Max. cosine distance allowed among actions for priors loss function evaluation (MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD)')
-cmd:option('-sigma', 0.1, "Sigma: denominator in continuous actions' extra factor (CONTINUOUS_ACTION_SIGMA)")
-
+cmd:option('-mcd', 0.4, 'Max. cosine distance allowed among actions for priors loss function evaluation (MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD)')
+cmd:option('-sigma', 0.4, "Sigma: denominator in continuous actions' extra factor (CONTINUOUS_ACTION_SIGMA)")
 cmd:option('-visualize_seq', false, "instead of computing representation for all images, just visualize a few for debugging purpose")
 
 local params = cmd:parse(arg)

@@ -46,7 +46,7 @@ EXTRAPOLATE_ACTION_CAUS = false
 
 --EXTRA PRIORS to apply:
 -- Creates a point where the robot wants the state to be very similar. Like a reference point for the robot.
-APPLY_BRING_CLOSER_REF_POINT = true
+APPLY_BRING_CLOSER_REF_POINT = false
 APPLY_BRING_CLOSER_REWARD = false
 APPLY_REWARD_PREDICTION_CRITERION = false
 ACTIVATE_PREDICTIVE_PRIORS = false -- Momentaneous substitution of APPLY_REWARD_PREDICTION_CRITERION
@@ -57,7 +57,7 @@ LR_DECAY = 3*1e-6
 SGD_METHOD = 'adam' -- Can be adam or adagrad
 
 BATCH_SIZE = 12
-NB_EPOCHS= 10
+NB_EPOCHS= 50
 
 DATA_AUGMENTATION = 0.01
 NORMALIZE_IMAGE = true
@@ -75,5 +75,3 @@ COEF_MSE = 1
 
 COEF_CLOSE=0.001
 COEF_FIX = 1
-
-DIMENSION_OUT=3

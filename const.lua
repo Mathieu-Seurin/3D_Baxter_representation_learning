@@ -16,12 +16,12 @@ require 'hyperparams'
 ---NOTE: THESE ARE DEFAULTS (IF NOT COMMAND LINE ARGS ARE PASSED), AND ARE OVERRIDEN BY DATA_FOLDER SPECIFIC CASES BELOW :
 ----------------------------------------------------------------------------------------------------------------------------
 USE_CUDA = true
-USE_SECOND_GPU = false
+USE_SECOND_GPU = true
 
 USE_CONTINUOUS = false
 
-MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.5
-CONTINUOUS_ACTION_SIGMA = 0.5
+MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.4  -- best so far for colorful75 with 4priors + fixed point
+CONTINUOUS_ACTION_SIGMA = 0.4
 DATA_FOLDER = MOBILE_ROBOT --works best!
 
 --===============================================
@@ -31,15 +31,20 @@ REP = "Rep"
 CAUS = "Caus"
 PROP = "Prop"
 TEMP = "Temp"
-BRING_CLOSER_REWARD = "make_reward_closer"
-BRING_CLOSER_REF_POINT = "fixed_point"
+BRING_CLOSER_REWARD = "Reward_closer"
+BRING_CLOSER_REF_POINT = "Fixed_point"
 ROUNDING_VALUE_FIX = 0.1  -- used in BRING_CLOSER_REF_POINT
-REWARD_PREDICTION_CRITERION= 'reward_prediction_criterion'
+REWARD_PREDICTION_CRITERION= 'Prediction Reward'
 ALL_PRIORS = {REP, CAUS,PROP,TEMP,BRING_CLOSER_REWARD, BRING_CLOSER_REF_POINT, REWARD_PREDICTION_CRITERION}
 --DEFAULTS BEING APPLIED (SET THEM IN HYPERPARAMS.LUA)
 PRIORS_CONFIGS_TO_APPLY ={{PROP, TEMP, CAUS, REP}}
 
+SAVE_MODEL_T7_FILE = true --NECESSARY STEP TO RUN FULL EVALUATION PIPELINE (REQUIRED FILE BY imagesAndReprToTxt.lua)
 -- ====================================================
+---- needed for non cuda mode?
+-- cutorch = require 'cutorch'
+-- cudnn = require 'cudnn'
+-- cunn = require 'cunn'
 
 if USE_CUDA then
     require 'cunn'
@@ -93,6 +98,7 @@ MIN_TABLE = {-10000,-10000} -- for x,y
 MAX_TABLE = {10000,10000} -- for x,y
 
 DIMENSION_IN = 2
+DIMENSION_OUT= 3
 
 REWARD_INDEX = 1  --3 reward values: -1, 0, 10
 INDEX_TABLE = {1,2} --column index for coordinate in state file (respectively x,y)
@@ -135,7 +141,6 @@ function addLeadingZero(number)
     if number >= 0 and number <= 9 then  return "0" .. number else return tostring(number)    end
 end
 
-
 ---------------------------------------------------------------------------------------
 -- Function :	priorsToString(params)
 --======================================================
@@ -159,7 +164,7 @@ end
 -- Input ():  modelApproach string, 2nd param adds model approach to model name
 -- Output ():
 ---------------------------------------------------------------------------------------
-function set_hyperparams(params, modelApproach)
+function set_hyperparams(params, modelApproach, createNewModelFolder)
     --overriding the defaults:
     USE_CUDA = params.use_cuda      --print ('Boolean param: ') -- type is boolean
     USE_CONTINUOUS = params.use_continuous
@@ -167,7 +172,7 @@ function set_hyperparams(params, modelApproach)
     CONTINUOUS_ACTION_SIGMA = params.sigma
     DATA_FOLDER = params.data_folder  --print('[Log: Setting command line dataset to '..params.data_folder..']') type is a str
     set_cuda_hyperparams(USE_CUDA)
-    set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach)
+    set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach, createNewModelFolder)
 end
 
 function set_cuda_hyperparams(USE_CUDA)
@@ -191,12 +196,10 @@ function set_cuda_hyperparams(USE_CUDA)
     end
 end
 
-function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach)
+function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach, createNewModelFolder)
     STRING_MEAN_AND_STD_FILE = PRELOAD_FOLDER..'meanStdImages_'..DATA_FOLDER..'.t7'
     -- print(MODEL_ARCHITECTURE_FILE) --./models/minimalNetModel      -- print(MODEL_ARCHITECTURE_FILE:match("(.+)/(.+)")) -- returns  ./models	minimalNetModel
     _, architecture_name = MODEL_ARCHITECTURE_FILE:match("(.+)/(.+)") --architecture_name, _ = split(architecture_name, ".")
-
-
 
     if DATA_FOLDER == SIMPLEDATA3D then
        DEFAULT_PRECISION = 0.05 -- for 'arrondit' function
@@ -204,8 +207,6 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach)
 
        MIN_TABLE = {0.42,-0.2,-10} -- for x,y,z doesn't really matter in fact
        MAX_TABLE = {0.8,0.7,10} -- for x,y,z doesn't really matter in fact
-
-       DIMENSION_IN = 3
 
        REWARD_INDICE = 2
        INDEX_TABLE = {2,3,4} --column indice for coordinate in state file (respectively x,y,z)
@@ -381,6 +382,8 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach)
 
         SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
         AVG_FRAMES_PER_RECORD = 250  --HINT: reduce for fast full epoch testing in CPU mode
+        NB_EPOCHS = 5 --otherwise, see hyperparams for default value. colorful75 converges in losses fast, as it has more images, around epoch 3-5 and therefore 5-10 epocs are enough, while for the rest of smaller #seqs (~50), the nr of epocs is 50.
+
     else
       print("No supported data folder provided, please add either of the data folders defined in hyperparams: "..BABBLING..", "..MOBILE_ROBOT.." "..SIMPLEDATA3D..' or others in const.lua' )
       os.exit()
@@ -401,7 +404,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach)
         IS_RESNET = true
     end
 
-    if string.find(MODEL_ARCHITECTURE_FILE, 'autoencoder_conv') then 
+    if string.find(MODEL_ARCHITECTURE_FILE, 'autoencoder_conv') then
        IS_RESNET = true -- AUTO_ENCODER USES RESNET AT THE MOMENT (encoding part)
     end
 
@@ -438,7 +441,9 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach)
     if APPLY_REWARD_PREDICTION_CRITERION then
        table.insert(PRIORS_CONFIGS_TO_APPLY[1], REWARD_PREDICTION_CRITERION)
     end
-
+    if RUN_FORWARD_MODEL then
+        PRIORS_CONFIGS_TO_APPLY = {{FORWARD_MODEL}}
+    end
     -- L1Smooth and cosDistance and max margin: compare with homemade MSDCriterion and replace if similar in the good practice of using native code
     --TODO PRIORS_CONFIGS_TO_APPLY.add('CosDist','L1SmoothDist','MaxMargin')
 
@@ -446,7 +451,6 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach)
     if USE_CONTINUOUS then  --otherwise, it is not used
         DEFAULT_PRECISION = 0.01
     end
-
     ------------------ Predictive priors settings---------
     ----------------------------------------------------------
     if ACTIVATE_PREDICTIVE_PRIORS then
@@ -456,23 +460,26 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach)
     end
 
     -- SAVING MODEL CONFIG
-    now = os.date("*t")
-    if USE_CONTINUOUS then
-        DAY = 'Y'..now.year..'_D'..addLeadingZero(now.day)..'_M'..addLeadingZero(now.month)..'_H'..addLeadingZero(now.hour)..'M'..addLeadingZero(now.min)..'S'..addLeadingZero(now.sec)..'_'..DATA_FOLDER..'_'..architecture_name..'_cont'..'_MCD'..MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD..'_S'..CONTINUOUS_ACTION_SIGMA..priorsToString(PRIORS_CONFIGS_TO_APPLY)
-        DAY = DAY:gsub("%.", "_")  -- replace decimal points by '_' for folder naming
-    else
-        DAY = 'Y'..now.year..'_D'..addLeadingZero(now.day)..'_M'..addLeadingZero(now.month)..'_H'..addLeadingZero(now.hour)..'M'..addLeadingZero(now.min)..'S'..addLeadingZero(now.sec)..'_'..DATA_FOLDER..'_'..architecture_name..priorsToString(PRIORS_CONFIGS_TO_APPLY)
+    if createNewModelFolder then
+        --create new model filename to be uniquely identified
+        now = os.date("*t")
+        if USE_CONTINUOUS then
+            DAY = 'Y'..now.year..'_D'..addLeadingZero(now.day)..'_M'..addLeadingZero(now.month)..'_H'..addLeadingZero(now.hour)..'M'..addLeadingZero(now.min)..'S'..addLeadingZero(now.sec)..'_'..DATA_FOLDER..'_'..architecture_name..'_cont'..'_MCD'..MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD..'_S'..CONTINUOUS_ACTION_SIGMA..priorsToString(PRIORS_CONFIGS_TO_APPLY)
+            DAY = DAY:gsub("%.", "_")  -- replace decimal points by '_' for folder naming
+        else
+            DAY = 'Y'..now.year..'_D'..addLeadingZero(now.day)..'_M'..addLeadingZero(now.month)..'_H'..addLeadingZero(now.hour)..'M'..addLeadingZero(now.min)..'S'..addLeadingZero(now.sec)..'_'..DATA_FOLDER..'_'..architecture_name..priorsToString(PRIORS_CONFIGS_TO_APPLY)
+        end
+        if modelApproach then --to add an extra keyword  to the model name
+            NAME_SAVE= modelApproach..'model'..DAY
+        else
+            NAME_SAVE= 'model'..DAY
+        end
+        SAVED_MODEL_PATH = LOG_FOLDER..NAME_SAVE
+        print ('The model will be saved in '..SAVED_MODEL_PATH)
     end
-    if modelApproach then
-        NAME_SAVE= modelApproach..'model'..DAY
-    else
-        NAME_SAVE= 'model'..DAY
-    end
-    SAVED_MODEL_PATH = LOG_FOLDER..NAME_SAVE
-    print ('saving model to '..SAVED_MODEL_PATH)
 end
 
-function print_hyperparameters(using_precomputed_model, extra_string_to_print)
+function print_hyperparameters(print_continuous_actions_config, extra_string_to_print)
     extra_string_to_print = extra_string_to_print or ''
     print(extra_string_to_print)
     print("============ Experiment: DATA_FOLDER USED =========\n",
@@ -481,73 +488,12 @@ function print_hyperparameters(using_precomputed_model, extra_string_to_print)
                         ")\nUSE_CUDA ",USE_CUDA,", USE_CONTINUOUS ACTIONS: ",USE_CONTINUOUS, " MODEL: ",MODEL_ARCHITECTURE_FILE,". PRIORS_CONFIGS_TO_APPLY", PRIORS_CONFIGS_TO_APPLY)
     print('APPLY: EXTRAPOLATE_ACTION, EXTRAPOLATE_ACTION_CAUS, APPLY_BRING_CLOSER_REWARD, APPLY_BRING_CLOSER_REF_POINT, APPLY_REWARD_PREDICTION_CRITERION: ')
     print(EXTRAPOLATE_ACTION,EXTRAPOLATE_ACTION_CAUS,APPLY_BRING_CLOSER_REWARD,APPLY_BRING_CLOSER_REF_POINT,APPLY_REWARD_PREDICTION_CRITERION)
-    if USE_CONTINUOUS and not using_precomputed_model then  --otherwise, it is not used
+    if print_continuous_actions_config then--USE_CONTINUOUS and not using_precomputed_model then  --otherwise, it is not used
         --if we are using a precomputed model stored in a file, the command line default parameters are not effective and thus we should not print them, as they will be contradicting the ones being applied on the precomputed model that is going to be preloaded
-        print ('MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD: ',MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD,' CONTINUOUS_ACTION_SIGMA: ', CONTINUOUS_ACTION_SIGMA)
+        --Keep separated ifs to avoid conflicts with default parameters
+        if USE_CONTINUOUS then
+            print ('MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD: ',MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD,' CONTINUOUS_ACTION_SIGMA: ', CONTINUOUS_ACTION_SIGMA)
+        end
     end
     print("\n================================")
 end
-
--- 49 (1 repeated by error) IMAGES TEST SET HANDPICKED TO SHOW VISUAL VARIABILITY
-IMG_TEST_SET = {
-'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00000.jpg',
-'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00012.jpg',
-'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00015.jpg',
-'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00042.jpg',
-'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00039.jpg',
-'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00065.jpg',
-'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00048.jpg',
-'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00080.jpg',
-'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00004.jpg',
-'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00078.jpg',
-
-'staticButtonSimplest/record_008/recorded_cameras_head_camera_2_image_compressed/frame00056.jpg',
-'staticButtonSimplest/record_008/recorded_cameras_head_camera_2_image_compressed/frame00047.jpg',
-'staticButtonSimplest/record_008/recorded_cameras_head_camera_2_image_compressed/frame00033.jpg',
-'staticButtonSimplest/record_008/recorded_cameras_head_camera_2_image_compressed/frame00005.jpg',
-'staticButtonSimplest/record_008/recorded_cameras_head_camera_2_image_compressed/frame00026.jpg',
-'staticButtonSimplest/record_008/recorded_cameras_head_camera_2_image_compressed/frame00056.jpg',
-
-'staticButtonSimplest/record_011/recorded_cameras_head_camera_2_image_compressed/frame00003.jpg',
-'staticButtonSimplest/record_011/recorded_cameras_head_camera_2_image_compressed/frame00056.jpg',
-'staticButtonSimplest/record_011/recorded_cameras_head_camera_2_image_compressed/frame00063.jpg',
-'staticButtonSimplest/record_011/recorded_cameras_head_camera_2_image_compressed/frame00035.jpg',
-'staticButtonSimplest/record_011/recorded_cameras_head_camera_2_image_compressed/frame00015.jpg',
-
-'staticButtonSimplest/record_019/recorded_cameras_head_camera_2_image_compressed/frame00009.jpg',
-'staticButtonSimplest/record_019/recorded_cameras_head_camera_2_image_compressed/frame00074.jpg',
-'staticButtonSimplest/record_019/recorded_cameras_head_camera_2_image_compressed/frame00049.jpg',
-
-'staticButtonSimplest/record_022/recorded_cameras_head_camera_2_image_compressed/frame00039.jpg',
-'staticButtonSimplest/record_022/recorded_cameras_head_camera_2_image_compressed/frame00085.jpg',
-'staticButtonSimplest/record_022/recorded_cameras_head_camera_2_image_compressed/frame00000.jpg',
-
-'staticButtonSimplest/record_031/recorded_cameras_head_camera_2_image_compressed/frame00000.jpg',
-'staticButtonSimplest/record_031/recorded_cameras_head_camera_2_image_compressed/frame00007.jpg',
-'staticButtonSimplest/record_031/recorded_cameras_head_camera_2_image_compressed/frame00070.jpg',
-
-'staticButtonSimplest/record_036/recorded_cameras_head_camera_2_image_compressed/frame00085.jpg',
-'staticButtonSimplest/record_036/recorded_cameras_head_camera_2_image_compressed/frame00023.jpg',
-'staticButtonSimplest/record_036/recorded_cameras_head_camera_2_image_compressed/frame00036.jpg',
-
-'staticButtonSimplest/record_037/recorded_cameras_head_camera_2_image_compressed/frame00053.jpg',
-'staticButtonSimplest/record_037/recorded_cameras_head_camera_2_image_compressed/frame00083.jpg',
-'staticButtonSimplest/record_037/recorded_cameras_head_camera_2_image_compressed/frame00032.jpg',
-
-'staticButtonSimplest/record_040/recorded_cameras_head_camera_2_image_compressed/frame00045.jpg',
-'staticButtonSimplest/record_040/recorded_cameras_head_camera_2_image_compressed/frame00003.jpg',
-'staticButtonSimplest/record_040/recorded_cameras_head_camera_2_image_compressed/frame00080.jpg',
-
-'staticButtonSimplest/record_048/recorded_cameras_head_camera_2_image_compressed/frame00034.jpg',
-'staticButtonSimplest/record_048/recorded_cameras_head_camera_2_image_compressed/frame00059.jpg',
-'staticButtonSimplest/record_048/recorded_cameras_head_camera_2_image_compressed/frame00089.jpg',
-'staticButtonSimplest/record_048/recorded_cameras_head_camera_2_image_compressed/frame00030.jpg',
-
-'staticButtonSimplest/record_050/recorded_cameras_head_camera_2_image_compressed/frame00064.jpg',
-'staticButtonSimplest/record_050/recorded_cameras_head_camera_2_image_compressed/frame00019.jpg',
-'staticButtonSimplest/record_050/recorded_cameras_head_camera_2_image_compressed/frame00008.jpg',
-
-'staticButtonSimplest/record_052/recorded_cameras_head_camera_2_image_compressed/frame00000.jpg',
-'staticButtonSimplest/record_052/recorded_cameras_head_camera_2_image_compressed/frame00008.jpg',
-'staticButtonSimplest/record_052/recorded_cameras_head_camera_2_image_compressed/frame00068.jpg',
-'staticButtonSimplest/record_052/recorded_cameras_head_camera_2_image_compressed/frame00025.jpg'}

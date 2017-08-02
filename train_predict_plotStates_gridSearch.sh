@@ -20,12 +20,12 @@ function has_command_finished_correctly {
 
 # losses result in being nan for MCD 0.9 and sigma 0.01
 #for max_cos_dis in 0.01 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9  #for max_cos_dis in 0.9
-for max_cos_dis in 0.2 0.4 0.5 0.6 0.8 0.9 0.95 #0.4 0.5 0.8
+for max_cos_dis in 0.1 0.2 0.4 0.5 0.6 0.8 0.9 0.95 #0.4 0.5 0.8
 do
     #for s in  0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9
-    for s in 0.2 0.4 0.5 0.6 0.8 0.9 #0.2 0.4 0.5
+    for s in 0.1 0.2 0.4 0.5 0.6 0.8 0.9 #0.2 0.4 0.5
     do
-        echo "\n ********** Running pipeline for finetuning mcd: $max_cos_dis and sigma: $s *************"
+        echo " ********** Running pipeline for finetuning mcd: $max_cos_dis and sigma: $s *************"
         qlua script.lua  -use_cuda -use_continuous -mcd $max_cos_dis -sigma $s -data_folder mobileRobot #complexData #colorful  #stati$
         has_command_finished_correctly
 
@@ -44,6 +44,8 @@ do
         python report_results.py
         has_command_finished_correctly
 
+        python distortion_crit.py
+        has_command_finished_correctly
     done
 done
 

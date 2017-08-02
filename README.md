@@ -238,8 +238,11 @@ $ th
 luarocks install torchnet
 luarocks install qtlua
 
+* Q: bash script argument fails with error: invalid type for option -mcd (should be number)
+A: the error disappears if using instead th instead of qlua. Some versions of Ubuntu 14.04 do not handle well qtlua, see versions.
+
 * torchnet' not found
-The issue can be related to qlua not being properly installed. Install from https://github.com/LuaDist/qtlua
+The issue can be related to qlua not being properly installed. Avoid installing from https://github.com/LuaDist/qtlua  and only INSTALL FROM: https://github.com/torch/qtlua
 if luarocks install qtlua fails with
 ```
 /tmp/luarocks_qtlua-scm-1-MmsVrW/qtlua/qtlua/qtluautils.cpp: In function ‘const char* pushnexttemplate(lua_State*, const char*)’:
@@ -299,6 +302,27 @@ Option c) https://github.com/torch/cutorch/issues/175
 
 ~/qtlua/bld$ ../configure --help
 
+
+
+
+## Observations on datasets
+
+* Colorful75 converges in losses fast, as it has more images, around epoch 3-5 and therefore 5-10 epocs are enough, while for the rest of smaller #seqs (~50), the nr of epocs is 50.
+
+But before changing this parameter while testing, make sure the error converges fast in the first iterations when running. Currently for Colorful75 it is at --------------Epoch : 17 ---------------
+ [================================= 131/131 ============================>]  Tot: 4m36s | Step: 2s114ms   
+Loss Temp	0.0033959985800469
+Loss Prop	0.079365891051353
+Loss Caus	0.14184848366082
+Loss Rep	0.044838557231332
+Loss Fix (BRING_CLOSER_REF_POINT) 	0.0047991881112797
+
+
+## Visualizing Graphs
+Use nngraph_visualization.lua
+Pre-requirements:
+sudo apt-get install graphviz -y
+luarocks install nngraph
 
 
 ## REFERENCES

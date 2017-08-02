@@ -81,5 +81,3 @@ print far_str
 score_file.write(far_str+'\n')
 
 score_file.close()
-
-

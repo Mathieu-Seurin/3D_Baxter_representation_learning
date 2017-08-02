@@ -140,7 +140,7 @@ function train(Models, priors_used)
           xlua.progress(numBatch, NB_BATCHES)
        end
 
-       print("Loss Temp", TOTAL_LOSS_TEMP/NB_BATCHES/BATCH_SIZE)
+       print("Loss Temp", TOTAL_LOSS_TEMP/NB_BATCHES/BATCH_SIZE)  ---{*}
        print("Loss Prop", TOTAL_LOSS_PROP/NB_BATCHES/BATCH_SIZE)
        print("Loss Caus", TOTAL_LOSS_CAUS/NB_BATCHES/BATCH_SIZE)
        print("Loss Rep", TOTAL_LOSS_REP/NB_BATCHES/BATCH_SIZE)
@@ -161,7 +161,7 @@ function train(Models, priors_used)
     --        print("Loss MSE_CRITERION ", TOTAL_LOSS_MSE/NB_BATCHES/BATCH_SIZE)
     --    end
 
-       save_model(Models.Model1, NAME_SAVE) --TODO Do we need to write NB_EPOCH TIMES? isnt enough the last time to write once and not overwrite NB_EPOCH TIMES?
+       save_model(Models.Model1, NAME_SAVE, SAVE_MODEL_T7_FILE) --TODO Do we need to write NB_EPOCH TIMES? isnt enough the last time to write once and not overwrite NB_EPOCH TIMES?
    end
    log_model_params()
    return Models.Model1, NAME_SAVE
@@ -171,7 +171,7 @@ end
 
 local function main(params)
     print("\n\n>> script.lua: main model builder")
-    set_hyperparams(params)
+    set_hyperparams(params, '', true) --second param adds extra keyword to the model name if desired
     print('cmd default params (overridden by following set_hyperparams): ')
     print(params)
     print_hyperparameters(false, 'script.lua Hyperparams:')
@@ -215,7 +215,7 @@ local function main(params)
 
        if USE_CUDA then
           Model=Model:cuda()
-       end
+      end  -- in non cuda mode, cutorch = require 'cutorch'      cudnn = require 'cudnn' required?
 
        parameters, gradParameters = Model:getParameters()
        -- In siamese networks we need one copy of the network per input (image) we want to compare at the same time, because otherwise,
@@ -253,9 +253,13 @@ local cmd = torch.CmdLine()
 cmd:option('-use_cuda', false, 'true to use GPU, false (default) for CPU only mode')
 cmd:option('-use_continuous', false, 'true to use a continuous action space, false (default) for discrete one (0.5 range actions)')
 cmd:option('-data_folder', MOBILE_ROBOT, 'Possible Datasets to use: staticButtonSimplest, mobileRobot, staticButtonSimplest, simpleData3D, pushingButton3DAugmented, babbling')
-cmd:option('-mcd', 0.5, 'Max. cosine distance allowed among actions for priors loss function evaluation (MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD)')
-cmd:option('-sigma', 0.1, "Sigma: denominator in continuous actions' extra factor (CONTINUOUS_ACTION_SIGMA)")
+cmd:option('-mcd', 0.4, 'Max. cosine distance allowed among actions for priors loss function evaluation (MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD)')
+cmd:option('-sigma', 0.4, "Sigma: denominator in continuous actions' extra factor (CONTINUOUS_ACTION_SIGMA)")
 --TODO Set best mcd and sigma after grid search
 
 local params = cmd:parse(arg)  --TODO function to get all command line arguments that are the same right now for all Lua scripts, only in one function.
 main(params)
+
+
+----
+--[*} https://discuss.pytorch.org/t/how-to-combine-multiple-criterions-to-a-loss-function/348/8  Iterating over a batch and summing up the losses should work too, but is unnecessary, since the criterions already support batched inputs. It probably doesn't work for you, because criterions average the loss over the batch, instead of summing them (this can be changed using the size_average constructor argument). So if you have very large batches, your gradients will get multiplied by the batch size, and will likely blow up your network. Just divide the loss by the batch size and it should be fine.]

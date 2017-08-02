@@ -37,7 +37,7 @@ function custom(Dimension)
     decoder:add(cudnn.ReLU())
     decoder:add(nn.Linear(100,500))
     decoder:add(cudnn.ReLU())
-    local size = 25
+    local size = 28
     decoder:add(nn.Linear(500,Dimension * size * size))
     decoder:add(nn.View(Dimension,size,size):setNumInputDims(1))
 
@@ -77,7 +77,7 @@ function timnet_r(Dimension)
     decoder:add(cudnn.ReLU())
     decoder:add(nn.Linear(100,500))
     decoder:add(cudnn.ReLU())
-    local size = 25
+    local size = 28
     decoder:add(nn.Linear(500,Dimension * size * size))
     decoder:add(nn.View(Dimension,size,size):setNumInputDims(1))
 
