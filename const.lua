@@ -16,7 +16,7 @@ require 'hyperparams'
 ---NOTE: THESE ARE DEFAULTS (IF NOT COMMAND LINE ARGS ARE PASSED), AND ARE OVERRIDEN BY DATA_FOLDER SPECIFIC CASES BELOW :
 ----------------------------------------------------------------------------------------------------------------------------
 USE_CUDA = true
-USE_SECOND_GPU = true
+USE_SECOND_GPU = false
 
 USE_CONTINUOUS = false
 
@@ -303,8 +303,10 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach)
       AVG_FRAMES_PER_RECORD = 100
 
     elseif DATA_FOLDER == STATIC_BUTTON_SIMPLEST then
-        CLAMP_CAUSALITY = false --TODO: make false when continuous works
+        CLAMP_CAUSALITY = true --TODO: make false when continuous works
         -- A point where the robot wants the state to be very similar. Like a reference point for the robot
+        FIXED_POS = {0.607, 0.017, -0.143}
+        ROUNDING_VALUE_FIX = 0.04
 
         MIN_TABLE = {0.42,-0.2,-10} -- for x,y,z
         MAX_TABLE = {0.8,0.7,10} -- for x,y,z

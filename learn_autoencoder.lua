@@ -113,6 +113,7 @@ function train_Epoch(optimizer, list_folders_images,list_txt,Log_Folder)
       print('--------------Epoch : '..epoch..' ---------------')
       for iter=1, nbIter do
          batch=getRandomBatchFromSeparateList(BATCH_SIZE, 'regular') --just taking random images from all sequences
+
          batch=batch:cuda()
 
          loss_iter=AE_Training(model,batch, optimizer)
@@ -141,7 +142,7 @@ function set_AE_hyperparams(params)
 
    BATCH_SIZE= 20
    NB_EPOCHS = 50
-   NUM_HIDDEN = 3
+   NUM_HIDDEN = DIMENSION_OUT
    NOISE = true
    if params.optimiser=="sgd" then  optimizer = optim.sgd end
    if params.optimiser=="rmsprop" then  optimizer = optim.rmsprop end
@@ -179,7 +180,7 @@ local function main(params)
     image_height=IM_HEIGHT
 
     require('./models/autoencoder_conv')
-    model = getModel()
+    model = getModel(NUM_HIDDEN)
     print(model)
     model=model:cuda()
 

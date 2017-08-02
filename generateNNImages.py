@@ -59,7 +59,7 @@ if len(sys.argv) == 4:
     print """====================================
     WARNING: DATASET IS SET BY HAND HERE  (IN ALL PYTHON SCRIPTS, take into account when running pipeline scripts such as gridsearch): MOBILE ROBOT FOR NOW
     ============================================="""
-    data_folder = 'mobileRobot'
+    data_folder = get_data_folder_from_model_name(path_to_model)
 else:
     lastModelFile = open(LAST_MODEL_FILE)
     path_to_model = lastModelFile.readline()[:-1]

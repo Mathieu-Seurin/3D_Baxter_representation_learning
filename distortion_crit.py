@@ -25,8 +25,8 @@ data_folder = get_data_folder_from_model_name(path_to_model)
 file_representation_string=path_to_model+"/"+LEARNED_REPRESENTATIONS_FILE
 images, representations = parse_repr_file(file_representation_string)
 
-true_states = parse_true_state_file()
-
+#data_folder = 'staticButtonSimplest'
+true_states = parse_true_state_file(data_folder)
 
 # convert learned states to numpy
 learned_states = np.asarray([map(float,x) for x in representations])
