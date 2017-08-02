@@ -172,6 +172,7 @@ function getSimpleLinearModel(Dimension)
     --Input: {image, action}
     --Output: {}
 
+
 end
 
 M.getModel = getSimpleLinearModel

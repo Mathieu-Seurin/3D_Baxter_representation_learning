@@ -21,6 +21,14 @@ DATA_FOLDER = 'mobileRobot'
 --https://github.com/torch/nngraph#a-network-with-2-inputs-and-2-outputs
 --Todo: weight decay https://arxiv.org/pdf/1703.05298.pdf
 
+function printNetworkGraph(gmodule)
+    -- gmod is what we send to forward and backward pass
+    graph.dot(gmodule.fg, 'Forward Graph')
+    graph.dot(gmodule.bg, 'Backward Graph')
+    -- param, grad = net:getParameters() --returns all weights and the gradients of the network in two 2D vector
+    -- print('params: ',param, 'grad: ',grad)
+    -- plot_loss()
+end
 
 function sequentialTorchNNExample()
    mlp= nn.Sequential();       --Create a network that takes a Tensor as input
@@ -115,20 +123,21 @@ end
     -- saved in grad can be used to stop the training procedure.
     -- Another regularization method can be accomplished by implementing the weight decay method
 ---------------------------------------------------------------------------------------
-function trainNN(net, x, y, epochs, LR)
-    print('Torch.NN Train: x and y and sizes: ',x, y, x:size(), y:size())
-    criterion = nn.MSECriterion()
-    local loss = torch.Tensor(epochs):fill(0) -- training loss initialization
-    for i=1, epochs do             -- A few steps of training such a network..
-       pred = net:forward(x) --network forward step
-       loss[i] = criterion:forward(pred,y) -- network error evaluation (output, target)
-       local gradients = criterion:backward(pred, y); --loss gradients
-       net:zeroGradParameters(); -- zero reset of gradients
-       net:backward(x, gradients); --network backward step  (outputs, target)
-       net:updateParameters(LR); --given the LR, update parameters
-       print('Error (MSE):', loss[i])
-    end
-end
+-- function trainNN(net, x, y, epochs, LR)
+--     print('Torch.NN Train: x and y and sizes: ',x, y, x:size(), y:size())
+--     criterion = nn.MSECriterion()
+--     local loss = torch.Tensor(epochs):fill(0) -- training loss initialization
+--     for i=1, epochs do             -- A few steps of training such a network..
+--        pred = net:forward(x) --network forward step
+--        loss[i] = criterion:forward(pred,y) -- network error evaluation (output, target)
+--        local gradients = criterion:backward(pred, y); --loss gradients
+--        net:zeroGradParameters(); -- zero reset of gradients
+--        net:backward(x, gradients); --network backward step  (outputs, target)
+--        net:updateParameters(LR); --given the LR, update parameters
+--        print('Error (MSE):', loss[i])
+--     end
+--     return net:evaluate()  --Needed in nngraph too? only for sequential models?
+-- end
 
 
 ----------------
@@ -144,10 +153,6 @@ function updateGradient(net, x, y, criterion, learningRate)
     net:backward(x, gradients); --network backward step  (outputs, target)
     net:updateParameters(LR); --given the LR, update parameters
     return loss
-    -- param, grad = net:getParameters() --returns all weights and the gradients of the network in two 2D vector
-    -- print('params: ',param, 'grad: ',grad)
-    -- plot_loss()
-    -- return net:evaluate()  --Needed in nngraph too?
 end
 
 --Uses 2 losses, one per output being optimized
@@ -181,25 +186,39 @@ function trainNNGraph(net, input, output, epochs, LR)
 end
 ---------------------
 --Torch.nngraph Version Network
+-- state_out_dim is a finetunable param. Initially, as in Jonchowscki, 2
+--
 ---------------------
-function getStateAndAction2stateAndRewardNetwork(DIMENSION_OUT)
+function getStateAndAction2stateAndRewardNetwork(state_in_dim, state_out_dim)
     -- Input: State representation (s_t) and action
     -- Output: State representation (next state s_t+1) and reward
     -- size mismatch, m1: [8 x 2], m2: [1 x 2] at /tmp/luarocks_torch-scm-1-1606/torch7/lib/TH/generic/THTensorMath.c:1293
+    -- ReLU in pyTorch:  import torch.nn.functional as F .. x = F.relu( Conv2d(20, 20, 5)
+    -- ReLU in Torch: nn.ReLU
+    -- nn.HardShrink applies the hard shrinkage function element-wise to the input Tensor. lambda is set to 0.5 by default.
+    -- HardShrinkage operator is defined as:
+    --        ⎧ x, if x >  lambda
+    -- f(x) = ⎨ x, if x < -lambda
+    --        ⎩ 0, otherwise
+    -- A)
+    identity_for_state = nn.Identity(state_in_dim)
+    identity_for_action = nn.Identity(state_in_dim)
+    inStateT = nn.Linear(state_in_dim, state_out_dim)(identity_for_state)
+    inAction = nn.Linear(state_in_dim, state_out_dim)(identity_for_action)
+    -- B)
+    -- inStateT = nn.Linear(state_in_dim, state_out_dim)() -- Linear layer with input size 1 and output size 2
+    -- inAction = nn.Linear(state_in_dim, state_out_dim)()
+    outStateT1 = nn.ReLu()(nn.Linear(state_out_dim, state_in_dim)(inStateT)) -- equivalent to applying left to right or what in Python would be Linear(Tanh(h1))
+    outRewardT = nn.HardShrink(0)(nn.Linear(state_out_dim, state_in_dim)(inAction)) --NOTE Reward T or T+1?
+    --stateAndAction = nn.Concat()({hh1, hh2}) --Combining them by  CONCAT? before or after the activ function?
 
-    inState = nn.Linear(1, 2)()
-    inAction = nn.Linear(1, 2)()
-    hh1 = nn.Linear(2, 1)(nn.Tanh()(inState)) -- equvalent to applying left to right or what in Python would be Linear(Tanh(h1))
-    hh2 = nn.Linear(2, 1)(nn.Tanh()(inAction))
-    stateAndAction = nn.Concat()({hh1, hh2}) --Combining them by  CONCAT?
 
-    --	 nn.Concat, passes the same input to all the parallel branches.
-    outState = nn.Sigmoid()(stateAndAction)
-    outReward = nn.Tanh()(stateAndAction)
-    gmod = nn.gModule({inState, inAction}, {outState, outReward}) -- Parameters are Input and Output to our network  --Alterhative to nn.JoinTable?
-    -- gmod is what we send to forward and backward pass
-    -- graph.dot(gmod.fg, 'Forward Graph')
-    -- graph.dot(gmod.bg, 'Backward Graph')
+    --it in a 2 tensor input 2 tensor output network to create a bottle neck -- nn.Concat concatenates the output of one layer of "parallel" modules along the provided dimension"
+    --outState = nn.ReLU()(stateAndAction) --nn.Sigmoid()(stateAndAction)
+    --No need for any activ. function at all because our states should not be constrained in any range outReward = nn.HardShrink(0)(stateAndAction)
+    --For rewards of -1, 0 and 10 ->TODO: is it a problem to map 10 to 1? renormalize? nn.Tanh()(stateAndAction)
+    gmod = nn.gModule({inStateT, inAction}, {outStateT1, outRewardT}) -- Parameters are Input and Output to our network  --Alterhative to nn.JoinTable?
+    --printNetworkGraph(gmod)
     return gmod
 end
 
@@ -224,8 +243,6 @@ end
 --     outReward = nn.Tanh()(statePlusRw)
 --     gmod = nn.gModule({inImg, inAction}, {outState, outReward}) -- Parameters are Input and Output to our network  --Alterhative to nn.JoinTable?
 --     -- gmod is what we send to forward and backward pass
---     graph.dot(gmod.fg, 'Forward Graph')
---     -- graph.dot(gmod.bg, 'Backward Graph')
 --     return gmod
 -- end
 
@@ -235,14 +252,11 @@ function updateGradient(net, x, y, criterion, learningRate)
     print("prediction: ", y_pred)
     local output = criterion:forward(y_pred, y) --    output = mc:forward(x, y) --NOTE: how is different from applying to (y_pred, y)?
     local gradients = criterion:backward(y_pred, y)
-    net:zeroGradParameters()
+    net:zeroGradParameters() --sets them to zero, needs to be done in each fwd and backward update, otherwise Torch internally accumulates the sum of all gradients
     net:backward(x, gradients)
     net:updateParameters(learningRate)
 
-    -- param, grad = net:getParameters() --returns all weights and the gradients of the network in two 2D vector
-    -- print('params: ',param, 'grad: ',grad)
-    -- plot_loss()
-    -- return net:evaluate()  --Needed in nngraph too?
+    net:evaluate() --Best place is here (once per epoch) or once per whole training?
 end
 
 --sequentialTorchNNExample()
