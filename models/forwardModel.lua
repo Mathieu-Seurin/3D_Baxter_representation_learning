@@ -1,6 +1,7 @@
 -- tnt = require 'torchnet'
 -- vision = require 'torchnet-vision'
--- nngraph = require 'nngraph'
+require 'nn'
+require 'nngraph'
 -----------------------------------------
 -- in order to provide a prediction of next state, we need to predict the reward of
 --current state (given the state and the action taken).

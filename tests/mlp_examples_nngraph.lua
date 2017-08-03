@@ -68,38 +68,6 @@ function sequentialTorchNNExample()
    end
 end
 
-------------
---Torch.nngraph Version: more modularity and power than Torch.nn
--- TEST
-------------
-function twoInputs2OutputsNNGraph()
-    print('2 input 2 output model')
-    h1 = nn.Linear(20, 20)() --Linear takes in a vector of size 20
-    h2 = nn.Linear(10, 10)()
-    hh1 = nn.Linear(20, 1)(nn.Tanh()(h1)) -- equvalent to applying left to right or what in Python would be Linear(Tanh(h1))
-    hh2 = nn.Linear(10, 1)(nn.Tanh()(h2))
-    madd = nn.CAddTable()({hh1, hh2})
-    oA = nn.Sigmoid()(madd)
-    oB = nn.Tanh()(madd)
-    gmod = nn.gModule({h1, h2}, {oA, oB})
-
-    x1 = torch.rand(20)
-    x2 = torch.rand(10)
-
-    gmod:updateOutput({x1, x2})
-    gmod:updateGradInput({x1, x2}, {torch.rand(1), torch.rand(1)})
-    --graph.dot(gmod.fg, 'Big MLP 2I2O')
-    -- Alternatively, you can use - to make your code looks like the data flow:
-    -- h1 = - nn.Linear(20,20)
-    -- h2 = - nn.Linear(10,10)
-    -- hh1 = h1 - nn.Tanh() - nn.Linear(20,1)
-    -- hh2 = h2 - nn.Tanh() - nn.Linear(10,1)
-    -- madd = {hh1,hh2} - nn.CAddTable()
-    -- oA = madd - nn.Sigmoid()
-    -- oB = madd - nn.Tanh()
-    -- gmod = nn.gModule( {h1,h2}, {oA,oB} )
-end
-
 ---------------------------------------------------------------------------------------
 -- Function :Uses Torch.nn Version, from https://arxiv.org/pdf/1703.05298.pdf
 -- forward(input) returns the output of the multi layer perceptron w.r.t the given input; it updates
@@ -160,6 +128,17 @@ function updateGradient(net, x, y, criterion, learningRate)
     return loss
 end
 
+--1 unique loss
+function trainNNGraph(net, input, output, epochs, LR)
+    local MSECrit = nn.MSECriterion() --.cuda()
+    print('trainNNGraph: input, output and sizes: ',input, output, input:size(), output:size())
+    local loss = torch.Tensor(epochs):fill(0) -- training loss initialization
+    for i=1, epochs do             -- A few steps of training such a network..
+       loss[i] = updateGradient(net, input, output, MSECrit, LR)
+       print('Error (MSE loss):', loss[i])
+    end
+    net:evaluate() --Should be done only once per whole training, needed really only if doing dropout
+end
 
 --Uses 2 losses, one per output being optimized
 function trainSeveralLossesNNGraph(net, input, output, epochs, LR, weightImportanceForFirstInput)
@@ -185,17 +164,29 @@ function trainSeveralLossesNNGraph(net, input, output, epochs, LR, weightImporta
     net:evaluate() --Should be done only once per whole training, needed really only if doing dropout
 end
 
---1 unique loss
-function trainNNGraph(net, input, output, epochs, LR)
-    local MSECrit = nn.MSECriterion() --.cuda()
-    print('trainNNGraph: input, output and sizes: ',input, output, input:size(), output:size())
-    local loss = torch.Tensor(epochs):fill(0) -- training loss initialization
-    for i=1, epochs do             -- A few steps of training such a network..
-       loss[i] = updateGradient(net, input, output, MSECrit, LR)
-       print('Error (MSE loss):', loss[i])
-    end
-    net:evaluate() --Should be done only once per whole training, needed really only if doing dropout
+------------
+--Torch.nngraph Version: more modularity and power than Torch.nn
+-- TEST
+------------
+function twoInputs2OutputsNNGraph()
+    --print('2 input 2 output model')
+    h1 = nn.Linear(20, 20)() --Linear takes in a vector of size 20
+    h2 = nn.Linear(10, 10)()
+    hh1 = nn.Linear(20, 1)(nn.Tanh()(h1)) -- equvalent to applying left to right or what in Python would be Linear(Tanh(h1))
+    hh2 = nn.Linear(10, 1)(nn.Tanh()(h2))
+    madd = nn.CAddTable()({hh1, hh2})
+    oA = nn.Sigmoid()(madd)
+    oB = nn.Tanh()(madd)
+    gmod = nn.gModule({h1, h2}, {oA, oB})
+
+    x1 = torch.rand(20)
+    x2 = torch.rand(10)
+
+    gmod:updateOutput({x1, x2})
+    gmod:updateGradInput({x1, x2}, {torch.rand(1), torch.rand(1)})
+    --graph.dot(gmod.fg, 'Big MLP 2I2O')
 end
+
 ---------------------
 --Torch.nngraph Version Network
 -- state_out_dim is a finetunable param. Initially, as in Jonchowscki, 2
@@ -244,28 +235,28 @@ function getStateAndAction2stateAndRewardNetwork(state_in_dim, state_out_dim)
 end
 
 
--- function getImageAndAction2stateAndRewardNetwork(DIMENSION_OUT)
---     -- Input: State representation (s_t) and action
---     -- Output: State representation (next state s_t+1) and reward
---     --TOOD qlua: /home/natalia/torch/install/share/lua/5.2/nn/Linear.lua:66: size mismatch, m1: [8 x 2], m2: [20 x 20]
---     -- parents for nodes that do computation. Here is the same addition example:
---     -- x1 = nn.Identity()() --NOTE: When to use input Identity vs input Layer directly such as Linear?
---     -- x2 = nn.Identity()()
---
---     inImg = nn.Linear(1, 2)()
---     inAction = nn.Linear(1, 2)()
---     hh1 = nn.Linear(2, 1)(nn.Tanh()(inImg)) -- equivalent to applying left to right or what in Python would be Linear(Tanh(h1))
---     hh2 = nn.Linear(2, 1)(nn.Tanh()(inAction)) --NOTE Linear layers always map to 1 as output in second param?
---     -- Tanh activation function because our rewards can be in [-1, 1], if in (0, 1) use Sigmoid?
---     statePlusRw = nn.Concat()({hh1, hh2}) --Combining them by  CONCAT?
---
---     --	 nn.Concat, passes the same input to all the parallel branches.
---     outState = nn.Sigmoid()(statePlusRw)
---     outReward = nn.Tanh()(statePlusRw)
---     gmod = nn.gModule({inImg, inAction}, {outState, outReward}) -- Parameters are Input and Output to our network  --Alterhative to nn.JoinTable?
---     -- gmod is what we send to forward and backward pass
---     return gmod
--- end
+function getImageAndAction2stateAndRewardNetwork(state_dim_in, state_dim_out)
+    -- Input: State representation (s_t) and action
+    -- Output: State representation (next state s_t+1) and reward
+    --TOOD qlua: /home/natalia/torch/install/share/lua/5.2/nn/Linear.lua:66: size mismatch, m1: [8 x 2], m2: [20 x 20]
+    -- parents for nodes that do computation. Here is the same addition example:
+    -- x1 = nn.Identity()() --NOTE: When to use input Identity vs input Layer directly such as Linear?
+    -- x2 = nn.Identity()()
+
+    inImg = nn.Linear(1, 2)()
+    inAction = nn.Linear(1, 2)()
+    hh1 = nn.Linear(2, 1)(nn.Tanh()(inImg)) -- equivalent to applying left to right or what in Python would be Linear(Tanh(h1))
+    hh2 = nn.Linear(2, 1)(nn.Tanh()(inAction)) --NOTE Linear layers always map to 1 as output in second param?
+    -- Tanh activation function because our rewards can be in [-1, 1], if in (0, 1) use Sigmoid?
+    statePlusRw = nn.Concat()({hh1, hh2}) --Combining them by  CONCAT?
+
+    --	 nn.Concat, passes the same input to all the parallel branches.
+    outState = nn.Sigmoid()(statePlusRw)
+    outReward = nn.Tanh()(statePlusRw)
+    gmod = nn.gModule({inImg, inAction}, {outState, outReward}) -- Parameters are Input and Output to our network  --Alterhative to nn.JoinTable?
+    -- gmod is what we send to forward and backward pass
+    return gmod
+end
 
 -------------------------------------------------------------------------------
 
@@ -285,6 +276,8 @@ local statesT = torch.Tensor{{0,1},{1,1}, {1,0},{1,-1},{0,-1},{-1,-1},{-1,0},{-1
 local actions = torch.Tensor{{0,1},{1,1}, {1,0},{1,-1},{0,-1},{-1,-1},{-1,0},{-1,1}}
 local statesT1 = torch.Tensor{{1,1}, {1,0},{1,-1},{0,-1},{-1,-1},{-1,0},{-1,1},{0,1}}
 local rewards = torch.Tensor{0,0,0,0,0,0,0,1} --torch.rand(10)
+-- print(statesT)
+-- print(type(statesT))
 n = getStateAndAction2stateAndRewardNetwork(DIMENSION_IN, DIMENSION_OUT)
 trainSeveralLossesNNGraph(n, {statesT, actions}, {statesT1, rewards}, NB_EPOCHS, LR, WEIGHT_IMPORTANCE_FOR_FIRST_INPUT)
 

@@ -73,6 +73,14 @@ function get_last_architecture_used(model_name)
   end
 end
 
+function table2tensor(table)
+    --t2 = torch.Tensor(table)--{table})
+    -- print('converted to tensor')
+    -- print(type(t2))
+    -- print(t2)
+    return torch.Tensor(table)
+end
+
 ---------------------------------------------------------------------------------------
 -- Function :save_model(model,path)
 -- Input ():
@@ -310,7 +318,7 @@ end
 ---------------------------------------------------------------------------------------
 function load_seq_by_id(id)
    local string_precomputed_data
-   
+
    if IS_INCEPTION then
       -- since the model require images to be a 3x299x299
       --and normalize differently, we need to adapt
