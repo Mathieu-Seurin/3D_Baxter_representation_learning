@@ -18,7 +18,7 @@ require 'definition_priors'
 require 'const'
 -- try to avoid global variable as much as possible
 
-function Rico_Training(Models,priors_used)
+function Rico_Training(Models, priors_used)
    local rep_criterion=get_Rep_criterion()
    local prop_criterion=get_Prop_criterion()
    local caus_criterion=get_Caus_criterion()
@@ -134,7 +134,7 @@ function train(Models, priors_used)
 
        TOTAL_LOSS_TEMP,TOTAL_LOSS_CAUS,TOTAL_LOSS_PROP, TOTAL_LOSS_REP, TOTAL_LOSS_CLOSE, TOTAL_LOSS_FIX, TOTAL_LOSS_REWARD_PRED, TOTAL_LOSS_MSE = 0,0,0,0,0,0,0,0
 
-       xlua.progress(0, NB_BATCHES)
+       xlua.progress(0, NB_BATCHES) --prints progress bar for given epoch
        for numBatch=1, NB_BATCHES do
           Loss, Grad = Rico_Training(Models,priors_used)
           xlua.progress(numBatch, NB_BATCHES)
