@@ -15,12 +15,24 @@ require 'nngraph'
 -- SEE DOCUMENTATION IN https://github.com/torch/nn/blob/master/doc/module.md
 
 
+
+BATCH_SIZE = 2
+DIMENSION_IN = 3
+DIMENSION_OUT = 2 --DIMENSION_IN -- state in at time t should be same dim that state at time t+1
+DIMENSION_ACTION = 2
+NUM_CLASS = 3 --3 DIFFERENTS REWARDS
+
+NUM_HIDDEN_UNITS = 5 --TODO: what is ideal size? see ICM inverse model and forward model of loss is its own reward.
+
+
+
 local M = {}
 
 function getModel(dimension_out)
-
-   state_t0 = nn.Identity()()
-   a0 = nn.Identity()()
+    -- TODO: REAL FORWARD MODEL IN ICM PAPER ONLY PREDICTS NEXT STATE< NOT ALSO THE REWARD.
+    --SIMPLIFY? or add more past states in order to predict reward? (see UNREAL Jaderberg paper)
+   local state_t0 = nn.Identity()() -- notice, if not local vars, it can take the value from other models in the current folder and run as normal! that is LUA!
+   local a0 = nn.Identity()()
 
    state_and_action = nn.JoinTable(2)({state_t0, a0})
 
@@ -37,12 +49,20 @@ function getModel(dimension_out)
       -- return whole_net
 end
 
+--Once you have multiple outputs in your network (by using for example
+--ConcatTable), to compute different losses for different outputs you can use ParallelCriterion  TODO: check it works the same
+--https://github.com/torch/nn/blob/master/doc/criterion.md#nn.ParallelCriterion
+--Or you can separately compute the loss and gradOutput of each output, then add them together for further use. It also works.
 function train_model(model_graph)
     --https://github.com/torch/nn/blob/master/doc/criterion.md#nn.CrossEntropyCriterion
     --Basically, you don't put any activation unit at the end of you network
-    -- this criterion calculate the logsoftmax and the classification loss
-    crit1 = nn.MSECriterion()
-    crit2 = nn.CrossEntropyCriterion()
+    -- this criterion calculate the logsoftmax and the classification loss. CrossEntropyCriterion behaves similarly to
+    -- ClassNLLCriterion: the input should be batch_size x number_of_classes, but the
+    --target will be only batch_size, with elements in the range 1, 2, ..., number_of_classes.
+    --However, if your output and target are both n*n image tensors ？In this case，you can use cudnn.SpatialClassNLLCriterion  --TODO for general model with input images
+
+    local crit1 = nn.MSECriterion()
+    local crit2 = nn.CrossEntropyCriterion()
 
     batch_state = torch.randn(BATCH_SIZE, DIMENSION_IN) --Returns a Tensor filled with random numbers from a normal distribution with zero mean and variance of one.
     batch_action = torch.randn(BATCH_SIZE, DIMENSION_ACTION)
@@ -54,14 +74,15 @@ function train_model(model_graph)
     -- In general input and output are Tensors. However, some special sub-classes like table layers might expect something else.
     -- After a forward(), the returned output state variable should have been updated to the new value.
     output_state_var = model_graph:forward({batch_state, batch_action})
-
+    print('output state var ')
+    print(output_state_var)
     --NOTE WE NEED TO DO A FWD AND BACKWARD PASS PER LOSS FUNCTION (CRITERION) WE ARE USING:
-    loss1 = crit1:forward(output_state_var[1], batch_state_t1)
-    loss2 = crit2:forward(output_state_var[2], batch_rew)
+    local loss1 = crit1:forward(output_state_var[1], batch_state_t1)
+    local loss2 = crit2:forward(output_state_var[2], batch_rew)
     print('losses for criterion 1 and 2: '..loss1..' '..loss2)
 
-    grad1 = crit1:backward(output_state_var[1], batch_state_t1)
-    grad2 = crit2:backward(output_state_var[2], batch_rew)
+    local grad1 = crit1:backward(output_state_var[1], batch_state_t1)
+    local grad2 = crit2:backward(output_state_var[2], batch_rew)
     print('gradients for criterion 1 and 2: ')
     print(grad1)
     print(grad2)
@@ -80,17 +101,8 @@ function train_model(model_graph)
 end
 
 
-BATCH_SIZE = 2
-DIMENSION_IN = 3
-DIMENSION_OUT = 2
-DIMENSION_ACTION = 2
-NUM_CLASS = 3 --3 DIFFERENTS REWARDS
-
-NUM_HIDDEN_UNITS = 5 --TODO: what is ideal size? see ICM inverse model and forward model of loss is its own reward.
-
-
--- g = getModel(DIMENSION_OUT)
--- train_model(g)
+g = getModel(DIMENSION_OUT)
+train_model(g)
 
 M.getModel = getModel(DIMENSION_OUT)
 return M
