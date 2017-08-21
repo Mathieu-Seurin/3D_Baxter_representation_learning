@@ -359,6 +359,10 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach, createNewM
 
         SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
 
+        -- BEST WORKING PARAMETERS FOR CONTINUOUS ACTIONS in this dataset so far: 52,modelY2017_D03_M08_H09M40S59_colorful75_resnet_cont_MCD0_3_S0_3_ProTemCauRep,0.126241133861,colorful75,./models/resnet,0.3,0.3:
+        MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.01
+        CONTINUOUS_ACTION_SIGMA = 0.9
+
     elseif DATA_FOLDER == COLORFUL or DATA_FOLDER == COLORFUL75 then
         -- IMPORTANT: NOTE THAT BOTH THESE DATASETS HAVE CUSTOM TEST SETS THAT SHOULD BE USED, it is called sequence number record_150
         -- because it contains all different colors in domain randomization for a more fair assessment of the KNN_MSE
@@ -386,6 +390,9 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach, createNewM
         AVG_FRAMES_PER_RECORD = 250  --HINT: reduce for fast full epoch testing in CPU mode
         NB_EPOCHS = 5 --otherwise, see hyperparams for default value. colorful75 converges in losses fast, as it has more images, around epoch 3-5 and therefore 5-10 epocs are enough, while for the rest of smaller #seqs (~50), the nr of epocs is 50.
 
+        -- BEST WORKING PARAMETERS FOR CONTINUOUS ACTIONS in this dataset so far: 52,modelY2017_D03_M08_H09M40S59_colorful75_resnet_cont_MCD0_3_S0_3_ProTemCauRep,0.126241133861,colorful75,./models/resnet,0.3,0.3:
+        MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.3
+        CONTINUOUS_ACTION_SIGMA = 0.3
     else
       print("No supported data folder provided, please add either of the data folders defined in hyperparams: "..BABBLING..", "..MOBILE_ROBOT.." "..SIMPLEDATA3D..' or others in const.lua' )
       os.exit()

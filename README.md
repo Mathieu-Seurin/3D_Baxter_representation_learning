@@ -330,6 +330,10 @@ sudo apt-get install graphviz -y
 luarocks install nngraph
 
 
+## Tests Notes:
+
+* test_nn_graph.lua is an example of how nngraph should be done. Also a note: never use updateOutput and updateGradInput, Only use forward and backward. Basically, forward calls updateOutput + other stuff to retain the gradients etc. And backward calls updateGradInput + other stuff to retain gradients etc. In conclusion, it's better to call forward/backward because some models are doing more than just calling updateOutput etc.
+
 ## REFERENCES
 [1] Learning state representations with robotic priors. Rico Jonschkowski, Oliver Brock, 2015.
 http://www.robotics.tu-berlin.de/fileadmin/fg170/Publikationen_pdf/Jonschkowski-15-AURO.pdf
