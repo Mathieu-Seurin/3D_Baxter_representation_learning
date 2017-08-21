@@ -15,6 +15,7 @@ function define_model()
 
    state_and_action = nn.JoinTable(2)({state_t0, a0})
 
+   --Read pipeline application from left to right:
    reward_prediction = nn.Linear(NUM_HIDDEN_UNITS, NUM_CLASS)(nn.Linear(DIMENSION_IN, NUM_HIDDEN_UNITS)(state_t0))
    state_t1 = nn.Linear(NUM_HIDDEN_UNITS, DIMENSION_OUT)(nn.Linear(DIMENSION_IN + DIMENSION_ACTION, NUM_HIDDEN_UNITS)(state_and_action))
 
@@ -39,6 +40,9 @@ batch_action = torch.randn(BATCH_SIZE, DIMENSION_ACTION)
 
 batch_state_t1 = torch.randn(BATCH_SIZE, DIMENSION_OUT)
 batch_rew = torch.ones(BATCH_SIZE)
+
+print(batch_state_t1)
+print(batch_rew)
 
 out = g:forward({batch_state,batch_action})
 
