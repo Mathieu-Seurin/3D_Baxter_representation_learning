@@ -388,7 +388,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach, createNewM
 
         SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
         AVG_FRAMES_PER_RECORD = 250  --HINT: reduce for fast full epoch testing in CPU mode
-        NB_EPOCHS = 5 --otherwise, see hyperparams for default value. colorful75 converges in losses fast, as it has more images, around epoch 3-5 and therefore 5-10 epocs are enough, while for the rest of smaller #seqs (~50), the nr of epocs is 50.
+        NB_EPOCHS = 5 --otherwise, see hyperparams for default value. colorful75 converges in losses fast, as it has more images, around epoch 3-5 and therefore 5-10 epocs are enough, while for the rest of smaller #seqs (~50), the nr of epochs is 50.
 
         -- BEST WORKING PARAMETERS FOR CONTINUOUS ACTIONS in this dataset so far: 52,modelY2017_D03_M08_H09M40S59_colorful75_resnet_cont_MCD0_3_S0_3_ProTemCauRep,0.126241133861,colorful75,./models/resnet,0.3,0.3:
         MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.3
@@ -463,9 +463,14 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach, createNewM
     ------------------ Predictive priors settings---------
     ----------------------------------------------------------
     if ACTIVATE_PREDICTIVE_PRIORS then
-        LR = 0.003
+        USE_CONTINUOUS = false -- TODO extend ICM module to continuous actions
+        LR = 0.001 -- as in ICM pathak17  --0.003 in Shelhammer17?
         SGD_METHOD = 'adam'
         HIDDEN_LAYERS = 100 --neurons in Model learning DDPG (ML-DDPG)
+        --ICM settings:
+        BETA = 0.2
+        LAMBDA = 0.1
+        DIMENSION_OUT = 288
     end
 
     -- SAVING MODEL CONFIG

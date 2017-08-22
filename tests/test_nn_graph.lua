@@ -9,6 +9,14 @@ require 'nngraph'
 -- SEE DOCUMENTATION IN https://github.com/torch/nn/blob/master/doc/module.md
 
 
+BATCH_SIZE = 8--2
+DIMENSION_IN = 2--3
+DIMENSION_ACTION = 2
+NUM_HIDDEN_UNITS = 5
+DIMENSION_OUT = 2
+NUM_CLASS = 3 --3 DIFFERENTS REWARDS
+
+
 function define_model()
 
    state_t0 = nn.Identity()()
@@ -32,7 +40,7 @@ function train_model(model_graph)
     batch_action = torch.randn(BATCH_SIZE, DIMENSION_ACTION)
 
     batch_state_t1 = torch.randn(BATCH_SIZE, DIMENSION_OUT) -- print(batch_state_t1)--[torch.DoubleTensor of size 2x2]
-    batch_rew = torch.ones(BATCH_SIZE) -- print(batch_rew) --[torch.DoubleTensor of size 2]
+    batch_rew = torch.ones(BATCH_SIZE)--, NUM_CLASS)--torch.ones(BATCH_SIZE) -- print(batch_rew) --[torch.DoubleTensor of size 2]
 
     -- Takes an input object, and computes the corresponding output of the module.
     -- In general input and output are Tensors. However, some special sub-classes like table layers might expect something else.
@@ -42,7 +50,7 @@ function train_model(model_graph)
     --NOTE WE NEED TO DO A FWD AND BACKWARD PASS PER LOSS FUNCTION (CRITERION) WE ARE USING:
     loss1 = crit1:forward(output_state_var[1], batch_state_t1)
     loss2 = crit2:forward(output_state_var[2], batch_rew)
-    print('losses for criterion 1 and 2: '..loss1..' '..loss2)
+    print('losses for criterion 1 (MSE) and 2 (CrossEntropyCriterion): '..loss1..' '..loss2)
 
     grad1 = crit1:backward(output_state_var[1], batch_state_t1)
     grad2 = crit2:backward(output_state_var[2], batch_rew)
@@ -64,13 +72,5 @@ function train_model(model_graph)
 end
 
 
-BATCH_SIZE = 2
-DIMENSION_IN = 3
-DIMENSION_ACTION = 2
-NUM_HIDDEN_UNITS = 5
-DIMENSION_OUT = 2
-NUM_CLASS = 3 --3 DIFFERENTS REWARDS
-
-
-g = define_model()
+local g = define_model()
 train_model(g)
