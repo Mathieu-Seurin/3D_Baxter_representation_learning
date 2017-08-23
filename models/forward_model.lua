@@ -1,7 +1,6 @@
 require 'nn'
 require 'nngraph'
 
-
 --FORWARD MODEL (OR PREDICTIVE MODEL):
 --Given state and action taken in time t, predict next state at t+1 that that action will lead us to.
 -- I.e., "predicts" the future state
@@ -16,13 +15,13 @@ require 'nngraph'
 --https://groups.google.com/forum/#!topic/torch7/SzC84-7HZsU
 
 
-BATCH_SIZE = 8--2
-DIMENSION_IN = 3
-DIMENSION_OUT = 3 --DIMENSION_IN -- state in at time t should be same dim that state at time t+1
+BATCH_SIZE = 8
+DIMENSION_IN = 2
+DIMENSION_OUT = 2 --DIMENSION_IN -- state in at time t should be same dim that state at time t+1
 DIMENSION_ACTION = 2
 NUM_CLASS = 3 --3 DIFFERENTS REWARDS
 
-NUM_HIDDEN_UNITS = 5 
+NUM_HIDDEN_UNITS = 5
 --ICM config:
 --The forward model is constructed by concatenating φ(s_t) with a_t and passing it into a sequence of two fully connected layers with 256 and 288 units respectively
 FC_UNITS_LAYER1 = 256
@@ -31,7 +30,18 @@ ETA = 1-- ? hyperparam, scaling factor for reward prediction (based on next stat
 
 local M = {}
 
-function getModel(dimension_out)
+function saveNetworkGraph(gmodule, title, show)
+    -- gmod is what we send to forward and backward pass
+    if not show then
+        graph.dot(gmodule.fg, title ) --'Forward Graph')
+    else --show and save          --filename = '../modelGraphs/fwdGraph'..title --Using / in path gives segmentation fault error!?
+        print('saving network graph in main project dir: '..title)
+        --if not file_exists(filename) then
+        graph.dot(gmodule.fg, title, title)--, filename) --TODO fix: gives Graphviz Segmentation fault (core dumped)
+    end
+end
+
+function getFwdModel(dimension_out)
     -- TODO: REAL FORWARD MODEL IN ICM PAPER ONLY PREDICTS NEXT STATE< NOT ALSO THE REWARD.
     --SIMPLIFY? or add more past states in order to predict reward? (see UNREAL Jaderberg paper)
    local state_t0 = nn.Identity()() -- notice, if not local vars, it can take the value from other models in the current folder and run as normal! that is LUA!
@@ -45,6 +55,8 @@ function getModel(dimension_out)
 
    --TODO: m = nn.SpatialConvolution(1,3,2,2) -- learn 3 2x2 kernels --print(m.weight) -- initially, the weights are randomly initialized
    g = nn.gModule({state_t0, a0}, {state_t1, reward_prediction})
+   local g = require('weight-init')(g, 'xavier')
+   saveNetworkGraph(g,'ForwardModelGraph', true)
    return g
 
       -- whole_net:add(pretrain_net)
@@ -122,7 +134,7 @@ function train_model(model_graph)
 end
 
 
-local g = getModel(DIMENSION_OUT)
+local g = getFwdModel(DIMENSION_OUT)
 train_model(g)
 --
 -- M.getModel = getModel(DIMENSION_OUT)

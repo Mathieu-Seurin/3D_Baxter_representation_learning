@@ -43,14 +43,14 @@ require 'nngraph'
 -- value of β is 0.2, and λ is 0.1. The Equation (7) is minimized
 -- with learning rate of 1e − 3.
 
-BATCH_SIZE = 8
+BATCH_SIZE = 4
 DIMENSION_ACTION = 2
-DIMENSION_IN = 2
+DIMENSION_IN = 512
 DIMENSION_OUT = DIMENSION_ACTION
 NUM_CLASS = 3 --3 DIFFERENTS REWARDS
 
 --FROM ICM:
-NUM_HIDDEN_UNITS = 5 --TODO: what is ideal size? see ICM inverse model and forward model of loss is its own reward.
+HIDDEN_UNITS = 5 --TODO: what is ideal size? see ICM inverse model and forward model of loss is its own reward.
 FC_UNITS_LAYER1 = 256
 FC_UNITS_LAYER2 = 4
 --TODO add ELU after each conv layer  and  four convolution layers, each with
@@ -73,21 +73,19 @@ function saveNetworkGraph(gmodule, title, show)
     end
 end
 
-function getInverseModel(dimension_out)
+function getSimpleFeatureEncoderNetwork(dimension_out)
+    --Input: Image
+    --Output: state
+    local img = nn.Identity()()
+    state_prediction = nn.ReLU()(nn.Linear(DIMENSION_IN, dimension_out)(img))
+    --state_prediction = nn.Linear(HIDDEN_UNITS, dimension_out)(state_prediction) --NEEDED?
+    g = nn.gModule({img}, {state_prediction})
 
-   local state_t0 = nn.Identity()()
-   local state_t1 = nn.Identity()()
-
-   state_and_next_state = nn.JoinTable(2)({state_t0, state_t1})
-
-   action_prediction = nn.Linear(NUM_HIDDEN_UNITS, dimension_out)(nn.Linear(DIMENSION_IN *2, NUM_HIDDEN_UNITS)(state_and_next_state))
-
-   g = nn.gModule({state_t0, state_t1}, {action_prediction})
-   local g = require('weight-init')(g, 'xavier') 
-   saveNetworkGraph(g, 'InverseModel', true)
-   return g
+    -- Initialisation : "Understanding the difficulty of training deep feedforward neural networks"
+    local g = require('weight-init')(g, 'xavier') --    print('Simple Net\n' .. g:__tostring());
+    saveNetworkGraph(g, 'SimpleFeatureEncoderNetwork', true)
+    return g
 end
-
 
 function train_model(model_graph)
     --https://github.com/torch/nn/blob/master/doc/criterion.md#nn.CrossEntropyCriterion
@@ -95,27 +93,20 @@ function train_model(model_graph)
     -- this criterion calculate the logsoftmax and the classification loss
     -- WHAT SHOULD BE THE CRITERION LOSS FUNCTION IN AN INVERSE MODEL? If we had discrete actions, as in ICM, a soft-max distribution accross all possible actions (amounts to MLE of theta under a multinomial distribution)
     local crit = nn.MSECriterion() --    local crit2 = nn.MSECriterion()
-    batch_state_t = torch.randn(BATCH_SIZE, DIMENSION_IN) --Returns a Tensor filled with random numbers from a normal distribution with zero mean and variance of one.
-    batch_state_t1 = torch.randn(BATCH_SIZE, DIMENSION_IN)
-
-    batch_action = torch.randn(BATCH_SIZE, DIMENSION_ACTION) -- print(batch_state_t1)--[torch.DoubleTensor of size 2x2]
+    batch_img = torch.randn(BATCH_SIZE, DIMENSION_IN) --Returns a Tensor filled with random numbers from a normal distribution with zero mean and variance of one.
+    batch_state = torch.randn(BATCH_SIZE, DIMENSION_OUT) -- print(batch_state_t1)--[torch.DoubleTensor of size 2x2]
 
     -- Takes an input object, and computes the corresponding output of the module.
     -- In general input and output are Tensors. However, some special sub-classes like table layers might expect something else.
     -- After a forward(), the returned output state variable should have been updated to the new value.
-    local output_action_var = model_graph:forward({batch_state_t, batch_state_t1})
-    print('output action var ')
-    print(output_action_var)
-    --NOTE WE NEED TO DO A FWD AND BACKWARD PASS PER LOSS FUNCTION (CRITERION) WE ARE USING:
-    local loss1 = crit:forward(output_action_var, batch_action)
-    --loss2 = crit:forward(output_action_var[1], batch_state_t1)
-    print('loss for MSE criterion : '..loss1)--.." "..loss2)
+    local output_var = model_graph:forward(batch_img)
+    print(' output_var  ');  print(output_var)
+    local loss = crit:forward(output_var, batch_state)
+    print('loss for MSE criterion : '..loss)
 
-    local grad1 = crit:backward(output_action_var, batch_action)
-    --grad2 = crit1:backward(output_action_var[1], batch_state_t1)
+    local grad = crit:backward(output_var, batch_state)
     print('gradients for criterion : ')
-    print(grad1)
-    --print(grad2)
+    print(grad)
 
     --[gradInput] backward(input, gradOutput) Performs a backpropagation step through the module, with respect to the
     -- given input. In general this method makes the assumption forward(input) has been called before, with the same
@@ -125,16 +116,11 @@ function train_model(model_graph)
     --A backpropagation step consist in computing two kind of gradients at input given gradOutput (gradients with respect to the output of the module). This function simply performs this task using two function calls:
     -- A function call to updateGradInput(input, gradOutput).
     -- A function call to accGradParameters(input,gradOutput,scale).
-    res = model_graph:backward({batch_state_t, batch_state_t1}, grad1)
-    print('result from backward pass:  ')
-    print(res)
-    print(res[1])
-    print(res[2])
+    res = model_graph:backward({batch_img}, grad)
+    --print('result from backward pass:  '); print(res)
 end
 
 
-local g = getInverseModel(DIMENSION_OUT)
-train_model(g)
 
--- M.getModel = getModel(DIMENSION_OUT)
--- return M
+local g = getSimpleFeatureEncoderNetwork(DIMENSION_OUT)
+train_model(g)

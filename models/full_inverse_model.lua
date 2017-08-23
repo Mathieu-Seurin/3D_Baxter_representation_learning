@@ -1,8 +1,9 @@
 require 'nn'
 require 'nngraph'
---TODO for visualization: generateGraph = require 'optnet.graphgen'  https://github.com/fmassa/optimize-net   https://discuss.pytorch.org/t/print-autograd-graph/692/24
 
---require 'functions'
+--require 'cudnn'
+--require 'cunn'
+--require 'cutorch'
 
 ---INVERSE MODEL: : Given state_t and state_t+1, predict the action (needed to reach that state).
 --  This is common problem in planning and navigation where we have the goal we want
@@ -43,11 +44,29 @@ require 'nngraph'
 -- value of β is 0.2, and λ is 0.1. The Equation (7) is minimized
 -- with learning rate of 1e − 3.
 
+
 BATCH_SIZE = 8
 DIMENSION_ACTION = 2
 DIMENSION_IN = 2
 DIMENSION_OUT = DIMENSION_ACTION
 NUM_CLASS = 3 --3 DIFFERENTS REWARDS
+
+--TODO remove after testing:
+USE_CUDA = false
+
+if USE_CUDA then
+    require 'cunn'
+    require 'cutorch'
+    require 'cudnn'  --If trouble, installing, follow step 6 in https://github.com/jcjohnson/neural-style/blob/master/INSTALL.md
+    -- and https://github.com/soumith/cudnn.torch  --TODO: set to true when speed issues rise
+    -- cudnn.benchmark = true -- uses the inbuilt cudnn auto-tuner to find the fastest convolution algorithms.
+    --                -- If this is set to false, uses some in-built heuristics that might not always be fastest.
+    -- cudnn.fastest = true -- this is like the :fastest() mode for the Convolution modules,
+                 -- simply picks the fastest convolution algorithm, rather than tuning for workspace size
+    tnt = require 'torchnet'
+    vision = require 'torchnet-vision'  -- Install via https://github.com/Cadene/torchnet-vision
+end
+RESNET_VERSION = 18
 
 --FROM ICM:
 NUM_HIDDEN_UNITS = 5 --TODO: what is ideal size? see ICM inverse model and forward model of loss is its own reward.
@@ -61,8 +80,9 @@ PADDING = 1
 
 local M = {}
 
-
 function saveNetworkGraph(gmodule, title, show)
+    --see also https://github.com/fmassa/optimize-net
+    -- gmod is what we send to forward and backward pass
     -- gmod is what we send to forward and backward pass
     if not show then
         graph.dot(gmodule.fg, title ) --'Forward Graph')
@@ -71,6 +91,43 @@ function saveNetworkGraph(gmodule, title, show)
         --if not file_exists(filename) then
         graph.dot(gmodule.fg, title, title)--, filename) --TODO fix: gives Graphviz Segmentation fault (core dumped)
     end
+    --graph.dot(gmodule.bg, 'Backward Graph')
+    -- param, grad = net:getParameters() --returns all weights and the gradients of the network in two 2D vector
+    -- print('params: ',param, 'grad: ',grad)
+    -- plot_loss()
+end
+
+function getSimpleFeatureEncoderNetwork(dimension_out)
+    --Input: Image
+    --Output: state
+    local img = nn.Identity()()
+    state_prediction = nn.ReLU()(nn.Linear(DIMENSION_IN, dimension_out)(img))
+    --state_prediction = nn.Linear(HIDDEN_UNITS, dimension_out)(state_prediction) --NEEDED?
+    g = nn.gModule({img}, {state_prediction})
+
+    -- Initialisation : "Understanding the difficulty of training deep feedforward neural networks"
+    local g = require('weight-init')(g, 'xavier') --    print('Simple Net\n' .. g:__tostring());
+    saveNetworkGraph(g, 'SimpleFeatureEncoderNetwork', true)
+    return g
+end
+
+function getFullInverseModel(dimension_out)
+   local img_t = nn.Identity()()
+   local img_t1 = nn.Identity()()
+   local act_t = nn.Identity()()
+   local act_t1 = nn.Identity()()
+
+   siameseNetwork1 = getSimpleFeatureEncoderNetwork(dimension_out) --resnet = getResNetModel(dimension_out)
+   siameseNetwork2 = siameseNetwork1.clone()
+
+   state_and_next_state = nn.JoinTable(2)({img_t, img_t1})
+
+   action_prediction = nn.Linear(NUM_HIDDEN_UNITS, dimension_out)(nn.Linear(DIMENSION_IN *2, NUM_HIDDEN_UNITS)(state_and_next_state))
+
+   g = nn.gModule({img_t, img_t1, act_t, act_t1}, {action_prediction})
+   local g = require('weight-init')(g, 'xavier')
+   saveNetworkGraph(g,'FullInverseFwdModel', true)
+   return g
 end
 
 function getInverseModel(dimension_out)
@@ -83,11 +140,9 @@ function getInverseModel(dimension_out)
    action_prediction = nn.Linear(NUM_HIDDEN_UNITS, dimension_out)(nn.Linear(DIMENSION_IN *2, NUM_HIDDEN_UNITS)(state_and_next_state))
 
    g = nn.gModule({state_t0, state_t1}, {action_prediction})
-   local g = require('weight-init')(g, 'xavier') 
-   saveNetworkGraph(g, 'InverseModel', true)
+   local g = require('weight-init')(g, 'xavier')
    return g
 end
-
 
 function train_model(model_graph)
     --https://github.com/torch/nn/blob/master/doc/criterion.md#nn.CrossEntropyCriterion
@@ -133,7 +188,66 @@ function train_model(model_graph)
 end
 
 
-local g = getInverseModel(DIMENSION_OUT)
+function file_exists(name)
+   --tests whether the file can be opened for reading
+   local f=io.open(name,"r")
+   if f~=nil then io.close(f) return true else return false end
+end
+
+local function patch(nn_module)
+   if nn_module.modules then
+      for i =1,#nn_module.modules do
+         patch(nn_module.modules[i])
+      end
+   else
+      nn_module.accGradParameters = function(self,inp, out) end  -- this is freezing FROZEN_LAYER
+   end
+end
+
+function getResNetModel(dimension_out)
+
+   local whole_net, pretrain_net
+
+   whole_net = nn.Sequential()
+
+   local model = "resnet-"..RESNET_VERSION..".t7"
+   local model_full_path = "./models/"..model
+
+   if file_exists(model_full_path) then
+      pretrain_net = torch.load(model_full_path)
+   else
+      print(model_full_path)
+      error([[------------------The above model was required but it doesn't exist,
+      download it here :\n https://github.com/facebook/fb.resnet.torch/tree/master/pretrained \nAnd put it in models/ as resnet-VERSION.t7
+      Ex : resnet-18.t7 -------------------]])
+   end
+
+   if RESNET_VERSION == 18 or RESNET_VERSION == 34 then
+      pretrain_net.modules[11] = nil --nn.Linear(512 -> 1000)
+      --pretrain_net.modules[10] is a View(512)
+
+   else
+      error("Version of resnet not known or not available")
+   end
+
+   -- Block backpropagation, i.e Freeze FROZEN_LAYER layers (defined in hyperparams.lua)
+   for i=1,FROZEN_LAYER do
+      nn_module = pretrain_net:get(i)
+      patch(nn_module)  -- Freezes
+   end
+
+   whole_net:add(pretrain_net)
+   whole_net:add(nn.Linear(512, dimension_out))
+
+   whole_net:evaluate()
+
+   return whole_net
+end
+
+
+
+local g = getSimpleFeatureEncoderNetwork(DIMENSION_OUT)
+local g = getFullInverseModel(DIMENSION_OUT)
 train_model(g)
 
 -- M.getModel = getModel(DIMENSION_OUT)
