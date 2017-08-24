@@ -1,9 +1,11 @@
 require 'nn'
-require 'nngraph'
+require 'nngraph' --keep these two only for running the module independently from the main scripts. Otherwise, it will give error: THCudaCheck FAIL file=/home/natalia/torch/extra/cutorch/lib/THC/THCGeneral.c line=66 error=38 : no CUDA-capable device is detected   -due to import loop
+
+
+
+
 --TODO for visualization: generateGraph = require 'optnet.graphgen'  https://github.com/fmassa/optimize-net   https://discuss.pytorch.org/t/print-autograd-graph/692/24
-
 --require 'functions'
-
 ---INVERSE MODEL: : Given state_t and state_t+1, predict the action (needed to reach that state).
 --  This is common problem in planning and navigation where we have the goal we want
 -- to reach and we need to find the actions that take us there.
@@ -83,7 +85,7 @@ function getInverseModel(dimension_out)
    action_prediction = nn.Linear(NUM_HIDDEN_UNITS, dimension_out)(nn.Linear(DIMENSION_IN *2, NUM_HIDDEN_UNITS)(state_and_next_state))
 
    g = nn.gModule({state_t0, state_t1}, {action_prediction})
-   local g = require('weight-init')(g, 'xavier') 
+   local g = require('weight-init')(g, 'xavier')
    saveNetworkGraph(g, 'InverseModel', true)
    return g
 end

@@ -15,7 +15,7 @@ require 'hyperparams'
 
 ---NOTE: THESE ARE DEFAULTS (IF NOT COMMAND LINE ARGS ARE PASSED), AND ARE OVERRIDEN BY DATA_FOLDER SPECIFIC CASES BELOW :
 ----------------------------------------------------------------------------------------------------------------------------
-USE_CUDA = true
+USE_CUDA = false --true
 USE_SECOND_GPU = true
 
 USE_CONTINUOUS = false
@@ -31,6 +31,7 @@ REP = "Rep"
 CAUS = "Caus"
 PROP = "Prop"
 TEMP = "Temp"
+INVERSE_MODEL = 'InverseModel'
 BRING_CLOSER_REWARD = "Reward_closer"
 BRING_CLOSER_REF_POINT = "Fixed_point"
 ROUNDING_VALUE_FIX = 0.1  -- used in BRING_CLOSER_REF_POINT

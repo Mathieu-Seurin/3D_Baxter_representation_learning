@@ -41,7 +41,34 @@ require 'const'
 -- Octopus BenchmarK: The reward from the environment is based on the Euclidean distance D between the food and the segment (efector)
 --2-link arm ben
 
-function Rico_Training(Models,priors_used)
+
+RESNET_VERSION = 18
+USE_CUDA = false
+
+
+--
+-- BATCH_SIZE = 8
+DIMENSION_ACTION = 2
+DIMENSION_IN = 2
+DIMENSION_OUT = DIMENSION_ACTION
+NUM_CLASS = 3 --3 DIFFERENTS REWARDS
+
+-- if USE_CUDA then
+--     require 'cunn'
+--     require 'cutorch'
+--     require 'cudnn'  --If trouble, installing, follow step 6 in https://github.com/jcjohnson/neural-style/blob/master/INSTALL.md
+--     -- and https://github.com/soumith/cudnn.torch  --TODO: set to true when speed issues rise
+--     -- cudnn.benchmark = true -- uses the inbuilt cudnn auto-tuner to find the fastest convolution algorithms.
+--     --                -- If this is set to false, uses some in-built heuristics that might not always be fastest.
+--     -- cudnn.fastest = true -- this is like the :fastest() mode for the Convolution modules,
+--                  -- simply picks the fastest convolution algorithm, rather than tuning for workspace size
+--     tnt = require 'torchnet'
+--     vision = require 'torchnet-vision'  -- Install via https://github.com/Cadene/torchnet-vision
+-- end
+
+
+
+function train_batch(Models,priors_used)
    local rep_criterion=get_Rep_criterion()
    local prop_criterion=get_Prop_criterion()
    local caus_criterion=get_Caus_criterion()
@@ -66,7 +93,15 @@ function Rico_Training(Models,priors_used)
 
       --See Get_Images_Set.lua file for selecting the images for each prior, which is key for each prior's loss function input
       --===========
-      local mode= TEMP --Same for continuous or discrete actions
+      local mode = INVERSE_MODEL
+      if applying_prior(priors_used, mode) then
+          print('Backprop batch step for Inverse Model')
+          batch=getRandomBatchFromSeparateList(BATCH_SIZE,mode)
+          loss_temp, grad=backprop(Models,temp_criterion, batch,COEF_TEMP)
+          TOTAL_LOSS = loss_temp + TOTAL_LOSS_TEMP
+      end
+      --====PRIORS LOSSES:
+      mode= TEMP --Same for continuous or discrete actions
       if applying_prior(priors_used, mode) then
           batch=getRandomBatchFromSeparateList(BATCH_SIZE,mode)
           loss_temp, grad=doStuff_temp(Models,temp_criterion, batch,COEF_TEMP)
@@ -132,7 +167,6 @@ function Rico_Training(Models,priors_used)
     if SGD_METHOD == 'adagrad' then
         parameters, loss = optim.adagrad(feval, parameters, optimState)
     elseif SGD_METHOD == 'adam' then
-        print 'applying adam'
         parameters, loss = optim.adam(feval, parameters, optimState)
     else
         parameters, loss = optim.adamax(feval, parameters, optimState)
@@ -156,34 +190,18 @@ function train(Models, priors_used)
     for epoch=1, NB_EPOCHS do
        print('--------------Epoch : '..epoch..' ---------------')
 
-       TOTAL_LOSS_TEMP,TOTAL_LOSS_CAUS,TOTAL_LOSS_PROP, TOTAL_LOSS_REP, TOTAL_LOSS_CLOSE, TOTAL_LOSS_FIX, TOTAL_LOSS_REWARD_PRED, TOTAL_LOSS_MSE = 0,0,0,0,0,0,0,0
-
+       TOTAL_LOSS_TEMP,TOTAL_LOSS_CAUS,TOTAL_LOSS_PROP, TOTAL_LOSS_REP, TOTAL_LOSS_CLOSE, TOTAL_LOSS_FIX, TOTAL_LOSS_REWARD_PRED, TOTAL_LOSS_MSE, TOTAL_LOSS = 0,0,0,0,0,0,0,0, 0
        xlua.progress(0, NB_BATCHES)
        for numBatch=1, NB_BATCHES do
-          Loss, Grad = Rico_Training(Models,priors_used)
+          Loss, Grad = train_batch(Models,priors_used)
           xlua.progress(numBatch, NB_BATCHES)
        end
 
-       print("Loss Temp", TOTAL_LOSS_TEMP/NB_BATCHES/BATCH_SIZE)
-       print("Loss Prop", TOTAL_LOSS_PROP/NB_BATCHES/BATCH_SIZE)
-       print("Loss Caus", TOTAL_LOSS_CAUS/NB_BATCHES/BATCH_SIZE)
-       print("Loss Rep", TOTAL_LOSS_REP/NB_BATCHES/BATCH_SIZE)
-       if APPLY_BRING_CLOSER_REWARD then
-          print("Loss BRING_CLOSER_REWARD", TOTAL_LOSS_CLOSE/NB_BATCHES/BATCH_SIZE)
-       end
-       if APPLY_BRING_CLOSER_REF_POINT then
-          print("Loss Fix (BRING_CLOSER_REF_POINT) ", TOTAL_LOSS_FIX/NB_BATCHES/BATCH_SIZE)
-          --You don't need to see the log at every time step, the first 3 will do
-          if epoch == 1 or epoch ==2 or epoch==3 then
-             print("Log_Seq",LOG_SEQ_USED)
-          end
-       end
-       if APPLY_REWARD_PREDICTION_CRITERION then
-           print("Loss REWARD_PREDICTION_CRITERION", TOTAL_LOSS_REWARD_PRED/NB_BATCHES/BATCH_SIZE)
-       end
-       if APPLY_MSE_CRITERION or APPLY_FORWARD_MODEL then
-           print("Loss MSE_CRITERION ", TOTAL_LOSS_MSE/NB_BATCHES/BATCH_SIZE)
-       end
+    --    print("Loss Temp", TOTAL_LOSS_TEMP/NB_BATCHES/BATCH_SIZE)
+    --    print("Loss Prop", TOTAL_LOSS_PROP/NB_BATCHES/BATCH_SIZE)
+    --    print("Loss Caus", TOTAL_LOSS_CAUS/NB_BATCHES/BATCH_SIZE)
+    --    print("Loss Rep", TOTAL_LOSS_REP/NB_BATCHES/BATCH_SIZE)
+       print("Loss Inverse Model:", TOTAL_LOSS/NB_BATCHES/BATCH_SIZE)
 
        save_model(Models.Model1, NAME_SAVE, SAVE_MODEL_T7_FILE) --TODO Do we need to write NB_EPOCH TIMES? isnt enough the last time to write once and not overwrite NB_EPOCH TIMES?
    end
@@ -194,17 +212,17 @@ end
 
 
 local function main(params)
-    --TODO 2nd approach
-    ACTIVATE_PREDICTIVE_PRIORS = false -- Momentaneous substitution of APPLY_REWARD_PREDICTION_CRITERION  TODO: replace when wokring by APPLY_REWARD_PREDICTION_CRITERION
-    RUN_FORWARD_MODEL = true
-    USE_CUDA = false --TODO for testing locally only
-
     print("\n\n>> predictive_priors_script.lua: main model builder")
     if RUN_FORWARD_MODEL then
         set_hyperparams(params, 'Fwd', true)
     else
         set_hyperparams(params, 'PredictRewPrior', true)  -- 2nd param adds model approach to model name
     end
+    ACTIVATE_PREDICTIVE_PRIORS = false -- Momentaneous substitution of APPLY_REWARD_PREDICTION_CRITERION  TODO: replace when wokring by APPLY_REWARD_PREDICTION_CRITERION
+    RUN_FORWARD_MODEL = true
+    USE_CUDA = false --TODO for testing locally only
+
+
     print('cmd default params (overridden by following set_hyperparams): ')
     print(params)
     print_hyperparameters(true, 'predictive_priors_script.lua Hyperparams:')
@@ -240,8 +258,8 @@ local function main(params)
           Model = torch.load(SAVED_MODEL_PATH):double()
        else
           print("Getting model in : "..MODEL_ARCHITECTURE_FILE)
-          require(MODEL_ARCHITECTURE_FILE)
-          Model=getModel(DIMENSION_OUT)
+          require('./models/full_inverse_model')  --    MODEL_ARCHITECTURE_FILE = INVERSE
+          Model=getModel(DIMENSION_OUT, DIMENSION_ACTION)
           --graph.dot(Model.fg, 'Our Model')
        end
 
@@ -259,7 +277,7 @@ local function main(params)
        Model4=Model:clone('weight','bias','gradWeight','gradBias','running_mean','running_std')
        Models={Model1=Model,Model2=Model2,Model3=Model3,Model4=Model4}
 
-       local priors_used= PRIORS_CONFIGS_TO_APPLY[nb_test]
+       local priors_used = {FORWARD_MODEL}
        local Log_Folder=Get_Folder_Name(LOG_FOLDER, priors_used)
 
        print("Predictive priors Experiment "..nb_test)-- .." (Log_Folder="..Log_Folder..")")
