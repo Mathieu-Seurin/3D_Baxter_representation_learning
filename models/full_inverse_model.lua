@@ -112,6 +112,7 @@ function getSimpleFeatureEncoderNetwork(dimension_out)
 end
 
 function getFullInverseModel(dimension_out)
+    --TODO see parameter sharing http://kbullaughey.github.io/lstm-play/rnn/
    local img_t = nn.Identity()()
    local img_t1 = nn.Identity()()
    local act_t = nn.Identity()()
@@ -119,16 +120,36 @@ function getFullInverseModel(dimension_out)
 
    siameseNetwork1 = getSimpleFeatureEncoderNetwork(dimension_out) --resnet = getResNetModel(dimension_out)
    siameseNetwork2 = siameseNetwork1.clone()
-
-   state_and_next_state = nn.JoinTable(2)({img_t, img_t1})
-
-   action_prediction = nn.Linear(NUM_HIDDEN_UNITS, dimension_out)(nn.Linear(DIMENSION_IN *2, NUM_HIDDEN_UNITS)(state_and_next_state))
+   -- IS THERE A WAY TO CONNECT TWO SIAMESE OUTPUTS INTO A INVERSE MODEL'S INPUT, WHOE OUTPUT SHOULD BE INPUT TO A FORWARD MODEL?    --twoCopiesOfStates = nn.Parallel(2)() --xs = nn.SplitTable(2)()
+   st = siameseNetwork1(img_t)
+   s_t1 = siameseNetwork2(img_t1)
+   action_prediction = inverseModel(st, st1)
 
    g = nn.gModule({img_t, img_t1, act_t, act_t1}, {action_prediction})
    local g = require('weight-init')(g, 'xavier')
    saveNetworkGraph(g,'FullInverseFwdModel', true)
    return g
 end
+
+-- function getFullInverseModelConnectingGModules(dimension_out)
+--     --TODO see parameter sharing http://kbullaughey.github.io/lstm-play/rnn/
+--    local img_t = nn.Identity()()
+--    local img_t1 = nn.Identity()()
+--    local act_t = nn.Identity()()
+--    local act_t1 = nn.Identity()()
+--
+--    siameseNetwork1 = getSimpleFeatureEncoderNetwork(dimension_out) --resnet = getResNetModel(dimension_out)
+--    siameseNetwork2 = siameseNetwork1.clone()
+--    -- IS THERE A WAY TO CONNECT TWO SIAMESE OUTPUTS INTO A INVERSE MODEL'S INPUT, WHOE OUTPUT SHOULD BE INPUT TO A FORWARD MODEL?    --twoCopiesOfStates = nn.Parallel(2)() --xs = nn.SplitTable(2)()
+--    st = siameseNetwork1(img_t)
+--    s_t1 = siameseNetwork2(img_t1)
+--    action_prediction = inverseModel(st, st1)
+--
+--    g = nn.gModule({img_t, img_t1, act_t, act_t1}, {action_prediction})
+--    local g = require('weight-init')(g, 'xavier')
+--    saveNetworkGraph(g,'FullInverseFwdModel', true)
+--    return g
+-- end
 
 function getInverseModel(dimension_out)
 

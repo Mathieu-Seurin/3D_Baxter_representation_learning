@@ -391,8 +391,8 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach, createNewM
         NB_EPOCHS = 5 --otherwise, see hyperparams for default value. colorful75 converges in losses fast, as it has more images, around epoch 3-5 and therefore 5-10 epocs are enough, while for the rest of smaller #seqs (~50), the nr of epochs is 50.
 
         -- BEST WORKING PARAMETERS FOR CONTINUOUS ACTIONS in this dataset so far: 52,modelY2017_D03_M08_H09M40S59_colorful75_resnet_cont_MCD0_3_S0_3_ProTemCauRep,0.126241133861,colorful75,./models/resnet,0.3,0.3:
-        MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.3
-        CONTINUOUS_ACTION_SIGMA = 0.3
+        -- MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.3
+        -- CONTINUOUS_ACTION_SIGMA = 0.3
     else
       print("No supported data folder provided, please add either of the data folders defined in hyperparams: "..BABBLING..", "..MOBILE_ROBOT.." "..SIMPLEDATA3D..' or others in const.lua' )
       os.exit()
