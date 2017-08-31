@@ -35,6 +35,8 @@ function getModel(Dimension)
    end
 
    if RESNET_VERSION == 18 or RESNET_VERSION == 34 then
+      -- We delete the last layer of resnet (which was a nn.Linear(512,1000) to
+      -- classify 1000 classes of images) to later below, add our final customized dimensions layer
       pretrain_net.modules[11] = nil --nn.Linear(512 -> 1000)
       --pretrain_net.modules[10] is a View(512)
 

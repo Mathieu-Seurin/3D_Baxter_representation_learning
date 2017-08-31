@@ -32,6 +32,9 @@ INVERSE = './models/full_inverse_model' --used in predictive_priors_script
 --MODEL_ARCHITECTURE_FILE = BASE_TIMNET--without last layer as Tanh, use it for AE
 MODEL_ARCHITECTURE_FILE = RESNET
 
+--INVERSE AND FWD MODEL:
+NUM_HIDDEN_UNITS = 5 --TODO: what is ideal size? see ICM inverse model and forward model of loss is its own reward.
+
 --==================================================
 -- Hyperparams : Learning rate, batchsize, USE_CUDA etc...
 --==================================================
@@ -50,11 +53,12 @@ EXTRAPOLATE_ACTION_CAUS = false
 APPLY_BRING_CLOSER_REF_POINT = false
 APPLY_BRING_CLOSER_REWARD = false
 APPLY_REWARD_PREDICTION_CRITERION = false
-ACTIVATE_PREDICTIVE_PRIORS = false -- Momentaneous substitution of APPLY_REWARD_PREDICTION_CRITERION
+--ACTIVATE_PREDICTIVE_PRIORS = false -- Momentaneous substitution of APPLY_REWARD_PREDICTION_CRITERION
+RUNNING_FORWARD_MODEL = false
+RUNNING_INVERSE_MODEL = false
 
 LR=0.0001
 LR_DECAY = 3*1e-6
-
 SGD_METHOD = 'adam' -- Can be adam or adagrad
 
 BATCH_SIZE = 12

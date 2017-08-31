@@ -45,6 +45,8 @@ function train_model(model_graph)
     -- Takes an input object, and computes the corresponding output of the module.
     -- In general input and output are Tensors. However, some special sub-classes like table layers might expect something else.
     -- After a forward(), the returned output state variable should have been updated to the new value.
+    model_graph:zeroGradParameters() -- zero the internal gradient buffers of the network
+
     output_state_var = model_graph:forward({batch_state, batch_action})
 
     --NOTE WE NEED TO DO A FWD AND BACKWARD PASS PER LOSS FUNCTION (CRITERION) WE ARE USING:

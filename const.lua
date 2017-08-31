@@ -15,7 +15,7 @@ require 'hyperparams'
 
 ---NOTE: THESE ARE DEFAULTS (IF NOT COMMAND LINE ARGS ARE PASSED), AND ARE OVERRIDEN BY DATA_FOLDER SPECIFIC CASES BELOW :
 ----------------------------------------------------------------------------------------------------------------------------
-USE_CUDA = false --true
+USE_CUDA = false
 USE_SECOND_GPU = true
 
 USE_CONTINUOUS = false
@@ -100,6 +100,13 @@ MAX_TABLE = {10000,10000} -- for x,y
 
 DIMENSION_IN = 2
 DIMENSION_OUT= 3
+--for Inverse and Fwd models:
+DIMENSION_ACTION = DIMENSION_IN
+ACTIONS_CARDINAL = 2^DIMENSION_ACTION  --TODO check if not +1 for all datasets?
+--Actions cardinal in discrete case is  2 ** DIMENSION_ACTION (2 because of different sign of the +/- ACTION_AMPLITUDE)
+--(-0.05, 0.05 are the values and if DIMENSION_IN is 2, we have 2^DIMENSION_IN
+--I.e. 9 for DIMENSION_IN = 3 (as we also should consider no movement at all, i.e., action_x, y or z = 0.0 )  (same for mobileRobot, my baseline now, where actions are +- 0.33 in any x,y axis)
+NUM_CLASSES = ACTIONS_CARDINAL
 
 REWARD_INDEX = 1  --3 reward values: -1, 0, 10
 INDEX_TABLE = {1,2} --column index for coordinate in state file (respectively x,y)
@@ -172,6 +179,26 @@ function set_hyperparams(params, modelApproach, createNewModelFolder)
     MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = params.mcd
     CONTINUOUS_ACTION_SIGMA = params.sigma
     DATA_FOLDER = params.data_folder  --print('[Log: Setting command line dataset to '..params.data_folder..']') type is a str
+    if modelApproach == 'Inv' then
+        NUM_HIDDEN_UNITS = params.hidden_units
+
+        -- BATCH_SIZE = 8
+        -- DIMENSION_ACTION = 2
+        -- DIMENSION_IN = 2
+        -- DIMENSION_OUT = DIMENSION_ACTION
+        if DATA_FOLDER == MOBILE_ROBOT then
+            DIMENSION_IN = 2
+        else
+            DIMENSION_IN = 3
+        end
+        DIMENSION_ACTION = DIMENSION_IN
+        DIMENSION_OUT = DIMENSION_ACTION
+        ACTIONS_CARDINAL = 2^DIMENSION_ACTION  --TODO check if not +1 for all datasets?
+        --Actions cardinal in discrete case is  2 ** DIMENSION_ACTION (2 because of different sign of the +/- ACTION_AMPLITUDE)
+        --(-0.05, 0.05 are the values and if DIMENSION_IN is 2, we have 2^DIMENSION_IN
+        --I.e. 9 for DIMENSION_IN = 3 (as we also should consider no movement at all, i.e., action_x, y or z = 0.0 )  (same for mobileRobot, my baseline now, where actions are +- 0.33 in any x,y axis)
+        NUM_CLASSES = ACTIONS_CARDINAL --3 DIFFERENTS REWARDS in case of FWD model TODO: can be predicting instead which reward is better, r_t or r_t+1?
+    end
     set_cuda_hyperparams(USE_CUDA)
     set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach, createNewModelFolder)
 end
@@ -368,7 +395,6 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach, createNewM
         -- IMPORTANT: NOTE THAT BOTH THESE DATASETS HAVE CUSTOM TEST SETS THAT SHOULD BE USED, it is called sequence number record_150
         -- because it contains all different colors in domain randomization for a more fair assessment of the KNN_MSE
         CLAMP_CAUSALITY = false --TODO: make false when continuous works
-
         FIXED_POS  = {0.6, 0.30, 0.10} -- starting point for every sequence
         -- FIXED_POS = {0.587, -0.036, -0.143}
         -- A point where the robot wants the state to be very similar. Like a reference point for the robot
@@ -395,8 +421,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach, createNewM
         -- MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.3
         -- CONTINUOUS_ACTION_SIGMA = 0.3
     else
-      print("No supported data folder provided, please add either of the data folders defined in hyperparams: "..BABBLING..", "..MOBILE_ROBOT.." "..SIMPLEDATA3D..' or others in const.lua' )
-      os.exit()
+      error("No supported data folder provided, please add either of the data folders defined in hyperparams: "..BABBLING..", "..MOBILE_ROBOT.." "..SIMPLEDATA3D..' or others in const.lua' )
     end
 
     if VISUALIZE_IMAGES_TAKEN or VISUALIZE_CAUS_IMAGE or VISUALIZE_IMAGE_CROP or VISUALIZE_MEAN_STD or VISUALIZE_AE then
@@ -451,8 +476,11 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach, createNewM
     if APPLY_REWARD_PREDICTION_CRITERION then
        table.insert(PRIORS_CONFIGS_TO_APPLY[1], REWARD_PREDICTION_CRITERION)
     end
-    if RUN_FORWARD_MODEL then
+    if RUNNING_FORWARD_MODEL then
         PRIORS_CONFIGS_TO_APPLY = {{FORWARD_MODEL}}
+    end
+    if RUNNING_INVERSE_MODEL then
+        PRIORS_CONFIGS_TO_APPLY = {{INVERSE_MODEL}}
     end
     -- L1Smooth and cosDistance and max margin: compare with homemade MSDCriterion and replace if similar in the good practice of using native code
     --TODO PRIORS_CONFIGS_TO_APPLY.add('CosDist','L1SmoothDist','MaxMargin')
@@ -509,6 +537,9 @@ function print_hyperparameters(print_continuous_actions_config, extra_string_to_
         if USE_CONTINUOUS then
             print ('MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD: ',MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD,' CONTINUOUS_ACTION_SIGMA: ', CONTINUOUS_ACTION_SIGMA)
         end
+    end
+    if RUNNING_INVERSE_MODEL then
+        print ('INVERSE MODEL NUM_HIDDEN_UNITS: ',NUM_HIDDEN_UNITS)
     end
     print("\n================================")
 end

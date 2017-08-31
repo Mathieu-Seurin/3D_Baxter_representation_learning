@@ -18,15 +18,14 @@ function has_command_finished_correctly {
     fi
 }
 
-# losses result in being nan for MCD 0.9 and sigma 0.01
-#for max_cos_dis in 0.01 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9  #for max_cos_dis in 0.9
-for max_cos_dis in 0.2 0.4 0.5 0.6 0.8 0.9 0.95 #0.4 0.5 0.8
-do
-    #for s in  0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9
-    for s in 0.2 0.4 0.5 0.6 0.8 0.9 #0.2 0.4 0.5
+# for max_cos_dis in 0.2 0.4 0.5 0.6 0.8 0.9 0.95 #0.4 0.5 0.8
+# do
+#     for s in 0.2 0.4 0.5 0.6 0.8 0.9 #0.2 0.4 0.5
+#     do
+    for hidden_units in 3 5 10 100 1000
     do
         echo " ********** Running pipeline for finetuning mcd: $max_cos_dis and sigma: $s *************"
-        th predictive_priors_script.lua  -use_continuous -mcd $max_cos_dis -sigma $s -data_folder mobileRobot #complexData #colorful  #stati$
+        th predictive_priors_script.lua  -use_continuous -mcd $max_cos_dis -sigma $s -hidden_units $hidden_units -data_folder mobileRobot #complexData #colorful  #stati$
         has_command_finished_correctly
 
         th imagesAndReprToTxt.lua  -use_continuous -data_folder mobileRobot # complexData #colorful  #staticButtonSimplest
@@ -48,6 +47,6 @@ do
         has_command_finished_correctly
 
     done
-done
+# done
 
 # best so far in a 49 images dataset: modelY2017_D24_M06_H02M02S49_staticButtonSimplest_resnet_cont_MCD0_5_S0_1,0.222667244673

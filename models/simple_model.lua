@@ -95,6 +95,7 @@ function train_model(model_graph)
     local crit = nn.MSECriterion() --    local crit2 = nn.MSECriterion()
     batch_img = torch.randn(BATCH_SIZE, DIMENSION_IN) --Returns a Tensor filled with random numbers from a normal distribution with zero mean and variance of one.
     batch_state = torch.randn(BATCH_SIZE, DIMENSION_OUT) -- print(batch_state_t1)--[torch.DoubleTensor of size 2x2]
+    model_graph:zeroGradParameters() -- zero the internal gradient buffers of the network
 
     -- Takes an input object, and computes the corresponding output of the module.
     -- In general input and output are Tensors. However, some special sub-classes like table layers might expect something else.

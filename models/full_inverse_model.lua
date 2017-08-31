@@ -44,34 +44,11 @@
 -- value of β is 0.2, and λ is 0.1. The Equation (7) is minimized
 -- with learning rate of 1e − 3.
 
-
 --
---
--- BATCH_SIZE = 8
--- DIMENSION_ACTION = 2
--- DIMENSION_IN = 2
--- DIMENSION_OUT = DIMENSION_ACTION
--- NUM_CLASS = 3 --3 DIFFERENTS REWARDS
---
--- --TODO remove after testing:
--- USE_CUDA = false
---
--- if USE_CUDA then
---     require 'cunn'
---     require 'cutorch'
---     require 'cudnn'  --If trouble, installing, follow step 6 in https://github.com/jcjohnson/neural-style/blob/master/INSTALL.md
---     -- and https://github.com/soumith/cudnn.torch  --TODO: set to true when speed issues rise
---     -- cudnn.benchmark = true -- uses the inbuilt cudnn auto-tuner to find the fastest convolution algorithms.
---     --                -- If this is set to false, uses some in-built heuristics that might not always be fastest.
---     -- cudnn.fastest = true -- this is like the :fastest() mode for the Convolution modules,
---                  -- simply picks the fastest convolution algorithm, rather than tuning for workspace size
---     tnt = require 'torchnet'
---     vision = require 'torchnet-vision'  -- Install via https://github.com/Cadene/torchnet-vision
--- end
--- RESNET_VERSION = 18
+-- --TODO use softmax instead of reLu as in https://arxiv.org/pdf/1612.07307.pdf inverse models? and add reward prediction and sum of losses
 
 --FROM ICM:
-NUM_HIDDEN_UNITS = 5 --TODO: what is ideal size? see ICM inverse model and forward model of loss is its own reward.
+--NUM_HIDDEN_UNITS = 5 --TODO: what is ideal size? see ICM inverse model and forward model of loss is its own reward.
 FC_UNITS_LAYER1 = 256
 FC_UNITS_LAYER2 = 4
 --TODO add ELU after each conv layer  and  four convolution layers, each with
@@ -103,11 +80,13 @@ function getModel(dimension_state_out, dimension_action)
     --TODO see parameter sharing http://kbullaughey.github.io/lstm-play/rnn/
     --Input:  Img_t, Img_t+1, Action_t, Action_t+1
     -- Output:
+   print('getModel with hidden units '..NUM_HIDDEN_UNITS)
    local img_t = nn.Identity()()
    local img_t1 = nn.Identity()()
 
    state_t = nn.ReLU()(nn.Linear(DIMENSION_IN, dimension_state_out)(img_t))
    state_t1 = nn.ReLU()(nn.Linear(DIMENSION_IN, dimension_state_out)(img_t1)) --TODO How to make these two share params as they are not gModels to be cloned?
+   --savedModel = model.modules[1]:clone('weight','bias','running_mean','running_std') --or  savedModel = model:clone('weight','bias','running_mean','running_std')
 
    -- Inverse model:
    state_and_next_state = nn.JoinTable(2)({state_t, state_t1})
@@ -115,9 +94,13 @@ function getModel(dimension_state_out, dimension_action)
 
    --state_prediction = nn.Linear(512, dimension_out)
    g = nn.gModule({img_t, img_t1}, {action_prediction})
-   local g = require('weight-init')(g, 'xavier')
+   --TODO try g = nn.gModule({img_t, img_t1}, {action_prediction, reward}) -- and example from https://github.com/eladhoffer/ImageNet-Training/blob/master/Models/GoogLeNet_BN_Original.lua
+   local g = require('weight-init')(g, 'xavier')local NLL = nn.ClassNLLCriterion()
+   --local mse_crit = nn.MSECriterion()
+   --local mse_crit2 = nn.MSECriterion()
+   --local loss = nn.ParallelCriterion(true):add(mse_crit):add(mse_crit2)  -- return {model = model, loss = loss}
    saveNetworkGraph(g,'FullInverseModel', true)
-   return g
+   return g   --return {model = model, loss = loss}
 end
 
 function train_model(model_graph)
@@ -125,12 +108,15 @@ function train_model(model_graph)
     --Basically, you don't put any activation unit at the end of you network
     -- this criterion calculate the logsoftmax and the classification loss
     -- WHAT SHOULD BE THE CRITERION LOSS FUNCTION IN AN INVERSE MODEL? If we had discrete actions, as in ICM, a soft-max distribution accross all possible actions (amounts to MLE of theta under a multinomial distribution)
-    local crit = nn.MSECriterion() --    local crit2 = nn.MSECriterion()
+    local crit = nn.MSECriterion()--local mse_crit = nn.MSECriterion() -- TODO try SmoothL1Criterion(): Creates a criterion that can be thought of as a smooth version of the AbsCriterion. It uses a squared term if the absolute element-wise error falls below 1. It is less sensitive to outliers than the MSECriterion and in some cases prevents exploding gradients (e.g. see "Fast R-CNN" paper by Ross Girshick).
+    -- local mse_crit2 = nn.MSECriterion()
+    -- --local crit = nn.ParallelCriterion(true):add(mse_crit):add(mse_crit2) --Criterion is a weighted sum of other Criterion. Criterions are added using the method: If repeatTarget=true, the target is repeatedly presented to each criterion (with a different input).
     batch_img_t = torch.randn(BATCH_SIZE, DIMENSION_IN) --Returns a Tensor filled with random numbers from a normal distribution with zero mean and variance of one.
     batch_img_t1 = torch.randn(BATCH_SIZE, DIMENSION_IN)
 
     batch_action = torch.randn(BATCH_SIZE, DIMENSION_ACTION) -- print(batch_state_t1)--[torch.DoubleTensor of size 2x2]
 
+    model_graph:zeroGradParameters() -- zero the internal gradient buffers of the network
     -- Takes an input object, and computes the corresponding output of the module.
     -- In general input and output are Tensors. However, some special sub-classes like table layers might expect something else.
     -- After a forward(), the returned output state variable should have been updated to the new value.

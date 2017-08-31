@@ -47,12 +47,19 @@ require 'nngraph' --keep these two only for running the module independently fro
 
 BATCH_SIZE = 8
 DIMENSION_ACTION = 2
+local actions_cardinal = 2^DIMENSION_ACTION  --TODO check if not +1 for all datasets?
+--Actions cardinal in discrete case is  2 ** DIMENSION_ACTION (2 because of different sign of the +/- ACTION_AMPLITUDE)
+--(-0.05, 0.05 are the values and if DIMENSION_IN is 2, we have 2^DIMENSION_IN
+--I.e. 9 for DIMENSION_IN = 3 (as we also should consider no movement at all, i.e., action_x, y or z = 0.0 )  (same for mobileRobot, my baseline now, where actions are +- 0.33 in any x,y axis)
 DIMENSION_IN = 2
 DIMENSION_OUT = DIMENSION_ACTION
-NUM_CLASS = 3 --3 DIFFERENTS REWARDS
+NUM_CLASS = actions_cardinal --3 DIFFERENTS REWARDS in case of FWD model
+--No action (0,0,0) is never applied, so for discrete actions, your formula seems correct to me (2^DIMENSION)
+--For mobile robot, there are different magnitude for the robot actions, (TODO: ask Alexandre how many were given to the robot).
+
 
 --FROM ICM:
-NUM_HIDDEN_UNITS = 5 --TODO: what is ideal size? see ICM inverse model and forward model of loss is its own reward.
+--NUM_HIDDEN_UNITS = 5 --TODO:set when gridsearch is run.  what is ideal size? see ICM inverse model and forward model of loss is its own reward.
 FC_UNITS_LAYER1 = 256
 FC_UNITS_LAYER2 = 4
 --TODO add ELU after each conv layer  and  four convolution layers, each with
@@ -101,7 +108,7 @@ function train_model(model_graph)
     batch_state_t1 = torch.randn(BATCH_SIZE, DIMENSION_IN)
 
     batch_action = torch.randn(BATCH_SIZE, DIMENSION_ACTION) -- print(batch_state_t1)--[torch.DoubleTensor of size 2x2]
-
+    model_graph:zeroGradParameters() -- zero the internal gradient buffers of the network
     -- Takes an input object, and computes the corresponding output of the module.
     -- In general input and output are Tensors. However, some special sub-classes like table layers might expect something else.
     -- After a forward(), the returned output state variable should have been updated to the new value.

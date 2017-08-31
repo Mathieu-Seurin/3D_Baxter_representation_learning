@@ -44,8 +44,6 @@ require 'const'
 
 RESNET_VERSION = 18
 USE_CUDA = false
-
-
 --
 -- BATCH_SIZE = 8
 DIMENSION_ACTION = 2
@@ -213,13 +211,15 @@ end
 
 local function main(params)
     print("\n\n>> predictive_priors_script.lua: main model builder")
+    RUNNING_INVERSE_MODEL = true
     if RUN_FORWARD_MODEL then
         set_hyperparams(params, 'Fwd', true)
+    elseif RUNNING_INVERSE_MODEL then
+        set_hyperparams(params, 'Inv', true)
     else
         set_hyperparams(params, 'PredictRewPrior', true)  -- 2nd param adds model approach to model name
     end
-    ACTIVATE_PREDICTIVE_PRIORS = false -- Momentaneous substitution of APPLY_REWARD_PREDICTION_CRITERION  TODO: replace when wokring by APPLY_REWARD_PREDICTION_CRITERION
-    RUN_FORWARD_MODEL = true
+    --ACTIVATE_PREDICTIVE_PRIORS = false -- Momentaneous substitution of APPLY_REWARD_PREDICTION_CRITERION  TODO: replace when wokring by APPLY_REWARD_PREDICTION_CRITERION
     USE_CUDA = false --TODO for testing locally only
 
 
@@ -280,7 +280,7 @@ local function main(params)
        local priors_used = {FORWARD_MODEL}
        local Log_Folder=Get_Folder_Name(LOG_FOLDER, priors_used)
 
-       print("Predictive priors Experiment "..nb_test)-- .." (Log_Folder="..Log_Folder..")")
+       print("Inverse model Experiment "..nb_test)-- .." (Log_Folder="..Log_Folder..")")
        train(Models, priors_used)
        print_hyperparameters(false, "Predictive priors Experiment run successfully for hyperparams: ")
     end
@@ -305,6 +305,7 @@ cmd:option('-use_continuous', false, 'true to use a continuous action space, fal
 cmd:option('-data_folder', MOBILE_ROBOT, 'Possible Datasets to use: staticButtonSimplest, mobileRobot, staticButtonSimplest, simpleData3D, pushingButton3DAugmented, babbling')
 cmd:option('-mcd', 0.4, 'Max. cosine distance allowed among actions for priors loss function evaluation (MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD)')
 cmd:option('-sigma', 0.4, "Sigma: denominator in continuous actions' extra factor (CONTINUOUS_ACTION_SIGMA)")
+cmd:option('-hidden_units', 5, "Num of hidden units in the inverse/forward model (NUM_HIDDEN_UNITS)")
 --TODO Set best mcd and sigma after grid search
 
 local params = cmd:parse(arg)  --TODO function to get all command line arguments that are the same right now for all Lua scripts, only in one function.
