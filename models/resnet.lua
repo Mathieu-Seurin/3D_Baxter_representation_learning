@@ -26,7 +26,7 @@ function getModel(Dimension)
    local model_full_path = "./models/"..model
 
    if file_exists(model_full_path) then
-      pretrain_net = torch.load(model_full_path)
+      pretrain_net = torch.load(model_full_path) -- works only in CUDA mode
    else
       print(model_full_path)
       error([[------------------The above model was required but it doesn't exist,
