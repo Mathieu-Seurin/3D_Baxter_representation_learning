@@ -63,6 +63,8 @@ image in the test set and it will assess the test set of 50 images defined in Co
 ## RUNNING: python report_results.py
 Will plot the current winning leaderboard of models' KNN MSE for each dataset trained.
 
+## RUNNING supervised.lua
+th supervised.lua -use_cuda  -data_folder complexData
 
 ## DEPENDENCIES
 
@@ -308,6 +310,14 @@ mkdir Log   [if it does not exist]
 rm lastModel.txt
 rm -r preload_folder
 
+
+Q: Q: torch/install/share/lua/5.2/nn/Module.lua:286: bad argument #1 to 'set' (expecting number or Tensor or Storage)
+stack traceback:
+	[C]: in function 'set'
+	/home/gpu_center/torch/install/share/lua/5.2/nn/Module.lua:286: in function 'flatten'
+	/home/gpu_center/torch/install/share/lua/5.2/nn/Module.lua:326: in function 'getParameters'
+	supervised.lua:133: in function 'train'
+A: You are not using cuda when you should, activate USE_CUDA. This happens if you dont run supervised.lua with -use_cuda
 
 
 ## Observations on datasets

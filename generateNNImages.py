@@ -40,7 +40,6 @@ call it with only one argument (the number of neigbours to generate for each
 image in the test set and it will assess the test set of 50 images defined in Const.lua and Utils.py)
 
 """
-
 print"\n\n >> Running generateNNImages.py...."
 if len(sys.argv) <= 1:
     sys.exit("Give number of neighbors to produce, followed by number of input images (and model dir if you don't want to use the last model created)")

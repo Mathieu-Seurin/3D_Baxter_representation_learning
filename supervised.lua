@@ -308,8 +308,8 @@ end
 
 ----------------- run ----------
 -- cross_validation(1)
-
-ALL_SEQ = precompute_all_seq()
+print(NB_SEQUENCES)
+ALL_SEQ = precompute_all_seq(NB_SEQUENCES)
 verbose = true
 test_run(verbose)
 
