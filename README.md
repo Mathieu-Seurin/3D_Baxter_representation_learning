@@ -50,6 +50,12 @@ IMPORTANT:
 ## RUNNING: plotStates.py
 To get a glimpse of how the ground truth states look like, run `plotStates.py` and set there the constant: plotGroundTruthStates = True
 
+To run specific images' states:
+python makeMovieFromPlotStates.py model_name
+e.g.:
+
+python makeMovieFromPlotStates.py Log/modelY2017_D26_M08_H20M07S28_colorful75_resnet_cont_MCD0_4_S0_3_ProTemCauRepFix
+
 ## RUNNING: generateNNImages.py
 Example to run this program for a given trained model:
 
