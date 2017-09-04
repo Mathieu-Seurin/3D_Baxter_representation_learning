@@ -26,7 +26,9 @@ do
     for s in 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 #0.2 0.4 0.5
     do
         echo " ********** Running pipeline for finetuning mcd: $max_cos_dis and sigma: $s *************"
-        qlua script.lua  -use_cuda -use_continuous -mcd $max_cos_dis -sigma $s -data_folder mobileRobot #complexData #colorful  #stati$
+        #qlua script.lua  -use_cuda -use_continuous -mcd $max_cos_dis -sigma $s -data_folder mobileRobot #complexData #colorful  #stati$
+        th supervised.lua -data_folder colorful75
+
         has_command_finished_correctly
 
         th imagesAndReprToTxt.lua  -use_cuda -use_continuous -data_folder mobileRobot # complexData #colorful  #staticButtonSimplest

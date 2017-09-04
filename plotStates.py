@@ -47,7 +47,7 @@ else:
     elif path_list[0][:2].lower() == '3d':
         data_folder = 'staticButtonSimplest'
     else:
-        data_folder = 'mobileData'
+        data_folder = MOBILE_ROBOT
 
 reward_file_str = 'allRewardsGT_'+data_folder+'.txt'
 print "state file ",state_file_str
@@ -98,6 +98,7 @@ with open(reward_file_str) as f:
 
 rewards=rewards_l
 toplot=states
+print type(states), 'states'
 print "Ploting total states and total rewards: ",total_states, " ", total_rewards," in files: ",state_file_str," and ", reward_file_str
 test.assertEqual(total_rewards, total_states, "Datapoints size discordance! Length of rewards and state files should be equal, and it is "+str(len(rewards))+" and "+str(len(toplot))+" Run first create_all_reward.lua and create_plotStates_file_for_all_seq.lua")
 

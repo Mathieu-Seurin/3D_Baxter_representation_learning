@@ -39,10 +39,8 @@ else:
         print "*********************\nPLOTTING LEARNT STATES for model: ", model_name #(3D for Baxter PUSHING_BUTTON_AUGMENTED dataset, or 2D position for MOBILE_ROBOT dataset): ", state_file_str
         plot_path = path+'LearnedStatesPlot_'+model_name+'.png'
 
-    print "path_list",path_list 
-    print 'state_file_str', state_file_str
-
-    data_folder = get_data_folder_from_model_name(model_name)
+    data_folder = get_data_folder_from_model_name(model_name)   #print "path_list",path_list 
+    print 'state_file_str', state_file_str, '\n model name: ', model_name, 'data_folder: ', data_folder
 
 reward_file_str = 'allRewardsGT_'+data_folder+'.txt'
 print "state file ",state_file_str
@@ -58,6 +56,7 @@ total_rewards = 0
 total_states = 0
 states_l=[]
 rewards_l=[]
+img_paths = []
 
 if 'recorded_robot' in state_file_str :
     print 'Plotting ', MOBILE_ROBOT,' observed states and rewards in ',state_file_str
@@ -74,7 +73,9 @@ else: # general case
                 # Saving each image file and its learned representations
                 words=line.split(' ')
                 states_l.append((words[0], list(map(float,words[1:-1]))))
+                img_paths.append(words[0])
                 total_states += 1
+
 
     states_l.sort(key= lambda x : x[0])
     states = np.zeros((len(states_l), len(states_l[0][1])))
@@ -93,6 +94,11 @@ with open(reward_file_str) as f:
 
 rewards=rewards_l
 toplot=states
+print type(states), 'states'
+img_paths2repr = dict()
+for i in range(len(img_paths)):
+    img_paths2repr[img_paths[i]] = [states[i], rewards[i]]
+
 print "Ploting total states and total rewards: ",total_states, " ", total_rewards," in files: ",state_file_str," and ", reward_file_str
 test.assertEqual(total_rewards, total_states, "Datapoints size discordance! Length of rewards and state files should be equal, and it is "+str(len(rewards))+" and "+str(len(toplot))+" Run first create_all_reward.lua and create_plotStates_file_for_all_seq.lua")
 
@@ -112,9 +118,9 @@ else:
 
 
 if PLOT_DIMENSIONS == 2:
-    produceRelevantImageStatesPlotMovie('2D', rewards, toplot, model_name)
+    produceRelevantImageStatesPlotMovie('2D', rewards, toplot, img_paths2repr, model_name)
 elif PLOT_DIMENSIONS ==3:
-    produceRelevantImageStatesPlotMovie('3D', rewards, toplot, model_name)
+    produceRelevantImageStatesPlotMovie('3D', rewards, toplot, img_paths2repr, model_name)
 else:
     print " PLOT_DIMENSIONS other than 2 or 3 not supported"
 

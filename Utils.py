@@ -40,7 +40,8 @@ GIF_MOVIES_PATH = 'GIF_MOVIES/'
 
 # DEFINING A SET OF PREDEFINED IMAGES WE WANT ITS CORRESPONDING STATES FOR:
 # they represent left up, right up, down right, down left corner and pushing button images (clockwise hand movement
-REPRESENTATIVE_DIFFERENT_IMAGES = {COLORFUL75: ['colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00012.jpg','colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00087.jpg',
+REPRESENTATIVE_DIFFERENT_IMAGES = {COLORFUL75: ['colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00012.jpg',
+'colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00087.jpg',
 'colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00149.jpg',
 'colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00011.jpg',
 'colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00234.jpg',
@@ -57,13 +58,14 @@ def library_versions_tests():
         sys.exit(-1)
 
     numpy_versions_installed = np.__path__
-    #print "numpy_versions_installed: ", numpy_versions_installed
+    print "numpy_versions_installed: ", numpy_versions_installed
     if len(numpy_versions_installed)>1:
         print "Probably you have installed numpy with and without Anaconda, so there is a conflict because two numpy versions can be used."
         print "Remove non-Anaconda numpy:\n 1) pip uninstall numpy \n and if needed, install 2.1) pip install --user numpy  \n "
         print "2.2) If 1 does not work: last version in: \n -https://anaconda.org/anaconda/numpy"
 
 def get_data_folder_from_model_name(model_name):
+    print model_name
     if BABBLING in model_name:
         return BABBLING
     elif MOBILE_ROBOT in model_name:
@@ -81,7 +83,8 @@ def get_data_folder_from_model_name(model_name):
     elif COLORFUL in model_name:
         return COLORFUL
     else:
-        sys.exit("get_data_folder_from_model_name: Unsupported dataset!")
+        sys.exit("get_data_folder_from_model_name: Unsupported dataset! model_name must contain one of the datasets, input is: ")
+        print(model_name)
 
 # def get_visible_states_for_images(specific_images):
 #     return REPRESENTATIVE_DIFFERENT_IMAGES[] 
@@ -117,19 +120,28 @@ def get_data_folder_from_model_name(model_name):
 #         plotStates(mode, rewardsToPlot, statesToPlot, plot_path.replace('*', str(n_states_in_plot)), dataset=data_folder, specific_images=images_states_to_plot, list_of_colors = colors_to_use)
 #     create_movie_from_folder(plot_path, model_name)
 
-def produceRelevantImageStatesPlotMovie(mode, img_names, rewards, toplot, model_name, axes_labels = ['State Dimension 1','State Dimension 2','State Dimension 3'], title='Learned Representations-Rewards Distribution\n'):
+def produceRelevantImageStatesPlotMovie(mode, rewards, toplot, img_paths2repr, model_name, axes_labels = ['State Dimension 1','State Dimension 2','State Dimension 3'], title='Learned Representations-Rewards Distribution\n'):
     # Produces static plot GIF while the Evolving corresponding method provides an evolving (!= nr of states at each plot generated, where axis scale and labelling changes and squeezes the axes
-    list_of_colors = [(0.3,0.3,0.3), (0.0,0.0,1.0), (1,0,0)] 
-    #list_of_colors = [(0.0, 0.0, 1.0),(1,0,0), (0.3, 0.3, 0.3), (0,1,0), (1,0.5,0), (0.5, 0, 0.5)]
+    colors_to_use = [(0.3,0.3,0.3), (0.0,0.0,1.0), (1,0,0)] 
+    #colors_to_use = [(0.0, 0.0, 1.0),(1,0,0), (0.3, 0.3, 0.3), (0,1,0), (1,0.5,0), (0.5, 0, 0.5)]
     data_folder = get_data_folder_from_model_name(model_name)
-    specific_images = REPRESENTATIVE_DIFFERENT_IMAGES[data_folder]
-    for i in range(len(toplot)):
-        if img_names[i] in specific_images:
-            toplot_visible.append(toPlot[i])
-            rewards_visible.append(rewards[i])
-        else:
-            toplot_invisible.append(toplot[i])
-            rewards_invisible.append(rewards[i])
+    specific_images_to_plot = REPRESENTATIVE_DIFFERENT_IMAGES[data_folder]
+    statesToPlot = []; rewardsToPlot = []; images = []
+    axis_limits = [[np.min(toplot[:,0]), np.max(toplot[:,0])], 
+    [np.min(toplot[:,0]), np.max(toplot[:,0])], 
+    [np.min(toplot[:,0]), np.max(toplot[:,0])]]
+
+    #for img in range(len(specific_images_to_plot)):
+    for img in specific_images_to_plot:
+        statesToPlot.append(img_paths2repr[img][0])
+        rewardsToPlot.append(img_paths2repr[img][1])
+        images.append(img)
+    print axis_limits
+    print images
+    #rewardsToPlot = np.array(rewardsToPlot) #map(float, rewardsToPlot)
+    # else:
+    #     toplot_invisible.append(toplot[i])
+    #     rewards_invisible.append(rewards[i])
     #TODO toPlot = get_states_for_images(specific_images)
     #FIX 
     #toplot = toplot[:3]
@@ -141,40 +153,54 @@ def produceRelevantImageStatesPlotMovie(mode, img_names, rewards, toplot, model_
     except OSError as e:
         if e.errno != errno.EEXIST:
             raise
-    plot_path = plot_path+'StatesDemo'+model_name+'_*.png'
-    colors_to_use = list_of_colors[:n_states_in_plot]
+    plot_filename_template = plot_path+model_name+'_GIF_frame*.png'
     if not (0.0, 0.0, 1.0) in colors_to_use: 
         colors_to_use.append((0.0, 0.0, 1.0))
     if not (1,0,0) in colors_to_use:
         colors_to_use.append((1,0,0))
-    for n_states_in_plot in range(1, len(toplot)):
-        # save one plot per point to make a GIF movie with increasing number of states being represented
-        # statesToPlot = toplot[:n_states_in_plot]
-        # rewardsToPlot = rewards[:n_states_in_plot]
-        # images_states_to_plot = specific_images[:n_states_in_plot] #        colors_to_use = list_of_colors[:n_states_in_plot]
 
-        #print statesToPlot, rewardsToPlot, images_states_to_plot, colors_to_use
-        plotStates(mode, rewards_visible, statesToPlot, plot_path.replace('*', str(n_states_in_plot)), dataset=data_folder, specific_images=images_states_to_plot, list_of_colors = colors_to_use)
-        plotStates(mode, rewards_invisible, statesToPlot, plot_path.replace('*', str(n_states_in_plot)), dataset=data_folder, specific_images=images_states_to_plot, list_of_colors = colors_to_use)
+    #plotStates(mode, rewardsToPlot, statesToPlot, plot_filename.replace('*', str(0)), dataset=data_folder)#, title='Learned Representations for image: '+images[n_states_in_plot])
+        
+    for n_states_in_plot in range(1, len(statesToPlot)+1):
+        # save one plot per point to make a GIF movie with increasing number of states being represented   states = np.zeros((n_states_in_plot, len(toplot[0])))
+        #rewards_visible = []#np.zeros((n_states_in_plot, 1))
+        for s in range(1, n_states_in_plot+1):
+            states = np.zeros((s, len(statesToPlot[0])))
+            for i in range(len(states)):
+                states[i] = np.array(statesToPlot[i]) #            states = statesToPlot[:s] #np.array(statesToPlot[s])
+        rewards_visible = rewardsToPlot[:n_states_in_plot] #.append(rewardsToPlot[s]) #np.array(rewardsToPlot[s]) #rewardsToPlot[:s]
+        colors_visible = colors_to_use[:n_states_in_plot]  #n_states_in_plot>0
+        # images_states_to_plot = specific_images[:n_states_in_plot] #        colors_to_use = list_of_colors[:n_states_in_plot]
+        #https://stackoverflow.com/questions/30686157/python-matplotlib-invisible-point  , alpha=0.5  ('2D', rewards, toplot, img_paths2repr, model_name)
+        plot_filename = plot_filename_template.replace('*', str(n_states_in_plot-1))
+        print 'Plotting rewards and states: ', rewards_visible, states, rewards_visible[-1]
+        plotStates(mode, rewards_visible, states, plot_filename, dataset=data_folder, title='Learned Representation for image:\n'+images[n_states_in_plot-1], axis_limits= axis_limits, one_reward_value=rewards_visible[-1])#, list_of_colors = colors_visible)
+        #plotStates(mode, rewards_invisible, statesToPlot, plot_path.replace('*', str(n_states_in_plot)), dataset=data_folder, specific_images=images_states_to_plot, list_of_colors = colors_to_use)
+    # draw all finally
+    plotStates(mode, rewards, toplot, plot_filename_template.replace('*',str(n_states_in_plot)), dataset=model_name)
     create_movie_from_folder(plot_path, model_name)
 
 def create_movie_from_folder(folder_with_images, model_name):
-    #TODO GIF
+    #TODO GIF, at the moment using simple gifmaker.me, may be enough?
     output_file = folder_with_images+ model_name+'_STATES_MOVIE.gif'
     print 'Used images in ',folder_with_images,' to create movie that is now saved in ', output_file
 
 """
 Use this function if rewards need to be visualized, use plot_3D otherwise
 """
-def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension 1','State Dimension 2','State Dimension 3'], title='Learned Representations-Rewards Distribution\n', dataset='', specific_images=[], list_of_colors = []):
+def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension 1','State Dimension 2','State Dimension 3'], title='Learned Representations-Rewards Distribution\n', dataset='', list_of_colors = [], axis_limits = [[]], one_reward_value=''):
+    # INPUT: mode: '2d" or '3D'
+    # rewards: an array of  rewards in string shape
+    # toplot: an np.ndarray of states (n_states, dim_of_states)
     # Plots states either learned or the ground truth
     # Useful documentation: https://matplotlib.org/examples/mplot3d/scatter3d_demo.html
     # Against colourblindness: https://chrisalbon.com/python/seaborn_color_palettes.html
     # TODO: add vertical color bar for representing reward values  https://matplotlib.org/examples/api/colorbar_only.html
     reward_values = set(rewards)
     rewards_cardinal = len(reward_values)
+    print'plotStates ',mode,' for rewards cardinal: ',rewards_cardinal,' (', reward_values,' ',type(reward_values),': ',reward_values,'), states: ', type(toplot)#, toplot.shape
+    
     rewards = map(float, rewards)
-    print'plotStates ',mode,' for rewards cardinal: ',rewards_cardinal,' (', reward_values,')'
 
     # custom Red Gray Blue colormap
     if len(list_of_colors) == 0: # default for 3 values of reward possible
@@ -183,9 +209,13 @@ def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension
         cmap = colors.ListedColormap(['gray', 'blue', 'red'])     # print "cmap: ",type(cmap)
     else:
         cmap = colors.ListedColormap(['gray', 'blue', 'red', 'Pastel1', 'Pastel2', 'Paired', 'Accent','Dark2'])#'orange', 'purple'])
-    n_bins = 100
+    if ' Representation ' in title:
+        #plot only one state and therefore concatenating the dataset is redundant
+        n_bins = 3
+    else:
+        n_bins = 100
     cmap_name = 'rgrayb'
-    print 'list_of_colors ',list_of_colors
+    print 'Using list_of_colors ',list_of_colors, type(list_of_colors)
     cm = LinearSegmentedColormap.from_list(cmap_name, list_of_colors, n_bins)
 
     colorblind_palette = sns.color_palette("colorblind", rewards_cardinal)  # 3 is the number of different colours to use
@@ -194,7 +224,7 @@ def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension
     #print(type(cubehelix_pal_cmap))
 
     #sns.palplot(sns.color_palette("colorblind", 10))
-    # sns.color_palette()
+    #sns.color_palette()
     #sns.set_palette('colorblind')
 
     colorblind_cmap = ListedColormap(colorblind_palette) # not used
@@ -214,17 +244,26 @@ def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension
         ax = fig.add_subplot(111, projection='3d')
         # for c, m, zlow, zhigh in colors_markers:
         #     ax.scatter(toplot[:,0], toplot[:,1], toplot[:,2], c=c, marker=m)
-        cax = ax.scatter(toplot[:,0], toplot[:,1], toplot[:,2], c=rewards, cmap=cm, marker=".")#,fillstyle=None)
+        cax = ax.scatter(toplot[:,0], toplot[:,1], toplot[:,2], c=rewards, cmap=cm, marker=".")#, linestyle="")#, color = 'b')#,fillstyle=None)
         ax.set_zlabel(axes_labels[2])
     else:
         sys.exit("only mode '2D' and '3D' plot supported")
 
     ax.set_xlabel(axes_labels[0])
     ax.set_ylabel(axes_labels[1])
+
+    if len(axis_limits[0]) >0:
+        ax.set_xlim(axis_limits[0][0], axis_limits[0][1])
+        ax.set_ylim(axis_limits[1][0], axis_limits[1][1])
+        ax.set_zlim(axis_limits[2][0], axis_limits[2][1])
     if 'GroundTruth' in plot_path:
         ax.set_title(title.replace('Learned Representations','Ground Truth')+dataset)
     else:
-        ax.set_title(title+dataset)
+        if ' Representation ' in title:
+            #plot only one state and therefore concatenating the dataset is redundant
+            ax.set_title(title+'\nReward: '+str(one_reward_value).replace('recorded_cameras_head_camera_2_image_compressed/',''))
+        else:
+            ax.set_title(title+dataset)
 
     # adding color bar
     cbar = fig.colorbar(cax, ticks=[-1, 0, 1])
@@ -312,6 +351,10 @@ def get_test_set_for_data_folder(data_folder):
     else:
         sys.exit('get_list_of_test_imgs_for_dataset: Dataset has not a defined test set: {}'.format(data_folder))
 
+def remove_dataset_name(string):
+    for dataset in ALL_DATASETS:
+        if string.endswith(dataset):
+            return string[:(len(string)-len(dataset))]
 
 # 50 lines, 49 images (1 repeated by error) IMAGES TEST SET HANDPICKED TO SHOW VISUAL VARIABILITY
 IMG_TEST_SET = {
@@ -601,5 +644,6 @@ COLORFUL75_TEST_SET = {
 'colorful75/record_150/recorded_cameras_head_camera_2_image_compressed/frame00019.jpg',
 'colorful75/record_150/recorded_cameras_head_camera_2_image_compressed/frame00046.jpg'
 }
+
 #library_versions_tests()
 
