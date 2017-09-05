@@ -40,14 +40,14 @@ else:
     state_file_str = sys.argv[1]
     path_list = state_file_str.split('/')[-2:]
 
-    print "path_list",path_list 
+    print "path_list",path_list , ' Warning: plotting particular case, should not be the general pipeline case...'
 
     if path_list[0][:2] == 'co':
-        data_folder = 'complexData'
+        data_folder = COMPLEX_DATA
     elif path_list[0][:2].lower() == '3d':
-        data_folder = 'staticButtonSimplest'
+        data_folder = STATIC_BUTTON_SIMPLEST
     else:
-        data_folder = MOBILE_ROBOT
+        data_folder = 'mobileData' # NOTICE, not, MOBILE_ROBOT
 
 reward_file_str = 'allRewardsGT_'+data_folder+'.txt'
 print "state file ",state_file_str

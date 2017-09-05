@@ -65,7 +65,7 @@ def library_versions_tests():
         print "2.2) If 1 does not work: last version in: \n -https://anaconda.org/anaconda/numpy"
 
 def get_data_folder_from_model_name(model_name):
-    print model_name
+
     if BABBLING in model_name:
         return BABBLING
     elif MOBILE_ROBOT in model_name:
@@ -83,8 +83,9 @@ def get_data_folder_from_model_name(model_name):
     elif COLORFUL in model_name:
         return COLORFUL
     else:
-        sys.exit("get_data_folder_from_model_name: Unsupported dataset! model_name must contain one of the datasets, input is: ")
-        print(model_name)
+        print model_name
+        sys.exit("get_data_folder_from_model_name: Unsupported dataset! model_name must contain one of the datasets, input is: "+ model_name)
+
 
 # def get_visible_states_for_images(specific_images):
 #     return REPRESENTATIVE_DIFFERENT_IMAGES[] 

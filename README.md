@@ -361,3 +361,7 @@ mkdir ./Log/modelY2017_D22_M06_H14M36S26_staticButtonSimplest_resnet_cont_MCD0_4
 : mkdir ./Log/modelY2017_D22_M06_H14M36S26_staticButtonSimplest_resnet_cont_MCD0_4_S0_6/NearestNeighbors
 
 ```
+
+
+Documentation
+https://www.overleaf.com/10287644pmsgbdbwwshm#/38141559/

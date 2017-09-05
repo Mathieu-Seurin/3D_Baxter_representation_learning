@@ -17,29 +17,31 @@ plotGroundTruthStates = False
 with_title = False #do you want the title on your plots or nop ? Not implemented at the moment
 
 library_versions_tests()
-print"\n\n >> Running plotStatesGivenImages.py....plotGroundTruthStates: ",plotGroundTruthStates, " SKIP_RENDERING = ", SKIP_RENDERING
+print"\n\n >> Running makeMovieFromPlotStates.py... plotGroundTruthStates: ",plotGroundTruthStates, " SKIP_RENDERING = ", SKIP_RENDERING
 
 model_name = ''
 
-if len(sys.argv) !=2:  # regular pipeline in gridsearch script
+if len(sys.argv) !=2:  # regular pipeline in gridsearch script    
+    print 'Provide as argument a folder path (ending in "/") containing the model and reprsentations file'
     exit("Please provide the path to the model's learned representations within the Log folder, e.g. of program run: \n python plotStatesGivenImages.py Log/PredictRewPriormodelY2017_D24_M08_H19M18S22_mobileRobot_resnet_ProTemCauRep")
 
 else:
     state_file_str = sys.argv[1]
-    path_list = state_file_str.split('/')[-2:]
-
-    path = state_file_str+'/'
-    model_name = path.split('/')[1]
+    path = state_file_str
+    model_name = path.split('/')[-1]
     if plotGroundTruthStates:
         state_file_str = 'allStatesGT_'+data_folder+'.txt'
         print "*********************\nPLOTTING GROUND TRUTH (OBSERVED) STATES for model: ", model_name#(Baxter left wrist position for 3D PUSHING_BUTTON_AUGMENTED dataset, or grid 2D position for MOBILE_ROBOT dataset)
         plot_path = path+'GroundTruthStatesPlot_'+model_name+'.png'
     else:
-        state_file_str = path+ LEARNED_REPRESENTATIONS_FILE
+        if not state_file_str.endswith('/'):
+            state_file_str = path+'/'+LEARNED_REPRESENTATIONS_FILE
+        else:
+            state_file_str = path+ LEARNED_REPRESENTATIONS_FILE
         print "*********************\nPLOTTING LEARNT STATES for model: ", model_name #(3D for Baxter PUSHING_BUTTON_AUGMENTED dataset, or 2D position for MOBILE_ROBOT dataset): ", state_file_str
         plot_path = path+'LearnedStatesPlot_'+model_name+'.png'
 
-    data_folder = get_data_folder_from_model_name(model_name)   #print "path_list",path_list 
+    data_folder = get_data_folder_from_model_name(model_name)  
     print 'state_file_str', state_file_str, '\n model name: ', model_name, 'data_folder: ', data_folder
 
 reward_file_str = 'allRewardsGT_'+data_folder+'.txt'
