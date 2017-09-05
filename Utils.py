@@ -44,14 +44,24 @@ REPRESENTATIVE_DIFFERENT_IMAGES = {COLORFUL75: ['colorful75/record_008/recorded_
 'colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00087.jpg',
 'colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00149.jpg',
 'colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00011.jpg',
-'colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00234.jpg'
-], 
-COLORFUL: [], COMPLEX_DATA: ['complexData/record_008/recorded_cameras_head_camera_2_image_compressed/frame00001.jpg',
+'colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00234.jpg'], 
+COLORFUL: ['colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00012.jpg',
+'colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00087.jpg',
+'colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00149.jpg',
+'colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00011.jpg',
+'colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00234.jpg'], 
+COMPLEX_DATA: ['complexData/record_008/recorded_cameras_head_camera_2_image_compressed/frame00001.jpg',
 'complexData/record_008/recorded_cameras_head_camera_2_image_compressed/frame00070.jpg',
 'complexData/record_008/recorded_cameras_head_camera_2_image_compressed/frame00103.jpg',
 'complexData/record_008/recorded_cameras_head_camera_2_image_compressed/frame00176.jpg',
 'complexData/record_008/recorded_cameras_head_camera_2_image_compressed/frame00109.jpg'],
- STATIC_BUTTON_SIMPLEST:[], MOBILE_ROBOT: ['mobileRobot/record_008/recorded_camera_top/frame00001.jpg',
+ STATIC_BUTTON_SIMPLEST:['staticButtonSimplest/record_043/recorded_camera_top/frame00000.jpg',
+'staticButtonSimplest/record_043/recorded_camera_top/frame00020.jpg',
+'staticButtonSimplest/record_043/recorded_camera_top/frame00071.jpg',
+'staticButtonSimplest/record_043/recorded_camera_top/frame00028.jpg',
+'staticButtonSimplest/record_043/recorded_camera_top/frame00050.jpg',
+'staticButtonSimplest/record_043/recorded_camera_top/frame00009.jpg'], 
+ MOBILE_ROBOT: ['mobileRobot/record_008/recorded_camera_top/frame00001.jpg',
 'mobileRobot/record_008/recorded_camera_top/frame00072.jpg',
 'mobileRobot/record_008/recorded_camera_top/frame00063.jpg',
 'mobileRobot/record_008/recorded_camera_top/frame00011.jpg',
@@ -134,6 +144,7 @@ def get_data_folder_from_model_name(model_name):
 def produceRelevantImageStatesPlotMovie(mode, rewards, toplot, img_paths2repr, model_name, axes_labels = ['State Dimension 1','State Dimension 2','State Dimension 3'], title='Learned Representations-Rewards Distribution\n'):
     # Produces static plot GIF while the Evolving corresponding method provides an evolving (!= nr of states at each plot generated, where axis scale and labelling changes and squeezes the axes
     colors_to_use = [(0.3,0.3,0.3), (0.0,0.0,1.0), (1,0,0)] 
+    model_category = ''
     #colors_to_use = [(0.0, 0.0, 1.0),(1,0,0), (0.3, 0.3, 0.3), (0,1,0), (1,0.5,0), (0.5, 0, 0.5)]
     data_folder = get_data_folder_from_model_name(model_name)
     specific_images_to_plot = REPRESENTATIVE_DIFFERENT_IMAGES[data_folder]
@@ -184,12 +195,12 @@ def produceRelevantImageStatesPlotMovie(mode, rewards, toplot, img_paths2repr, m
         plot_filename = plot_filename_template.replace('*', str(n_states_in_plot-1))
         print 'Plotting rewards and states: ', rewards_visible, states, rewards_visible[-1]
         if n_states_in_plot:
-            plotStates(mode, rewards_visible, states, plot_filename, dataset=data_folder, title='Learned Representation for image:\n'+images[n_states_in_plot-1], axis_limits= axis_limits, one_reward_value=rewards_visible[-1])#, list_of_colors = colors_visible)
+            plotStates(mode, rewards_visible, states, plot_filename, dataset=data_folder, title='State Representation Learned Space: '+model_category+'\nDataset: '+data_folder, axis_limits= axis_limits, one_reward_value=rewards_visible[-1])#, list_of_colors = colors_visible)
         else:
             sys.exit('ERROR in produceRelevantImageStatesPlotMovie! Make sure you have a representative image set to make the gift, defined in REPRESENTATIVE_DIFFERENT_IMAGES for this dataset!')
         #plotStates(mode, rewards_invisible, statesToPlot, plot_path.replace('*', str(n_states_in_plot)), dataset=data_folder, specific_images=images_states_to_plot, list_of_colors = colors_to_use)
     # draw all finally
-    plotStates(mode, rewards, toplot, plot_filename_template.replace('*',str(n_states_in_plot)), dataset=model_name, axis_limits= axis_limits)
+    plotStates(mode, rewards, toplot, plot_filename_template.replace('*',str(n_states_in_plot)), dataset=model_name, title='State Representation Learned Space: '+model_category+'\nDataset: '+data_folder, axis_limits= axis_limits)
     create_movie_from_folder(plot_path, model_name)
 
 def create_movie_from_folder(folder_with_images, model_name):
@@ -221,9 +232,9 @@ def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension
         cmap = colors.ListedColormap(['gray', 'blue', 'red'])     # print "cmap: ",type(cmap)
     else:
         cmap = colors.ListedColormap(['gray', 'blue', 'red', 'Pastel1', 'Pastel2', 'Paired', 'Accent','Dark2'])#'orange', 'purple'])
-    if ' Representation ' in title:
+    if 'State Representation Learned Space' in title:
         #plot only one state and therefore concatenating the dataset is redundant
-        n_bins = 3
+        n_bins = 3 # TODO make function based on rewards_cardinal AND dataset
     else:
         n_bins = 100
     cmap_name = 'rgrayb'
@@ -271,7 +282,7 @@ def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension
     if 'GroundTruth' in plot_path:
         ax.set_title(title.replace('Learned Representations','Ground Truth')+dataset)
     else:
-        if ' Representation ' in title:
+        if 'Representation Learned Space' in title:
             #plot only one state and therefore concatenating the dataset is redundant
             ax.set_title(title+'\n                                                                            Reward: '+str(one_reward_value).replace('recorded_cameras_head_camera_2_image_compressed/',''))
         else:
