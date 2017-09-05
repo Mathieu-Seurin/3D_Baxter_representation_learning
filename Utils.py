@@ -51,7 +51,12 @@ COLORFUL: [], COMPLEX_DATA: ['complexData/record_008/recorded_cameras_head_camer
 'complexData/record_008/recorded_cameras_head_camera_2_image_compressed/frame00103.jpg',
 'complexData/record_008/recorded_cameras_head_camera_2_image_compressed/frame00176.jpg',
 'complexData/record_008/recorded_cameras_head_camera_2_image_compressed/frame00109.jpg'],
- STATIC_BUTTON_SIMPLEST:[], MOBILE_ROBOT: []}
+ STATIC_BUTTON_SIMPLEST:[], MOBILE_ROBOT: ['mobileRobot/record_008/recorded_camera_top/frame00001.jpg',
+'mobileRobot/record_008/recorded_camera_top/frame00072.jpg',
+'mobileRobot/record_008/recorded_camera_top/frame00063.jpg',
+'mobileRobot/record_008/recorded_camera_top/frame00011.jpg',
+'mobileRobot/record_008/recorded_camera_top/frame00048.jpg',
+'mobileRobot/record_008/recorded_camera_top/frame00090.jpg']}
 
 
 def library_versions_tests():
