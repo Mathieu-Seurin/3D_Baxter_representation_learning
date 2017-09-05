@@ -44,9 +44,14 @@ REPRESENTATIVE_DIFFERENT_IMAGES = {COLORFUL75: ['colorful75/record_008/recorded_
 'colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00087.jpg',
 'colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00149.jpg',
 'colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00011.jpg',
-'colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00234.jpg',
+'colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00234.jpg'
 ], 
-COLORFUL: [], COMPLEX_DATA: [], STATIC_BUTTON_SIMPLEST:[], MOBILE_ROBOT: []}
+COLORFUL: [], COMPLEX_DATA: ['complexData/record_008/recorded_cameras_head_camera_2_image_compressed/frame00001.jpg',
+'complexData/record_008/recorded_cameras_head_camera_2_image_compressed/frame00070.jpg',
+'complexData/record_008/recorded_cameras_head_camera_2_image_compressed/frame00103.jpg',
+'complexData/record_008/recorded_cameras_head_camera_2_image_compressed/frame00176.jpg',
+'complexData/record_008/recorded_cameras_head_camera_2_image_compressed/frame00109.jpg'],
+ STATIC_BUTTON_SIMPLEST:[], MOBILE_ROBOT: []}
 
 
 def library_versions_tests():
@@ -76,7 +81,7 @@ def get_data_folder_from_model_name(model_name):
         return PUSHING_BUTTON_AUGMENTED
     elif STATIC_BUTTON_SIMPLEST in model_name:
         return STATIC_BUTTON_SIMPLEST
-    elif COMPLEX_DATA in model_name:
+    elif COMPLEX_DATA in model_name or 'complex' in model_name:
         return COMPLEX_DATA
     elif COLORFUL75 in model_name:  # VERY IMPORTANT THE ORDER! TO NOT PROCESS THE WRONG SUPER LARGE DATASET WHEN RESOURCES NOT AVAILABLE!
         return COLORFUL75
@@ -160,8 +165,6 @@ def produceRelevantImageStatesPlotMovie(mode, rewards, toplot, img_paths2repr, m
     if not (1,0,0) in colors_to_use:
         colors_to_use.append((1,0,0))
 
-    #plotStates(mode, rewardsToPlot, statesToPlot, plot_filename.replace('*', str(0)), dataset=data_folder)#, title='Learned Representations for image: '+images[n_states_in_plot])
-        
     for n_states_in_plot in range(1, len(statesToPlot)+1):
         # save one plot per point to make a GIF movie with increasing number of states being represented   states = np.zeros((n_states_in_plot, len(toplot[0])))
         #rewards_visible = []#np.zeros((n_states_in_plot, 1))
@@ -175,10 +178,13 @@ def produceRelevantImageStatesPlotMovie(mode, rewards, toplot, img_paths2repr, m
         #https://stackoverflow.com/questions/30686157/python-matplotlib-invisible-point  , alpha=0.5  ('2D', rewards, toplot, img_paths2repr, model_name)
         plot_filename = plot_filename_template.replace('*', str(n_states_in_plot-1))
         print 'Plotting rewards and states: ', rewards_visible, states, rewards_visible[-1]
-        plotStates(mode, rewards_visible, states, plot_filename, dataset=data_folder, title='Learned Representation for image:\n'+images[n_states_in_plot-1], axis_limits= axis_limits, one_reward_value=rewards_visible[-1])#, list_of_colors = colors_visible)
+        if n_states_in_plot:
+            plotStates(mode, rewards_visible, states, plot_filename, dataset=data_folder, title='Learned Representation for image:\n'+images[n_states_in_plot-1], axis_limits= axis_limits, one_reward_value=rewards_visible[-1])#, list_of_colors = colors_visible)
+        else:
+            sys.exit('ERROR in produceRelevantImageStatesPlotMovie! Make sure you have a representative image set to make the gift, defined in REPRESENTATIVE_DIFFERENT_IMAGES for this dataset!')
         #plotStates(mode, rewards_invisible, statesToPlot, plot_path.replace('*', str(n_states_in_plot)), dataset=data_folder, specific_images=images_states_to_plot, list_of_colors = colors_to_use)
     # draw all finally
-    plotStates(mode, rewards, toplot, plot_filename_template.replace('*',str(n_states_in_plot)), dataset=model_name)
+    plotStates(mode, rewards, toplot, plot_filename_template.replace('*',str(n_states_in_plot)), dataset=model_name, axis_limits= axis_limits)
     create_movie_from_folder(plot_path, model_name)
 
 def create_movie_from_folder(folder_with_images, model_name):
@@ -262,7 +268,7 @@ def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension
     else:
         if ' Representation ' in title:
             #plot only one state and therefore concatenating the dataset is redundant
-            ax.set_title(title+'\nReward: '+str(one_reward_value).replace('recorded_cameras_head_camera_2_image_compressed/',''))
+            ax.set_title(title+'\n                                                                            Reward: '+str(one_reward_value).replace('recorded_cameras_head_camera_2_image_compressed/',''))
         else:
             ax.set_title(title+dataset)
 
