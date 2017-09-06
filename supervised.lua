@@ -283,7 +283,7 @@ function test_run(verbose)
   NB_TEST = 2
   NB_TRAIN = NB_SEQUENCES - NB_TEST
   _, err = train(Model, verbose, false)
-  NAME_SAVE = 'Supervised_'..NAME_SAVE
+  NAME_SAVE = 'Supervised_'..DATA_FOLDER --TODO ADD DATE as rest of experiments?
   save_model(Model)
 
   local error_train = 0

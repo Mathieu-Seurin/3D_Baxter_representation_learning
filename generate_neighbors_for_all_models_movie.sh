@@ -36,7 +36,7 @@ function has_command_finished_correctly {
 # /home/natalia/dream/baxter_representation_learning_3D/Log/complex bst078
 # /home/natalia/dream/baxter_representation_learning_3D/Log/modelY2017_D26_M08_H20M07S28_colorful75_resnet_cont_MCD0_4_S0_3_ProTemCauRepFix
 
-for path_to_model in './Log/colorful75_0.013_ground_truth' #'./Log/colorful75_0.196_button_ref' 
+for path_to_model in './Log/Supervised_colorful75' #'./Log/colorful75_0.013_ground_truth' #'./Log/colorful75_0.196_button_ref' 
 do
     echo " **** Running neighbour generation for all models. Model: $path_to_model ****"
     python generateNNImages.py -1 $path_to_model 

@@ -59,6 +59,7 @@ if nbr_neighbors == -1: # TODO FIX AND ADD MODEL NAME TO SUPERVISED!
 	data_folder = DEFAULT_DATASET
 	nbr_neighbors = 2 # for GIF creation purposes
 	TEST_SET = get_movie_test_set_for_data_folder(data_folder)
+	TEST_SET = TEST_SET[:2]  # TODO TEST
 	if len(sys.argv) != 3:
 		sys.exit('calling this program with first argument being -1 means we will use TEST_MOVIE test sets and you need to provide aftewrards, in the command line, the path to the model you want to build the neigbours for. Exiting...')
 	else:

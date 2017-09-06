@@ -168,7 +168,7 @@ local function main(params)
    --  end
    --Not necessary anymore because ae uses resnet
 
-   NAME_SAVE = 'AE_'..NUM_HIDDEN..NAME_SAVE
+   NAME_SAVE = 'AE_'..DATA_FOLDER..NUM_HIDDEN..NAME_SAVE
    print('NAME SAVE IN set_AE_hyp:  '..NAME_SAVE)
    local list_folders_images, list_txt=Get_HeadCamera_View_Files(DATA_FOLDER)
 
