@@ -18,7 +18,7 @@ function has_command_finished_correctly {
     fi
 }
 
-echo " ********** Running supervised script: *************"
+echo " ********** Running Denoising Conv. Autoencoder script: *************"
 #qlua script.lua  -use_cuda -use_continuous -mcd $max_cos_dis -sigma $s -data_folder mobileRobot #complexData #colorful  #stati$
 th supervised.lua -use_cuda -data_folder colorful75
 has_command_finished_correctly
@@ -38,3 +38,4 @@ has_command_finished_correctly
 
 #python distortion_crit.py  # short to compute, it's just that it doesn't seem to be very useful
 #has_command_finished_correctly
+
