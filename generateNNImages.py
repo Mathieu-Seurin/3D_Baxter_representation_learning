@@ -70,7 +70,7 @@ if nbr_neighbors == -1: # TODO FIX AND ADD MODEL NAME TO SUPERVISED!
 		else:
 			sys.exit('calling this program with first argument being -1 means we will use TEST_MOVIE test sets and you need to provide aftewrards, in the command line, the path to the model you want to build the neigbours for. For a given data_folder, add it as a 4th argument. Exiting...')
 	TEST_SET = get_movie_test_set_for_data_folder(data_folder)
-	#TEST_SET = TEST_SET[:2]
+	#TEST_SET = TEST_SET[:2] # just for fast testing!
 else:
 	generating_neigbours_for_movie = False
 	if len(sys.argv) >= 3:

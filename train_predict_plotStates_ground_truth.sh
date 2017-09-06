@@ -20,16 +20,16 @@ function has_command_finished_correctly {
 
 data_folder='colorful75'  #mobileRobot # complexData #colorful  #staticButtonSimplest
 
-echo " ********** Running Denoising Conv. Autoencoder script: *************"
+echo " ********** Running Ground Truth (arm position) state representations script: *************"
 #qlua script.lua  -use_cuda -use_continuous -mcd $max_cos_dis -sigma $s -data_folder mobileRobot #complexData #colorful  #stati$
-th supervised.lua -use_cuda -data_folder $data_folder
-has_command_finished_correctly
+# th supervised.lua -use_cuda -data_folder $data_folder
+# has_command_finished_correctly
 
-#th imagesAndReprToTxt.lua  -use_cuda -use_continuous -data_folder mobileRobot # complexData #colorful  #staticButtonSimplest
-th imagesAndReprToTxt.lua  -use_cuda -data_folder $data_folder
-has_command_finished_correctly
+# #th imagesAndReprToTxt.lua  -use_cuda -use_continuous -data_folder mobileRobot # complexData #colorful  #staticButtonSimplest
+# th imagesAndReprToTxt.lua  -use_cuda -data_folder $data_folder
+# has_command_finished_correctly
 
-python generateNNImages.py 10 # -1 uses a characteristic set of image for creating the neigbors for a GIF animation, REQUIRES SETTING DEFAULT_DATASET in Utils.py
+python generateNNImages.py -ground_truth # -1 uses a characteristic set of image for creating the neigbors for a GIF animation, REQUIRES SETTING DEFAULT_DATASET in Utils.py
 #   ----- Note: includes the call to:
 #                th create_all_reward.lua
 #                th create_plotStates_file_for_all_seq.lua

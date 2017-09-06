@@ -22,7 +22,7 @@ data_folder='colorful75'  #mobileRobot # complexData #colorful  #staticButtonSim
 
 echo " ********** Running Denoising Conv. Autoencoder script: *************"
 #qlua script.lua  -use_cuda -use_continuous -mcd $max_cos_dis -sigma $s -data_folder mobileRobot #complexData #colorful  #stati$
-th supervised.lua -use_cuda -data_folder $data_folder
+th learn_autoencoder.lua -use_cuda -data_folder $data_folder
 has_command_finished_correctly
 
 #th imagesAndReprToTxt.lua  -use_cuda -use_continuous $data_folder 
