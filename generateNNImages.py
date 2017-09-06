@@ -50,43 +50,51 @@ if len(sys.argv) <= 1:
 # Some parameters
 nbr_neighbors= int(sys.argv[1])
 nbr_images = -1
-
 use_test_set = True  
 with_title = True
 
-if len(sys.argv) >= 3:
-	nbr_images=int(sys.argv[2])
-if len(sys.argv) == 4:
-    path_to_model = sys.argv[3]
-    print """====================================
-    WARNING: DATASET IS SET BY HAND HERE  (IN ALL PYTHON SCRIPTS, take into account when running pipeline scripts such as gridsearch): MOBILE ROBOT FOR NOW
-    ============================================="""
-    data_folder = get_data_folder_from_model_name(path_to_model)
-else:
-    lastModelFile = open(LAST_MODEL_FILE)
-    path_to_model = lastModelFile.readline()[:-1]
-    data_folder = get_data_folder_from_model_name(path_to_model)
-    
 
 if nbr_neighbors == -1: # TODO FIX AND ADD MODEL NAME TO SUPERVISED!
+	generating_neigbours_for_movie = True
 	data_folder = DEFAULT_DATASET
 	nbr_neighbors = 2 # for GIF creation purposes
 	TEST_SET = get_movie_test_set_for_data_folder(data_folder)
+	if len(sys.argv) != 3:
+		sys.exit('calling this program with first argument being -1 means we will use TEST_MOVIE test sets and you need to provide aftewrards, in the command line, the path to the model you want to build the neigbours for. Exiting...')
+	else:
+		path_to_model = sys.argv[2]
 else:
+	generating_neigbours_for_movie = False
+	if len(sys.argv) >= 3:
+		nbr_images=int(sys.argv[2])
+	if len(sys.argv) == 4:
+	    path_to_model = sys.argv[3]
+	    print """====================================
+	    WARNING: DATASET IS SET BY HAND HERE  (IN ALL PYTHON SCRIPTS, take into account when running pipeline scripts such as gridsearch): MOBILE ROBOT FOR NOW
+	    ============================================="""
+	    data_folder = get_data_folder_from_model_name(path_to_model)
+	else:
+	    lastModelFile = open(LAST_MODEL_FILE)
+	    path_to_model = lastModelFile.readline()[:-1]
+	    data_folder = get_data_folder_from_model_name(path_to_model)
+	    
 	TEST_SET = get_test_set_for_data_folder(data_folder)
 
-print "Using data_folder set by hand in all python scripts for SUPERVISED scripts. HERE DATA_FOLDER: ", data_folder
 
 
+print "Using data_folder set by hand in all python scripts for SUPERVISED scripts. HERE DATA_FOLDER: ", data_folder, " Using path_to_model: ", path_to_model
 if len(sys.argv) == 2:
 	# We use fixed test set for fair comparison reasons
 	use_test_set = True
 	nbr_images = len(TEST_SET) 
     
-# THE FOLLOWING ONLY WILL RUN IN USE_CUDA false way  #print('Calling lua subprocesses with ',data_folder)
-subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_cuda','-use_continuous','-data_folder', data_folder])  
-# TODO: READ CMD LINE ARGS FROM FILE INSTEAD (and set accordingly here) TO NOT HAVING TO MODIFY INSTEAD train_predict_plotStates and the python files
-subprocess.call(['th','create_all_reward.lua','-use_cuda','-use_continuous','-data_folder',data_folder])
+if not generating_neigbours_for_movie:
+	#THE FOLLOWING ONLY WILL RUN IN USE_CUDA false way  #print('Calling lua subprocesses with ',data_folder)
+	subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_cuda','-use_continuous','-data_folder', data_folder])  
+	# TODO: READ CMD LINE ARGS FROM FILE INSTEAD (and set accordingly here) TO NOT HAVING TO MODIFY INSTEAD train_predict_plotStates and the python files
+	subprocess.call(['th','create_all_reward.lua','-use_cuda','-use_continuous','-data_folder',data_folder])
+# else, the files should exist
+
 
 #Parsing representation file
 #===================
@@ -102,7 +110,10 @@ nbrs = NearestNeighbors(n_neighbors=(nbr_neighbors+1), algorithm='ball_tree').fi
 distances, indexes = nbrs.kneighbors(representations)
 
 #Generate mosaics
-path_to_neighbour = path_to_model + '/NearestNeighbors/'
+if generating_neigbours_for_movie:
+	path_to_neighbour = path_to_model + '/NearestNeighborsGIFSeq/'
+else:
+	path_to_neighbour = path_to_model + '/NearestNeighbors/'
 last_model_name = path_to_model.split('/')[-1]
 
 print "path_to_model: ",path_to_model
@@ -195,19 +206,21 @@ score_file = path_to_model+'/scoreNN.txt'
 f = open(score_file,'w')
 f.write(str(mean_error)[:5])
 f.close()
+print 'KNN_MSE score for given neighbors: ', mean_error
 
-# writing scores to global log for plotting and reporting
-header = ['Model', 'KNN_MSE']
-d = {'Model':[last_model_name], 'KNN_MSE': [mean_error]}
-global_scores_df = pd.DataFrame(data=d, columns = header) #global_scores_df.reset_index()
+if not generating_neigbours_for_movie:
+	# writing scores to global log for plotting and reporting
+	header = ['Model', 'KNN_MSE']
+	d = {'Model':[last_model_name], 'KNN_MSE': [mean_error]}
+	global_scores_df = pd.DataFrame(data=d, columns = header) #global_scores_df.reset_index()
 
-if not os.path.isfile(GLOBAL_SCORE_LOG_FILE):
-	global_scores_df.to_csv(GLOBAL_SCORE_LOG_FILE, header=True)
-else: # it exists so append without writing the header
-	global_scores_df.to_csv(GLOBAL_SCORE_LOG_FILE, mode ='a', header=False)
+	if not os.path.isfile(GLOBAL_SCORE_LOG_FILE):
+		global_scores_df.to_csv(GLOBAL_SCORE_LOG_FILE, header=True)
+	else: # it exists so append without writing the header
+		global_scores_df.to_csv(GLOBAL_SCORE_LOG_FILE, mode ='a', header=False)
 
-print 'Saved mean KNN MSE score entry from model \n++ ', last_model_name, ' ++\n to ', GLOBAL_SCORE_LOG_FILE, '. Last score is in: ',score_file ,': KNN_MSE: \n'
-print global_scores_df.tail(20)
+	print 'Saved mean KNN MSE score entry from model \n++ ', last_model_name, ' ++\n to ', GLOBAL_SCORE_LOG_FILE, '. Last score is in: ',score_file ,': KNN_MSE: \n'
+	print global_scores_df.tail(20)
 
 # try:
 # 	distances, indexes = nbrs.kneighbors(representations)

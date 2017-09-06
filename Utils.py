@@ -690,7 +690,7 @@ COLORFUL75_TEST_SET = {
 }
 
 
-COLORFUL75_MOVIE_TEST_SET = {   
+COLORFUL75_MOVIE_TEST_SET = [   
 'colorful75/record_150/recorded_cameras_head_camera_2_image_compressed/frame00001.jpg',
 'colorful75/record_150/recorded_cameras_head_camera_2_image_compressed/frame00002.jpg',
 'colorful75/record_150/recorded_cameras_head_camera_2_image_compressed/frame00003.jpg',
@@ -741,9 +741,9 @@ COLORFUL75_MOVIE_TEST_SET = {
 'colorful75/record_150/recorded_cameras_head_camera_2_image_compressed/frame00048.jpg',
 'colorful75/record_150/recorded_cameras_head_camera_2_image_compressed/frame00049.jpg',
 'colorful75/record_150/recorded_cameras_head_camera_2_image_compressed/frame00050.jpg'
-}
+]
 
-COMPLEX_DATA_MOVIE_TEST_SET = {   
+COMPLEX_DATA_MOVIE_TEST_SET = [  
 'complexData/record_024/recorded_cameras_head_camera_2_image_compressed/frame00001.jpg',
 'complexData/record_024/recorded_cameras_head_camera_2_image_compressed/frame00002.jpg',
 'complexData/record_024/recorded_cameras_head_camera_2_image_compressed/frame00003.jpg',
@@ -793,7 +793,7 @@ COMPLEX_DATA_MOVIE_TEST_SET = {
 'complexData/record_024/recorded_cameras_head_camera_2_image_compressed/frame00048.jpg',
 'complexData/record_024/recorded_cameras_head_camera_2_image_compressed/frame00049.jpg',
 'complexData/record_024/recorded_cameras_head_camera_2_image_compressed/frame00050.jpg'
-}
+]
 
 STATIC_BUTTON_SIMPLEST_MOVIE_TEST_SET = []
 COLORFUL_MOVIE_TEST_SET = []
