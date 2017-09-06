@@ -26,7 +26,8 @@ COMPLEX_DATA = 'complexData'
 COLORFUL = 'colorful'  # 150 data recording sequences
 COLORFUL75 = 'colorful75' # a smaller version half size of colorful
 ALL_DATASETS = [BABBLING, MOBILE_ROBOT, SIMPLEDATA3D, PUSHING_BUTTON_AUGMENTED, STATIC_BUTTON_SIMPLEST,COMPLEX_DATA, COLORFUL, COLORFUL75]
-
+SUPERVISED = 'Supervised'
+DEFAULT_DATASET = COLORFUL75  # needs to be set for running all Python scripts in AE, GT? and Supervised modes
 # 2 options of plotting:
 LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
 GLOBAL_SCORE_LOG_FILE = 'globalScoreLog.csv'
@@ -371,6 +372,8 @@ def get_test_set_for_data_folder(data_folder):
         return COLORFUL_TEST_SET
     elif data_folder == MOBILE_ROBOT:
         return ROBOT_TEST_SET
+    elif 'Supervised' in data_folder:
+        return SUPERVISED
     else:
         sys.exit('get_list_of_test_imgs_for_dataset: Dataset has not a defined test set: {}'.format(data_folder))
 

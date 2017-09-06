@@ -14,6 +14,7 @@ require 'functions'
 
 require 'const'
 
+
 function AE_Training(model, batch, optimizer)
    input=batch
    expected=batch

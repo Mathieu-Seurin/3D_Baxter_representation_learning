@@ -27,13 +27,13 @@ has_command_finished_correctly
 th imagesAndReprToTxt.lua  -use_cuda -data_folder colorful75 #mobileRobot
 has_command_finished_correctly
 
-python generateNNImages.py -1  # -1 uses a characteristic set of image for creating the neigbors for a GIF animation, REQUIRES SETTING DEFAULT_DATASET in Utils.py
+python generateNNImages.py -1 # -1 uses a characteristic set of image for creating the neigbors for a GIF animation, REQUIRES SETTING DEFAULT_DATASET in Utils.py
 #   ----- Note: includes the call to:
 #                th create_all_reward.lua
 #                th create_plotStates_file_for_all_seq.lua
 has_command_finished_correctly
 
-python plotStates.py
+python plotStates.py # TODO SET HERE AUTOMATICALLY AS PARAM -use_ground_truth and in gnerateNNImages.py
 has_command_finished_correctly
 
 #python distortion_crit.py  # short to compute, it's just that it doesn't seem to be very useful

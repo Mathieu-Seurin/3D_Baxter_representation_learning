@@ -1,6 +1,6 @@
 # coding: utf-8
 from Utils import library_versions_tests, get_data_folder_from_model_name, plotStates
-from Utils import MOBILE_ROBOT, LEARNED_REPRESENTATIONS_FILE, SKIP_RENDERING
+from Utils import MOBILE_ROBOT, LEARNED_REPRESENTATIONS_FILE, SKIP_RENDERING, DEFAULT_DATASET
 import numpy as np
 import sys
 import os.path
@@ -26,6 +26,8 @@ if len(sys.argv) < 2:  # regular pipeline in gridsearch script
     model_name = path.split('/')[1]
     # ONLY FOR FAST TESTING !!:   model_name = MOBILE_ROBOT#STATIC_BUTTON_SIMPLEST#'pushingButton3DAugmented' #TODO REMOVE-testing  model_name = MOBILE_ROBOT
     data_folder = get_data_folder_from_model_name(model_name)
+    if data_folder == SUPERVISED:
+        data_folder = DEFAULT_DATASET
     if plotGroundTruthStates:
         state_file_str = 'allStatesGT_'+data_folder+'.txt'
         print "*********************\nPLOTTING GROUND TRUTH (OBSERVED) STATES for model: ", model_name#(Baxter left wrist position for 3D PUSHING_BUTTON_AUGMENTED dataset, or grid 2D position for MOBILE_ROBOT dataset)

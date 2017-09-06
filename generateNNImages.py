@@ -10,11 +10,13 @@ from PIL import Image
 import os, os.path
 import subprocess
 
-from Utils import ALL_STATE_FILE, LEARNED_REPRESENTATIONS_FILE, LAST_MODEL_FILE, GLOBAL_SCORE_LOG_FILE, IMG_TEST_SET, COMPLEX_TEST_SET, STATIC_BUTTON_SIMPLEST, COMPLEX_DATA, MOBILE_ROBOT, ROBOT_TEST_SET
+from Utils import ALL_STATE_FILE, LEARNED_REPRESENTATIONS_FILE, LAST_MODEL_FILE, GLOBAL_SCORE_LOG_FILE, IMG_TEST_SET, COMPLEX_TEST_SET, STATIC_BUTTON_SIMPLEST, COMPLEX_DATA, MOBILE_ROBOT, ROBOT_TEST_SET, SUPERVISED, DEFAULT_DATASET
 from Utils import get_data_folder_from_model_name, file2dict, parse_repr_file, parse_true_state_file, get_test_set_for_data_folder
 
 import unittest
 test = unittest.TestCase('__init__')
+
+
 
 """
 NOTE, if sklearn.neighbours import fails, remove  and install:
@@ -40,6 +42,7 @@ call it with only one argument (the number of neigbours to generate for each
 image in the test set and it will assess the test set of 50 images defined in Const.lua and Utils.py)
 
 """
+
 print"\n\n >> Running generateNNImages.py...."
 if len(sys.argv) <= 1:
     sys.exit("Give number of neighbors to produce, followed by number of input images (and model dir if you don't want to use the last model created)")
@@ -63,7 +66,12 @@ else:
     lastModelFile = open(LAST_MODEL_FILE)
     path_to_model = lastModelFile.readline()[:-1]
     data_folder = get_data_folder_from_model_name(path_to_model)
+    
 
+if nbr_neighbors == -1: # TODO FIX AND ADD MODEL NAME TO SUPERVISED!
+	data_folder = DEFAULT_DATASET
+	nbr_neighbors = 2 # for GIF creation purposes
+	print "Using data_folder set by hand in all python scripts for SUPERVISED scripts. HERE DATA_FOLDER: ", data_folder
 TEST_SET = get_test_set_for_data_folder(data_folder)
 
 if len(sys.argv) == 2:
