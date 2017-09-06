@@ -58,7 +58,6 @@ if nbr_neighbors == -1: # TODO FIX AND ADD MODEL NAME TO SUPERVISED!
 	generating_neigbours_for_movie = True
 	nbr_neighbors = 2 # for GIF creation purposes
 
-	#TEST_SET = TEST_SET[:2]  # TODO TEST
 	if len(sys.argv) != 3 and len(sys.argv) != 4:
 		sys.exit('calling this program with first argument being -1 means we will use TEST_MOVIE test sets and you need to provide aftewrards, in the command line, the path to the model you want to build the neigbours for. Exiting...')
 	else:
@@ -90,7 +89,7 @@ else:
 
 
 
-print "Using data_folder set by hand in all python scripts for SUPERVISED scripts. HERE DATA_FOLDER: ", data_folder, " Using path_to_model: ", path_to_model
+#print "Using data_folder set by hand in pipeline bash scripts (for all python scripts). HERE DATA_FOLDER: ", data_folder, " Using path_to_model: ", path_to_model
 if len(sys.argv) == 2:
 	# We use fixed test set for fair comparison reasons
 	use_test_set = True
