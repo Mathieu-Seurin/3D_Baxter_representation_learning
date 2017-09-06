@@ -36,10 +36,14 @@ function has_command_finished_correctly {
 # /home/natalia/dream/baxter_representation_learning_3D/Log/complex bst078
 # /home/natalia/dream/baxter_representation_learning_3D/Log/modelY2017_D26_M08_H20M07S28_colorful75_resnet_cont_MCD0_4_S0_3_ProTemCauRepFix
 
-for path_to_model in './Log/Supervised_colorful75' #'./Log/colorful75_0.013_ground_truth' #'./Log/colorful75_0.196_button_ref' 
+data_folder='staticButtonSimplest' #'colorful75'  #IMPORTANT: = the assignment operator (no space before and after)
+# COLORFUL75 datasets  not done yet #'./Log/colorful75_0.196_button_ref' 
+#for path_to_model in # './Log/colorful75_0.196_button_ref' './Log/Supervised_colorful75' './Log/colorful75_0.013_ground_truth'    
+# 3D (STATIC_BUTTON_SIMPLEST) dataset
+for path_to_model in './Log/3D_0.03_supervised_staticButtonSimplest' './Log/3D_0.053_fix_butt_15ep_staticButtonSimplest' './Log/3D_0.097_AE_staticButtonSimplest'
 do
-    echo " **** Running neighbour generation for all models. Model: $path_to_model ****"
-    python generateNNImages.py -1 $path_to_model 
+    echo " **** Running neighbour generation for all models. Model: $path_to_model DATA_FOLDER: $data_folder****"
+    python generateNNImages.py -1 $path_to_model $data_folder
     #   ----- Note: includes the call to:
     #                th create_all_reward.lua
     #                th create_plotStates_file_for_all_seq.lua

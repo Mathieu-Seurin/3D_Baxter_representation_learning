@@ -16,6 +16,8 @@ function has_command_finish_correctly {
     fi
 }
 
+DATA_FOLDER='colorful75'
+
 th learn_autoencoder.lua -use_cuda -data_folder $DATA_FOLDER
 has_command_finish_correctly
 

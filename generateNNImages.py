@@ -56,14 +56,21 @@ with_title = True
 
 if nbr_neighbors == -1: # TODO FIX AND ADD MODEL NAME TO SUPERVISED!
 	generating_neigbours_for_movie = True
-	data_folder = DEFAULT_DATASET
 	nbr_neighbors = 2 # for GIF creation purposes
-	TEST_SET = get_movie_test_set_for_data_folder(data_folder)
-	TEST_SET = TEST_SET[:2]  # TODO TEST
-	if len(sys.argv) != 3:
+
+	#TEST_SET = TEST_SET[:2]  # TODO TEST
+	if len(sys.argv) != 3 and len(sys.argv) != 4:
 		sys.exit('calling this program with first argument being -1 means we will use TEST_MOVIE test sets and you need to provide aftewrards, in the command line, the path to the model you want to build the neigbours for. Exiting...')
 	else:
 		path_to_model = sys.argv[2]
+		if len(sys.argv) == 2:
+			data_folder = DEFAULT_DATASET
+		elif len(sys.argv) == 4:
+			data_folder = sys.argv[3]
+		else:
+			sys.exit('calling this program with first argument being -1 means we will use TEST_MOVIE test sets and you need to provide aftewrards, in the command line, the path to the model you want to build the neigbours for. For a given data_folder, add it as a 4th argument. Exiting...')
+	TEST_SET = get_movie_test_set_for_data_folder(data_folder)
+	#TEST_SET = TEST_SET[:2]
 else:
 	generating_neigbours_for_movie = False
 	if len(sys.argv) >= 3:
@@ -126,7 +133,7 @@ if not os.path.exists(path_to_neighbour):
 if use_test_set or nbr_images == -1:
 	data = zip(images,indexes,distances,representations)
 	if len(set(images).intersection(TEST_SET)) == 0:
-		sys.exit('Error in generateNNImages.py: the TEST_SET for this dataset has not been properly defined in Utils.py. TEST_SET must contain a subset of the full set of images in DATA_FOLDER => which in this case is:',DATA_FOLDER)
+		sys.exit('Error in generateNNImages.py: the TEST_SET for this dataset has not been properly defined in Utils.py. TEST_SET must contain a subset of the full set of images in DATA_FOLDER => which in this case is:',data_folder)
 else:
 	print ('Using a random test set of images for KNN MSE evaluation...')
 	data = random.sample(zip(images,indexes,distances,representations),nbr_images)

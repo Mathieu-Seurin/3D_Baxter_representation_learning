@@ -689,6 +689,8 @@ COLORFUL75_TEST_SET = {
 'colorful75/record_150/recorded_cameras_head_camera_2_image_compressed/frame00046.jpg'
 }
 
+# IMPORTANT NOTE: MOVIE TEST SETS MUST BE AN ARRAY TO PRESERVE ORDER IN THE MOVIE:
+
 
 COLORFUL75_MOVIE_TEST_SET = [   
 'colorful75/record_150/recorded_cameras_head_camera_2_image_compressed/frame00001.jpg',
@@ -792,10 +794,61 @@ COMPLEX_DATA_MOVIE_TEST_SET = [
 'complexData/record_024/recorded_cameras_head_camera_2_image_compressed/frame00047.jpg',
 'complexData/record_024/recorded_cameras_head_camera_2_image_compressed/frame00048.jpg',
 'complexData/record_024/recorded_cameras_head_camera_2_image_compressed/frame00049.jpg',
-'complexData/record_024/recorded_cameras_head_camera_2_image_compressed/frame00050.jpg'
-]
+'complexData/record_024/recorded_cameras_head_camera_2_image_compressed/frame00050.jpg']
 
-STATIC_BUTTON_SIMPLEST_MOVIE_TEST_SET = []
+STATIC_BUTTON_SIMPLEST_MOVIE_TEST_SET = [
+'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00000.jpg',
+'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00001.jpg',
+'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00002.jpg',
+'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00003.jpg',
+'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00004.jpg',
+'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00005.jpg',
+'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00006.jpg',
+'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00007.jpg',
+'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00008.jpg',
+'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00009.jpg',
+'staticButtonSimplest/record_008/recorded_cameras_head_camera_2_image_compressed/frame00010.jpg',
+'staticButtonSimplest/record_008/recorded_cameras_head_camera_2_image_compressed/frame00011.jpg',
+'staticButtonSimplest/record_008/recorded_cameras_head_camera_2_image_compressed/frame00012.jpg',
+'staticButtonSimplest/record_008/recorded_cameras_head_camera_2_image_compressed/frame00013.jpg',
+'staticButtonSimplest/record_008/recorded_cameras_head_camera_2_image_compressed/frame00014.jpg',
+'staticButtonSimplest/record_008/recorded_cameras_head_camera_2_image_compressed/frame00015.jpg',
+'staticButtonSimplest/record_011/recorded_cameras_head_camera_2_image_compressed/frame00016.jpg',
+'staticButtonSimplest/record_011/recorded_cameras_head_camera_2_image_compressed/frame00017.jpg',
+'staticButtonSimplest/record_011/recorded_cameras_head_camera_2_image_compressed/frame00018.jpg',
+'staticButtonSimplest/record_011/recorded_cameras_head_camera_2_image_compressed/frame00019.jpg',
+'staticButtonSimplest/record_011/recorded_cameras_head_camera_2_image_compressed/frame00020.jpg',
+'staticButtonSimplest/record_019/recorded_cameras_head_camera_2_image_compressed/frame00021.jpg',
+'staticButtonSimplest/record_019/recorded_cameras_head_camera_2_image_compressed/frame00022.jpg',
+'staticButtonSimplest/record_019/recorded_cameras_head_camera_2_image_compressed/frame00023.jpg',
+'staticButtonSimplest/record_022/recorded_cameras_head_camera_2_image_compressed/frame00024.jpg',
+'staticButtonSimplest/record_022/recorded_cameras_head_camera_2_image_compressed/frame00025.jpg',
+'staticButtonSimplest/record_022/recorded_cameras_head_camera_2_image_compressed/frame00026.jpg',
+'staticButtonSimplest/record_031/recorded_cameras_head_camera_2_image_compressed/frame00027.jpg',
+'staticButtonSimplest/record_031/recorded_cameras_head_camera_2_image_compressed/frame00028.jpg',
+'staticButtonSimplest/record_031/recorded_cameras_head_camera_2_image_compressed/frame00029.jpg',
+'staticButtonSimplest/record_036/recorded_cameras_head_camera_2_image_compressed/frame00030.jpg',
+'staticButtonSimplest/record_036/recorded_cameras_head_camera_2_image_compressed/frame00031.jpg',
+'staticButtonSimplest/record_036/recorded_cameras_head_camera_2_image_compressed/frame00032.jpg',
+'staticButtonSimplest/record_037/recorded_cameras_head_camera_2_image_compressed/frame00033.jpg',
+'staticButtonSimplest/record_037/recorded_cameras_head_camera_2_image_compressed/frame00034.jpg',
+'staticButtonSimplest/record_037/recorded_cameras_head_camera_2_image_compressed/frame00035.jpg',
+'staticButtonSimplest/record_040/recorded_cameras_head_camera_2_image_compressed/frame00036.jpg',
+'staticButtonSimplest/record_040/recorded_cameras_head_camera_2_image_compressed/frame00037.jpg',
+'staticButtonSimplest/record_040/recorded_cameras_head_camera_2_image_compressed/frame00038.jpg',
+'staticButtonSimplest/record_048/recorded_cameras_head_camera_2_image_compressed/frame00039.jpg',
+'staticButtonSimplest/record_048/recorded_cameras_head_camera_2_image_compressed/frame00040.jpg',
+'staticButtonSimplest/record_048/recorded_cameras_head_camera_2_image_compressed/frame00041.jpg',
+'staticButtonSimplest/record_048/recorded_cameras_head_camera_2_image_compressed/frame00042.jpg',
+'staticButtonSimplest/record_050/recorded_cameras_head_camera_2_image_compressed/frame00043.jpg',
+'staticButtonSimplest/record_050/recorded_cameras_head_camera_2_image_compressed/frame00044.jpg',
+'staticButtonSimplest/record_050/recorded_cameras_head_camera_2_image_compressed/frame00045.jpg',
+'staticButtonSimplest/record_052/recorded_cameras_head_camera_2_image_compressed/frame00046.jpg',
+'staticButtonSimplest/record_052/recorded_cameras_head_camera_2_image_compressed/frame00047.jpg',
+'staticButtonSimplest/record_052/recorded_cameras_head_camera_2_image_compressed/frame00048.jpg',
+'staticButtonSimplest/record_052/recorded_cameras_head_camera_2_image_compressed/frame00049.jpg',
+'staticButtonSimplest/record_052/recorded_cameras_head_camera_2_image_compressed/frame00050.jpg']
+
 COLORFUL_MOVIE_TEST_SET = []
 MOBILE_ROBOT_MOVIE_TEST_SET = []
 

@@ -18,13 +18,15 @@ function has_command_finished_correctly {
     fi
 }
 
+data_folder='colorful75'  #mobileRobot # complexData #colorful  #staticButtonSimplest  # IMPORTANT: do not leave spaces in assignment here
+
 echo " ********** Running Denoising Conv. Autoencoder script: *************"
 #qlua script.lua  -use_cuda -use_continuous -mcd $max_cos_dis -sigma $s -data_folder mobileRobot #complexData #colorful  #stati$
-th supervised.lua -use_cuda -data_folder colorful75
+th supervised.lua -use_cuda -data_folder $data_folder
 has_command_finished_correctly
 
-#th imagesAndReprToTxt.lua  -use_cuda -use_continuous -data_folder mobileRobot # complexData #colorful  #staticButtonSimplest
-th imagesAndReprToTxt.lua  -use_cuda -data_folder colorful75 #mobileRobot
+#th imagesAndReprToTxt.lua  -use_cuda -use_continuous $data_folder 
+th imagesAndReprToTxt.lua  -use_cuda -data_folder $data_folder #mobileRobot
 has_command_finished_correctly
 
 python generateNNImages.py 10 # -1 uses a characteristic set of image for creating the neigbors for a GIF animation, REQUIRES SETTING DEFAULT_DATASET in Utils.py
