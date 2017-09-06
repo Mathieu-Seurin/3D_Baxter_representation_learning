@@ -10,8 +10,8 @@ from PIL import Image
 import os, os.path
 import subprocess
 
-from Utils import ALL_STATE_FILE, LEARNED_REPRESENTATIONS_FILE, LAST_MODEL_FILE, GLOBAL_SCORE_LOG_FILE, IMG_TEST_SET, COMPLEX_TEST_SET, STATIC_BUTTON_SIMPLEST, COMPLEX_DATA, MOBILE_ROBOT, ROBOT_TEST_SET, SUPERVISED, DEFAULT_DATASET
-from Utils import get_data_folder_from_model_name, file2dict, parse_repr_file, parse_true_state_file, get_test_set_for_data_folder
+from Utils import ALL_STATE_FILE, LEARNED_REPRESENTATIONS_FILE, LAST_MODEL_FILE, GLOBAL_SCORE_LOG_FILE, IMG_TEST_SET, COMPLEX_TEST_SET, STATIC_BUTTON_SIMPLEST, COMPLEX_DATA, MOBILE_ROBOT, ROBOT_TEST_SET, SUPERVISED, DEFAULT_DATASET, COLORFUL75, COMPLEX_DATA_MOVIE_TEST_SET, COLORFUL75_MOVIE_TEST_SET, STATIC_BUTTON_SIMPLEST_MOVIE_TEST_SET, COLORFUL_MOVIE_TEST_SET, MOBILE_ROBOT_MOVIE_TEST_SET
+from Utils import get_data_folder_from_model_name, file2dict, parse_repr_file, parse_true_state_file, get_test_set_for_data_folder, get_movie_test_set_for_data_folder
 
 import unittest
 test = unittest.TestCase('__init__')
@@ -71,8 +71,12 @@ else:
 if nbr_neighbors == -1: # TODO FIX AND ADD MODEL NAME TO SUPERVISED!
 	data_folder = DEFAULT_DATASET
 	nbr_neighbors = 2 # for GIF creation purposes
-	print "Using data_folder set by hand in all python scripts for SUPERVISED scripts. HERE DATA_FOLDER: ", data_folder
-TEST_SET = get_test_set_for_data_folder(data_folder)
+	TEST_SET = get_movie_test_set_for_data_folder(data_folder)
+else:
+	TEST_SET = get_test_set_for_data_folder(data_folder)
+
+print "Using data_folder set by hand in all python scripts for SUPERVISED scripts. HERE DATA_FOLDER: ", data_folder
+
 
 if len(sys.argv) == 2:
 	# We use fixed test set for fair comparison reasons

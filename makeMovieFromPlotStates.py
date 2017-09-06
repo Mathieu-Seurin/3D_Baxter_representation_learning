@@ -126,3 +126,8 @@ elif PLOT_DIMENSIONS ==3:
 else:
     print " PLOT_DIMENSIONS other than 2 or 3 not supported"
 
+
+
+if not os.path.isfile(reward_file_str): 
+    print('Calling subprocess to write to create KNN images for dataset: ', data_folder)
+    subprocess.call(['python','generateNNimages.py', '-1', '-data_folder', data_folder])
