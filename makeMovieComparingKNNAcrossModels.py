@@ -1,127 +1,196 @@
 # coding: utf-8
-from Utils import library_versions_tests, get_data_folder_from_model_name, produceRelevantImageStatesPlotMovie
-from Utils import LEARNED_REPRESENTATIONS_FILE, SKIP_RENDERING, MOBILE_ROBOT, GIF_MOVIES_PATH, BENCHMARK_DATASETS
+from Utils import library_versions_tests, get_data_folder_from_model_name, produceRelevantImageStatesPlotMovie, get_movie_test_set_for_data_folder
+from Utils import LEARNED_REPRESENTATIONS_FILE, SKIP_RENDERING, MOBILE_ROBOT, GIF_MOVIES_PATH, ALL_KNN_MOVIE_TEST_SETS, BENCHMARK_DATASETS, FOLDER_NAME_FOR_KNN_GIF_SEQ
 #from Utils import STATIC_BUTTON_SIMPLEST, COMPLEX_DATA, COLORFUL75, COLORFUL, MOBILE_ROBOT
 import numpy as np
 import sys
 import os.path
 import subprocess
 from sklearn.decomposition import PCA  # with some version of sklearn fails with ImportError: undefined symbol: PyFPE_jbuf
-import unittest
-test = unittest.TestCase('__init__')
+from os import listdir
+from os.path import isfile, join
 
-# 
-print"\n\n >> Running makeMovieFromComparingKNNAcrossModels.py... plotGroundTruthStates: ",plotGroundTruthStates, " SKIP_RENDERING = ", SKIP_RENDERING
 
-model_name = ''
+# ++++ This program assumes a folder containing all models where we have run  generate_neighbors_for_all_models_movie.sh
 
-if len(sys.argv) !=2:  # regular pipeline in gridsearch script    
-    print 'Provide as argument a folder path (ending in "/") containing the model and reprsentations file'
-    exit("Please provide the path to the model's learned representations within the Log folder, e.g. of program run: \n python plotStatesGivenImages.py Log/PredictRewPriormodelY2017_D24_M08_H19M18S22_mobileRobot_resnet_ProTemCauRep")
 
-else:
-    state_file_str = sys.argv[1]
-    path = state_file_str
-    model_name = path.split('/')[-1]
-    if plotGroundTruthStates:
-        state_file_str = 'allStatesGT_'+data_folder+'.txt'
-        print "*********************\nPLOTTING GROUND TRUTH (OBSERVED) STATES for model: ", model_name#(Baxter left wrist position for 3D PUSHING_BUTTON_AUGMENTED dataset, or grid 2D position for MOBILE_ROBOT dataset)
-        plot_path = path+'GroundTruthStatesPlot_'+model_name+'.png'
+def create_mosaic_img_and_save(input_reference_img_to_show_on_top, list_of_input_imgs, path_to_image):
+    print "output folder: ",path_to_image
+    if not os.path.exists(path_to_image):
+        os.mkdir(path_to_image)
+
+    if use_test_set or nbr_images == -1:
+        data = zip(images,indexes,distances,representations)
+        if len(set(images).intersection(TEST_SET)) == 0:
+            sys.exit('Error in generateNNImages.py: the TEST_SET for this dataset has not been properly defined in Utils.py. TEST_SET must contain a subset of the full set of images in DATA_FOLDER => which in this case is:',data_folder)
     else:
-        if not state_file_str.endswith('/'):
-            state_file_str = path+'/'+LEARNED_REPRESENTATIONS_FILE
+        print ('Using a random test set of images for KNN MSE evaluation...')
+        data = random.sample(zip(images,indexes,distances,representations),nbr_images)
+
+
+    # For each random selected images (or all images in nbr_images==-1), you take
+    # the k-nearest neighbour in the REPRESENTATION SPACE (the first argv parameter)
+
+    #As a quantitative measure, for the k nearest neighbour
+    #you compute the distance between the state of the original image and
+    #the images retrieved using knn on representation space
+
+    total_error = 0 # to assess the quality of repr
+    nb_tot_img = 0
+
+    if nbr_neighbors<=5:
+        numline = 1  # number of rows to show in the image of neigbours to be saved, for visibility
+    elif nbr_neighbors<=10:
+        numline = 2
+    else:
+        numline = 3
+
+    # TODO: more efficient: for img_name in test_set.keys() revising data above: 
+    # HOWEVER this needs to compute also in create_all_rewards and create_plotStates for the test set, separately and  an extra file. Is it fair comparison to test images for nearest neigbours that are seen during training?
+    print 'nr images: ', nbr_neighbors, ' nbr of images: ', len(data), 'use_test_set ',use_test_set, ' of size: ', len(TEST_SET)#, TEST_SET
+    for img_name,neigbour_indexes,dist,state in data:
+        if use_test_set: #      print img_name   colorful75/record_073/recorded_cameras_head_camera_2_image_compressed/frame00022.jpg
+            if not(img_name in TEST_SET): 
+                continue
+        base_name= os.path.splitext(os.path.basename(img_name))[0]
+        seq_name= img_name.split("/")[1]
+        print('Processing ' + seq_name + "/" + base_name + ' ...'+base_name)
+        fig = plt.figure()
+        fig.set_size_inches(60,35)
+        a=fig.add_subplot(numline+1,5,3)
+        a.axis('off')
+        # img = mpimg.imread(img_name)
+        img = Image.open(img_name)
+        imgplot = plt.imshow(img)
+        state_str='[' + ",".join(['{:.3f}'.format(float(x)) for x in state]) + "]"
+
+        original_coord = true_states[img_name]
+
+        if with_title:
+            a.set_title(seq_name + "/" + base_name + ": \n" + state_str + '\n' + str(original_coord))
+
+        for i in range(0,nbr_neighbors):
+            a=fig.add_subplot(numline+1,5,6+i)
+            img_name=images[neigbour_indexes[i+1]]
+            # img = mpimg.imread(img_name)
+            img = Image.open(img_name)
+            imgplot = plt.imshow(img)
+
+            base_name_n= os.path.splitext(os.path.basename(img_name))[0]
+            seq_name_n= img_name.split("/")[1]
+
+            dist_str = ' d=' + '{:.4f}'.format(dist[i+1])
+
+            state_str='[' + ",".join(['{:.3f}'.format(float(x)) for x in representations[neigbour_indexes[i+1]]]) + "]"
+            neighbour_coord = true_states[img_name]
+            total_error += np.linalg.norm(neighbour_coord-original_coord)
+            nb_tot_img += 1
+
+            if with_title:
+                a.set_title(seq_name_n + "/" + base_name_n + ": \n" + state_str + dist_str + '\n' + str(neighbour_coord))
+            a.axis('off')
+
+
+        plt.tight_layout()
+        output_file = path_to_image + seq_name + "_" + base_name
+
+        plt.savefig(output_file, bbox_inches='tight')
+        plt.close() # efficiency: avoids keeping all images into RAM
+
+    print 'Created mosaic in ',path_to_image
+
+def create_GIF_from_imgs_in_folder(folder_rel_path, output_file_name):
+    print 'GIF created in ',output_file_name
+
+
+
+def list_only_directories_in_path(given_path, recursively = False, containing_pattern_in_name =''):# = 'KNNGIFSeq'):
+    dirs_paths = []
+    if  recursively:
+        for dir_, _, files in os.walk(given_path):
+            for fileName in files:
+                if containing_pattern_in_name in fileName:
+                    relDir = os.path.relpath(dir_, given_path)
+                    relFile = os.path.join(relDir, fileName)
+                    dirs_paths.append(relFile) # relative path to each fiile
+                    print os.path.relpath((given_path))
+                    print relFile
+        return dirs_paths
+    else:
+        return [d for d in os.listdir(given_path) if os.path.isdir(os.path.join(given_path, d))]
+        # for d in os.listdir(given_path):
+        #     path_to_file = FOLDER_NAME_FOR_KNN_GIF_SEQ.replace('/', '') 
+        #     if containing_pattern_in_name in path_to_file and os.path.isdir(os.path.join(given_path, d)):
+        #         dirs_paths.append(path_to_file)
+        # return dirs_paths
+
+def list_only_files_in_path(given_path, containing_pattern_in_name= ''):
+    list_of_files =[]
+    for f in os.listdir(given_path):
+        path_to_file = FOLDER_NAME_FOR_KNN_GIF_SEQ.replace('/', '') 
+        if containing_pattern_in_name in path_to_file and isfile(path_to_file):
+            list_of_files.append(path_to_file)
+    return list_of_files
+
+def get_immediate_subdirectories_path(given_path, containing_pattern_in_name = ''):
+    return [name for name in os.listdir(given_path)
+            if os.path.isdir(os.path.join(given_path, name))]
+
+FOLDER_CONTAINING_ALL_MODELS = './Log/ALL_MODELS_KNNS'
+datasets = BENCHMARK_DATASETS
+
+
+print"\n\n >> Running makeMovieFromComparingKNNAcrossModels.py... FOLDER_CONTAINING_ALL_MODELS: ", FOLDER_CONTAINING_ALL_MODELS, '\nALL_KNN_MOVIE_TEST_SETS: ', ALL_KNN_MOVIE_TEST_SETS
+print 'datasets: ', datasets
+model_name = ''
+# from glob import glob
+# paths = glob(FOLDER_CONTAINING_ALL_MODELS)
+# print paths
+
+for data_folder, test_set in zip(datasets, ALL_KNN_MOVIE_TEST_SETS):
+    models_for_a_dataset = get_immediate_subdirectories_path(FOLDER_CONTAINING_ALL_MODELS+'/'+data_folder)#list_only_directories_in_path(FOLDER_CONTAINING_ALL_MODELS)
+    print 'Stitching images into a mosaic for dataset ',data_folder
+    GT_imgs = []
+    AE_imgs = []
+    supervised_imgs = []
+    priors_imgs = []
+    for model_folder in models_for_a_dataset:
+        path_to_neighbors = FOLDER_CONTAINING_ALL_MODELS+'/'+data_folder+'/'+model_folder+FOLDER_NAME_FOR_KNN_GIF_SEQ
+        print 'Processing model ', model_folder, ' from dataset ',data_folder, ' path_to_neighbors: ', path_to_neighbors
+        if 'Supervised' in model_folder:
+            supervised_imgs = list_only_files_in_path(path_to_neighbors,'_frame')
+            if len(supervised_imgs)>0:
+                if len(supervised_imgs)!=len(test_set):
+                    print 'Sizes: ', len(supervised_imgs), ' and ', len(test_set)
+                    sys.exit("The size of the image sets in each model's folder should coincide! It does not for data_folder "+data_folder+' and supervised_imgs')
+        elif 'AE' in model_folder:
+            AE_imgs = list_only_files_in_path(path_to_neighbors,'_frame')
+            if len(AE_imgs) >0:
+                if len(AE_imgs) !=len(test_set):
+                    print 'Sizes: ', len(AE_imgs), ' and ', len(test_set)
+                    sys.exit("The size of the image sets in each model's folder should coincide! It does not for data_folder "+data_folder+' and AE_imgs')
+        elif 'GT' in model_folder:
+            GT_imgs = list_only_files_in_path(path_to_neighbors,'_frame')
+            if len(GT_imgs)>0:
+                if len(GT_imgs) !=len(test_set):
+                    print 'Sizes: ', len(GT_imgs), ' and ', len(test_set)
+                    sys.exit("The size of the image sets in each model's folder should coincide! It does not for data_folder "+data_folder+' and GT_imgs')
         else:
-            state_file_str = path+ LEARNED_REPRESENTATIONS_FILE
-        print "*********************\nPLOTTING LEARNT STATES for model: ", model_name #(3D for Baxter PUSHING_BUTTON_AUGMENTED dataset, or 2D position for MOBILE_ROBOT dataset): ", state_file_str
-        plot_path = path+'LearnedStatesPlot_'+model_name+'.png'
+            if model_folder != '':
+                priors_imgs = list_only_files_in_path(path_to_neighbors,'_frame')
+                if len(priors_imgs)>0:
+                    if len(priors_imgs) !=len(test_set):
+                        print 'Sizes: ', len(priors_imgs), ' and ', len(test_set)
+                        sys.exit("The size of the image sets in each model's folder should coincide! It does not for data_folder "+data_folder+' and priors_imgs')
+            else:
+                sys.exit('Missing model for robotic priors in folder: '+data_folder)
 
-    data_folder = get_data_folder_from_model_name(model_name)  
-    print 'state_file_str', state_file_str, '\n model name: ', model_name, 'data_folder: ', data_folder
-
-reward_file_str = 'allRewardsGT_'+data_folder+'.txt'
-print "state file ",state_file_str
-if not os.path.isfile(state_file_str): 
-    print('Calling subprocess to write to file all GT states: create_plotStates_file_in file and for dataset: ',state_file_str, data_folder)
-    subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_cuda','-use_continuous','-data_folder', data_folder])  # TODO: READ CMD LINE ARGS FROM FILE INSTEAD (and set accordingly here) TO NOT HAVING TO MODIFY INSTEAD train_predict_plotStates and the python files
-if not os.path.isfile(reward_file_str): 
-    print('Calling subprocess to write to file all GT rewards: create_all_reward in file and for dataset: ',reward_file_str, data_folder)
-    subprocess.call(['th','create_all_reward.lua', '-use_cuda','-use_continuous','-data_folder', data_folder])
-
-
-total_rewards = 0
-total_states = 0
-states_l=[]
-rewards_l=[]
-img_paths = []
-
-if 'recorded_robot' in state_file_str :
-    print 'Plotting ', MOBILE_ROBOT,' observed states and rewards in ',state_file_str
-    for line in state_file:
-            if line[0]!='#':
-                words=line.split(' ')
-                states_l.append([ float(words[0]),float(words[1])] )
-    states=np.asarray(states_l)
-else: # general case
-    print 'GT states file name: ', state_file_str
-    with open(state_file_str) as f:
-        for line in f:
-            if line[0]!='#':
-                # Saving each image file and its learned representations
-                words=line.split(' ')
-                states_l.append((words[0], list(map(float,words[1:-1]))))
-                img_paths.append(words[0])
-                total_states += 1
-
-
-    states_l.sort(key= lambda x : x[0])
-    states = np.zeros((len(states_l), len(states_l[0][1])))
-
-    for i in range(len(states_l)):
-        states[i] = np.array(states_l[i][1])
-
-
-# Reading rewards
-with open(reward_file_str) as f:
-    for line in f:
-        if line[0]!='#':
-            words=line.split(' ')
-            rewards_l.append(words[0])
-            total_rewards+= 1
-
-rewards=rewards_l
-toplot=states
-print type(states), 'states'
-img_paths2repr = dict()
-for i in range(len(img_paths)):
-    img_paths2repr[img_paths[i]] = [states[i], rewards[i]]
-
-print "Ploting total states and total rewards: ",total_states, " ", total_rewards," in files: ",state_file_str," and ", reward_file_str
-test.assertEqual(total_rewards, total_states, "Datapoints size discordance! Length of rewards and state files should be equal, and it is "+str(len(rewards))+" and "+str(len(toplot))+" Run first create_all_reward.lua and create_plotStates_file_for_all_seq.lua")
-
-REPRESENTATIONS_DIMENSIONS = len(states[0])
-PLOT_DIMENSIONS = 3
-
-if REPRESENTATIONS_DIMENSIONS >3:
-    print "[Applying PCA to visualize the ",REPRESENTATIONS_DIMENSIONS,"D learnt representations space (PLOT_DIMENSIONS = ", PLOT_DIMENSIONS,")"
-    pca = PCA(n_components=PLOT_DIMENSIONS) # default to 3
-    pca.fit(states)
-    toplot = pca.transform(states)
-elif REPRESENTATIONS_DIMENSIONS==2:
-    PLOT_DIMENSIONS = 2 #    print "[PCA not applied since learnt representations' dimensions are not larger than 2]"
-else:
-    PLOT_DIMENSIONS = 3  # Default, if mobileData used, we plot just 2
-#print "\n REPRESENTATIONS_DIMENSIONS =", REPRESENTATIONS_DIMENSIONS
-
-
-if PLOT_DIMENSIONS == 2:
-    produceRelevantImageStatesPlotMovie('2D', rewards, toplot, img_paths2repr, model_name)
-elif PLOT_DIMENSIONS ==3:
-    produceRelevantImageStatesPlotMovie('3D', rewards, toplot, img_paths2repr, model_name)
-else:
-    print " PLOT_DIMENSIONS other than 2 or 3 not supported"
-
-
-
-if not os.path.isfile(reward_file_str): 
-    print('Calling subprocess to write to create KNN images for dataset: ', data_folder)
-    subprocess.call(['python','generateNNimages.py', '-1', '-data_folder', data_folder])
+    if len(test_set)>0 and len(GT_imgs)>0 and len(AE_imgs)>0 and len(supervised_imgs)>0 and len(priors_imgs)>0 :
+        index =1
+        for gt, superv, ae, prior in zip(GT, supervised, AEs, GTs):
+            path_to_image = data_folder+'/KNN_Comparison_Dataset_'+data_folder+'.gif'
+            joint_img = create_mosaic_img_and_save([gt, superv, ae, prior], path_to_image)
+            index +=1
+        create_GIF_from_imgs_in_folder(folder, output_file_name+data_folder)
+    else:
+        print 'Missing models for dataset: ', data_folder

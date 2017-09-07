@@ -26,7 +26,6 @@ COMPLEX_DATA = 'complexData'
 COLORFUL = 'colorful'  # 150 data recording sequences
 COLORFUL75 = 'colorful75' # a smaller version half size of colorful
 ALL_DATASETS = [BABBLING, MOBILE_ROBOT, SIMPLEDATA3D, PUSHING_BUTTON_AUGMENTED, STATIC_BUTTON_SIMPLEST,COMPLEX_DATA, COLORFUL75, COLORFUL] #COLORFUL not in use yet due to memory issues
-BENCHMARK_DATASETS = [MOBILE_ROBOT, STATIC_BUTTON_SIMPLEST, COLORFUL75, COMPLEX_DATA]  # used for GIF movie demo for all discrete actions DREAM DEMO
 SUPERVISED = 'Supervised' 
 DEFAULT_DATASET = COLORFUL75  # needs to be set for running all Python scripts in AE, GT? and Supervised modes
 # 2 options of plotting:
@@ -38,10 +37,11 @@ LAST_MODEL_FILE = 'lastModel.txt'
 ALL_STATS_FILE ='allStats.csv'
 CONFIG = 'config.json' # not used yet, TODO
 PATH_TO_LINEAR_MODEL = 'disentanglementLinearModels/'
-GIF_MOVIES_PATH = 'GIF_MOVIES/'
+GIF_MOVIES_PATH = 'GIF_MOVIES/'  # used for states plot movie
+FOLDER_NAME_FOR_KNN_GIF_SEQ =  '/NearestNeighborsGIFSeq/' 
 
 # DEFINING A SET OF PREDEFINED IMAGES WE WANT ITS CORRESPONDING STATES FOR:
-# they represent left up, right up, down right, down left corner and pushing button images (clockwise hand movement
+# they represent left up, right up, down right, down left corner and pushing button images (clockwise hand movement. Used by makeMovieFromPlotStates.py
 REPRESENTATIVE_DIFFERENT_IMAGES = {COLORFUL75: ['colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00012.jpg',
 'colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00087.jpg',
 'colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00149.jpg',
@@ -57,13 +57,13 @@ COMPLEX_DATA: ['complexData/record_008/recorded_cameras_head_camera_2_image_comp
 'complexData/record_008/recorded_cameras_head_camera_2_image_compressed/frame00103.jpg',
 'complexData/record_008/recorded_cameras_head_camera_2_image_compressed/frame00176.jpg',
 'complexData/record_008/recorded_cameras_head_camera_2_image_compressed/frame00109.jpg'],
- STATIC_BUTTON_SIMPLEST:['staticButtonSimplest/record_043/recorded_camera_top/frame00000.jpg',
+STATIC_BUTTON_SIMPLEST:['staticButtonSimplest/record_043/recorded_camera_top/frame00000.jpg',
 'staticButtonSimplest/record_043/recorded_camera_top/frame00020.jpg',
 'staticButtonSimplest/record_043/recorded_camera_top/frame00071.jpg',
 'staticButtonSimplest/record_043/recorded_camera_top/frame00028.jpg',
 'staticButtonSimplest/record_043/recorded_camera_top/frame00050.jpg',
 'staticButtonSimplest/record_043/recorded_camera_top/frame00009.jpg'], 
- MOBILE_ROBOT: ['mobileRobot/record_008/recorded_camera_top/frame00001.jpg',
+MOBILE_ROBOT: ['mobileRobot/record_008/recorded_camera_top/frame00001.jpg',
 'mobileRobot/record_008/recorded_camera_top/frame00072.jpg',
 'mobileRobot/record_008/recorded_camera_top/frame00063.jpg',
 'mobileRobot/record_008/recorded_camera_top/frame00011.jpg',
@@ -377,7 +377,7 @@ def get_test_set_for_data_folder(data_folder):
         return COLORFUL_TEST_SET
     elif data_folder == MOBILE_ROBOT:
         return ROBOT_TEST_SET
-    elif SUPERVISED in data_folder:
+    elif SUPERVISED in data_folder or 'supervised' in data_folder:
         return SUPERVISED
     else:
         sys.exit('get_test_set_for_data_folder has not defined a set for: {}'.format(data_folder))
@@ -394,7 +394,7 @@ def get_movie_test_set_for_data_folder(data_folder):
         return COLORFUL_MOVIE_TEST_SET #'not yet'
     elif data_folder == MOBILE_ROBOT:
         return MOBILE_ROBOT_MOVIE_TEST_SET # not yet
-    elif 'Supervised' in data_folder:
+    elif 'supervised' in data_folder or SUPERVISED in data_folder:
         return DEFAULT_DATASET
     else:
         sys.exit('get_movie_test_set_for_data_folder has not defined a set for: {}'.format(data_folder))
@@ -909,6 +909,10 @@ MOBILE_ROBOT_MOVIE_TEST_SET = [
 
 COLORFUL_MOVIE_TEST_SET = []
 
+# used for GIF movie demo for all discrete actions DREAM DEMO
+# NOTE THAT THE ORDER MUST COINCIDE PER DATASET PER ITS CORRECT USAGE BY makeMovieComparingKNNAcrossModels.py
+ALL_KNN_MOVIE_TEST_SETS = [COLORFUL75_MOVIE_TEST_SET, COMPLEX_DATA_MOVIE_TEST_SET, STATIC_BUTTON_SIMPLEST_MOVIE_TEST_SET, MOBILE_ROBOT_MOVIE_TEST_SET]#, COLORFUL_MOVIE_TEST_SET]
+BENCHMARK_DATASETS = [COLORFUL75, COMPLEX_DATA, STATIC_BUTTON_SIMPLEST, MOBILE_ROBOT]  
 
 #library_versions_tests()
 

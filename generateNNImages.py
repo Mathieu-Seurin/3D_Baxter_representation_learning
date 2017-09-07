@@ -118,7 +118,7 @@ distances, indexes = nbrs.kneighbors(representations)
 
 #Generate mosaics
 if generating_neigbours_for_movie:
-	path_to_neighbour = path_to_model + '/NearestNeighborsGIFSeq/'
+	path_to_neighbour = path_to_model + FOLDER_NAME_FOR_KNN_GIF_SEQ
 else:
 	path_to_neighbour = path_to_model + '/NearestNeighbors/'
 last_model_name = path_to_model.split('/')[-1]
