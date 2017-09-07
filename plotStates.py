@@ -1,6 +1,6 @@
 # coding: utf-8
 from Utils import library_versions_tests, get_data_folder_from_model_name, plotStates
-from Utils import MOBILE_ROBOT, LEARNED_REPRESENTATIONS_FILE, SKIP_RENDERING, DEFAULT_DATASET
+from Utils import MOBILE_ROBOT, LEARNED_REPRESENTATIONS_FILE, SKIP_RENDERING, DEFAULT_DATASET, SUPERVISED
 import numpy as np
 import sys
 import os.path
@@ -52,7 +52,6 @@ else:
         data_folder = 'mobileData' # NOTICE, not, MOBILE_ROBOT
 
 reward_file_str = 'allRewardsGT_'+data_folder+'.txt'
-print "state file ",state_file_str
 if not os.path.isfile(state_file_str): 
     print('Calling subprocess to write to file all GT states: create_plotStates_file_in file and for dataset: ',state_file_str, data_folder)
     subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_cuda','-use_continuous','-data_folder', data_folder])  # TODO: READ CMD LINE ARGS FROM FILE INSTEAD (and set accordingly here) TO NOT HAVING TO MODIFY INSTEAD train_predict_plotStates and the python files
@@ -100,7 +99,6 @@ with open(reward_file_str) as f:
 
 rewards=rewards_l
 toplot=states
-print type(states), 'states'
 print "Ploting total states and total rewards: ",total_states, " ", total_rewards," in files: ",state_file_str," and ", reward_file_str
 test.assertEqual(total_rewards, total_states, "Datapoints size discordance! Length of rewards and state files should be equal, and it is "+str(len(rewards))+" and "+str(len(toplot))+" Run first create_all_reward.lua and create_plotStates_file_for_all_seq.lua")
 

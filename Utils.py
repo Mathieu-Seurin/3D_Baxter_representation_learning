@@ -377,7 +377,7 @@ def get_test_set_for_data_folder(data_folder):
         return COLORFUL_TEST_SET
     elif data_folder == MOBILE_ROBOT:
         return ROBOT_TEST_SET
-    elif 'Supervised' in data_folder:
+    elif SUPERVISED in data_folder:
         return SUPERVISED
     else:
         sys.exit('get_test_set_for_data_folder has not defined a set for: {}'.format(data_folder))
