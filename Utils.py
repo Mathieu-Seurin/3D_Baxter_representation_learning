@@ -38,7 +38,7 @@ ALL_STATS_FILE ='allStats.csv'
 CONFIG = 'config.json' # not used yet, TODO
 PATH_TO_LINEAR_MODEL = 'disentanglementLinearModels/'
 GIF_MOVIES_PATH = 'GIF_MOVIES/'  # used for states plot movie
-FOLDER_NAME_FOR_KNN_GIF_SEQ =  '/NearestNeighborsGIFSeq/' 
+FOLDER_NAME_FOR_KNN_GIF_SEQS =  '/KNN_GIF_Seqs/' 
 PATH_TO_MOSAICS = './Mosaics/'
 
 # DEFINING A SET OF PREDEFINED IMAGES WE WANT ITS CORRESPONDING STATES FOR:

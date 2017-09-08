@@ -1,6 +1,6 @@
 # coding: utf-8
 from Utils import library_versions_tests, get_data_folder_from_model_name, produceRelevantImageStatesPlotMovie, get_movie_test_set_for_data_folder
-from Utils import LEARNED_REPRESENTATIONS_FILE, SKIP_RENDERING, MOBILE_ROBOT, GIF_MOVIES_PATH, ALL_KNN_MOVIE_TEST_SETS, BENCHMARK_DATASETS, FOLDER_NAME_FOR_KNN_GIF_SEQ,PATH_TO_MOSAICS
+from Utils import LEARNED_REPRESENTATIONS_FILE, SKIP_RENDERING, MOBILE_ROBOT, GIF_MOVIES_PATH, ALL_KNN_MOVIE_TEST_SETS, BENCHMARK_DATASETS, FOLDER_NAME_FOR_KNN_GIF_SEQS,PATH_TO_MOSAICS
 #from Utils import STATIC_BUTTON_SIMPLEST, COMPLEX_DATA, COLORFUL75, COLORFUL, MOBILE_ROBOT
 import numpy as np
 import sys
@@ -33,7 +33,7 @@ from PIL import Image
 #     else:
 #         return [d for d in os.listdir(given_path) if os.path.isdir(os.path.join(given_path, d))]
 #         # for d in os.listdir(given_path):
-#         #     path_to_file = FOLDER_NAME_FOR_KNN_GIF_SEQ.replace('/', '') 
+#         #     path_to_file = FOLDER_NAME_FOR_KNN_GIF_SEQS.replace('/', '') 
 #         #     if containing_pattern_in_name in path_to_file and os.path.isdir(os.path.join(given_path, d)):
 #         #         dirs_paths.append(path_to_file)
 #         # return dirs_paths
@@ -42,7 +42,7 @@ from PIL import Image
 #NOT WORKING
 #     list_of_files =[]
 #     for f in os.listdir(given_path):
-#         path_to_file = FOLDER_NAME_FOR_KNN_GIF_SEQ.replace('/', '') 
+#         path_to_file = FOLDER_NAME_FOR_KNN_GIF_SEQS.replace('/', '') 
 #         if containing_pattern_in_name in path_to_file and isfile(path_to_file):
 #             list_of_files.append(path_to_file)
 #     return list_of_files
@@ -55,38 +55,38 @@ def get_immediate_files_in_path(given_path, containing_pattern_in_name = ''):
     return [os.path.join(given_path, name) for name in os.listdir(given_path)
             if os.path.isfile(os.path.join(given_path, name)) and containing_pattern_in_name in os.path.join(given_path, name)]
 
-
-
 def create_mosaic_img_and_save(input_reference_img_to_show_on_top, list_of_input_imgs, path_to_image_directory, output_file_name, top_title='', titles=[]):
     print "Creating mosaic from input reference image ", input_reference_img_to_show_on_top, '\nUsing images: ', list_of_input_imgs, 'saving it to ', path_to_image_directory
 
     if not os.path.exists(path_to_image_directory):
         os.mkdir(path_to_image_directory)
 
-    numline = 4
+    rows_in_mosaic = len(list_of_input_imgs) +1   # number of rows to show in the image mosaic
+    columns_in_mosaic = 1
     with_title = True
         
+    # DRAW FIRST REFERENCE INPUT IMAGE FIRST
     fig = plt.figure()
     fig.set_size_inches(60,35)
-    a=fig.add_subplot(numline+1,5,3)
+    a=fig.add_subplot(rows_in_mosaic,columns_in_mosaic, 1) # subplot(nrows, ncols, plot_number)
     a.axis('off')
     # img = mpimg.imread(img_name)
     img = Image.open(input_reference_img_to_show_on_top)
     imgplot = plt.imshow(img)
 
-    if with_title:
-        a.set_title(top_title)
+    if len(top_title)>0:
+        a.set_title(top_title, fontsize = 60) 
 
-
+    # DRAW BELOW ALL MODELS IMAGES (KNN)
     for i in range(0, len(list_of_input_imgs)):
-        a=fig.add_subplot(numline+1,5,6+i)
+        a=fig.add_subplot(rows_in_mosaic, columns_in_mosaic, 2+i)
         img_name= list_of_input_imgs[i]
         # img = mpimg.imread(img_name)
         img = Image.open(img_name)
         imgplot = plt.imshow(img)
 
-        if with_title:
-            a.set_title(titles[i])
+        if len(titles)>0:
+            a.set_title(titles[i], fontsize = 40) 
         a.axis('off')
 
     plt.tight_layout()
@@ -94,7 +94,6 @@ def create_mosaic_img_and_save(input_reference_img_to_show_on_top, list_of_input
 
     plt.savefig(output_file, bbox_inches='tight')
     plt.close() # efficiency: avoids keeping all images into RAM
-
     print 'Created mosaic in ', output_file
 
 def create_GIF_from_imgs_in_folder(folder_rel_path, output_file_name):
@@ -119,8 +118,8 @@ for data_folder, test_set in zip(datasets, ALL_KNN_MOVIE_TEST_SETS):
         supervised_imgs = []
         priors_imgs = []
         for model_folder in models_for_a_dataset:
-            path_to_neighbors = FOLDER_CONTAINING_ALL_MODELS+'/'+data_folder+'/'+model_folder+FOLDER_NAME_FOR_KNN_GIF_SEQ
-            print 'Processing model ', model_folder, ' from dataset ', data_folder, '\n path_to_neighbors: ', path_to_neighbors
+            path_to_neighbors = FOLDER_CONTAINING_ALL_MODELS+'/'+data_folder+'/'+model_folder+FOLDER_NAME_FOR_KNN_GIF_SEQS
+            #print 'Processing model ', model_folder, ' from dataset ', data_folder, '\n path_to_neighbors: ', path_to_neighbors
             if 'Supervised' in model_folder or 'supervised' in model_folder:
                 supervised_imgs = get_immediate_files_in_path(path_to_neighbors, containing_pattern_in_name='_frame')
                 if len(supervised_imgs)>0:
@@ -161,8 +160,8 @@ for data_folder, test_set in zip(datasets, ALL_KNN_MOVIE_TEST_SETS):
                 create_mosaic_img_and_save(input_img_test, [prior, ae, superv, gt], path_to_mosaic_images, 'mosaic_'+str(index)+'.jpg', top_title=get_data_folder_from_model_name(input_img_test), titles=['Robotic Priors', 'Denoising Auto-Encoder', 'Supervised (Robot Hand Position)', 'Ground Truth'])
                 index +=1
                 # TODO TEST ONLY
-                if index==2:
-                    break
+                # if index==2:
+                #     break
             #TODO create_GIF_from_imgs_in_folder(path_to_mosaic_images, './DEMO_GIFs/'+data_folder+'_KNN.gif')
     else:
         print 'Missing models for dataset (must be 4 at least): ', data_folder, ' Skipping this dataset for now'
