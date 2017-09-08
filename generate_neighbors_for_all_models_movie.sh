@@ -41,7 +41,7 @@ data_folder='colorful75' #staticButtonSimplest' #'mobileRobot' #complexData' 'co
 #### OPTIONS DEPENDING ON DATASET:
 
 # A) COLORFUL75 datasets  not done yet #'./Log/colorful75_0.196_button_ref' 
-for path_to_model in './Log/AE_colorful753AEmodelY2017_D06_M09_H18M14S22_colorful75_autoencoder_conv_cont_MCD0_5_S0_1_ProTemCauRepFix' './Log/colorful75_0.196_button_ref' './Log/Supervised_colorful75' './Log/colorful75_0.013_ground_truth'    
+for path_to_model in './Log/AE_colorful753AEmodelY2017_D06_M09_H18M14S22_colorful75_autoencoder_conv_cont_MCD0_5_S0_1_ProTemCauRepFix' #'./Log/colorful75_0.196_button_ref' './Log/Supervised_colorful75' './Log/colorful75_0.013_ground_truth'    
 
 # B) 3D (STATIC_BUTTON_SIMPLEST) dataset     './Log/3D_0.097_AE_staticButtonSimplest' gives core dump? 
 #for path_to_model in  './Log/3D_0.03_supervised_staticButtonSimplest' './Log/3D_0.053_fix_butt_15ep_staticButtonSimplest' './Log/3D_0.097_AE_staticButtonSimplest' 

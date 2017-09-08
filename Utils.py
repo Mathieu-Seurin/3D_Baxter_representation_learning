@@ -39,6 +39,7 @@ CONFIG = 'config.json' # not used yet, TODO
 PATH_TO_LINEAR_MODEL = 'disentanglementLinearModels/'
 GIF_MOVIES_PATH = 'GIF_MOVIES/'  # used for states plot movie
 FOLDER_NAME_FOR_KNN_GIF_SEQ =  '/NearestNeighborsGIFSeq/' 
+PATH_TO_MOSAICS = './Mosaics/'
 
 # DEFINING A SET OF PREDEFINED IMAGES WE WANT ITS CORRESPONDING STATES FOR:
 # they represent left up, right up, down right, down left corner and pushing button images (clockwise hand movement. Used by makeMovieFromPlotStates.py
@@ -345,7 +346,6 @@ def parse_true_state_file(dataset):
     return true_states
 
 def parse_repr_file(learned_representations_file):
-
     images=[]
     representations=[]
 
@@ -746,9 +746,7 @@ COLORFUL75_MOVIE_TEST_SET = [
 'colorful75/record_150/recorded_cameras_head_camera_2_image_compressed/frame00046.jpg',
 'colorful75/record_150/recorded_cameras_head_camera_2_image_compressed/frame00047.jpg',
 'colorful75/record_150/recorded_cameras_head_camera_2_image_compressed/frame00048.jpg',
-'colorful75/record_150/recorded_cameras_head_camera_2_image_compressed/frame00049.jpg',
-'colorful75/record_150/recorded_cameras_head_camera_2_image_compressed/frame00050.jpg'
-]
+'colorful75/record_150/recorded_cameras_head_camera_2_image_compressed/frame00049.jpg']#,'colorful75/record_150/recorded_cameras_head_camera_2_image_compressed/frame00050.jpg']
 
 COMPLEX_DATA_MOVIE_TEST_SET = [  
 'complexData/record_024/recorded_cameras_head_camera_2_image_compressed/frame00001.jpg',
@@ -798,8 +796,7 @@ COMPLEX_DATA_MOVIE_TEST_SET = [
 'complexData/record_024/recorded_cameras_head_camera_2_image_compressed/frame00046.jpg',
 'complexData/record_024/recorded_cameras_head_camera_2_image_compressed/frame00047.jpg',
 'complexData/record_024/recorded_cameras_head_camera_2_image_compressed/frame00048.jpg',
-'complexData/record_024/recorded_cameras_head_camera_2_image_compressed/frame00049.jpg',
-'complexData/record_024/recorded_cameras_head_camera_2_image_compressed/frame00050.jpg']
+'complexData/record_024/recorded_cameras_head_camera_2_image_compressed/frame00049.jpg']#,'complexData/record_024/recorded_cameras_head_camera_2_image_compressed/frame00050.jpg']
 
 STATIC_BUTTON_SIMPLEST_MOVIE_TEST_SET = [
 'staticButtonSimplest/record_011/recorded_cameras_head_camera_2_image_compressed/frame00000.jpg',
@@ -851,11 +848,9 @@ STATIC_BUTTON_SIMPLEST_MOVIE_TEST_SET = [
 'staticButtonSimplest/record_011/recorded_cameras_head_camera_2_image_compressed/frame00046.jpg',
 'staticButtonSimplest/record_011/recorded_cameras_head_camera_2_image_compressed/frame00047.jpg',
 'staticButtonSimplest/record_011/recorded_cameras_head_camera_2_image_compressed/frame00048.jpg',
-'staticButtonSimplest/record_011/recorded_cameras_head_camera_2_image_compressed/frame00049.jpg',
-'staticButtonSimplest/record_011/recorded_cameras_head_camera_2_image_compressed/frame00050.jpg']
+'staticButtonSimplest/record_011/recorded_cameras_head_camera_2_image_compressed/frame00049.jpg']#, 'staticButtonSimplest/record_011/recorded_cameras_head_camera_2_image_compressed/frame00050.jpg']
 
-MOBILE_ROBOT_MOVIE_TEST_SET = [
-'mobileRobot/record_004/recorded_camera_top/frame00000.jpg',
+MOBILE_ROBOT_MOVIE_TEST_SET = [  # NOTICE index starts from 1 here for mobileRobot dataset
 'mobileRobot/record_004/recorded_camera_top/frame00001.jpg',
 'mobileRobot/record_004/recorded_camera_top/frame00002.jpg',
 'mobileRobot/record_004/recorded_camera_top/frame00003.jpg',
