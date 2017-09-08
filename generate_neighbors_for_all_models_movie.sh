@@ -36,27 +36,25 @@ function has_command_finished_correctly {
 # /home/natalia/dream/baxter_representation_learning_3D/Log/complex bst078
 # /home/natalia/dream/baxter_representation_learning_3D/Log/modelY2017_D26_M08_H20M07S28_colorful75_resnet_cont_MCD0_4_S0_3_ProTemCauRepFix
 
-data_folder='mobileRobot' #'staticButtonSimplest' #'colorful75' #staticButtonSimplest' #'mobileRobot' #complexData' 'colorful75' 'complexData' #colorful75'  #mobileRobot # complexData #colorful  #staticButtonSimplest #IMPORTANT: = the assignment operator (no space before and after)
+data_folder='colorful75' #'mobileRobot' #'staticButtonSimplest' ##staticButtonSimplest' #'mobileRobot' ' 'colorful75' 'complexData' #colorful75'  #mobileRobot # complexData #colorful  #staticButtonSimplest #IMPORTANT: = the assignment operator (no space before and after)
 
 #### OPTIONS DEPENDING ON DATASET:
 
 # A) COLORFUL75 datasets 
-#for path_to_model in './Log/colorful75_0.196_button_ref' './Log/colorful75_supervised' './Log/colorful75_0.013_ground_truth' './Log/colorful75_3AEmodelY2017_D06_M09_H18M14S22_colorful75_autoencoder_conv_cont_MCD0_5_S0_1_ProTemCauRepFix' #   
+for path_to_model in './Log/colorful75_0.196_button_ref' './Log/colorful75_supervised' './Log/colorful75_3AEmodelY2017_D06_M09_H18M14S22_colorful75_autoencoder_conv_cont_MCD0_5_S0_1_ProTemCauRepFix' #'./Log/colorful75_0.013_ground_truth' #   
 
 # B) 3D (STATIC_BUTTON_SIMPLEST) dataset     './Log/3D_0.097_AE_staticButtonSimplest' gives core dump? 
 #for path_to_model in  './Log/3D_0.03_supervised_staticButtonSimplest' './Log/3D_0.053_fix_butt_15ep_staticButtonSimplest' './Log/3D_0.097_AE_staticButtonSimplest' 
 
 # C) COMPLEX_DATA  complexDataset
-#for path_to_model in './Log/complex_0.035_groundTruth' './Log/complex_0.071_supervised_bit_bad' './Log/complex_0.078_fix_above_more_tol' './Log/complex_0.145_AE_res'
+#for path_to_model in './Log/complex_0.145_AE_res' './Log/complex_0.071_supervised_bit_bad' './Log/complex_0.078_fix_above_more_tol'  #'./Log/complex_0.035_GT' 
 
 # D) MOBILE_ROBOT 'mobileRobot'
-for path_to_model in './Log/mobile_0.183_frozen0_dim20' #'./Log/mobile_1.7_ae'  #./Log/mobile_0.185_supervised' './Log/mobile_0.172_ground_truth' 
+#for path_to_model in './Log/mobile_0.183_frozen0_dim20' #'./Log/mobile_1.7_ae'  #./Log/mobile_0.185_supervised' #'./Log/mobile_0.172_ground_truth' 
 
 do
     echo "***** generate_neighbors_for_all_models_movie.sh: Running neighbour generation for all models. Model: $path_to_model DATA_FOLDER: $data_folder*****"
     python generateNNImages.py -1 $path_to_model $data_folder
     has_command_finished_correctly
 
-    #python plotStates.py  -1
-    #has_command_finished_correctly
 done

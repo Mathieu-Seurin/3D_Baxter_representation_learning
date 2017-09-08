@@ -56,7 +56,7 @@ with_title = True
 
 if nbr_neighbors == -1: # TODO FIX AND ADD MODEL NAME TO SUPERVISED!
 	generating_neigbours_for_movie = True
-	nbr_neighbors = 2 # for GIF creation purposes
+	nbr_neighbors = 1 # for GIF creation purposes
 
 	if len(sys.argv) != 3 and len(sys.argv) != 4:
 		sys.exit('calling this program with first argument being -1 means we will use TEST_MOVIE test sets and you need to provide aftewrards, in the command line, the path to the model you want to build the neigbours for. Exiting...')
