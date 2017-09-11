@@ -419,6 +419,15 @@ def remove_dataset_name(string):
         if string.endswith(dataset):
             return string[:(len(string)-len(dataset))]
 
+def get_immediate_subdirectories_path(given_path, containing_pattern_in_name = ''):  # TODO add param for relative path vs just folder names
+    return [name for name in os.listdir(given_path)
+            if os.path.isdir(os.path.join(given_path, name)) and containing_pattern_in_name in os.path.join(given_path, name)]
+
+def get_immediate_files_in_path(given_path, containing_pattern_in_name = ''):
+    return [os.path.join(given_path, name) for name in os.listdir(given_path)
+            if os.path.isfile(os.path.join(given_path, name)) and containing_pattern_in_name in os.path.join(given_path, name)]
+
+
 # 50 lines, 49 images (1 repeated by error) IMAGES TEST SET HANDPICKED TO SHOW VISUAL VARIABILITY
 IMG_TEST_SET = {
 'staticButtonSimplest/record_000/recorded_cameras_head_camera_2_image_compressed/frame00000.jpg',

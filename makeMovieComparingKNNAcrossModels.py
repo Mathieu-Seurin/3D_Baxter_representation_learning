@@ -1,7 +1,7 @@
 # coding: utf-8
 from Utils import library_versions_tests, get_data_folder_from_model_name, produceRelevantImageStatesPlotMovie, get_movie_test_set_for_data_folder
 from Utils import LEARNED_REPRESENTATIONS_FILE, SKIP_RENDERING, MOBILE_ROBOT, GIF_MOVIES_PATH, ALL_KNN_MOVIE_TEST_SETS, BENCHMARK_DATASETS, FOLDER_NAME_FOR_KNN_GIF_SEQS,PATH_TO_MOSAICS
-from Utils import create_GIF_from_imgs_in_folder
+from Utils import create_GIF_from_imgs_in_folder, get_immediate_subdirectories_path, get_immediate_files_in_path
 import numpy as np
 import sys
 import os.path
@@ -47,13 +47,6 @@ use_ground_truth = False
 #             list_of_files.append(path_to_file)
 #     return list_of_files
 
-def get_immediate_subdirectories_path(given_path, containing_pattern_in_name = ''):  # TODO add param for relative path vs just folder names
-    return [name for name in os.listdir(given_path)
-            if os.path.isdir(os.path.join(given_path, name)) and containing_pattern_in_name in os.path.join(given_path, name)]
-
-def get_immediate_files_in_path(given_path, containing_pattern_in_name = ''):
-    return [os.path.join(given_path, name) for name in os.listdir(given_path)
-            if os.path.isfile(os.path.join(given_path, name)) and containing_pattern_in_name in os.path.join(given_path, name)]
 
 def create_mosaic_img_and_save(input_reference_img_to_show_on_top, list_of_input_imgs, path_to_image_directory, output_file_name, top_title='', titles=[]):
     print "Creating mosaic from input reference image ", input_reference_img_to_show_on_top, '\nUsing images: ', list_of_input_imgs, 'saving it to ', path_to_image_directory
