@@ -154,7 +154,7 @@ for data_folder, test_set in zip(datasets, ALL_KNN_MOVIE_TEST_SETS):
         index =0
         if use_ground_truth:
             if use_ground_truth and len(GT_imgs) ==0:
-                sys.exit('If you want to also plot ground truth neighbors, you should run first generat_neighbors_for_all_models_movie.sh and include a GT folder model there')      
+                sys.exit('If you want to also plot ground truth neighbors, you should run first generate_neighbors_for_all_models_movie.sh and include a GT folder model there')      
             for input_img_test, gt, superv, prior, ae in zip(test_set, GT_imgs, supervised_imgs, priors_imgs, AE_imgs):
                 path_to_mosaic_images = PATH_TO_MOSAICS+data_folder+'/'
                 create_mosaic_img_and_save(input_img_test, [gt, superv, prior, ae], path_to_mosaic_images, 'mosaic_'+str(index)+'.jpg', top_title=get_data_folder_from_model_name(input_img_test), titles=['Ground Truth', 'Supervised (Robot Hand Position)', 'Robotic Priors', 'Denoising Auto-Encoder'])

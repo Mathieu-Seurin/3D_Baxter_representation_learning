@@ -117,6 +117,8 @@ def create_1_row_mosaic(path_to_folder_with_input_images, output_mosaic_path, ti
 path_to_folder_with_input_images = './data_minisample/'
 titles = ['Mobile Robot', 'Static-Button-Distractors\n3D', 'Complex-Data-Distractors\n(3D Cont.Act. 2 Arms)', 'Colorful75'] # BENCHMARK_DATASETS ;titles.reverse() # INTERESTING! reverse returns nil, as it is inplace method!
 print titles
-create_1_row_mosaic(path_to_folder_with_input_images, path_to_folder_with_input_images, titles, 'Datasets')
-create_4_row_mosaic(path_to_folder_with_input_images, path_to_folder_with_input_images, titles, 'Datasets')
+#create_1_row_mosaic(path_to_folder_with_input_images, path_to_folder_with_input_images, titles, 'Datasets')
+
+# TODO
+#create_4_row_mosaic(path_to_folder_with_input_images, path_to_folder_with_input_images, titles, 'Datasets')
 create_GIF_from_imgs_in_folder(path_to_folder_with_input_images, 'GIF_MOVIES','test.gif')

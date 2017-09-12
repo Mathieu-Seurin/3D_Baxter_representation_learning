@@ -12,7 +12,7 @@ import os, os.path, errno
 import matplotlib
 import seaborn as sns
 from PIL import Image
-import imageio
+
 
 """
 Documentation for colorblind-supported plots: #http://seaborn.pydata.org/introduction.html
