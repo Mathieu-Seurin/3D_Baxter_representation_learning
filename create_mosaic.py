@@ -15,7 +15,7 @@ from Utils import get_data_folder_from_model_name, file2dict, parse_repr_file, p
 from Utils import BENCHMARK_DATASETS, get_immediate_subdirectories_path, get_immediate_files_in_path
 import unittest
 test = unittest.TestCase('__init__')
-
+import imageio
 
 
 """
@@ -65,6 +65,19 @@ image in the test set and it will assess the test set of 50 images defined in Co
 #             a.set_title(titles[i], fontsize = 40) 
 #         a.axis('off')
 
+def create_GIF_from_imgs_in_folder(folder_rel_path, output_folder, output_file_name):
+    if not os.path.exists(output_folder):
+		os.mkdir(output_folder)
+    filenames = get_immediate_files_in_path(folder_rel_path, '.jpg')
+    #For longer movies, use the streaming approach 'I'
+    output_full_path = output_folder+'/'+output_file_name
+    with imageio.get_writer(output_full_path, mode='I') as writer:
+        for filename in filenames:
+            image = imageio.imread(filename)
+            writer.append_data(image)
+    print 'Made GIF from images in ', folder_rel_path, ' saved in ',output_file_name
+
+
 def create_1_row_mosaic(path_to_folder_with_input_images, output_mosaic_path, titles, title ):
 	#Generate mosaics
 	input_images = get_immediate_files_in_path(path_to_folder_with_input_images, '.jpg')
@@ -105,3 +118,5 @@ path_to_folder_with_input_images = './data_minisample/'
 titles = ['Mobile Robot', 'Static-Button-Distractors\n3D', 'Complex-Data-Distractors\n(3D Cont.Act. 2 Arms)', 'Colorful75'] # BENCHMARK_DATASETS ;titles.reverse() # INTERESTING! reverse returns nil, as it is inplace method!
 print titles
 create_1_row_mosaic(path_to_folder_with_input_images, path_to_folder_with_input_images, titles, 'Datasets')
+create_4_row_mosaic(path_to_folder_with_input_images, path_to_folder_with_input_images, titles, 'Datasets')
+create_GIF_from_imgs_in_folder(path_to_folder_with_input_images, 'GIF_MOVIES','test.gif')

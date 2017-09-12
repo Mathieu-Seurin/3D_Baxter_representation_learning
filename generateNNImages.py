@@ -45,7 +45,7 @@ image in the test set and it will assess the test set of 50 images defined in Co
 
 print"\n\n >> Running generateNNImages.py...."
 if len(sys.argv) <= 1:
-    sys.exit("Give number of neighbors to produce, followed by number of input images (and model dir if you don't want to use the last model created)")
+    sys.exit("Give number of neighbors to produce, followed by number of input images (and model dir if you don't want to use the last model created). To produce a movie, provide only argument -1 and set nb of neighbors below")
 
 # Some parameters
 nbr_neighbors= int(sys.argv[1])
@@ -57,17 +57,11 @@ with_title = True
 if nbr_neighbors == -1: # TODO FIX AND ADD MODEL NAME TO SUPERVISED!
 	generating_neigbours_for_movie = True
 	nbr_neighbors = 1 # for GIF creation purposes
-
-	if len(sys.argv) != 3 and len(sys.argv) != 4:
-		sys.exit('calling this program with first argument being -1 means we will use TEST_MOVIE test sets and you need to provide aftewrards, in the command line, the path to the model you want to build the neigbours for. Exiting...')
+	if len(sys.argv) != 3: # remember the program name counts as argument!
+		sys.exit('calling this program with first argument being -1 means we will use TEST_MOVIE test sets, the only parameter to provide is -1 and the path to model name to build the neigbours for. Exiting...')
 	else:
 		path_to_model = sys.argv[2]
-		if len(sys.argv) == 2:
-			data_folder = DEFAULT_DATASET
-		elif len(sys.argv) == 4:
-			data_folder = sys.argv[3]
-		else:
-			sys.exit('calling this program with first argument being -1 means we will use TEST_MOVIE test sets and you need to provide aftewrards, in the command line, the path to the model you want to build the neigbours for. For a given data_folder, add it as a 4th argument. Exiting...')
+		data_folder = get_data_folder_from_model_name(path_to_model)  # DEFAULT_DATASET
 	TEST_SET = get_movie_test_set_for_data_folder(data_folder)
 	#TEST_SET = TEST_SET[:2] # just for fast testing!
 else:
@@ -132,7 +126,10 @@ if not os.path.exists(path_to_neighbour):
 if use_test_set or nbr_images == -1:
 	data = zip(images,indexes,distances,representations)
 	if len(set(images).intersection(TEST_SET)) == 0:
-		sys.exit('Error in generateNNImages.py: the TEST_SET for this dataset has not been properly defined in Utils.py. TEST_SET must contain a subset of the full set of images in DATA_FOLDER => which in this case is:',data_folder)
+		sys.exit('Error in generateNNImages.py: the TEST_SET for this dataset has not been properly defined in Utils.py. TEST_SET must contain a subset of the full set of images in DATA_FOLDER => which in this case is: '+data_folder)
+
+#TODO process separate test set
+
 else:
 	print ('Using a random test set of images for KNN MSE evaluation...')
 	data = random.sample(zip(images,indexes,distances,representations),nbr_images)

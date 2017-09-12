@@ -122,26 +122,26 @@ for data_folder, test_set in zip(datasets, ALL_KNN_MOVIE_TEST_SETS):
             if len(supervised_imgs)>0:
                 if len(supervised_imgs)!=len(test_set):
                     print 'Sizes Model KNNs and Input KNNs: ', len(supervised_imgs), ' and ', len(test_set)
-                    sys.exit("The size of the image sets in each model's folder should coincide! It does not for data_folder "+data_folder+' and supervised_imgs')
+                    sys.exit("The size of the image sets in each model's folder should coincide! It does not for model_folder "+model_folder+' and supervised_imgs')
         elif 'AE' in model_folder:
             AE_imgs = get_immediate_files_in_path(path_to_neighbors, containing_pattern_in_name='_frame')
             if len(AE_imgs) >0:
                 if len(AE_imgs) !=len(test_set):
                     print 'Sizes Model KNNs and Input KNNs:', len(AE_imgs), ' and ', len(test_set)
-                    sys.exit("The size of the image sets in each model's folder should coincide! It does not for data_folder "+data_folder+' and AE_imgs')
+                    sys.exit("The size of the image sets in each model's folder should coincide! It does not for model_folder "+model_folder+' and AE_imgs')
         elif 'GT' in model_folder or 'ground_truth' in model_folder:
             GT_imgs = get_immediate_files_in_path(path_to_neighbors, containing_pattern_in_name='_frame')
             if len(GT_imgs)>0:
                 if len(GT_imgs) !=len(test_set):
                     print 'Sizes Model KNNs and Input KNNs:', len(GT_imgs), ' and ', len(test_set)
-                    sys.exit("The size of the image sets in each model's folder should coincide! It does not for data_folder "+data_folder+' and GT_imgs')
+                    sys.exit("The size of the image sets in each model's folder should coincide! It does not for model_folder "+model_folder+' and GT_imgs')
         else:
             if model_folder != '' and len(model_folder) >0: #     # TODO elif 'Priors' in model_folder: #                print 'Processi           print 'Processing Robotics priors model: ', path_to_neighbors
                 priors_imgs = get_immediate_files_in_path(path_to_neighbors, containing_pattern_in_name='_frame') #list_only_files_in_path(path_to_neighbors, containing_pattern_in_name='_frame')
                 if len(priors_imgs)>0:
                     if len(priors_imgs) !=len(test_set):
                         print 'Sizes Model KNNs and Input KNNs:', len(priors_imgs), ' and ', len(test_set)
-                        sys.exit("The size of the image sets in each model's folder should coincide! It does not for data_folder "+data_folder+' and priors_imgs')
+                        sys.exit("The size of the image sets in each model's folder should coincide! It does not for model_folder "+model_folder+' and priors_imgs')
             else:
                 sys.exit('Missing model for robotic priors in folder: '+data_folder)
 

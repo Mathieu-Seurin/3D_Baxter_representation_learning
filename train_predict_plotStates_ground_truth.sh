@@ -29,6 +29,7 @@ echo " ********** Running Ground Truth (arm position) state representations scri
 # th imagesAndReprToTxt.lua  -use_cuda -data_folder $data_folder
 # has_command_finished_correctly
 
+# TODO: TO BE TESTED:
 python generateNNImages.py -ground_truth # -1 uses a characteristic set of image for creating the neigbors for a GIF animation, REQUIRES SETTING DEFAULT_DATASET in Utils.py
 #   ----- Note: includes the call to:
 #                th create_all_reward.lua
@@ -40,4 +41,3 @@ has_command_finished_correctly
 
 #python distortion_crit.py  # short to compute, it's just that it doesn't seem to be very useful
 #has_command_finished_correctly
-
