@@ -147,6 +147,13 @@ for data_folder, test_set in zip(datasets, ALL_KNN_MOVIE_TEST_SETS):
 
 
     # create mosaics
+    # FOR IT TO LOOK COHERENT! THEY NEED TO BE SORTED!! listing  files in Ubuntu does not return them sorted!! and they will be sampled randomly!!!!!!
+    # SO, SORTING THEM (here, inline) IS CRUCIAL!
+    test_set.sort()
+    GT_imgs.sort()
+    supervised_imgs.sort()
+    priors_imgs.sort()
+    AE_imgs.sort()
     if not os.path.exists(PATH_TO_MOSAICS):
         os.mkdir(PATH_TO_MOSAICS)
     if len(test_set)>0 and len(AE_imgs)>0 and len(supervised_imgs)>0 and len(priors_imgs)>0 :
@@ -164,10 +171,9 @@ for data_folder, test_set in zip(datasets, ALL_KNN_MOVIE_TEST_SETS):
                 path_to_mosaic_images = PATH_TO_MOSAICS+data_folder+'/'
                 create_mosaic_img_and_save(input_img_test, [superv, prior, ae], path_to_mosaic_images, 'mosaic_'+str(index)+'.jpg', top_title=get_data_folder_from_model_name(input_img_test), titles=['Supervised (Robot Hand Position)', 'Robotic Priors', 'Denoising Auto-Encoder'])
                 index +=1
-            # TODO TEST ONLY
-            # if index==2:
-            #     break
-        #TODO 
+        #TODO : AT THE MOMENT THE SPEED IS TOO FAST, SO using GIFMAKER.ME INSTEAD
         #create_GIF_from_imgs_in_folder(path_to_mosaic_images, './DEMO_GIFs/'+data_folder+'_KNN.gif')
     else:
         print 'Missing models for dataset (must be 4 at least): ', data_folder, ' Skipping this dataset for now'
+
+
