@@ -1,7 +1,7 @@
 # coding: utf-8
 from Utils import library_versions_tests, get_data_folder_from_model_name, produceRelevantImageStatesPlotMovie, get_movie_test_set_for_data_folder
 from Utils import LEARNED_REPRESENTATIONS_FILE, SKIP_RENDERING, MOBILE_ROBOT, GIF_MOVIES_PATH, ALL_KNN_MOVIE_TEST_SETS, BENCHMARK_DATASETS, FOLDER_NAME_FOR_KNN_GIF_SEQS,PATH_TO_MOSAICS
-from Utils import create_GIF_from_imgs_in_folder, get_immediate_subdirectories_path, get_immediate_files_in_path
+from Utils import create_GIF_from_imgs_in_folder, get_immediate_subdirectories_path, get_immediate_files_in_path, create_mosaic_img_and_save
 import numpy as np
 import sys
 import os.path
@@ -16,78 +16,6 @@ from PIL import Image
 
 # ++++ This program assumes a folder containing all models where we have run  generate_neighbors_for_all_models_movie.sh
 use_ground_truth = False
-
-# def list_only_directories_in_path(given_path, recursively = False, containing_pattern_in_name =''):# = 'KNNGIFSeq'):
-#     #NOT WORKING
-#     dirs_paths = []
-#     if  recursively:
-#         for dir_, _, files in os.walk(given_path):
-#             for fileName in files:
-#                 if containing_pattern_in_name in fileName:
-#                     relDir = os.path.relpath(dir_, given_path)
-#                     relFile = os.path.join(relDir, fileName)
-#                     dirs_paths.append(relFile) # relative path to each fiile
-#                     print os.path.relpath((given_path))
-#                     print relFile
-#         return dirs_paths
-#     else:
-#         return [d for d in os.listdir(given_path) if os.path.isdir(os.path.join(given_path, d))]
-#         # for d in os.listdir(given_path):
-#         #     path_to_file = FOLDER_NAME_FOR_KNN_GIF_SEQS.replace('/', '') 
-#         #     if containing_pattern_in_name in path_to_file and os.path.isdir(os.path.join(given_path, d)):
-#         #         dirs_paths.append(path_to_file)
-#         # return dirs_paths
-
-# def list_only_files_in_path(given_path, containing_pattern_in_name= ''):
-#NOT WORKING
-#     list_of_files =[]
-#     for f in os.listdir(given_path):
-#         path_to_file = FOLDER_NAME_FOR_KNN_GIF_SEQS.replace('/', '') 
-#         if containing_pattern_in_name in path_to_file and isfile(path_to_file):
-#             list_of_files.append(path_to_file)
-#     return list_of_files
-
-
-def create_mosaic_img_and_save(input_reference_img_to_show_on_top, list_of_input_imgs, path_to_image_directory, output_file_name, top_title='', titles=[]):
-    print "Creating mosaic from input reference image ", input_reference_img_to_show_on_top, '\nUsing images: ', list_of_input_imgs, 'saving it to ', path_to_image_directory
-
-    if not os.path.exists(path_to_image_directory):
-        os.mkdir(path_to_image_directory)
-
-    rows_in_mosaic = 2 #len(list_of_input_imgs) +1   # number of rows to show in the image mosaic
-    columns_in_mosaic = 3 #1
-    with_title = True
-        
-    # DRAW FIRST REFERENCE INPUT IMAGE FIRST
-    fig = plt.figure()
-    fig.set_size_inches(60,35)
-    a=fig.add_subplot(rows_in_mosaic, columns_in_mosaic, 2) # subplot(nrows, ncols, plot_number)
-    a.axis('off')
-    # img = mpimg.imread(img_name)
-    img = Image.open(input_reference_img_to_show_on_top)
-    imgplot = plt.imshow(img)
-
-    if len(top_title)>0:
-        a.set_title(top_title, fontsize = 60) 
-
-    # DRAW BELOW ALL MODELS IMAGES (KNN)
-    for i in range(0, len(list_of_input_imgs)):
-        a=fig.add_subplot(rows_in_mosaic, columns_in_mosaic, 4+i)#2+i)
-        img_name= list_of_input_imgs[i]
-        # img = mpimg.imread(img_name)
-        img = Image.open(img_name)
-        imgplot = plt.imshow(img)
-
-        if len(titles)>0:
-            a.set_title(titles[i], fontsize = 40) 
-        a.axis('off')
-
-    plt.tight_layout()
-    output_file = path_to_image_directory+output_file_name
-
-    plt.savefig(output_file, bbox_inches='tight')
-    plt.close() # efficiency: avoids keeping all images into RAM
-    print 'Created mosaic in ', output_file
 
 
 FOLDER_CONTAINING_ALL_MODELS = './Log/ALL_MODELS_KNNS'
