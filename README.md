@@ -346,6 +346,28 @@ sudo apt-get install graphviz -y
 luarocks install nngraph
 
 
+## Regarding the 5th priors_used--Ref. Point position for the 5th Ref. point prior
+--(A point where the robot wants the state to be very similar. Like a reference point for the robot)
+-- Button’s position:
+-- {0.587, 0.300, -0.13} (Y,X,Z?) in ComplexData and Colorful75  (can vary, sometimes you get: 0.63 0.29 -0.14)
+-- Colorful starting pos is 0.6 0.3 0.1         	NO starting point for complex and static
+-- According to the current status of the code, I run using starting position all experiments for colorful while for all other datasets (complex and static button) we have by default and have run experiments using fixed point close to the button.
+--
+-- {0.58,  -0.03, -0.13} (X,Y,Z) in StaticButtonSimplest (more or less, you can check in recorded_robot_limb_left_endpoint_state.txt, it can vary a little bit (sometimes you get 0.64 -0.04 -0.14))
+-- ---
+-- STATIC_BUTTON_SIMPLEST:        (ROUNDING_VALUE_FIX = 0.04)  Button’s position is: (0.58, -0.03, -0.13)
+--         FIXED_POS = {0.607, 0.017, -0.143} :  Not the button, i was testing other location  BUT VERY CLOSE TO THE BUTTON!
+-- COMPLEX_DATA:   (ROUNDING_VALUE_FIX = 0.04,  Button’s position: (0.587, 0.3, -0.13))
+--         -- just above the button:
+--         FIXED_POS = { 0.598, 0.300, -0.143}   The position is above the button, again, it was just for testing purpose, trying different ref point position
+--         -- Above and further:
+--         -- FIXED_POS = {0.639, 0.286, 0.136}  -- Is this the position of the arm in the beginning of each sequence? No, this is a random test position
+--  COLORFUL or COLORFUL75 (ROUNDING_VALUE_FIX = 0.01,  Button’s position: (0.587, 0.3, -0.13))
+--         FIXED_POS  = {0.6, 0.30, 0.10} -- starting point for every sequence in fixed point prior -- Is this the position of the arm in the beginning of each sequence? If not, Why is so close to the button position and what was the position of the initial arm at the beginning of each sequence? Same for the next line:   THIS is the starting point for every colorful sequence (if you look at every recorded_robot_limb_left_endpoint_state.txt, it start with this) If you look at images, it’s not close to the button, it’s above, yes, that why the first 2 coordinate are close, but the last one is very different (-0.14 on the button, 0.10 for starting point)
+--         -- FIXED_POS = {0.587, -0.036, -0.143}  This is the position of the button
+--
+
+
 ## Tests Notes:
 
 * test_nn_graph.lua is an example of how nngraph should be done. Also a note: never use updateOutput and updateGradInput, Only use forward and backward. Basically, forward calls updateOutput + other stuff to retain the gradients etc. And backward calls updateGradInput + other stuff to retain gradients etc. In conclusion, it's better to call forward/backward because some models are doing more than just calling updateOutput etc.
