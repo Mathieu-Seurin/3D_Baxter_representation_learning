@@ -9,6 +9,7 @@ STATIC_BUTTON_SIMPLEST = 'staticButtonSimplest'
 COMPLEX_DATA = 'complexData'
 COLORFUL = 'colorful'-- 150 data recording sequences
 COLORFUL75 = 'colorful75'-- a smaller version half size of colorful
+NONSTATIC_BUTTON = 'nonStaticButton'
 
 --!!! AVOID SETTING IT HERE FOR INCONSISTENCIES< SET VIA COMMAND LINE !!!
 --DATA_FOLDER = MOBILE_ROBOT

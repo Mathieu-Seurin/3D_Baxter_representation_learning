@@ -18,8 +18,10 @@ function has_command_finished_correctly {
     fi
 }
 
-data_folder='complexData' #colorful75'  #'mobileRobot' # 'complexData' #'colorful'  #'staticButtonSimplest'
+data_folder='nonStaticButton' #'complexData' #colorful75'  #'mobileRobot' # 'complexData' #'colorful'  #'staticButtonSimplest'
 
+# TODO
+#for dimension in 3 4 5 6 7 8 9 10 15 20
 # losses result in being nan for MCD 0.9 and sigma 0.01
 #for max_cos_dis in 0.01 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9  #for max_cos_dis in 0.9
 for max_cos_dis in 0.01 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 0.95 #0.4 0.5 0.8
@@ -31,7 +33,7 @@ do
         qlua script.lua  -use_cuda -use_continuous  -mcd $max_cos_dis -sigma $s -data_folder $data_folder
         has_command_finished_correctly
 
-        th imagesAndReprToTxt.lua  -use_cuda -use_continuous -data_folder $data_folder 
+        th imagesAndReprToTxt.lua  -use_cuda -use_continuous -data_folder $data_folder
         has_command_finished_correctly
 
         python generateNNImages.py 10

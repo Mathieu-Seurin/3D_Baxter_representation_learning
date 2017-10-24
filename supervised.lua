@@ -28,6 +28,7 @@ cmd:option('-use_continuous', false, 'true to use a continuous action space, fal
 cmd:option('-data_folder', STATIC_BUTTON_SIMPLEST, 'Possible Datasets to use: staticButtonSimplest, mobileRobot, staticButtonSimplest, simpleData3D, pushingButton3DAugmented, babbling')
 cmd:option('-mcd', 0.4, 'Max. cosine distance allowed among actions for priors loss function evaluation (MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD)')
 cmd:option('-sigma', 0.6, "Sigma: denominator in continuous actions' extra factor (CONTINUOUS_ACTION_SIGMA)")
+cmd:option('-states_dimensions', 3, "states_dimensions: Default DIMENSION_OUT, i.e., dimensionality of the states learned (default is 3)")
 
 RELATIVE = false
 
@@ -123,7 +124,7 @@ function train(Model, verbose, final)
   collectgarbage()
   Model:clearState()
   if RELATIVE then
-    print("============ Using relative states =========")
+    print("============ Using relative button position states =========")
   end
   local final = final or false
   local verbose = verbose or false

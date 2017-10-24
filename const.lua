@@ -12,6 +12,7 @@
 --=============================================================
 require 'lfs'
 require 'hyperparams'
+json = require 'json'
 
 ---NOTE: THESE ARE DEFAULTS (IF NOT COMMAND LINE ARGS ARE PASSED), AND ARE OVERRIDEN BY DATA_FOLDER SPECIFIC CASES BELOW :
 ----------------------------------------------------------------------------------------------------------------------------
@@ -22,7 +23,8 @@ USE_CONTINUOUS = false
 
 MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.4  -- best so far for colorful75 with 4priors + fixed point
 CONTINUOUS_ACTION_SIGMA = 0.4
-DATA_FOLDER = MOBILE_ROBOT --works best!
+DATA_FOLDER = MOBILE_ROBOT --works best!  # NONSTATIC_BUTTON
+CONFIG_DICT = {}
 
 --===============================================
 --ALL POSSIBLE PRIORS: (set them in hyperparams)
@@ -98,7 +100,7 @@ MIN_TABLE = {-10000,-10000} -- for x,y
 MAX_TABLE = {10000,10000} -- for x,y
 
 DIMENSION_IN = 2
-DIMENSION_OUT= 3
+DIMENSION_OUT= 3  -- STATES_DIMENSION (to be learned, configurable as cmd line param)
 
 REWARD_INDEX = 1  --3 reward values: -1, 0, 10
 INDEX_TABLE = {1,2} --column index for coordinate in state file (respectively x,y)
@@ -171,8 +173,11 @@ function set_hyperparams(params, modelApproach, createNewModelFolder)
     MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = params.mcd
     CONTINUOUS_ACTION_SIGMA = params.sigma
     DATA_FOLDER = params.data_folder  --print('[Log: Setting command line dataset to '..params.data_folder..']') type is a str
+    STATES_DIMENSION = params.states_dimensions
+
     set_cuda_hyperparams(USE_CUDA)
     set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach, createNewModelFolder)
+    save_config_to_file(CONFIG_DICT, CONFIG_JSON_FILE)
 end
 
 function set_cuda_hyperparams(USE_CUDA)
@@ -304,7 +309,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach, createNewM
       AVG_FRAMES_PER_RECORD = 100
 
     elseif DATA_FOLDER == STATIC_BUTTON_SIMPLEST then
-        CLAMP_CAUSALITY = true --TODO: make false when continuous works
+        CLAMP_CAUSALITY = false --TODO: make false when continuous works
         -- A point where the robot wants the state to be very similar. Like a reference point for the robot
         FIXED_POS = {0.607, 0.017, -0.143} --for fixed point prior
         ROUNDING_VALUE_FIX = 0.04
@@ -394,6 +399,29 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach, createNewM
         -- BEST WORKING PARAMETERS FOR CONTINUOUS ACTIONS in this dataset so far: 52,modelY2017_D03_M08_H09M40S59_colorful75_resnet_cont_MCD0_3_S0_3_ProTemCauRep,0.126241133861,colorful75,./models/resnet,0.3,0.3:
         -- MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.3
         -- CONTINUOUS_ACTION_SIGMA = 0.3
+    elseif DATA_FOLDER == NONSTATIC_BUTTON then  -- FOR NOW, A COPY OF 3D_STATIC_DATASET TODO: MODIFY ACCORDINGLY WITH NEW SIMULATOR OF ANTONIN
+      CLAMP_CAUSALITY = false --TODO: make false when continuous works
+      -- A point where the robot wants the state to be very similar. Like a reference point for the robot
+      FIXED_POS = {0.607, 0.017, -0.143} --for fixed point prior
+      ROUNDING_VALUE_FIX = 0.04
+
+      MIN_TABLE = {0.42,-0.2,-10} -- for x,y,z
+      MAX_TABLE = {0.8,0.7,10} -- for x,y,z
+
+      DIMENSION_IN = 3
+      DIMENSION_OUT = 3
+
+      REWARD_INDEX = 2 --2 reward values: -0, 1 ?
+      INDEX_TABLE = {2,3,4} --column index for coordinates in state file, respectively (x,y,z)
+
+      DEFAULT_PRECISION = 0.05 -- for 'arrondit' function
+      FILENAME_FOR_REWARD = "recorded_button1_is_pressed.txt"
+      FILENAME_FOR_ACTION = "recorded_robot_limb_left_endpoint_action.txt" -- Never written, always computed on the fly
+      FILENAME_FOR_STATE = "recorded_robot_limb_left_endpoint_state.txt"
+
+      SUB_DIR_IMAGE = 'recorded_cameras_head_camera_2_image_compressed'
+      AVG_FRAMES_PER_RECORD = 90  --HINT: reduce for fast full epoch testing in CPU mode
+
     else
       print("No supported data folder provided, please add either of the data folders defined in hyperparams: "..BABBLING..", "..MOBILE_ROBOT.." "..SIMPLEDATA3D..' or others in const.lua' )
       os.exit()
@@ -442,13 +470,13 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach, createNewM
     end
 
     -- EXTRA PRIORS:
-    if APPLY_BRING_CLOSER_REWARD then
+    if APPLY_BRING_CLOSER_REWARD then  -- TODO implement
        table.insert(PRIORS_CONFIGS_TO_APPLY[1], BRING_CLOSER_REWARD)
     end
     if APPLY_BRING_CLOSER_REF_POINT then
        table.insert(PRIORS_CONFIGS_TO_APPLY[1], BRING_CLOSER_REF_POINT)
     end
-    if APPLY_REWARD_PREDICTION_CRITERION then
+    if APPLY_REWARD_PREDICTION_CRITERION then  -- TODO implement
        table.insert(PRIORS_CONFIGS_TO_APPLY[1], REWARD_PREDICTION_CRITERION)
     end
     if RUN_FORWARD_MODEL then
@@ -456,6 +484,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach, createNewM
     end
     -- L1Smooth and cosDistance and max margin: compare with homemade MSDCriterion and replace if similar in the good practice of using native code
     --TODO PRIORS_CONFIGS_TO_APPLY.add('CosDist','L1SmoothDist','MaxMargin')
+
 
     -- DEFAULT_PRECISION for all CONTINUOUS ACTIONS:
     if USE_CONTINUOUS then  --otherwise, it is not used
@@ -479,10 +508,10 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach, createNewM
         --create new model filename to be uniquely identified
         now = os.date("*t")
         if USE_CONTINUOUS then
-            DAY = 'Y'..now.year..'_D'..addLeadingZero(now.day)..'_M'..addLeadingZero(now.month)..'_H'..addLeadingZero(now.hour)..'M'..addLeadingZero(now.min)..'S'..addLeadingZero(now.sec)..'_'..DATA_FOLDER..'_'..architecture_name..'_cont'..'_MCD'..MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD..'_S'..CONTINUOUS_ACTION_SIGMA..priorsToString(PRIORS_CONFIGS_TO_APPLY)
+            DAY = 'Y'..now.year..'_M'..addLeadingZero(now.month)..'_D'..addLeadingZero(now.day)..'_H'..addLeadingZero(now.hour)..'M'..addLeadingZero(now.min)..'S'..addLeadingZero(now.sec)..'_'..DATA_FOLDER..'_'..architecture_name..'_cont'..'_MCD'..MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD..'_S'..CONTINUOUS_ACTION_SIGMA..priorsToString(PRIORS_CONFIGS_TO_APPLY)
             DAY = DAY:gsub("%.", "_")  -- replace decimal points by '_' for folder naming
         else
-            DAY = 'Y'..now.year..'_D'..addLeadingZero(now.day)..'_M'..addLeadingZero(now.month)..'_H'..addLeadingZero(now.hour)..'M'..addLeadingZero(now.min)..'S'..addLeadingZero(now.sec)..'_'..DATA_FOLDER..'_'..architecture_name..priorsToString(PRIORS_CONFIGS_TO_APPLY)
+            DAY = 'Y'..now.year..'_M'..addLeadingZero(now.month)..'_D'..addLeadingZero(now.day)..'_H'..addLeadingZero(now.hour)..'M'..addLeadingZero(now.min)..'S'..addLeadingZero(now.sec)..'_'..DATA_FOLDER..'_'..architecture_name..priorsToString(PRIORS_CONFIGS_TO_APPLY)
         end
         if modelApproach then --to add an extra keyword  to the model name
             NAME_SAVE= modelApproach..'model'..DAY
@@ -513,7 +542,34 @@ function print_hyperparameters(print_continuous_actions_config, extra_string_to_
     print("\n================================")
 end
 
+function save_config_to_file(config_dict)
+    --    Saves config into json file for only one file to include important constans
+    --to be read by whole learning pipeline of lua and python scripts
+    CONFIG_DICT['DATA_FOLDER']= DATA_FOLDER
+    CONFIG_DICT['STATES_DIMENSION']= DIMENSION_OUT
+    CONFIG_DICT['PRIORS_CONFIGS_TO_APPLY']=  PRIORS_CONFIGS_TO_APPLY
 
+    print ('Saving config tp file ',CONFIG_DICT)
+    --json.dump(config_dict, open(CONFIG_JSON_FILE, 'wb'))
+end
+
+function read_config()
+    -- load the data from json file into a dictionary
+    config_dict = json.load(open(CONFIG_JSON_FILE, 'rb'))
+    print('Reading config: ', config_dict)
+    return config_dict
+end
+
+function json_test()
+  --   Returns a string representing value encoded in JSON.
+  json.encode({ 1, 2, 3, { x = 10 } }) -- Returns '[1,2,3,{"x":10}]'
+  json.decode('str')
+  --Returns a value representing the decoded JSON string.
+  json.decode('[1,2,3,{"x":10}]')
+end
+
+
+json_test()
 
 --Ref. Point position for the 5th Ref. point prior
 --(A point where the robot wants the state to be very similar. Like a reference point for the robot)

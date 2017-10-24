@@ -201,6 +201,7 @@ cmd:option('-use_continuous', true, 'true to use a continuous action space, fals
 cmd:option('-data_folder', STATIC_BUTTON_SIMPLEST, 'Possible Datasets to use: staticButtonSimplest, mobileRobot, staticButtonSimplest, simpleData3D, pushingButton3DAugmented, babbling')
 cmd:option('-mcd', 0.5, 'Max cosine distance')
 cmd:option('-sigma', 0.1, 'Max cosine distance')
+cmd:option('-states_dimensions', 3, "states_dimensions: Default DIMENSION_OUT, i.e., dimensionality of the states learned (default is 3)")
 
 local params = cmd:parse(arg)
 main(params)

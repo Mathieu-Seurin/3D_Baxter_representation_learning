@@ -34,6 +34,8 @@ NONSTATIC_BUTTON = 'nonStaticButton'
 ALL_DATASETS = [BABBLING, MOBILE_ROBOT, SIMPLEDATA3D, PUSHING_BUTTON_AUGMENTED, STATIC_BUTTON_SIMPLEST,COMPLEX_DATA, COLORFUL75, COLORFUL, NONSTATIC_BUTTON] #COLORFUL not in use yet due to memory issues
 SUPERVISED = 'Supervised'
 DEFAULT_DATASET = NONSTATIC_BUTTON  #COLORFUL75  # needs to be set for running all Python scripts in AE, GT? and Supervised modes
+DIMENSIONS_OUT = 3 # default
+
 # 2 options of plotting:
 LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
 GLOBAL_SCORE_LOG_FILE = 'globalScoreLog.csv'
@@ -47,11 +49,15 @@ GIF_MOVIES_PATH = 'GIF_MOVIES/'  # used for states plot movie
 FOLDER_NAME_FOR_KNN_GIF_SEQS =  '/KNN_GIF_Seqs/'
 PATH_TO_MOSAICS = './Mosaics/'
 CONFIG_JSON_FILE = 'Config.json'
-CONFIG_DICT = {
-	'DATA_FOLDER': NONSTATIC_BUTTON,
-	'DIMENSIONS_OUT': 3,
-	'PRIORS': ['prior']
-}
+
+# Priors
+REP = "Rep"
+CAUS = "Caus"
+PROP = "Prop"
+TEMP = "Temp"
+BRING_CLOSER_REWARD = "Reward_closer"
+BRING_CLOSER_REF_POINT = "Fixed_point"
+REWARD_PREDICTION_CRITERION= 'Prediction Reward'
 
 # DEFINING A SET OF PREDEFINED IMAGES WE WANT ITS CORRESPONDING STATES FOR:
 # they represent left up, right up, down right, down left corner and pushing button images (clockwise hand movement. Used by makeMovieFromPlotStates.py
@@ -84,6 +90,41 @@ MOBILE_ROBOT: ['mobileRobot/record_008/recorded_camera_top/frame00001.jpg',
 'mobileRobot/record_008/recorded_camera_top/frame00090.jpg']}
 # NEW DATASET AFTER ICRA18
 NONSTATIC_BUTTON = []
+
+
+
+
+def save_config_to_file(config_dict, filename):
+    """
+    Saves config into json file for only one file to include important constans
+    to be read by whole learning pipeline of lua and python scripts
+    """
+    # config_dict = {}  
+    # config_dict['DATA_FOLDER']= DATA_FOLDER
+    # config_dict['STATES_DIMENSION']= DIMENSION_OUT
+    # config_dict['PRIORS_CONFIGS_TO_APPLY']=  PRIORS_CONFIGS_TO_APPLY
+    #save it to a json file
+    print 'Saving config ',config_dict
+    json.dump(config_dict, open(filename, 'wb'))
+
+def read_config(filename):
+    # load the data from json file into a dictionary
+    config_dict = json.load(open(filename, 'rb'))
+    print 'Current config: ', config_dict
+    return config_dict
+
+
+
+if os.path.exists(CONFIG_JSON_FILE) and  os.path.isfile(CONFIG_JSON_FILE):
+    CONFIG_DICT = read_config(CONFIG_JSON_FILE)
+else:  # Default values
+    CONFIG_DICT = {
+        'DATA_FOLDER': DEFAULT_DATASET,
+        'STATES_DIMENSION': DIMENSIONS_OUT,
+        'PRIORS_CONFIGS_TO_APPLY': [PROP, TEMP, CAUS, REP, BRING_CLOSER_REF_POINT]
+    }
+    save_config_to_file(CONFIG_DICT, CONFIG_JSON_FILE)
+
 
 def library_versions_tests():
     if not matplotlib.__version__.startswith('2.'):
@@ -485,25 +526,7 @@ def get_immediate_files_in_path(given_path, containing_pattern_in_name = ''):
     return [os.path.join(given_path, name) for name in os.listdir(given_path)
             if os.path.isfile(os.path.join(given_path, name)) and containing_pattern_in_name in os.path.join(given_path, name)]
 
-def save_config(config_dict):
-    """
-    Saves config into json file for only one file to include important constans
-    to be read by whole learning pipeline of lua and python scripts
-    """
-    # config_dict = {
-    # 	'key_1': 1,
-    # 	'key_2': "a string",
-    # 	'key_3': ['element']
-    # }
-    #save it to a json file
-    print 'Saving config ',config_dict
-    json.dump(config_dict, open(CONFIG_JSON_FILE, 'wb'))
 
-def read_config():
-    # load the data
-    config_dict = json.load(open(CONFIG_JSON_FILE, 'rb'))
-    print 'Reading config: ', config_dict
-    return config_dict
 
 # 50 lines, 49 images (1 repeated by error) IMAGES TEST SET HANDPICKED TO SHOW VISUAL VARIABILITY
 IMG_TEST_SET = {
@@ -931,5 +954,5 @@ BENCHMARK_DATASETS = [COLORFUL75, COMPLEX_DATA, STATIC_BUTTON_SIMPLEST, MOBILE_R
 #### Tests
 
 #library_versions_tests()
-# save_config(CONFIG_DICT)
-# read_config()
+# save_config_to_file(CONFIG_DICT, CONFIG_JSON_FILE)
+# read_config(CONFIG_JSON_FILE)

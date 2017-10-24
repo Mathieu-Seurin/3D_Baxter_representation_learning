@@ -10,7 +10,7 @@ from PIL import Image
 import os, os.path
 import subprocess
 
-from Utils import ALL_STATE_FILE, LEARNED_REPRESENTATIONS_FILE, LAST_MODEL_FILE, GLOBAL_SCORE_LOG_FILE, IMG_TEST_SET, COMPLEX_TEST_SET, STATIC_BUTTON_SIMPLEST, COMPLEX_DATA, MOBILE_ROBOT, ROBOT_TEST_SET, SUPERVISED, DEFAULT_DATASET, COLORFUL75, COMPLEX_DATA_MOVIE_TEST_SET, COLORFUL75_MOVIE_TEST_SET, STATIC_BUTTON_SIMPLEST_MOVIE_TEST_SET, COLORFUL_MOVIE_TEST_SET, MOBILE_ROBOT_MOVIE_TEST_SET, FOLDER_NAME_FOR_KNN_GIF_SEQS
+from Utils import ALL_STATE_FILE, LEARNED_REPRESENTATIONS_FILE, LAST_MODEL_FILE, GLOBAL_SCORE_LOG_FILE, IMG_TEST_SET, COMPLEX_TEST_SET, STATIC_BUTTON_SIMPLEST, COMPLEX_DATA, MOBILE_ROBOT, ROBOT_TEST_SET, SUPERVISED, DEFAULT_DATASET, COLORFUL75, NONSTATIC_BUTTON, COMPLEX_DATA_MOVIE_TEST_SET, COLORFUL75_MOVIE_TEST_SET, STATIC_BUTTON_SIMPLEST_MOVIE_TEST_SET, COLORFUL_MOVIE_TEST_SET, MOBILE_ROBOT_MOVIE_TEST_SET, FOLDER_NAME_FOR_KNN_GIF_SEQS
 from Utils import get_data_folder_from_model_name, file2dict, parse_repr_file, parse_true_state_file, get_test_set_for_data_folder, get_movie_test_set_for_data_folder
 
 import unittest
@@ -50,7 +50,7 @@ if len(sys.argv) <= 1:
 # Some parameters
 nbr_neighbors= int(sys.argv[1])
 nbr_images = -1
-use_test_set = True  
+use_test_set = True
 with_title = True
 
 
@@ -78,7 +78,7 @@ else:
 	    lastModelFile = open(LAST_MODEL_FILE)
 	    path_to_model = lastModelFile.readline()[:-1]
 	    data_folder = get_data_folder_from_model_name(path_to_model)
-	    
+
 	TEST_SET = get_test_set_for_data_folder(data_folder)
 
 
@@ -87,11 +87,11 @@ else:
 if len(sys.argv) == 2:
 	# We use fixed test set for fair comparison reasons
 	use_test_set = True
-	nbr_images = len(TEST_SET) 
-    
+	nbr_images = len(TEST_SET)
+
 if not generating_neigbours_for_movie:
 	#THE FOLLOWING ONLY WILL RUN IN USE_CUDA false way  #print('Calling lua subprocesses with ',data_folder)
-	subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_cuda','-use_continuous','-data_folder', data_folder])  
+	subprocess.call(['th','create_plotStates_file_for_all_seq.lua','-use_cuda','-use_continuous','-data_folder', data_folder])
 	# TODO: READ CMD LINE ARGS FROM FILE INSTEAD (and set accordingly here) TO NOT HAVING TO MODIFY INSTEAD train_predict_plotStates and the python files
 	subprocess.call(['th','create_all_reward.lua','-use_cuda','-use_continuous','-data_folder',data_folder])
 # else, the files should exist
@@ -152,12 +152,12 @@ elif nbr_neighbors<=10:
 else:
 	numline = 3
 
-# TODO: more efficient: for img_name in test_set.keys() revising data above: 
+# TODO: more efficient: for img_name in test_set.keys() revising data above:
 # HOWEVER this needs to compute also in create_all_rewards and create_plotStates for the test set, separately and  an extra file. Is it fair comparison to test images for nearest neigbours that are seen during training?
 print 'nbr_neighbours: ', nbr_neighbors, ' nbr of images: ', len(data), 'use_test_set ',use_test_set, ' of size: ', len(TEST_SET)#, TEST_SET
 for img_name,neigbour_indexes,dist,state in data:
 	if use_test_set: #		print img_name   colorful75/record_073/recorded_cameras_head_camera_2_image_compressed/frame00022.jpg
-		if not(img_name in TEST_SET): 
+		if not(img_name in TEST_SET):
 			continue
 	base_name= os.path.splitext(os.path.basename(img_name))[0]
 	seq_name= img_name.split("/")[1]
@@ -166,7 +166,7 @@ for img_name,neigbour_indexes,dist,state in data:
 	fig.set_size_inches(60,35)
 
 	original_coord = true_states[img_name]
-	if not generating_neigbours_for_movie:  
+	if not generating_neigbours_for_movie:
 		#We don't add to the mosaic the reference image (just the neigbours, will be added later in makeMovieComparingKNNAcrossModels.py)
 		a=fig.add_subplot(numline+1,5,3)
 		a.axis('off')

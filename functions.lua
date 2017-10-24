@@ -46,6 +46,8 @@ function get_data_folder_from_model_name(model_name)
         return COLORFUL75
     elseif string.find(model_name, COLORFUL) then
         return COLORFUL
+    elseif string.find(model_name, NONSTATIC_BUTTON) then
+        return NONSTATIC_BUTTON
     else
         print "Unsupported dataset!"
     end

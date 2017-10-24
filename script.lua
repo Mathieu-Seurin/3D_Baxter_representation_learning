@@ -172,7 +172,7 @@ end
 local function main(params)
     print("\n\n>> script.lua: main model builder")
     set_hyperparams(params, '', true) --second param adds extra keyword to the model name if desired
-    print('cmd default params (overridden by following set_hyperparams): ')
+    print('cmd default params (overridden by following set_hyperparams): ') --Because Torch prints here only default ones
     print(params)
     print_hyperparameters(false, 'script.lua Hyperparams:')
 
@@ -198,7 +198,6 @@ local function main(params)
           LOG_ACTION[#LOG_ACTION+1] = {}
        end
     end
-
 
     ALL_SEQ = precompute_all_seq(NB_SEQUENCES)
 
@@ -255,6 +254,8 @@ cmd:option('-use_continuous', false, 'true to use a continuous action space, fal
 cmd:option('-data_folder', MOBILE_ROBOT, 'Possible Datasets to use: staticButtonSimplest, mobileRobot, staticButtonSimplest, simpleData3D, pushingButton3DAugmented, babbling')
 cmd:option('-mcd', 0.4, 'Max. cosine distance allowed among actions for priors loss function evaluation (MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD)')
 cmd:option('-sigma', 0.4, "Sigma: denominator in continuous actions' extra factor (CONTINUOUS_ACTION_SIGMA)")
+cmd:option('-states_dimensions', 3, "states_dimensions: Default DIMENSION_OUT, i.e., dimensionality of the states learned (default is 3)")
+
 --TODO Set best mcd and sigma after grid search
 
 local params = cmd:parse(arg)  --TODO function to get all command line arguments that are the same right now for all Lua scripts, only in one function.
