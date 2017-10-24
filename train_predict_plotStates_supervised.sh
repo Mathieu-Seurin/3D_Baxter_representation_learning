@@ -18,7 +18,7 @@ function has_command_finished_correctly {
     fi
 }
 
-data_folder='colorful75' #complexData' #colorful75'  #mobileRobot # complexData #colorful  #staticButtonSimplest
+data_folder='staticButtonSimplest' #colorful75' #complexData' #colorful75'  #mobileRobot # complexData #colorful  #staticButtonSimplest
 
 echo " ********** Running supervised script: *************"
 #qlua script.lua  -use_cuda -use_continuous -mcd $max_cos_dis -sigma $s -data_folder mobileRobot #complexData #colorful  #stati$

@@ -12,6 +12,7 @@ import os, os.path, errno
 import matplotlib
 import seaborn as sns
 from PIL import Image
+import json
 
 
 """
@@ -28,9 +29,11 @@ STATIC_BUTTON_SIMPLEST = 'staticButtonSimplest'
 COMPLEX_DATA = 'complexData'
 COLORFUL = 'colorful'  # 150 data recording sequences
 COLORFUL75 = 'colorful75' # a smaller version half size of colorful
-ALL_DATASETS = [BABBLING, MOBILE_ROBOT, SIMPLEDATA3D, PUSHING_BUTTON_AUGMENTED, STATIC_BUTTON_SIMPLEST,COMPLEX_DATA, COLORFUL75, COLORFUL] #COLORFUL not in use yet due to memory issues
-SUPERVISED = 'Supervised' 
-DEFAULT_DATASET = COLORFUL75  # needs to be set for running all Python scripts in AE, GT? and Supervised modes
+NONSTATIC_BUTTON = 'nonStaticButton'
+
+ALL_DATASETS = [BABBLING, MOBILE_ROBOT, SIMPLEDATA3D, PUSHING_BUTTON_AUGMENTED, STATIC_BUTTON_SIMPLEST,COMPLEX_DATA, COLORFUL75, COLORFUL, NONSTATIC_BUTTON] #COLORFUL not in use yet due to memory issues
+SUPERVISED = 'Supervised'
+DEFAULT_DATASET = NONSTATIC_BUTTON  #COLORFUL75  # needs to be set for running all Python scripts in AE, GT? and Supervised modes
 # 2 options of plotting:
 LEARNED_REPRESENTATIONS_FILE = "saveImagesAndRepr.txt"
 GLOBAL_SCORE_LOG_FILE = 'globalScoreLog.csv'
@@ -41,8 +44,14 @@ ALL_STATS_FILE ='allStats.csv'
 CONFIG = 'config.json' # not used yet, TODO
 PATH_TO_LINEAR_MODEL = 'disentanglementLinearModels/'
 GIF_MOVIES_PATH = 'GIF_MOVIES/'  # used for states plot movie
-FOLDER_NAME_FOR_KNN_GIF_SEQS =  '/KNN_GIF_Seqs/' 
+FOLDER_NAME_FOR_KNN_GIF_SEQS =  '/KNN_GIF_Seqs/'
 PATH_TO_MOSAICS = './Mosaics/'
+CONFIG_JSON_FILE = 'Config.json'
+CONFIG_DICT = {
+	'DATA_FOLDER': NONSTATIC_BUTTON,
+	'DIMENSIONS_OUT': 3,
+	'PRIORS': ['prior']
+}
 
 # DEFINING A SET OF PREDEFINED IMAGES WE WANT ITS CORRESPONDING STATES FOR:
 # they represent left up, right up, down right, down left corner and pushing button images (clockwise hand movement. Used by makeMovieFromPlotStates.py
@@ -50,12 +59,12 @@ REPRESENTATIVE_DIFFERENT_IMAGES = {COLORFUL75: ['colorful75/record_008/recorded_
 'colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00087.jpg',
 'colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00149.jpg',
 'colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00011.jpg',
-'colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00234.jpg'], 
+'colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00234.jpg'],
 COLORFUL: ['colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00012.jpg',
 'colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00087.jpg',
 'colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00149.jpg',
 'colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00011.jpg',
-'colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00234.jpg'], 
+'colorful75/record_008/recorded_cameras_head_camera_2_image_compressed/frame00234.jpg'],
 COMPLEX_DATA: ['complexData/record_008/recorded_cameras_head_camera_2_image_compressed/frame00001.jpg',
 'complexData/record_008/recorded_cameras_head_camera_2_image_compressed/frame00070.jpg',
 'complexData/record_008/recorded_cameras_head_camera_2_image_compressed/frame00103.jpg',
@@ -66,14 +75,15 @@ STATIC_BUTTON_SIMPLEST:['staticButtonSimplest/record_043/recorded_camera_top/fra
 'staticButtonSimplest/record_043/recorded_camera_top/frame00071.jpg',
 'staticButtonSimplest/record_043/recorded_camera_top/frame00028.jpg',
 'staticButtonSimplest/record_043/recorded_camera_top/frame00050.jpg',
-'staticButtonSimplest/record_043/recorded_camera_top/frame00009.jpg'], 
+'staticButtonSimplest/record_043/recorded_camera_top/frame00009.jpg'],
 MOBILE_ROBOT: ['mobileRobot/record_008/recorded_camera_top/frame00001.jpg',
 'mobileRobot/record_008/recorded_camera_top/frame00072.jpg',
 'mobileRobot/record_008/recorded_camera_top/frame00063.jpg',
 'mobileRobot/record_008/recorded_camera_top/frame00011.jpg',
 'mobileRobot/record_008/recorded_camera_top/frame00048.jpg',
 'mobileRobot/record_008/recorded_camera_top/frame00090.jpg']}
-
+# NEW DATASET AFTER ICRA18
+NONSTATIC_BUTTON = []
 
 def library_versions_tests():
     if not matplotlib.__version__.startswith('2.'):
@@ -92,8 +102,8 @@ def library_versions_tests():
 
 # def create_GIF_from_imgs_in_folder(folder_rel_path, output_folder, output_file_name):
 #     # TODO: does not work properly, plus needs imageio installation, GIF created has to be rendered slower, other ideas in https://stackoverflow.com/questions/24688802/saving-an-animated-gif-in-pillow
-#     # or https://stackoverflow.com/questions/753190/programmatically-generate-video-or-animated-gif-in-python 
-#     # For now gifmaker.me works better up to 300 frames, and if not, ffmpeg: 
+#     # or https://stackoverflow.com/questions/753190/programmatically-generate-video-or-animated-gif-in-python
+#     # For now gifmaker.me works better up to 300 frames, and if not, ffmpeg:
 #     # ffmpeg -framerate 2 -f image2 -i "%*.jpg" -q:v 2  test.mp4
 #     if not os.path.exists(output_folder):
 #         os.mkdir(output_folder)
@@ -125,21 +135,23 @@ def get_data_folder_from_model_name(model_name):
         return COLORFUL75
     elif COLORFUL in model_name:
         return COLORFUL
+    elif NONSTATIC_BUTTON in model_name:
+        return NONSTATIC_BUTTON
     else:
         print model_name
         sys.exit("get_data_folder_from_model_name: Unsupported dataset! model_name must contain one of the official datasets defined in Utils.py, input is: "+ model_name)
 
 
 # def get_visible_states_for_images(specific_images):
-#     return REPRESENTATIVE_DIFFERENT_IMAGES[] 
+#     return REPRESENTATIVE_DIFFERENT_IMAGES[]
 
 # def produceEvolvingRelevantImageStatesPlotMovie(images2states, mode, rewards, toplot, model_name, axes_labels = ['State Dimension 1','State Dimension 2','State Dimension 3'], title='Learned Representations-Rewards Distribution\n'):
-#     list_of_colors = [(0.3,0.3,0.3), (0.0,0.0,1.0), (1,0,0)] 
+#     list_of_colors = [(0.3,0.3,0.3), (0.0,0.0,1.0), (1,0,0)]
 #     #list_of_colors = [(0.0, 0.0, 1.0),(1,0,0), (0.3, 0.3, 0.3), (0,1,0), (1,0.5,0), (0.5, 0, 0.5)]
 #     data_folder = get_data_folder_from_model_name(model_name)
 #     specific_images = REPRESENTATIVE_DIFFERENT_IMAGES[data_folder]
 #     #TODO toPlot = get_states_for_images(specific_images)
-#     #FIX 
+#     #FIX
 #     #toplot = toplot[:3]
 #     plot_path = GIF_MOVIES_PATH+model_name+'/'
 #     # if not os.path.exists(plot_path):
@@ -156,7 +168,7 @@ def get_data_folder_from_model_name(model_name):
 #         rewardsToPlot = rewards[:n_states_in_plot]
 #         images_states_to_plot = specific_images[:n_states_in_plot]
 #         colors_to_use = list_of_colors[:n_states_in_plot]
-#         if not (0.0, 0.0, 1.0) in colors_to_use: 
+#         if not (0.0, 0.0, 1.0) in colors_to_use:
 #             colors_to_use.append((0.0, 0.0, 1.0))
 #         if not (1,0,0) in colors_to_use:
 #             colors_to_use.append((1,0,0))
@@ -176,7 +188,7 @@ def create_mosaic_img_and_save(input_reference_img_to_show_on_top, list_of_input
     rows_in_mosaic = 2 #len(list_of_input_imgs) +1   # number of rows to show in the image mosaic
     columns_in_mosaic = 3 #1
     with_title = True
-        
+
     # DRAW FIRST REFERENCE INPUT IMAGE FIRST
     fig = plt.figure()
     fig.set_size_inches(60,35)
@@ -187,7 +199,7 @@ def create_mosaic_img_and_save(input_reference_img_to_show_on_top, list_of_input
     imgplot = plt.imshow(img)
 
     if len(top_title)>0:
-        a.set_title(top_title, fontsize = 60) 
+        a.set_title(top_title, fontsize = 60)
 
     # DRAW BELOW ALL MODELS IMAGES (KNN)
     for i in range(0, len(list_of_input_imgs)):
@@ -198,7 +210,7 @@ def create_mosaic_img_and_save(input_reference_img_to_show_on_top, list_of_input
         imgplot = plt.imshow(img)
 
         if len(titles)>0:
-            a.set_title(titles[i], fontsize = 40) 
+            a.set_title(titles[i], fontsize = 40)
         a.axis('off')
 
     plt.tight_layout()
@@ -210,15 +222,15 @@ def create_mosaic_img_and_save(input_reference_img_to_show_on_top, list_of_input
 
 def produceRelevantImageStatesPlotMovie(mode, rewards, toplot, img_paths2repr, model_name, axes_labels = ['State Dimension 1','State Dimension 2','State Dimension 3'], title='Learned Representations-Rewards Distribution\n'):
     # Produces full (all states) static plot GIF while the Evolving corresponding method provides an evolving (!= nr of states at each plot generated, where axis scale and labelling changes and squeezes the axes
-    colors_to_use = [(0.3,0.3,0.3), (0.0,0.0,1.0), (1,0,0)] 
+    colors_to_use = [(0.3,0.3,0.3), (0.0,0.0,1.0), (1,0,0)]
     model_category = ''
     #colors_to_use = [(0.0, 0.0, 1.0),(1,0,0), (0.3, 0.3, 0.3), (0,1,0), (1,0.5,0), (0.5, 0, 0.5)]
     data_folder = get_data_folder_from_model_name(model_name)
     specific_images_to_plot = REPRESENTATIVE_DIFFERENT_IMAGES[data_folder]
     specific_images_to_plot.sort()
     statesToPlot = []; rewardsToPlot = []; images = []
-    axis_limits = [[np.min(toplot[:,0]), np.max(toplot[:,0])], 
-    [np.min(toplot[:,0]), np.max(toplot[:,0])], 
+    axis_limits = [[np.min(toplot[:,0]), np.max(toplot[:,0])],
+    [np.min(toplot[:,0]), np.max(toplot[:,0])],
     [np.min(toplot[:,0]), np.max(toplot[:,0])]]
 
     #for img in range(len(specific_images_to_plot)):
@@ -233,7 +245,7 @@ def produceRelevantImageStatesPlotMovie(mode, rewards, toplot, img_paths2repr, m
     #     toplot_invisible.append(toplot[i])
     #     rewards_invisible.append(rewards[i])
     #TODO toPlot = get_states_for_images(specific_images)
-    #FIX 
+    #FIX
     #toplot = toplot[:3]
     plot_path = GIF_MOVIES_PATH+model_name+'/'
     # if not os.path.exists(plot_path):
@@ -244,7 +256,7 @@ def produceRelevantImageStatesPlotMovie(mode, rewards, toplot, img_paths2repr, m
         if e.errno != errno.EEXIST:
             raise
     plot_filename_template = plot_path+model_name+'_GIF_frame*.png'
-    if not (0.0, 0.0, 1.0) in colors_to_use: 
+    if not (0.0, 0.0, 1.0) in colors_to_use:
         colors_to_use.append((0.0, 0.0, 1.0))
     if not (1,0,0) in colors_to_use:
         colors_to_use.append((1,0,0))
@@ -286,7 +298,7 @@ def plotStates(mode, rewards, toplot, plot_path, axes_labels = ['State Dimension
     reward_values = set(rewards)
     rewards_cardinal = len(reward_values)
     print'plotStates ',mode,' for rewards cardinal: ',rewards_cardinal,' (', reward_values,' ',type(reward_values),': ',reward_values,'), states: ', type(toplot)#, toplot.shape
-    
+
     rewards = map(float, rewards)
 
     # custom Red Gray Blue colormap
@@ -422,7 +434,7 @@ def parse_repr_file(learned_representations_file):
 
 def get_test_set_for_data_folder(data_folder):
     # Returns a dictionary (notice, with unique keys) of test images. Used to create movie from scatterplot
-    # TODO : extend for other datasets for comparison, e.g. babbling. 
+    # TODO : extend for other datasets for comparison, e.g. babbling.
     if data_folder == STATIC_BUTTON_SIMPLEST:
         return IMG_TEST_SET
     elif data_folder == COMPLEX_DATA:
@@ -433,6 +445,8 @@ def get_test_set_for_data_folder(data_folder):
         return COLORFUL_TEST_SET
     elif data_folder == MOBILE_ROBOT:
         return ROBOT_TEST_SET
+    elif data_folder == NONSTATIC_BUTTON:
+        return NONSTATIC_BUTTON
     elif SUPERVISED in data_folder or 'supervised' in data_folder:
         return SUPERVISED
     else:
@@ -442,7 +456,7 @@ def get_movie_test_set_for_data_folder(data_folder):
     # returns the ordered sequence of first 50 frames in the test sequence for movie smoothness creation purpose
     # Used to create movie from KNN mosaics
     if data_folder == STATIC_BUTTON_SIMPLEST:
-        return STATIC_BUTTON_SIMPLEST_MOVIE_TEST_SET 
+        return STATIC_BUTTON_SIMPLEST_MOVIE_TEST_SET
     elif data_folder == COMPLEX_DATA:
         return COMPLEX_DATA_MOVIE_TEST_SET
     elif data_folder == COLORFUL75:
@@ -451,11 +465,13 @@ def get_movie_test_set_for_data_folder(data_folder):
         return COLORFUL_MOVIE_TEST_SET #'not yet'
     elif data_folder == MOBILE_ROBOT:
         return MOBILE_ROBOT_MOVIE_TEST_SET # not yet
+    elif data_folder == NONSTATIC_BUTTON:
+        return NONSTATIC_BUTTON
     elif 'supervised' in data_folder or SUPERVISED in data_folder:
         return DEFAULT_DATASET
     else:
         sys.exit('get_movie_test_set_for_data_folder has not defined a set for: {}'.format(data_folder))
-    
+
 def remove_dataset_name(string):
     for dataset in ALL_DATASETS:
         if string.endswith(dataset):
@@ -469,6 +485,25 @@ def get_immediate_files_in_path(given_path, containing_pattern_in_name = ''):
     return [os.path.join(given_path, name) for name in os.listdir(given_path)
             if os.path.isfile(os.path.join(given_path, name)) and containing_pattern_in_name in os.path.join(given_path, name)]
 
+def save_config(config_dict):
+    """
+    Saves config into json file for only one file to include important constans
+    to be read by whole learning pipeline of lua and python scripts
+    """
+    # config_dict = {
+    # 	'key_1': 1,
+    # 	'key_2': "a string",
+    # 	'key_3': ['element']
+    # }
+    #save it to a json file
+    print 'Saving config ',config_dict
+    json.dump(config_dict, open(CONFIG_JSON_FILE, 'wb'))
+
+def read_config():
+    # load the data
+    config_dict = json.load(open(CONFIG_JSON_FILE, 'rb'))
+    print 'Reading config: ', config_dict
+    return config_dict
 
 # 50 lines, 49 images (1 repeated by error) IMAGES TEST SET HANDPICKED TO SHOW VISUAL VARIABILITY
 IMG_TEST_SET = {
@@ -535,7 +570,7 @@ IMG_TEST_SET = {
 'staticButtonSimplest/record_052/recorded_cameras_head_camera_2_image_compressed/frame00025.jpg'}
 #print(len(IMG_TEST_SET))
 
-# 50 unique images 
+# 50 unique images
 COMPLEX_TEST_SET = {
 'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00030.jpg',
 'complexData/record_025/recorded_cameras_head_camera_2_image_compressed/frame00003.jpg',
@@ -653,7 +688,7 @@ ROBOT_TEST_SET = {
 
 # 50 Images: NOTE: IMPORTANT: RECORD_150 is a special one created with multi colors domain randomization WITHIN the same sequence (other sequences are not)
 # in order to have a varied dataset in the test set.
-COLORFUL_TEST_SET = {   
+COLORFUL_TEST_SET = {
 'colorful/record_150/recorded_cameras_head_camera_2_image_compressed/frame00030.jpg',
 'colorful/record_150/recorded_cameras_head_camera_2_image_compressed/frame00003.jpg',
 'colorful/record_150/recorded_cameras_head_camera_2_image_compressed/frame00021.jpg',
@@ -706,7 +741,7 @@ COLORFUL_TEST_SET = {
 'colorful/record_150/recorded_cameras_head_camera_2_image_compressed/frame00046.jpg'
 }
 
-COLORFUL75_TEST_SET = {   
+COLORFUL75_TEST_SET = {
 'colorful75/record_150/recorded_cameras_head_camera_2_image_compressed/frame00030.jpg',
 'colorful75/record_150/recorded_cameras_head_camera_2_image_compressed/frame00003.jpg',
 'colorful75/record_150/recorded_cameras_head_camera_2_image_compressed/frame00021.jpg',
@@ -759,12 +794,67 @@ COLORFUL75_TEST_SET = {
 'colorful75/record_150/recorded_cameras_head_camera_2_image_compressed/frame00046.jpg'
 }
 
-# IMPORTANT NOTE: MOVIE TEST SETS MUST BE AN ARRAY TO PRESERVE ORDER IN THE MOVIE:
+NONSTATIC_BUTTON_TEST_SET = {
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00030.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00003.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00021.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00025.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00014.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00027.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00034.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00016.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00001.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00026.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00015.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00011.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00047.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00020.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00012.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00029.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00045.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00049.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00039.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00038.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00032.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00028.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00037.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00005.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00004.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00040.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00017.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00008.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00006.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00031.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00035.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00042.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00000.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00036.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00002.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00044.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00018.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00041.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00013.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00033.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00048.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00009.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00024.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00010.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00022.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00043.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00007.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00023.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00019.jpg',
+'nonStaticButton/record_025/recorded_cameras_head_camera_2_image_compressed/frame00046.jpg'
+}
+
+
+#########
+# IMPORTANT NOTE: MOVIE TEST SETS MUST BE AN ARRAY TO PRESERVE ORDER IN A SMOOTH TRANSITION IN THE MOVIE:
 COLORFUL75_MOVIE_TEST_SET = get_immediate_files_in_path('colorful75/record_031/recorded_cameras_head_camera_2_image_compressed', containing_pattern_in_name='frame')
 COLORFUL75_MOVIE_TEST_SET.sort()
 
 # THE FOLLOWING SEQUENCE (N 150) IS AD-HOC CREATED WITH  MULTIMPLE NON_SMOOTH LOOKING COLOUR CHANGING IN BETWEEN THE SEQUENCE. FOR MAKING MOVIE< USE THE ABOVE ONE
-# COLORFUL75_MOVIE_TEST_SET = [ 
+# COLORFUL75_MOVIE_TEST_SET = [
 # 'colorful75/record_150/recorded_cameras_head_camera_2_image_compressed/frame00000.jpg',
 # 'colorful75/record_150/recorded_cameras_head_camera_2_image_compressed/frame00001.jpg',
 # 'colorful75/record_150/recorded_cameras_head_camera_2_image_compressed/frame00002.jpg',
@@ -833,7 +923,7 @@ COLORFUL_MOVIE_TEST_SET = COLORFUL75_MOVIE_TEST_SET
 # used for GIF movie demo for all discrete actions DREAM DEMO
 # NOTE THAT THE ORDER MUST COINCIDE PER DATASET PER ITS CORRECT USAGE BY makeMovieComparingKNNAcrossModels.py
 ALL_KNN_MOVIE_TEST_SETS = [COLORFUL75_MOVIE_TEST_SET, COMPLEX_DATA_MOVIE_TEST_SET, STATIC_BUTTON_SIMPLEST_MOVIE_TEST_SET, MOBILE_ROBOT_MOVIE_TEST_SET]#, COLORFUL_MOVIE_TEST_SET]
-BENCHMARK_DATASETS = [COLORFUL75, COMPLEX_DATA, STATIC_BUTTON_SIMPLEST, MOBILE_ROBOT]  
+BENCHMARK_DATASETS = [COLORFUL75, COMPLEX_DATA, STATIC_BUTTON_SIMPLEST, MOBILE_ROBOT, NONSTATIC_BUTTON]
 
 
 
@@ -841,3 +931,5 @@ BENCHMARK_DATASETS = [COLORFUL75, COMPLEX_DATA, STATIC_BUTTON_SIMPLEST, MOBILE_R
 #### Tests
 
 #library_versions_tests()
+# save_config(CONFIG_DICT)
+# read_config()
