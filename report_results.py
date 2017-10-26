@@ -40,7 +40,7 @@ def print_leader_board(df, datasets):
 # writing scores to global log for plotting and reporting
 if os.path.isfile(GLOBAL_SCORE_LOG_FILE):
     if os.path.isfile(MODELS_CONFIG_LOG_FILE):
-        mse_df = pd.read_csv(GLOBAL_SCORE_LOG_FILE, usecols=['Model','KNN_MSE'])# columns = header)
+        mse_df = pd.read_csv(GLOBAL_SCORE_LOG_FILE, usecols=['Model','KNN_MSE','STATES_DIMENSION'])# columns = header)
         models_df = pd.read_csv(MODELS_CONFIG_LOG_FILE, usecols=['Model','DATA_FOLDER','MODEL_ARCHITECTURE_FILE','MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD','CONTINUOUS_ACTION_SIGMA'])#, columns = header)   print mse_df.head()    print models_df.head()
         #print "Initial log files contain ", len(mse_df), ' MSE datapoints and ', len(models_df), ' models experimented '
         #all_scores_logs = mse_df.merge(models_df, on='Model', how='left') #all_scores_logs = mse_df.set_index('Model').join(models_df.set_index('Model'))

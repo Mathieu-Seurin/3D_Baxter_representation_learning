@@ -11,7 +11,7 @@ import os, os.path
 import subprocess
 
 from Utils import ALL_STATE_FILE, LEARNED_REPRESENTATIONS_FILE, LAST_MODEL_FILE, GLOBAL_SCORE_LOG_FILE, IMG_TEST_SET, COMPLEX_TEST_SET, STATIC_BUTTON_SIMPLEST, COMPLEX_DATA, MOBILE_ROBOT, ROBOT_TEST_SET, SUPERVISED, DEFAULT_DATASET, COLORFUL75, NONSTATIC_BUTTON, COMPLEX_DATA_MOVIE_TEST_SET, COLORFUL75_MOVIE_TEST_SET, STATIC_BUTTON_SIMPLEST_MOVIE_TEST_SET, COLORFUL_MOVIE_TEST_SET, MOBILE_ROBOT_MOVIE_TEST_SET, FOLDER_NAME_FOR_KNN_GIF_SEQS
-from Utils import get_data_folder_from_model_name, file2dict, parse_repr_file, parse_true_state_file, get_test_set_for_data_folder, get_movie_test_set_for_data_folder
+from Utils import read_config, get_data_folder_from_model_name, file2dict, parse_repr_file, parse_true_state_file, get_test_set_for_data_folder, get_movie_test_set_for_data_folder
 
 import unittest
 test = unittest.TestCase('__init__')
@@ -44,15 +44,17 @@ image in the test set and it will assess the test set of 50 images defined in Co
 """
 
 print"\n\n >> Running generateNNImages.py...."
+
 if len(sys.argv) <= 1:
-    sys.exit("Give number of neighbors to produce, followed by number of input images (and model dir if you don't want to use the last model created). To produce a movie, provide only argument -1 and set nb of neighbors below")
+    sys.exit("Give number of neighbors to produce, followed by number of input images (and model dir if you don't want to use the last model created). To produce a movie, provide only argument -1 and set nb of neighbors in the program below")
+
 
 # Some parameters
 nbr_neighbors= int(sys.argv[1])
 nbr_images = -1
 use_test_set = True
 with_title = True
-
+STATES_DIMENSION = read_config()['STATES_DIMENSION']
 
 if nbr_neighbors == -1: # TODO FIX AND ADD MODEL NAME TO SUPERVISED!
 	generating_neigbours_for_movie = True
@@ -214,10 +216,11 @@ f.write(str(mean_error)[:5])
 f.close()
 print 'KNN_MSE score for given neighbors: ', mean_error
 
+
 if not generating_neigbours_for_movie:
 	# writing scores to global log for plotting and reporting
-	header = ['Model', 'KNN_MSE']
-	d = {'Model':[last_model_name], 'KNN_MSE': [mean_error]}
+	header = ['Model', 'KNN_MSE', 'STATES_DIMENSION']
+	d = {'Model':[last_model_name], 'KNN_MSE': [mean_error], 'STATES_DIMENSION': [STATES_DIMENSION]}
 	global_scores_df = pd.DataFrame(data=d, columns = header) #global_scores_df.reset_index()
 
 	if not os.path.isfile(GLOBAL_SCORE_LOG_FILE):

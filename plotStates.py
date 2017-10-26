@@ -1,5 +1,5 @@
 # coding: utf-8
-from Utils import library_versions_tests, get_data_folder_from_model_name, plotStates
+from Utils import library_versions_tests, get_data_folder_from_model_name, plotStates, read_config
 from Utils import MOBILE_ROBOT, LEARNED_REPRESENTATIONS_FILE, SKIP_RENDERING, DEFAULT_DATASET, SUPERVISED
 import numpy as np
 import sys
@@ -17,6 +17,7 @@ with_title = False #do you want the title on your plots or nop ? Not implemented
 
 library_versions_tests()
 print"\n\n >> Running plotStates.py....plotGroundTruthStates: ",plotGroundTruthStates, " SKIP_RENDERING = ", SKIP_RENDERING
+CONFIG_DICT = read_config()
 
 model_name = ''
 

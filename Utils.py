@@ -107,10 +107,10 @@ def save_config_to_file(config_dict, filename):
     print 'Saving config ',config_dict
     json.dump(config_dict, open(filename, 'wb'))
 
-def read_config(filename):
+def read_config(filename=CONFIG_JSON_FILE):
     # load the data from json file into a dictionary
     config_dict = json.load(open(filename, 'rb'))
-    print 'Current config: ', config_dict
+    #print 'Current config: ', config_dict
     return config_dict
 
 

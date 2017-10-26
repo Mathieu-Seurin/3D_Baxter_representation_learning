@@ -20,9 +20,9 @@ function has_command_finished_correctly {
 }
 
 
-data_folder='staticButtonSimplest' #mobileRobot' #'nonStaticButton' #'complexData' #colorful75'  #'mobileRobot' # 'complexData' #'colorful'  #
+data_folder='colorful75' #staticButtonSimplest' #mobileRobot' #'nonStaticButton' #'complexData' #colorful75'  #'mobileRobot' # 'complexData' #'colorful'  #
 for states_dimension in 3 4 5 6 7 8 9 10 15 20
-  do
+do
       echo " ********** Running pipeline for finetuning states dimension to be learned: $states_dimension and sigma: $s *************"
       qlua script.lua  -use_cuda -states_dimension $states_dimension  -data_folder $data_folder
       has_command_finished_correctly
