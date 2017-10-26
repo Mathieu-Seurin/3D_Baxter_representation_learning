@@ -12,7 +12,7 @@
 --=============================================================
 require 'lfs'
 require 'hyperparams'
-json = require 'json'
+json = require 'json'   --  json = require("json")
 
 ---NOTE: THESE ARE DEFAULTS (IF NOT COMMAND LINE ARGS ARE PASSED), AND ARE OVERRIDEN BY DATA_FOLDER SPECIFIC CASES BELOW :
 ----------------------------------------------------------------------------------------------------------------------------
@@ -25,6 +25,7 @@ MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.4  -- best so far for colorful75 with 4
 CONTINUOUS_ACTION_SIGMA = 0.4
 DATA_FOLDER = MOBILE_ROBOT --works best!  # NONSTATIC_BUTTON
 CONFIG_DICT = {}
+CONFIG_JSON_FILE = 'Config.json'
 
 --===============================================
 --ALL POSSIBLE PRIORS: (set them in hyperparams)
@@ -542,34 +543,68 @@ function print_hyperparameters(print_continuous_actions_config, extra_string_to_
     print("\n================================")
 end
 
-function save_config_to_file(config_dict)
+function save_config_to_file(config_dict, filename)
     --    Saves config into json file for only one file to include important constans
     --to be read by whole learning pipeline of lua and python scripts
     CONFIG_DICT['DATA_FOLDER']= DATA_FOLDER
     CONFIG_DICT['STATES_DIMENSION']= DIMENSION_OUT
     CONFIG_DICT['PRIORS_CONFIGS_TO_APPLY']=  PRIORS_CONFIGS_TO_APPLY
+    CONFIG_DICT['MODEL_ARCHITECTURE_FILE']= MODEL_ARCHITECTURE_FILE
 
-    print ('Saving config tp file ',CONFIG_DICT)
-    --json.dump(config_dict, open(CONFIG_JSON_FILE, 'wb'))
+    --local path, err = io.open(CONFIG_JSON_FILE, "rb")
+    --local path = system.pathForFile( filename, system.DocumentsDirectory)  -- how to require system? 'lfs' and 'system' do not work.   local lfs = require "lfs";
+
+    local file = io.open(CONFIG_JSON_FILE, "w")
+
+    if file then
+        local contents = json.encode(CONFIG_DICT)
+        file:write( contents )
+        io.close( file )
+        print ('Saved config to file ',CONFIG_DICT)
+        return true
+    else
+        print ('Could not save config to file ',CONFIG_DICT)
+        return false
+    end
 end
 
-function read_config()
+function read_config(filename)
     -- load the data from json file into a dictionary
-    config_dict = json.load(open(CONFIG_JSON_FILE, 'rb'))
-    print('Reading config: ', config_dict)
-    return config_dict
+    local myTable = {}
+    local file = io.open( filename, "r" )
+
+    if file then
+        -- read all contents of file into a string
+        local contents = file:read( "*a" )
+        myTable = json.decode(contents)
+        io.close( file )
+        print('Read  config: ', myTable)
+        return myTable
+    end
+    return nil
 end
+
+
+
+----------------- Tests
 
 function json_test()
+  --Install json2lua luarocks install --server=http://rocks.moonscript.org/manifests/amrhassan --local json4Lua
+  --json = require("json")
   --   Returns a string representing value encoded in JSON.
-  json.encode({ 1, 2, 3, { x = 10 } }) -- Returns '[1,2,3,{"x":10}]'
-  json.decode('str')
+  table = { 1, 2, 3, { x = 10 } }
+  string = json.encode(table) -- Returns '[1,2,3,{"x":10}]'
   --Returns a value representing the decoded JSON string.
-  json.decode('[1,2,3,{"x":10}]')
+  --decoded = json.decode('[1,2,3,{"x":10}]')  --gives qlua: /home/seurin/.luarocks/share/lua/5.2/json.lua:232: attempt to call global 'loadstring' (a nil value)
+  save_config_to_file(string, CONFIG_JSON_FILE)
+  loaded = read_config(CONFIG_JSON_FILE)
+  print(loaded)
 end
 
+--json_test()    --/home/seurin/torch/install/share/lua/5.2/torch/CmdLine.lua:104: attempt to call field 'insert' (a nil value)
+--stack traceback:   /home/seurin/torch/install/share/lua/5.2/torch/CmdLine.lua:104: in function 'option'   script.lua:252: in main chunk
 
-json_test()
+
 
 --Ref. Point position for the 5th Ref. point prior
 --(A point where the robot wants the state to be very similar. Like a reference point for the robot)

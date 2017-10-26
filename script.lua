@@ -167,13 +167,12 @@ function train(Models, priors_used)
    return Models.Model1, NAME_SAVE
 end
 
-
-
 local function main(params)
     print("\n\n>> script.lua: main model builder")
-    set_hyperparams(params, '', true) --second param adds extra keyword to the model name if desired
-    print('cmd default params (overridden by following set_hyperparams): ') --Because Torch prints here only default ones
+    
+    print('cmd default params are (overridden if passed by cmd line or set_hyperparams is called): ') --Because Torch prints here only default ones
     print(params)
+    set_hyperparams(params, '', true) --second param adds extra keyword to the model name if desired
     print_hyperparameters(false, 'script.lua Hyperparams:')
 
     local records_paths = Get_Folders(DATA_FOLDER, 'record') --local list_folders_images, list_txt_action,list_txt_button, list_txt_state=Get_HeadCamera_View_Files(DATA_FOLDER)
@@ -209,6 +208,7 @@ local function main(params)
           print("Getting model in : "..MODEL_ARCHITECTURE_FILE)
           require(MODEL_ARCHITECTURE_FILE)
           Model=getModel(DIMENSION_OUT)
+          --print(Model)
           --graph.dot(Model.fg, 'Our Model')
        end
 

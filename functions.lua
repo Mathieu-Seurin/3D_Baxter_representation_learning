@@ -2,10 +2,7 @@ require 'const'
 require 'image'
 require 'Get_Images_Set'
 
-
-
-
----------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
 -- Function :get_last_used_model_name()-- LAST_MODEL_FILE is a file where the name of the last model computed is saved
 -- this way, you just have to launch the programm without specifying anything,
 -- and it will load the good model

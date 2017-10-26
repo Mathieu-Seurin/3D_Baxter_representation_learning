@@ -124,6 +124,8 @@ and do:
 require 'cunn'
 require 'cudnn'  --If trouble, installing, follow step 6 in https://github.com/jcjohnson/neural-style/blob/master/INSTALL.md
 
+5. Json4Lua https://github.com/craigmj/json4lua
+[Should not be needed: Luarocks install json]
 
 ## OPTIMIZATIONS
 For cudnn memory/speed optimization options, see
@@ -193,6 +195,10 @@ TORCH_LUA_VERSION=LUA52 ./install.sh
 ```
 
 Switching to lua52 worked
+
+5. qlua: /home/seurin/.luarocks/share/lua/5.2/json.lua:232: attempt to call global 'loadstring' (a nil value)
+PR issued, solved replacing loadstring with load
+
 
 ## KNOWN ERRORS:
 
