@@ -434,14 +434,12 @@ function Get_Folder_Name(Log_Folder,list_prior)
 end
 
 function getInfos(txt,txt_reward,txt_state)
-
-
    local Infos={}
    for dim=1,DIMENSION_IN do
       Infos[dim] = {}
    end
    Infos.reward = {}
-
+   Infos.buttonPosition = tensorFromTxt(txt_button)
    local reward_index= REWARD_INDEX
 
    local tensor_state, label=tensorFromTxt(txt_state)
@@ -480,7 +478,6 @@ function getInfos(txt,txt_reward,txt_state)
    end
 
    Infos.txt = txt
-
    return Infos
 end
 

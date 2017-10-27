@@ -54,6 +54,8 @@ nbr_neighbors= int(sys.argv[1])
 nbr_images = -1
 use_test_set = True
 with_title = True
+CONFIG_DICT = read_config()
+print (CONFIG_DICT)
 STATES_DIMENSION = read_config()['STATES_DIMENSION']
 
 if nbr_neighbors == -1: # TODO FIX AND ADD MODEL NAME TO SUPERVISED!

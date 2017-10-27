@@ -20,7 +20,7 @@ function has_command_finished_correctly {
 }
 
 
-data_folder='colorful75' #staticButtonSimplest' #mobileRobot' #'nonStaticButton' #'complexData' #colorful75'  #'mobileRobot' # 'complexData' #'colorful'  #
+data_folder='nonStaticButton' #colorful75' #staticButtonSimplest' #mobileRobot' #'nonStaticButton' #'complexData' #colorful75'  #'mobileRobot' # 'complexData' #'colorful'  #
 for states_dimension in 4 5 6 7 8 9 10 15 20 50 100 200 500 1000
   do
         echo " ********** Running pipeline for finetuning states dimension to be learned: $states_dimension and sigma: $s *************"

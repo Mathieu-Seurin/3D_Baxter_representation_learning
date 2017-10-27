@@ -45,10 +45,12 @@ th script.lua -use_continuous -data_folder staticButtonSimplest
 
 IMPORTANT:
 -If you want to run grid search, ssh or batch processing pipelines such as learn_predict_plotStates.sh, make SKIP_RENDERING = true in Utils.py for the KNN images and plots to be saved properly and later copy them with scp for visualization, e.g. using [2].
+-First, set your current configuration in hyperparams.lua and const.lua and run the train_predict_plotStates pipeline which saves the last model for which representations have been learned). 
 
 
 ## RUNNING: plotStates.py
 To get a glimpse of how the ground truth states look like, run `plotStates.py` and set there the constant: plotGroundTruthStates = True
+either a) provide the saved model name as argument or b) if  running plotStates.py without arguments, make sure you have trained a model (saved in lastModel.txt) and run imagesAndReprToTxt.lua previously (i.e. make sure you are running the train_predict_plotStates pipeline which saves the last model for which representations have been learned)
 
 To run specific images' states:
 python makeMovieFromPlotStates.py model_name

@@ -18,6 +18,7 @@ with_title = False #do you want the title on your plots or nop ? Not implemented
 library_versions_tests()
 print"\n\n >> Running plotStates.py....plotGroundTruthStates: ",plotGroundTruthStates, " SKIP_RENDERING = ", SKIP_RENDERING
 CONFIG_DICT = read_config()
+STATES_DIMENSION = CONFIG_DICT['STATES_DIMENSION']
 
 model_name = ''
 
@@ -104,7 +105,7 @@ print "Ploting total states and total rewards: ",total_states, " ", total_reward
 test.assertEqual(total_rewards, total_states, "Datapoints size discordance! Length of rewards and state files should be equal, and it is "+str(len(rewards))+" and "+str(len(toplot))+" Run first create_all_reward.lua and create_plotStates_file_for_all_seq.lua")
 
 REPRESENTATIONS_DIMENSIONS = len(states[0])
-test.assertEqual(REPRESENTATIONS_DIMENSIONS, STATES_DIMENSION, "REPRESENTATIONS_DIMENSIONS and STATES_DIMENSION should coincide, set your current configuration in const.lua "+REPRESENTATIONS_DIMENSIONS+' '+STATES_DIMENSION)
+test.assertEqual(REPRESENTATIONS_DIMENSIONS, STATES_DIMENSION, "REPRESENTATIONS_DIMENSIONS and STATES_DIMENSION should coincide, set your current configuration in const.lua and either a) provide the model as argument or b) if  running plotStates.py without arguments, make sure you have trained a model (saved in lastModel.txt) and run imagesAndReprToTxt.lua previously (i.e. make sure you are running the train_predict_plotStates pipeline which saves the last model for which representations have been learned). Values are: "+str(REPRESENTATIONS_DIMENSIONS)+' '+str(STATES_DIMENSION))
 
 PLOT_DIMENSIONS = 3
 
