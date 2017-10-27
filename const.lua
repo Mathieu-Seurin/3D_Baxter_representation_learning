@@ -43,6 +43,8 @@ ALL_PRIORS = {REP, CAUS,PROP,TEMP,BRING_CLOSER_REWARD, BRING_CLOSER_REF_POINT, R
 PRIORS_CONFIGS_TO_APPLY ={{PROP, TEMP, CAUS, REP}}
 MODEL_APPROACH = 'RoboticPriors'
 SAVE_MODEL_T7_FILE = true --NECESSARY STEP TO RUN FULL EVALUATION PIPELINE (REQUIRED FILE BY imagesAndReprToTxt.lua)
+USING_BUTTONS_RELATIVE_POSITION = false
+
 -- ====================================================
 ---- needed for non cuda mode?
 -- cutorch = require 'cutorch'
@@ -102,7 +104,7 @@ MAX_TABLE = {10000,10000} -- for x,y
 
 DIMENSION_IN = 2
 DIMENSION_OUT= 3  -- STATES_DIMENSION (to be learned, configurable as cmd line param as STATES_DIMENSION,for grid search)
-STATES_DIMENSION = -1 
+STATES_DIMENSION = -1
 
 REWARD_INDEX = 1  --3 reward values: -1, 0, 10
 INDEX_TABLE = {1,2} --column index for coordinate in state file (respectively x,y)
@@ -180,7 +182,7 @@ function set_hyperparams(params, modelApproach, createNewModelFolder)
 
     set_cuda_hyperparams(USE_CUDA)
     set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach, createNewModelFolder)
-    
+
     save_config_to_file(CONFIG_DICT, CONFIG_JSON_FILE)
 end
 
@@ -440,6 +442,7 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach, createNewM
         -- MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = 0.3
         -- CONTINUOUS_ACTION_SIGMA = 0.3
     elseif DATA_FOLDER == NONSTATIC_BUTTON then  -- FOR NOW, A COPY OF 3D_STATIC_DATASET TODO: MODIFY ACCORDINGLY WITH NEW SIMULATOR OF ANTONIN
+      USING_BUTTONS_RELATIVE_POSITION = true
       CLAMP_CAUSALITY = false --TODO: make false when continuous works
       -- A point where the robot wants the state to be very similar. Like a reference point for the robot
       FIXED_POS = {0.607, 0.017, -0.143} --for fixed point prior
