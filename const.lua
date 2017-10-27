@@ -41,7 +41,7 @@ REWARD_PREDICTION_CRITERION= 'Prediction Reward'
 ALL_PRIORS = {REP, CAUS,PROP,TEMP,BRING_CLOSER_REWARD, BRING_CLOSER_REF_POINT, REWARD_PREDICTION_CRITERION}
 --DEFAULTS BEING APPLIED (SET THEM IN HYPERPARAMS.LUA)
 PRIORS_CONFIGS_TO_APPLY ={{PROP, TEMP, CAUS, REP}}
-
+MODEL_APPROACH = 'RoboticPriors'
 SAVE_MODEL_T7_FILE = true --NECESSARY STEP TO RUN FULL EVALUATION PIPELINE (REQUIRED FILE BY imagesAndReprToTxt.lua)
 -- ====================================================
 ---- needed for non cuda mode?
@@ -101,7 +101,8 @@ MIN_TABLE = {-10000,-10000} -- for x,y
 MAX_TABLE = {10000,10000} -- for x,y
 
 DIMENSION_IN = 2
-DIMENSION_OUT= 3  -- STATES_DIMENSION (to be learned, configurable as cmd line param)
+DIMENSION_OUT= 3  -- STATES_DIMENSION (to be learned, configurable as cmd line param as STATES_DIMENSION,for grid search)
+STATES_DIMENSION = -1 
 
 REWARD_INDEX = 1  --3 reward values: -1, 0, 10
 INDEX_TABLE = {1,2} --column index for coordinate in state file (respectively x,y)
@@ -174,10 +175,12 @@ function set_hyperparams(params, modelApproach, createNewModelFolder)
     MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD = params.mcd
     CONTINUOUS_ACTION_SIGMA = params.sigma
     DATA_FOLDER = params.data_folder  --print('[Log: Setting command line dataset to '..params.data_folder..']') type is a str
-    STATES_DIMENSION = params.states_dimensions
+    STATES_DIMENSION = params.states_dimension
+    MODEL_APPROACH = modelApproach  --if non empty (RoboticsPriors), can be inverse, forward model or ICM (TODO)
 
     set_cuda_hyperparams(USE_CUDA)
     set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach, createNewModelFolder)
+    
     save_config_to_file(CONFIG_DICT, CONFIG_JSON_FILE)
 end
 
@@ -227,7 +230,12 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach, createNewM
        MAX_TABLE = {0.75,0.6,10} -- for x,y,z doesn't really matter in fact
 
        DIMENSION_IN = 3
-       DIMENSION_OUT = 3
+       if STATES_DIMENSION == -1 then  -- we use default dimension per dataset
+          DIMENSION_OUT = 3
+          STATES_DIMENSION = DIMENSION_OUT
+       else
+          DIMENSION_OUT = STATES_DIMENSION
+       end
 
        REWARD_INDEX = 2 --2 reward va_robot_limb_left_endpoint_state.txt"--endpoint_state"
 
@@ -239,7 +247,12 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach, createNewM
        --NOTE: DEFAULT PARAMETERS FOR OUR BASELINE DATABASE SET AT THE BEGINNING OF THE FILE (NEED TO BE DECLARED AS CONSTANTS
         CLAMP_CAUSALITY = false
 
-        DIMENSION_OUT = 2 --100 is a bit better, but we keep it default 2 for now
+        if STATES_DIMENSION == -1 then  -- we use default dimension per dataset
+            DIMENSION_OUT = 2 --100 is a bit better, but we keep it default 2 for now
+            STATES_DIMENSION = DIMENSION_OUT
+        else
+            DIMENSION_OUT = STATES_DIMENSION
+        end
         -- MIN_TABLE = {-10000,-10000} -- for x,y
         -- MAX_TABLE = {10000,10000} -- for x,y
 
@@ -273,7 +286,13 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach, createNewM
       MAX_TABLE = {10000, 10000, 10000} -- for x,y, z
       --
       DIMENSION_IN = 3
-      DIMENSION_OUT = 3
+      if STATES_DIMENSION == -1 then  -- we use default dimension per dataset
+          DIMENSION_OUT = 3
+          STATES_DIMENSION = DIMENSION_OUT
+      else
+          DIMENSION_OUT = STATES_DIMENSION
+      end
+
       REWARD_INDEX = 2 -- column (2 reward values: 0, 1 in this dataset)
       INDEX_TABLE = {2,3,4} --column indexes for coordinate in state file (respectively x,y)
       --
@@ -296,7 +315,12 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach, createNewM
       MAX_TABLE = {0.8,0.7,10} -- for x,y,z
 
       DIMENSION_IN = 3
-      DIMENSION_OUT = 3
+      if STATES_DIMENSION == -1 then  -- we use default dimension per dataset
+          DIMENSION_OUT = 3
+          STATES_DIMENSION = DIMENSION_OUT
+      else
+          DIMENSION_OUT = STATES_DIMENSION
+      end
 
       REWARD_INDEX = 2 --2 reward values: -0, 1 ?
       INDEX_TABLE = {2,3,4} --column index for coordinates in state file, respectively (x,y,z)
@@ -319,7 +343,12 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach, createNewM
         MAX_TABLE = {0.8,0.7,10} -- for x,y,z
 
         DIMENSION_IN = 3
-        DIMENSION_OUT = 3
+        if STATES_DIMENSION == -1 then  -- we use default dimension per dataset
+            DIMENSION_OUT = 3
+            STATES_DIMENSION = DIMENSION_OUT
+        else
+            DIMENSION_OUT = STATES_DIMENSION
+        end
 
         REWARD_INDEX = 2 --2 reward values: -0, 1 ?
         INDEX_TABLE = {2,3,4} --column index for coordinates in state file, respectively (x,y,z)
@@ -352,7 +381,12 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach, createNewM
         MAX_TABLE = {0.75,0.60,0.35} -- for x,y,z
 
         DIMENSION_IN = 3
-        DIMENSION_OUT = 3
+        if STATES_DIMENSION == -1 then  -- we use default dimension per dataset
+            DIMENSION_OUT = 3
+            STATES_DIMENSION = DIMENSION_OUT
+        else
+            DIMENSION_OUT = STATES_DIMENSION
+        end
 
         REWARD_INDEX = 2 -- Which column in the reward file indicates the value of reward ?
         INDEX_TABLE = {2,3,4} --column index for coordinates in state file, respectively (x,y,z)
@@ -383,7 +417,12 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach, createNewM
         MAX_TABLE = {0.75,0.60,0.35} -- for x,y,z
 
         DIMENSION_IN = 3
-        DIMENSION_OUT = 3
+        if STATES_DIMENSION == -1 then  -- we use default dimension per dataset
+            DIMENSION_OUT = 3
+            STATES_DIMENSION = DIMENSION_OUT
+        else
+            DIMENSION_OUT = STATES_DIMENSION
+        end
 
         REWARD_INDEX = 2 -- Which column in the reward file indicates the value of reward ?
         INDEX_TABLE = {2,3,4} --column index for coordinates in state file, respectively (x,y,z)
@@ -410,7 +449,12 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach, createNewM
       MAX_TABLE = {0.8,0.7,10} -- for x,y,z
 
       DIMENSION_IN = 3
-      DIMENSION_OUT = 3
+      if STATES_DIMENSION == -1 then  -- we use default dimension per dataset
+          DIMENSION_OUT = 3
+          STATES_DIMENSION = DIMENSION_OUT
+      else
+          DIMENSION_OUT = STATES_DIMENSION
+      end
 
       REWARD_INDEX = 2 --2 reward values: -0, 1 ?
       INDEX_TABLE = {2,3,4} --column index for coordinates in state file, respectively (x,y,z)
@@ -547,20 +591,20 @@ function save_config_to_file(config_dict, filename)
     --    Saves config into json file for only one file to include important constans
     --to be read by whole learning pipeline of lua and python scripts
     CONFIG_DICT['DATA_FOLDER']= DATA_FOLDER
+    -- if STATES_DIMENSION == -1 then  -- we use default dimension per dataset
+    --   STATES_DIMENSION = DIMENSION_OUT
+    -- end
     CONFIG_DICT['STATES_DIMENSION']= DIMENSION_OUT
     CONFIG_DICT['PRIORS_CONFIGS_TO_APPLY']=  PRIORS_CONFIGS_TO_APPLY
     CONFIG_DICT['MODEL_ARCHITECTURE_FILE']= MODEL_ARCHITECTURE_FILE
-
-    --local path, err = io.open(CONFIG_JSON_FILE, "rb")
+    CONFIG_DICT['MODEL_APPROACH']= MODEL_APPROACH
+    CONFIG_DICT['FIFTH_PRIOR_FIXED_POINT']= FIXED_POS
     --local path = system.pathForFile( filename, system.DocumentsDirectory)  -- how to require system? 'lfs' and 'system' do not work.   local lfs = require "lfs";
-
-    local file = io.open(CONFIG_JSON_FILE, "w")
-
+    local file = io.open(CONFIG_JSON_FILE, "w")     -- "rb")
     if file then
         local contents = json.encode(CONFIG_DICT)
         file:write( contents )
         io.close( file )
-        print ('Saved config to file ',CONFIG_DICT)
         return true
     else
         print ('Could not save config to file ',CONFIG_DICT)
@@ -578,23 +622,11 @@ function read_config(filename)
         local contents = file:read( "*a" )
         myTable = json.decode(contents)
         io.close( file )
-        print('Read  config: ', myTable)
+        print('Read config: ', myTable)
         return myTable
     end
     return nil
 end
-
-
-
-
-
-
-
-
-
-
-
-
 
 ----------------- Tests
 

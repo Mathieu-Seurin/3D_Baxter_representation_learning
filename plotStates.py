@@ -104,6 +104,8 @@ print "Ploting total states and total rewards: ",total_states, " ", total_reward
 test.assertEqual(total_rewards, total_states, "Datapoints size discordance! Length of rewards and state files should be equal, and it is "+str(len(rewards))+" and "+str(len(toplot))+" Run first create_all_reward.lua and create_plotStates_file_for_all_seq.lua")
 
 REPRESENTATIONS_DIMENSIONS = len(states[0])
+test.assertEqual(REPRESENTATIONS_DIMENSIONS, STATES_DIMENSION, "REPRESENTATIONS_DIMENSIONS and STATES_DIMENSION should coincide, set your current configuration in const.lua "+REPRESENTATIONS_DIMENSIONS+' '+STATES_DIMENSION)
+
 PLOT_DIMENSIONS = 3
 
 if REPRESENTATIONS_DIMENSIONS >3:

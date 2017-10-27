@@ -18,7 +18,7 @@ from Utils import GLOBAL_SCORE_LOG_FILE, MODELS_CONFIG_LOG_FILE, ALL_STATS_FILE,
 ############ PLOT ALL EXPERIMENTS SCORES
 print"\n\n >> Running report_results.py...."
 
-header = ['Model','KNN_MSE','DATA_FOLDER','MODEL_ARCHITECTURE_FILE','MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD','CONTINUOUS_ACTION_SIGMA']
+header = ['Model','KNN_MSE','DATA_FOLDER','MODEL_ARCHITECTURE_FILE','MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD','CONTINUOUS_ACTION_SIGMA','STATES_DIMENSION']
 
 def plot_all_config_performance(df):
     # Plot all MSE_KNN scores for each experiment
