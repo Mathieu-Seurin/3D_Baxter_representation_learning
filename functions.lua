@@ -327,7 +327,7 @@ function load_seq_by_id(id)
       --print("load_seq_by_id: Data exists in "..string_precomputed_data..".  Loading...")
    else   -- DATA DOESN'T EXIST AT ALL
       print("load_seq_by_id input file DOES NOT exists (input id "..id..") Getting files and saving them to "..string_precomputed_data..' from DATA_FOLDER '..DATA_FOLDER)
-      local list_folders_images, list_txt_action,list_txt_button, list_txt_state = Get_HeadCamera_View_Files(DATA_FOLDER)
+      local list_folders_images, list_txt_action,list_txt_button, list_txt_state, txt_button_position = Get_HeadCamera_View_Files(DATA_FOLDER)
       --print('Get_HeadCamera_View_Files returned #folders: '..#list_folders_images) --print(list_folders_images)
       if #list_folders_images == 0 then
          error("load_seq_by_id: list_folders_images returned by Get_HeadCamera_View_Files is empty! ",#list_folders_images)
@@ -337,8 +337,10 @@ function load_seq_by_id(id)
       local txt = list_txt_action[id]
       local txt_reward = list_txt_button[id] --nil
       local txt_state = list_txt_state[id]--nil
-
-      data = load_Part_list(list, txt, txt_reward, txt_state)--      print("load_Part_list: ",#data) --for tables, #table returns 0 despite not being empty table.       print (data)
+      local txt_button_position = txt_button_position[1] -- we have only a 3D pos
+      print('Button position for this seq: ')
+      print(txt_button_position)
+      data = load_Part_list(list, txt, txt_reward, txt_state, txt_button_position)--      print("load_Part_list: ",#data) --for tables, #table returns 0 despite not being empty table.       print (data)
       torch.save(string_precomputed_data, data)
    end
    assert(data, 'Failure in load_seq_by_id: data to be saved is nil')
@@ -346,20 +348,21 @@ function load_seq_by_id(id)
 end
 
 ---------------------------------------------------------------------------------------
--- Function : load_list(list,length,height)
+-- Function : load_list(list,length,height)  Loads the data from the different
+---input files into a Lua table
 -- Input ():
 -- Output ():
 ---------------------------------------------------------------------------------------
-function load_Part_list(list, txt, txt_reward, txt_state)
+function load_Part_list(list, txt, txt_reward, txt_state, txt_button_position)
 
    assert(list, "list not found")
    assert(txt, "Txt not found")
    assert(txt_state, "Txt state not found")
    assert(txt_reward, "Txt reward not found")
+   assert(txt_button_position, 'Txt file for button position not found on data record folder')
 
    local all_images={}
-   print(DATA_FOLDER)
-   local Infos = getInfos(txt,txt_reward,txt_state)
+   local Infos = getInfos(txt, txt_reward, txt_state, txt_button_position)
    -- print('list size: '..#list)
    -- print('Infos[1] size: '..#Infos[1])
    -- print ('Infos size: '..#Infos)
@@ -433,19 +436,24 @@ function Get_Folder_Name(Log_Folder,list_prior)
    return Log_Folder..name..'/'
 end
 
-function getInfos(txt,txt_reward,txt_state)
+function getInfos(txt, txt_reward, txt_state, txt_button)
    local Infos={}
    for dim=1,DIMENSION_IN do
       Infos[dim] = {}
    end
    Infos.reward = {}
-   Infos.buttonPosition = tensorFromTxt(txt_button)
+   Infos.buttonPosition = {}
    local reward_index= REWARD_INDEX
 
    local tensor_state, label=tensorFromTxt(txt_state)
 
    local tensor, label=tensorFromTxt(txt)
    local tensor_reward, label=tensorFromTxt(txt_reward)
+   local tensor_button_pos, label = tensorFromTxt(txt_button)
+   print ('getInfos: buttonPosition and label')
+   print(tensor_button_pos)
+   print(label)
+   table.insert(Infos.buttonPosition, tensor_button_pos)
    local there_is_reward=false
 
    for i=1,tensor_reward:size(1) do
@@ -476,7 +484,6 @@ function getInfos(txt,txt_reward,txt_state)
       -- else
       --     print('Causality prior will be ignored for dataset '..BABBLING)
    end
-
    Infos.txt = txt
    return Infos
 end

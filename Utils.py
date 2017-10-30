@@ -49,6 +49,7 @@ GIF_MOVIES_PATH = 'GIF_MOVIES/'  # used for states plot movie
 FOLDER_NAME_FOR_KNN_GIF_SEQS =  '/KNN_GIF_Seqs/'
 PATH_TO_MOSAICS = './Mosaics/'
 CONFIG_JSON_FILE = 'Config.json'
+FILENAME_FOR_BUTTON_POSITION = 'recorded_button1_position.txt'  # content example: # x y z     # 0.599993419271 0.29998631216 -0.160117283495
 
 # Priors
 REP = "Rep"
@@ -99,7 +100,7 @@ def save_config_to_file(config_dict, filename):
     Saves config into json file for only one file to include important constans
     to be read by whole learning pipeline of lua and python scripts
     """
-    # config_dict = {}  
+    # config_dict = {}
     # config_dict['DATA_FOLDER']= DATA_FOLDER
     # config_dict['STATES_DIMENSION']= DIMENSION_OUT
     # config_dict['PRIORS_CONFIGS_TO_APPLY']=  PRIORS_CONFIGS_TO_APPLY
@@ -443,7 +444,10 @@ def file2dict(file): # DO SAME FUNCTIONS IN LUA and call at the end of set_hyper
 
 def parse_true_state_file(dataset):
     true_states = {}
-    all_states_file = ALL_STATE_FILE.replace('.txt', ('_'+dataset+'.txt'))
+    if USING_RELATIVE_POSITION_BUTTON:
+        all_states_file = ALL_STATE_FILE.replace('.txt', ('_'+dataset+'RelativePos.txt'))
+    else:
+        all_states_file = ALL_STATE_FILE.replace('.txt', ('_'+dataset+'.txt'))
     file_state = open(all_states_file, "r")
 
     for line in file_state:

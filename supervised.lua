@@ -89,8 +89,10 @@ function getLabel(data, index)
       print(data)
       print(label)
       print(type(label))
-      data.posButton = getButtonPosition()
-      label = label - data.posButton-- TODO change data's sturecture to include posB
+      label = label - data.Infos.buttonPosition
+      print('getLabel for relative position and label: ')
+      print(data.Infos.buttonPosition)
+      print(type(label))
   end
   return label
 end

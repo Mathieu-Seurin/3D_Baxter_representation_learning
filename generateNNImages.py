@@ -10,7 +10,7 @@ from PIL import Image
 import os, os.path
 import subprocess
 
-from Utils import ALL_STATE_FILE, LEARNED_REPRESENTATIONS_FILE, LAST_MODEL_FILE, GLOBAL_SCORE_LOG_FILE, IMG_TEST_SET, COMPLEX_TEST_SET, STATIC_BUTTON_SIMPLEST, COMPLEX_DATA, MOBILE_ROBOT, ROBOT_TEST_SET, SUPERVISED, DEFAULT_DATASET, COLORFUL75, NONSTATIC_BUTTON, COMPLEX_DATA_MOVIE_TEST_SET, COLORFUL75_MOVIE_TEST_SET, STATIC_BUTTON_SIMPLEST_MOVIE_TEST_SET, COLORFUL_MOVIE_TEST_SET, MOBILE_ROBOT_MOVIE_TEST_SET, FOLDER_NAME_FOR_KNN_GIF_SEQS
+from Utils import ALL_STATE_FILE, LEARNED_REPRESENTATIONS_FILE, LAST_MODEL_FILE, GLOBAL_SCORE_LOG_FILE, BUTTON_POSITION_FILE, IMG_TEST_SET, COMPLEX_TEST_SET, STATIC_BUTTON_SIMPLEST, COMPLEX_DATA, MOBILE_ROBOT, ROBOT_TEST_SET, SUPERVISED, DEFAULT_DATASET, COLORFUL75, NONSTATIC_BUTTON, COMPLEX_DATA_MOVIE_TEST_SET, COLORFUL75_MOVIE_TEST_SET, STATIC_BUTTON_SIMPLEST_MOVIE_TEST_SET, COLORFUL_MOVIE_TEST_SET, MOBILE_ROBOT_MOVIE_TEST_SET, FOLDER_NAME_FOR_KNN_GIF_SEQS
 from Utils import read_config, get_data_folder_from_model_name, file2dict, parse_repr_file, parse_true_state_file, get_test_set_for_data_folder, get_movie_test_set_for_data_folder
 
 import unittest
@@ -55,8 +55,11 @@ nbr_images = -1
 use_test_set = True
 with_title = True
 CONFIG_DICT = read_config()
-print (CONFIG_DICT)
+
 STATES_DIMENSION = read_config()['STATES_DIMENSION']
+data_folder = read_config()['DATA_FOLDER']
+#BUTTON_POSITION_FILE = BUTTON_POSITION_FILE.replace('DATA_FOLDER', DATA_FOLDER)
+print (CONFIG_DICT)
 
 if nbr_neighbors == -1: # TODO FIX AND ADD MODEL NAME TO SUPERVISED!
 	generating_neigbours_for_movie = True
@@ -64,8 +67,7 @@ if nbr_neighbors == -1: # TODO FIX AND ADD MODEL NAME TO SUPERVISED!
 	if len(sys.argv) != 3: # remember the program name counts as argument!
 		sys.exit('calling this program with first argument being -1 means we will use TEST_MOVIE test sets, the only parameter to provide is -1 and the path to model name to build the neigbours for. Exiting...')
 	else:
-		path_to_model = sys.argv[2]
-		data_folder = get_data_folder_from_model_name(path_to_model)  # DEFAULT_DATASET
+		path_to_model = sys.argv[2]  		# not needed any longer with read_config()  #data_folder = get_data_folder_from_model_name(path_to_model)  # DEFAULT_DATASET
 	TEST_SET = get_movie_test_set_for_data_folder(data_folder)
 	#TEST_SET = TEST_SET[:2] # just for fast testing!
 else:
@@ -77,11 +79,10 @@ else:
 	    print """====================================
 	    WARNING: DATASET IS SET BY HAND HERE  (IN ALL PYTHON SCRIPTS, take into account when running pipeline scripts such as gridsearch): MOBILE ROBOT FOR NOW
 	    ============================================="""
-	    data_folder = get_data_folder_from_model_name(path_to_model)
+	    # not needed any longer with read_config()  #data_folder = get_data_folder_from_model_name(path_to_model)
 	else:
 	    lastModelFile = open(LAST_MODEL_FILE)
-	    path_to_model = lastModelFile.readline()[:-1]
-	    data_folder = get_data_folder_from_model_name(path_to_model)
+	    path_to_model = lastModelFile.readline()[:-1]  # not needed any longer with read_config()  #	    data_folder = get_data_folder_from_model_name(path_to_model)
 
 	TEST_SET = get_test_set_for_data_folder(data_folder)
 

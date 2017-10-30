@@ -45,7 +45,7 @@ th script.lua -use_continuous -data_folder staticButtonSimplest
 
 IMPORTANT:
 -If you want to run grid search, ssh or batch processing pipelines such as learn_predict_plotStates.sh, make SKIP_RENDERING = true in Utils.py for the KNN images and plots to be saved properly and later copy them with scp for visualization, e.g. using [2].
--First, set your current configuration in hyperparams.lua and const.lua and run the train_predict_plotStates pipeline which saves the last model for which representations have been learned). 
+-First, set your current configuration in hyperparams.lua and const.lua and run the train_predict_plotStates pipeline which saves the last model for which representations have been learned).
 
 
 ## RUNNING: plotStates.py
@@ -121,13 +121,12 @@ cd models and Download it remotely via:
 wget https://d2j0dndfm35trm.cloudfront.net/resnet-18.t7
 wget https://d2j0dndfm35trm.cloudfront.net/resnet-34.t7
 wget https://d2j0dndfm35trm.cloudfront.net/resnet-50.t7  
-# Beware: 101, 152 and 200 also exist!
+ (Beware: ResNet 101, 152 and 200 also exist!)
 and do:
 require 'cunn'
 require 'cudnn'  --If trouble, installing, follow step 6 in https://github.com/jcjohnson/neural-style/blob/master/INSTALL.md
 
-5. Json4Lua https://github.com/craigmj/json4lua
-[Should not be needed: Luarocks install json]
+5. Json4Lua https://github.com/craigmj/json4lua   [Luarocks install json Should not be needed]
 
 ## OPTIMIZATIONS
 For cudnn memory/speed optimization options, see

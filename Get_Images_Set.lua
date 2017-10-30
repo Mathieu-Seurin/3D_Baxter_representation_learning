@@ -51,6 +51,8 @@ function Get_HeadCamera_View_Files(Path)
    list_txt_button={}
    list_txt_action={}
    list_txt_state={}
+   txt_button_position = {}
+   table.insert(txt_button_position, get_path_to_text_files(Paths[i], FILENAME_FOR_BUTTON_POSITION)
    for i=1, #Paths do
       list_folder = Get_Folders(Paths[i],SUB_DIR_IMAGE,'txt',list_folder)
       table.insert(list_txt_button, get_path_to_text_files(Paths[i],FILENAME_FOR_REWARD))
@@ -62,7 +64,7 @@ function Get_HeadCamera_View_Files(Path)
    table.sort(list_txt_state)--recroded_robot_libm_left_endpoint_state  -- for the hand position
    table.sort(list_folder) --recorded_cameras_head_camera_2_image_compressed
    --print(FILENAME_FOR_REWARD,FILENAME_FOR_ACTION,FILENAME_FOR_STATE)
-   return list_folder, list_txt_action,list_txt_button, list_txt_state
+   return list_folder, list_txt_action,list_txt_button, list_txt_state, txt_button_position
 end
 
 ---------------------------------------------------------------------------------------

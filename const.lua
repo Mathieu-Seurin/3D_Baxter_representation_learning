@@ -43,7 +43,7 @@ ALL_PRIORS = {REP, CAUS,PROP,TEMP,BRING_CLOSER_REWARD, BRING_CLOSER_REF_POINT, R
 PRIORS_CONFIGS_TO_APPLY ={{PROP, TEMP, CAUS, REP}}
 MODEL_APPROACH = 'RoboticPriors'
 SAVE_MODEL_T7_FILE = true --NECESSARY STEP TO RUN FULL EVALUATION PIPELINE (REQUIRED FILE BY imagesAndReprToTxt.lua)
-USING_BUTTONS_RELATIVE_POSITION = true
+USING_BUTTONS_RELATIVE_POSITION = false
 
 -- ====================================================
 ---- needed for non cuda mode?
@@ -114,6 +114,7 @@ DEFAULT_PRECISION = 0.05
 FILENAME_FOR_ACTION = "recorded_robot_action.txt" --not used at all, we use state file, and compute the action with it (contains dx, dy)
 FILENAME_FOR_STATE = "recorded_robot_state.txt"
 FILENAME_FOR_REWARD = "recorded_robot_reward.txt"
+FILENAME_FOR_BUTTON_POSITION = 'recorded_button1_position.txt'  -- content example: # x y z   # 0.599993419271 0.29998631216 -0.160117283495
 
 -- WARNING : If you change the folder (top, pano, front)
 -- do rm preload_folder/* because the images won't be good
@@ -179,7 +180,6 @@ function set_hyperparams(params, modelApproach, createNewModelFolder)
     DATA_FOLDER = params.data_folder  --print('[Log: Setting command line dataset to '..params.data_folder..']') type is a str
     STATES_DIMENSION = params.states_dimension
     MODEL_APPROACH = modelApproach  --if non empty (RoboticsPriors), can be inverse, forward model or ICM (TODO)
-
     set_cuda_hyperparams(USE_CUDA)
     set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach, createNewModelFolder)
 
@@ -556,10 +556,10 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach, createNewM
         --create new model filename to be uniquely identified
         now = os.date("*t")
         if USE_CONTINUOUS then
-            DAY = 'Y'..now.year..'_M'..addLeadingZero(now.month)..'_D'..addLeadingZero(now.day)..'_H'..addLeadingZero(now.hour)..'M'..addLeadingZero(now.min)..'S'..addLeadingZero(now.sec)..'_'..DATA_FOLDER..'_'..architecture_name..'_cont'..'_MCD'..MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD..'_S'..CONTINUOUS_ACTION_SIGMA..priorsToString(PRIORS_CONFIGS_TO_APPLY)
+            DAY = 'Y'..now.year..'_M'..addLeadingZero(now.month)..'_D'..addLeadingZero(now.day)..'_H'..addLeadingZero(now.hour)..'M'..addLeadingZero(now.min)..'S'..addLeadingZero(now.sec)..'_'..DATA_FOLDER..'_'..architecture_name..'_cont'..'_MCD'..MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD..'_S'..CONTINUOUS_ACTION_SIGMA..priorsToString(PRIORS_CONFIGS_TO_APPLY)..'_STATES_DIM'..DIMENSION_OUT
             DAY = DAY:gsub("%.", "_")  -- replace decimal points by '_' for folder naming
         else
-            DAY = 'Y'..now.year..'_M'..addLeadingZero(now.month)..'_D'..addLeadingZero(now.day)..'_H'..addLeadingZero(now.hour)..'M'..addLeadingZero(now.min)..'S'..addLeadingZero(now.sec)..'_'..DATA_FOLDER..'_'..architecture_name..priorsToString(PRIORS_CONFIGS_TO_APPLY)
+            DAY = 'Y'..now.year..'_M'..addLeadingZero(now.month)..'_D'..addLeadingZero(now.day)..'_H'..addLeadingZero(now.hour)..'M'..addLeadingZero(now.min)..'S'..addLeadingZero(now.sec)..'_'..DATA_FOLDER..'_'..architecture_name..priorsToString(PRIORS_CONFIGS_TO_APPLY)..'_STATES_DIM'..DIMENSION_OUT
         end
         if modelApproach then --to add an extra keyword  to the model name
             NAME_SAVE= modelApproach..'model'..DAY
@@ -602,6 +602,7 @@ function save_config_to_file(config_dict, filename)
     CONFIG_DICT['MODEL_ARCHITECTURE_FILE']= MODEL_ARCHITECTURE_FILE
     CONFIG_DICT['MODEL_APPROACH']= MODEL_APPROACH
     CONFIG_DICT['FIFTH_PRIOR_FIXED_POINT']= FIXED_POS
+    CONFIG_DICT['USING_BUTTONS_RELATIVE_POSITION']= USING_BUTTONS_RELATIVE_POSITION
     --local path = system.pathForFile( filename, system.DocumentsDirectory)  -- how to require system? 'lfs' and 'system' do not work.   local lfs = require "lfs";
     local file = io.open(CONFIG_JSON_FILE, "w")     -- "rb")
     if file then
