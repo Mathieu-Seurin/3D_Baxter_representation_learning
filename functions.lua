@@ -337,9 +337,8 @@ function load_seq_by_id(id)
       local txt = list_txt_action[id]
       local txt_reward = list_txt_button[id] --nil
       local txt_state = list_txt_state[id]--nil
-      local txt_button_position = txt_button_position[1] -- we have only a 3D pos
-      print('Button position for this seq: ')
-      print(txt_button_position)
+      local txt_button_position = txt_button_position[1] -- filename (we have only a 3D pos)
+      --print('Button position for this seq: ')       print(txt_button_position)
       data = load_Part_list(list, txt, txt_reward, txt_state, txt_button_position)--      print("load_Part_list: ",#data) --for tables, #table returns 0 despite not being empty table.       print (data)
       torch.save(string_precomputed_data, data)
    end
@@ -449,10 +448,7 @@ function getInfos(txt, txt_reward, txt_state, txt_button)
 
    local tensor, label=tensorFromTxt(txt)
    local tensor_reward, label=tensorFromTxt(txt_reward)
-   local tensor_button_pos, label = tensorFromTxt(txt_button)
-   print ('getInfos: buttonPosition and label')
-   print(tensor_button_pos)
-   print(label)
+   local tensor_button_pos, label = tensorFromTxt(txt_button) --print ('getInfos: buttonPosition and label')  --   print(tensor_button_pos)   --   print(label)(DoubleTensor 1x3)
    table.insert(Infos.buttonPosition, tensor_button_pos)
    local there_is_reward=false
 

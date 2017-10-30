@@ -169,7 +169,7 @@ end
 
 local function main(params)
     print("\n\n>> script.lua: main model builder")
-    
+
     print('cmd default params are (overridden if passed by cmd line or set_hyperparams is called): ') --Because Torch prints here only default ones
     print(params)
     set_hyperparams(params, '', true) --second param adds extra keyword to the model name if desired
