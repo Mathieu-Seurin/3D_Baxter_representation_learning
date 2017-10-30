@@ -52,7 +52,7 @@ function Get_HeadCamera_View_Files(Path)
    list_txt_action={}
    list_txt_state={}
    txt_button_position = {}
-   table.insert(txt_button_position, get_path_to_text_files(Paths[i], FILENAME_FOR_BUTTON_POSITION)
+   table.insert(txt_button_position, get_path_to_text_files(Paths[1], FILENAME_FOR_BUTTON_POSITION))
    for i=1, #Paths do
       list_folder = Get_Folders(Paths[i],SUB_DIR_IMAGE,'txt',list_folder)
       table.insert(list_txt_button, get_path_to_text_files(Paths[i],FILENAME_FOR_REWARD))
@@ -64,7 +64,10 @@ function Get_HeadCamera_View_Files(Path)
    table.sort(list_txt_state)--recroded_robot_libm_left_endpoint_state  -- for the hand position
    table.sort(list_folder) --recorded_cameras_head_camera_2_image_compressed
    --print(FILENAME_FOR_REWARD,FILENAME_FOR_ACTION,FILENAME_FOR_STATE)
-   return list_folder, list_txt_action,list_txt_button, list_txt_state, txt_button_position
+   print('Get_HeadCamera_View_Files: ')
+   print(Paths)
+   print(get_path_to_text_files(Paths[1], FILENAME_FOR_BUTTON_POSITION))
+   return list_folder, list_txt_action, list_txt_button, list_txt_state, txt_button_position
 end
 
 ---------------------------------------------------------------------------------------
@@ -76,7 +79,9 @@ function get_path_to_text_files(Path, including, excluding)
    local incl=including or ""
    local excl=excluding or "uyfouhjbhytfoughl" -- random motif
    local txt=nil
-   -- print('get_path_to_text_files Path: ')   -- print (Path)
+   print('get_path_to_text_files Path: ')
+   print (Path)
+   print(incl)
 
    for file in paths.files(Path) do
       -- We only load files that match the 'including' pattern because we know that there are the folder we are interested in

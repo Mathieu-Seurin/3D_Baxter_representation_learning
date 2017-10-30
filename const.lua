@@ -556,10 +556,10 @@ function set_dataset_specific_hyperparams(DATA_FOLDER, modelApproach, createNewM
         --create new model filename to be uniquely identified
         now = os.date("*t")
         if USE_CONTINUOUS then
-            DAY = 'Y'..now.year..'_M'..addLeadingZero(now.month)..'_D'..addLeadingZero(now.day)..'_H'..addLeadingZero(now.hour)..'M'..addLeadingZero(now.min)..'S'..addLeadingZero(now.sec)..'_'..DATA_FOLDER..'_'..architecture_name..'_cont'..'_MCD'..MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD..'_S'..CONTINUOUS_ACTION_SIGMA..priorsToString(PRIORS_CONFIGS_TO_APPLY)..'_STATES_DIM'..DIMENSION_OUT
+            DAY = 'Y'..now.year..'_M'..addLeadingZero(now.month)..'_D'..addLeadingZero(now.day)..'_H'..addLeadingZero(now.hour)..'M'..addLeadingZero(now.min)..'S'..addLeadingZero(now.sec)..'_'..DATA_FOLDER..'_'..architecture_name..'_cont'..'_MCD'..MAX_COS_DIST_AMONG_ACTIONS_THRESHOLD..'_S'..CONTINUOUS_ACTION_SIGMA..priorsToString(PRIORS_CONFIGS_TO_APPLY)..'_ST_DIM'..STATES_DIMENSION
             DAY = DAY:gsub("%.", "_")  -- replace decimal points by '_' for folder naming
         else
-            DAY = 'Y'..now.year..'_M'..addLeadingZero(now.month)..'_D'..addLeadingZero(now.day)..'_H'..addLeadingZero(now.hour)..'M'..addLeadingZero(now.min)..'S'..addLeadingZero(now.sec)..'_'..DATA_FOLDER..'_'..architecture_name..priorsToString(PRIORS_CONFIGS_TO_APPLY)..'_STATES_DIM'..DIMENSION_OUT
+            DAY = 'Y'..now.year..'_M'..addLeadingZero(now.month)..'_D'..addLeadingZero(now.day)..'_H'..addLeadingZero(now.hour)..'M'..addLeadingZero(now.min)..'S'..addLeadingZero(now.sec)..'_'..DATA_FOLDER..'_'..architecture_name..priorsToString(PRIORS_CONFIGS_TO_APPLY)..'_ST_DIM'..STATES_DIMENSION
         end
         if modelApproach then --to add an extra keyword  to the model name
             NAME_SAVE= modelApproach..'model'..DAY
