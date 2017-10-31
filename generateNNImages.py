@@ -1,6 +1,10 @@
-import matplotlib.pyplot as plt
+#import matplotlib
+#matplotlib.use('qt5agg')
+#import matplotlib.pyplot as plt     # Potential errors may require pip install --upgrade matplotlib
 import matplotlib.image as mpimg
 import numpy as np
+# import sklearn
+# print sklearn.__version__
 from sklearn.neighbors import NearestNeighbors
 import shutil
 import random
@@ -10,7 +14,7 @@ from PIL import Image
 import os, os.path
 import subprocess
 
-from Utils import ALL_STATE_FILE, LEARNED_REPRESENTATIONS_FILE, LAST_MODEL_FILE, GLOBAL_SCORE_LOG_FILE, BUTTON_POSITION_FILE, IMG_TEST_SET, COMPLEX_TEST_SET, STATIC_BUTTON_SIMPLEST, COMPLEX_DATA, MOBILE_ROBOT, ROBOT_TEST_SET, SUPERVISED, DEFAULT_DATASET, COLORFUL75, NONSTATIC_BUTTON, COMPLEX_DATA_MOVIE_TEST_SET, COLORFUL75_MOVIE_TEST_SET, STATIC_BUTTON_SIMPLEST_MOVIE_TEST_SET, COLORFUL_MOVIE_TEST_SET, MOBILE_ROBOT_MOVIE_TEST_SET, FOLDER_NAME_FOR_KNN_GIF_SEQS
+from Utils import ALL_STATE_FILE, LEARNED_REPRESENTATIONS_FILE, LAST_MODEL_FILE, GLOBAL_SCORE_LOG_FILE, FILENAME_FOR_BUTTON_POSITION, IMG_TEST_SET, COMPLEX_TEST_SET, STATIC_BUTTON_SIMPLEST, COMPLEX_DATA, MOBILE_ROBOT, ROBOT_TEST_SET, SUPERVISED, DEFAULT_DATASET, COLORFUL75, NONSTATIC_BUTTON, COMPLEX_DATA_MOVIE_TEST_SET, COLORFUL75_MOVIE_TEST_SET, STATIC_BUTTON_SIMPLEST_MOVIE_TEST_SET, COLORFUL_MOVIE_TEST_SET, MOBILE_ROBOT_MOVIE_TEST_SET, FOLDER_NAME_FOR_KNN_GIF_SEQS
 from Utils import read_config, get_data_folder_from_model_name, file2dict, parse_repr_file, parse_true_state_file, get_test_set_for_data_folder, get_movie_test_set_for_data_folder
 
 import unittest
@@ -58,8 +62,8 @@ CONFIG_DICT = read_config()
 
 STATES_DIMENSION = read_config()['STATES_DIMENSION']
 data_folder = read_config()['DATA_FOLDER']
-#BUTTON_POSITION_FILE = BUTTON_POSITION_FILE.replace('DATA_FOLDER', DATA_FOLDER)
-print (CONFIG_DICT)
+#FILENAME_FOR_BUTTON_POSITION = FILENAME_FOR_BUTTON_POSITION.replace('DATA_FOLDER', DATA_FOLDER)
+print ('Using CONFIG_DICT: ', CONFIG_DICT)
 
 if nbr_neighbors == -1: # TODO FIX AND ADD MODEL NAME TO SUPERVISED!
 	generating_neigbours_for_movie = True
@@ -73,7 +77,7 @@ if nbr_neighbors == -1: # TODO FIX AND ADD MODEL NAME TO SUPERVISED!
 else:
 	generating_neigbours_for_movie = False
 	if len(sys.argv) >= 3:
-		nbr_images=int(sys.argv[2])
+		nbr_images=int(sys.argv[2]) 
 	if len(sys.argv) == 4:
 	    path_to_model = sys.argv[3]
 	    print """====================================

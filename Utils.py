@@ -1,5 +1,7 @@
 #!/usr/bin/python
 # coding: utf-8
+import matplotlib
+#matplotlib.use('qt5agg')
 import matplotlib.pyplot as plt
 from matplotlib import colors
 from matplotlib.colors import ListedColormap
@@ -50,6 +52,7 @@ FOLDER_NAME_FOR_KNN_GIF_SEQS =  '/KNN_GIF_Seqs/'
 PATH_TO_MOSAICS = './Mosaics/'
 CONFIG_JSON_FILE = 'Config.json'
 FILENAME_FOR_BUTTON_POSITION = 'recorded_button1_position.txt'  # content example: # x y z     # 0.599993419271 0.29998631216 -0.160117283495
+USING_BUTTONS_RELATIVE_POSITION = False  # by default
 
 # Priors
 REP = "Rep"
@@ -59,6 +62,35 @@ TEMP = "Temp"
 BRING_CLOSER_REWARD = "Reward_closer"
 BRING_CLOSER_REF_POINT = "Fixed_point"
 REWARD_PREDICTION_CRITERION= 'Prediction Reward'
+
+def save_config_to_file(config_dict, filename):
+    """
+    Saves config into json file for only one file to include important constans
+    to be read by whole learning pipeline of lua and python scripts
+    """
+    print 'Saving config ',config_dict
+    json.dump(config_dict, open(filename, 'wb'))
+
+def read_config(filename=CONFIG_JSON_FILE):
+    # load the data from json file into a dictionary
+    CONFIG_DICT = json.load(open(filename, 'rb'))
+    USING_BUTTONS_RELATIVE_POSITION = CONFIG_DICT['USING_BUTTONS_RELATIVE_POSITION']
+    STATES_DIMENSION = CONFIG_DICT['STATES_DIMENSION']
+    DATA_FOLDER = CONFIG_DICT['DATA_FOLDER']
+    PRIORS_CONFIGS_TO_APPLY = CONFIG_DICT['PRIORS_CONFIGS_TO_APPLY']
+    return CONFIG_DICT
+
+### LOADING CONFIG FILE
+if os.path.exists(CONFIG_JSON_FILE) and  os.path.isfile(CONFIG_JSON_FILE):
+    CONFIG_DICT = read_config(CONFIG_JSON_FILE)
+else:  # Default values
+    CONFIG_DICT = {
+        'DATA_FOLDER': DEFAULT_DATASET,
+        'STATES_DIMENSION': DIMENSIONS_OUT,
+        'PRIORS_CONFIGS_TO_APPLY': [PROP, TEMP, CAUS, REP, BRING_CLOSER_REF_POINT],
+        'USING_BUTTONS_RELATIVE_POSITION': USING_BUTTONS_RELATIVE_POSITION
+    }
+    save_config_to_file(CONFIG_DICT, CONFIG_JSON_FILE)
 
 # DEFINING A SET OF PREDEFINED IMAGES WE WANT ITS CORRESPONDING STATES FOR:
 # they represent left up, right up, down right, down left corner and pushing button images (clockwise hand movement. Used by makeMovieFromPlotStates.py
@@ -95,36 +127,7 @@ NONSTATIC_BUTTON = []
 
 
 
-def save_config_to_file(config_dict, filename):
-    """
-    Saves config into json file for only one file to include important constans
-    to be read by whole learning pipeline of lua and python scripts
-    """
-    # config_dict = {}
-    # config_dict['DATA_FOLDER']= DATA_FOLDER
-    # config_dict['STATES_DIMENSION']= DIMENSION_OUT
-    # config_dict['PRIORS_CONFIGS_TO_APPLY']=  PRIORS_CONFIGS_TO_APPLY
-    #save it to a json file
-    print 'Saving config ',config_dict
-    json.dump(config_dict, open(filename, 'wb'))
 
-def read_config(filename=CONFIG_JSON_FILE):
-    # load the data from json file into a dictionary
-    config_dict = json.load(open(filename, 'rb'))
-    #print 'Current config: ', config_dict
-    return config_dict
-
-
-
-if os.path.exists(CONFIG_JSON_FILE) and  os.path.isfile(CONFIG_JSON_FILE):
-    CONFIG_DICT = read_config(CONFIG_JSON_FILE)
-else:  # Default values
-    CONFIG_DICT = {
-        'DATA_FOLDER': DEFAULT_DATASET,
-        'STATES_DIMENSION': DIMENSIONS_OUT,
-        'PRIORS_CONFIGS_TO_APPLY': [PROP, TEMP, CAUS, REP, BRING_CLOSER_REF_POINT]
-    }
-    save_config_to_file(CONFIG_DICT, CONFIG_JSON_FILE)
 
 
 def library_versions_tests():
@@ -141,6 +144,19 @@ def library_versions_tests():
         print "Probably you have installed numpy with and without Anaconda, so there is a conflict because two numpy versions can be used."
         print "Remove non-Anaconda numpy:\n 1) pip uninstall numpy \n and if needed, install 2.1) pip install --user numpy  \n "
         print "2.2) If 1 does not work: last version in: \n -https://anaconda.org/anaconda/numpy"
+
+    # common error, check your version: from sklearn.neighbors import NearestNeighbors
+    # File "/home/seurin/anaconda2/lib/python2.7/site-packages/sklearn/__init__.py", line 134, in <module>
+    #     from .base import clone
+    #   File "/home/seurin/anaconda2/lib/python2.7/site-packages/sklearn/base.py", line 11, in <module>
+    #     from scipy import sparse
+    #   File "/home/seurin/.local/lib/python2.7/site-packages/scipy/__init__.py", line 114, in <module>
+    #     from scipy._lib._ccallback import LowLevelCallable
+    #   File "/home/seurin/.local/lib/python2.7/site-packages/scipy/_lib/_ccallback.py", line 1, in <module>
+    #     from . import _ccallback_c
+    # ImportError: /home/seurin/.local/lib/python2.7/site-packages/scipy/_lib/_ccallback_c.so: undefined symbol: PyFPE_jbuf
+    import sklearn; print sklearn.__version__
+    # If fail, try install a stable one: e.g. '0.16.1' does not work, but 0.16 does.      conda install -c anaconda scikit-learn=0.18.1
 
 # def create_GIF_from_imgs_in_folder(folder_rel_path, output_folder, output_file_name):
 #     # TODO: does not work properly, plus needs imageio installation, GIF created has to be rendered slower, other ideas in https://stackoverflow.com/questions/24688802/saving-an-animated-gif-in-pillow
@@ -444,7 +460,7 @@ def file2dict(file): # DO SAME FUNCTIONS IN LUA and call at the end of set_hyper
 
 def parse_true_state_file(dataset):
     true_states = {}
-    if USING_RELATIVE_POSITION_BUTTON:
+    if USING_BUTTONS_RELATIVE_POSITION:
         all_states_file = ALL_STATE_FILE.replace('.txt', ('_'+dataset+'RelativePos.txt'))
     else:
         all_states_file = ALL_STATE_FILE.replace('.txt', ('_'+dataset+'.txt'))
@@ -491,7 +507,7 @@ def get_test_set_for_data_folder(data_folder):
     elif data_folder == MOBILE_ROBOT:
         return ROBOT_TEST_SET
     elif data_folder == NONSTATIC_BUTTON:
-        return NONSTATIC_BUTTON
+        return NONSTATIC_BUTTON_TEST_SET
     elif SUPERVISED in data_folder or 'supervised' in data_folder:
         return SUPERVISED
     else:
@@ -511,7 +527,7 @@ def get_movie_test_set_for_data_folder(data_folder):
     elif data_folder == MOBILE_ROBOT:
         return MOBILE_ROBOT_MOVIE_TEST_SET # not yet
     elif data_folder == NONSTATIC_BUTTON:
-        return NONSTATIC_BUTTON
+        return NONSTATIC_BUTTON_TEST_SET  # TODO create NONSTATIC_BUTTON_MOVIE_TEST_SET
     elif 'supervised' in data_folder or SUPERVISED in data_folder:
         return DEFAULT_DATASET
     else:
@@ -957,6 +973,6 @@ BENCHMARK_DATASETS = [COLORFUL75, COMPLEX_DATA, STATIC_BUTTON_SIMPLEST, MOBILE_R
 
 #### Tests
 
-#library_versions_tests()
+library_versions_tests()
 # save_config_to_file(CONFIG_DICT, CONFIG_JSON_FILE)
 # read_config(CONFIG_JSON_FILE)

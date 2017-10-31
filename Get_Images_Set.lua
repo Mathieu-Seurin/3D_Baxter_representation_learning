@@ -61,9 +61,6 @@ function Get_HeadCamera_View_Files(Path)
    end
    table.sort(list_txt_button) -- file recorded_button_is_pressed.txt
    table.sort(list_txt_action) --fileoss fix
-
-
-    recorded_robot_limb_left_endpoint_action.txt
    table.sort(list_txt_state)--recroded_robot_libm_left_endpoint_state  -- for the hand position
    table.sort(list_folder) --recorded_cameras_head_camera_2_image_compressed
    --print(FILENAME_FOR_REWARD,FILENAME_FOR_ACTION,FILENAME_FOR_STATE)

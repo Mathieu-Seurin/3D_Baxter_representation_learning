@@ -113,6 +113,11 @@ pip install --user seaborn (or  conda install seaborn
 or
 sudo apt-get pandas  ---see full scipy stack and add to readme
 
+or 
+```
+conda install -c anaconda pandas     
+conda install -c anaconda seaborn
+```
 Mac install: cd /etc/   and $ Natalias-MacBook:etc natalia$ sudo nano tsocks.conf
 
 
@@ -129,7 +134,7 @@ require 'cudnn'  --If trouble, installing, follow step 6 in https://github.com/j
 5. Json4Lua https://github.com/craigmj/json4lua   [Luarocks install json Should not be needed]
 
 ## OPTIMIZATIONS
-For cudnn memory/speed optimization options, see
+cudnn is REQUIRED. For installation and memory/speed optimization options, see
 https://github.com/soumith/cudnn.torch
 
 
@@ -152,17 +157,30 @@ and after, reinstall torchnet and torchnet-vision as above indicated
 2. SKLEARN AND SCIPY VERSION CONFLICTS: USE ONLY CONDA INSTALL SPECIFIC ONLINE COMMAND OR PIP INSTALL --user  *** WITHOUT SUDO ! ***
 
 
-Do first (Requirements for scikit-learn) (Note: -U will give permission errors!):
+Do first (Requirements for scikit-learn): (Note: -U will give permission errors!):
 ```
 pip install --user numpy
 pip install --user scipy
 ```
+or with conda:
+```
+conda install -c anaconda numpy
+conda install -c anaconda scipy
+```
+and finally:
+```
+conda install -c anaconda scikit-learn 
+```
+
 If sklearn.neighbours import fails, remove  and install:
 Either use conda (in which case all your installed packages would be in ~/miniconda/ or pip install --user don't mix the two. Removing either
 ```
 rm -rf ~/.local/lib/python2.7/site-packages/sklearn or your ~/miniconda folder and reinstalling it cleanly should fix this.
 sudo rm -rf scikit_learn-0.18.1.egg-info/
-pip uninstall sklearn
+pip uninstall sklearn 
+and 
+conda remove scikit-learn
+
 ```
 and
 ```
@@ -199,6 +217,23 @@ Switching to lua52 worked
 
 5. qlua: /home/seurin/.luarocks/share/lua/5.2/json.lua:232: attempt to call global 'loadstring' (a nil value)
 PR issued, solved replacing loadstring with load
+
+
+6. 
+```
+from sklearn.neighbors import NearestNeighbors
+  File "/home/seurin/anaconda2/lib/python2.7/site-packages/sklearn/__init__.py", line 57, in <module>
+    from .base import clone
+  File "/home/seurin/anaconda2/lib/python2.7/site-packages/sklearn/base.py", line 10, in <module>
+    from scipy import sparse
+  File "/home/seurin/.local/lib/python2.7/site-packages/scipy/__init__.py", line 114, in <module>
+    from scipy._lib._ccallback import LowLevelCallable
+  File "/home/seurin/.local/lib/python2.7/site-packages/scipy/_lib/_ccallback.py", line 1, in <module>
+    from . import _ccallback_c
+ImportError: /home/seurin/.local/lib/python2.7/site-packages/scipy/_lib/_ccallback_c.so: undefined symbol: PyFPE_jbuf
+```
+Solution: Probably you have installed numpy without Anaconda, so there is a conflict because of this, which numpy to use: that one installed with pip or with conda. When you remove non-Anaconda numpy, error gone: pip uninstall numpy
+
 
 
 ## KNOWN ERRORS:
