@@ -60,7 +60,10 @@ function Get_HeadCamera_View_Files(Path)
       table.insert(list_txt_state, get_path_to_text_files(Paths[i],FILENAME_FOR_STATE))
    end
    table.sort(list_txt_button) -- file recorded_button_is_pressed.txt
-   table.sort(list_txt_action) --file recorded_robot_limb_left_endpoint_action.txt
+   table.sort(list_txt_action) --fileoss fix
+
+
+    recorded_robot_limb_left_endpoint_action.txt
    table.sort(list_txt_state)--recroded_robot_libm_left_endpoint_state  -- for the hand position
    table.sort(list_folder) --recorded_cameras_head_camera_2_image_compressed
    --print(FILENAME_FOR_REWARD,FILENAME_FOR_ACTION,FILENAME_FOR_STATE)
@@ -79,9 +82,6 @@ function get_path_to_text_files(Path, including, excluding)
    local incl=including or ""
    local excl=excluding or "uyfouhjbhytfoughl" -- random motif
    local txt=nil
-   print('get_path_to_text_files Path: ')
-   print (Path)
-   print(incl)
 
    for file in paths.files(Path) do
       -- We only load files that match the 'including' pattern because we know that there are the folder we are interested in
@@ -261,7 +261,7 @@ function get_one_random_Caus_Set(Infos1, Infos2)
    local size2=#Infos2[1]
    local watchDog=0
 
-   while watchDog<50 do
+   while watchDog<75 do
 
       repeat
          --Sample an action, whose reward is not 0
