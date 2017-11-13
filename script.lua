@@ -83,7 +83,7 @@ function Rico_Training(Models, priors_used)
       mode = BRING_CLOSER_REF_POINT
       if applying_prior(priors_used, mode) then
           batch = getRandomBatchFromSeparateList(BATCH_SIZE, mode)
-          loss_fix, gradClose=doStuff_temp(Models,temp_criterion,batch,COEF_FIX) --Just minimizing mse criterion, so we can use temp criterion
+          loss_fix, gradFix =doStuff_temp(Models,temp_criterion,batch,COEF_FIX) --Just minimizing mse criterion, so we can use temp criterion
           TOTAL_LOSS_FIX = loss_fix + TOTAL_LOSS_FIX
       end
 
